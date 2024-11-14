@@ -1,0 +1,66 @@
+---
+Checks: >
+  -*,
+
+  #*,
+  #-android-*,
+  #-abseil-*,
+  #-altera-*,
+  #-darwin-*,
+  #-fuchsia-*,
+  #-google-*,
+  #-objc-*,
+  #-zircon-*,
+  #-llvm*,
+  #-cppcoreguidelines-non-private-member-variables-in-classes,
+  #-cppcoreguidelines-pro-bounds-pointer-arithmetic,
+  #-cppcoreguidelines-macro-usage,
+  #-readability-function-cognitive-complexity,
+  #-misc-non-private-member-variables-in-classes,
+  #-clang-analyzer-optin.cplusplus.UninitializedObject,
+  #-misc-static-assert,
+  #-modernize-use-trailing-return-type,
+  #-bugprone-easily-swappable-parameters,
+  #-cert-env33-c,
+  #-cert-err58-cpp,
+  #-hicpp-vararg,
+  #-hicpp-move-const-arg,
+  #-cppcoreguidelines-pro-type-vararg,
+  #-readability-identifier-length,
+  #-readability-identifier-naming,
+  #-*-avoid-c-arrays,
+  #-*-special-member-functions,
+  #-*-magic-numbers,
+  #-*-array-to-pointer-decay,
+  #-*-array-decay,
+  #-*-no-recursion,
+  #-*-reinterpret-cast,
+  #-*-non-const-global-variables,
+
+WarningsAsErrors: '*'
+HeaderFilterRegex: ''
+FormatStyle: none
+
+CheckOptions:
+  - key: readability-identifier-naming.NamespaceCase
+    value: lower_case
+  - key: readability-identifier-naming.ClassCase
+    value: CamelCase
+  - key: readability-identifier-naming.StructCase
+    value: CamelCase
+  - key: readability-identifier-naming.ClassMethodCase
+    value: snakeCase
+  - key: readability-identifier-naming.ClassMemberCase
+    value: lower_case
+  - key: readability-identifier-naming.FunctionCase
+    value: snakeCase
+  - key: readability-identifier-naming.VariableCase
+    value: lower_case
+  - key: readability-identifier-naming.GlobalConstantCase
+    value: snakeCase
+  - key: readability-identifier-length.MinimumVariableNameLength
+    value: 2
+  - key: readability-identifier-length.MinimumParameterNameLength
+    value: 2
+  - key: cppcoreguidelines-explicit-virtual-functions.IgnoreDestructors
+    value: '1'
