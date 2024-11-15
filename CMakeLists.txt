@@ -7,7 +7,10 @@ project(
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
-set(FRAMEWORK_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR})
+set(PDFT_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR})
+
+include(./thirdparty/MuPDF.cmake)
+include(./thirdparty/fswatch.cmake)
 
 include(./cmake/StandardProjectSettings.cmake)
 include(./cmake/EnableCompilerWarnings.cmake)

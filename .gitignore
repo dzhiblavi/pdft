@@ -44,3 +44,6 @@ bazel-*
 *.out
 *.app
 .vscode
+
+# Test assets
+assets/

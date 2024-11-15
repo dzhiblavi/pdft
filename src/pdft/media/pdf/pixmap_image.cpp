@@ -1,0 +1,50 @@
+#include "pdft/media/pdf/pixmap_image.h"
+
+extern "C" {
+#include <mupdf/fitz/pixmap.h>
+}
+
+#include <utility>
+
+namespace pdft::media::pdf {
+
+PixmapImage::PixmapImage(PixmapImage&& rhs)
+    : context_(rhs.context_), pixmap_(std::exchange(rhs.pixmap_, nullptr)) {
+    assert(pixmap_);
+}
+
+PixmapImage::~PixmapImage() noexcept {
+    if (pixmap_ == nullptr) {
+        return;
+    }
+
+    /*
+       [...]
+       Bit 1: If set, free the samples buffer when the pixmap is destroyed.
+    */
+    //if (pixmap_->flags & (1 << 1)) {
+        //::free(pixmap_->samples);
+    //}
+
+    fz_drop_pixmap(context_.native(), pixmap_);
+}
+
+ImageSize PixmapImage::size() const {
+    assert(pixmap_);
+
+    return {
+        .width_px = pixmap_->w,
+        .height_px = pixmap_->h,
+    };
+}
+
+std::string_view PixmapImage::samples() const {
+    assert(pixmap_);
+
+    return {
+        (char*)pixmap_->samples,
+        size_t(pixmap_->w * pixmap_->h * pixmap_->n),
+    };
+}
+
+}  // namespace pdft::media::pdf

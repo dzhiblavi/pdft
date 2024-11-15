@@ -24,16 +24,20 @@ deps-%: _prepare_target-%
 	$(CONAN) install .                     \
 		--output-folder=$(call depsdir,$*) \
 		--build=missing                    \
-		-s build_type=$*
+		--profile=./conan/$*.profile
 
 configure-%: deps-%
 	cd $(call builddir,$*) && $(CMAKE) ../../../               \
 		-G "Unix Makefiles"                                    \
 		-DCMAKE_TOOLCHAIN_FILE="../deps/conan_toolchain.cmake" \
-		-DFRAMEWORK_BUILD_TESTS=Yes
+		-DPDFT_BUILD_TESTS=Yes \
+		-DCMAKE_BUILD_TYPE=$*
 
 build-%: configure-%
 	cd $(call builddir,$*) && $(CMAKE) --build . --config $*
 
 test: build-Debug
 	cd $(call builddir,Debug) && ctest --output-on-failure
+
+run-%: build-%
+	cd $(call builddir,$*) && ./src/app $(path)

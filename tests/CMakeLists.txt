@@ -1,13 +1,25 @@
 include(Catch)
 find_package(Catch2 REQUIRED)
 
-function(add_test name)
-  add_executable(${name} "test_${name}.cpp" ${ARGN})
-  target_link_libraries(${name} PRIVATE pdft Catch2::Catch2WithMain)
-  catch_discover_tests(${name} DISCOVERY_MODE PRE_TEST WORKING_DIRECTORY
+function(add_test path)
+  string(REPLACE ".cpp" "" name ${path})
+  string(REPLACE "./" "" name ${name})
+  string(REPLACE "/" "_" name ${name})
+
+  add_executable("test_${name}" "${path}" ${ARGN})
+
+  target_link_libraries(test_${name} PRIVATE pdft Catch2::Catch2WithMain)
+  target_include_directories(test_${name}
+                             PRIVATE $<BUILD_INTERFACE:${PDFT_SOURCE_DIR}/>)
+
+  catch_discover_tests(test_${name} DISCOVERY_MODE PRE_TEST WORKING_DIRECTORY
                        ${CMAKE_CURRENT_SOURCE_DIR})
 endfunction(add_test)
 
-# Add subdirectories with tests here
+# Add tests here
 
-add_subdirectory(pdft)
+add_test(./pdft/view/test_layout.cpp)
+add_test(./pdft/core/io/posix/test_console.cpp)
+add_test(./pdft/core/terminal/ansi/test_terminal.cpp)
+add_test(./pdft/core/terminal/tmux/test_apc_executor.cpp)
+add_test(./pdft/core/terminal/regular/test_apc_executor.cpp)
