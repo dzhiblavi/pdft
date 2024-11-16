@@ -3,6 +3,7 @@
 #include "pdft/core/log/log.h"
 #include "pdft/core/trace/time_traits.h"
 #include "pdft/utils/overloaded.h"
+#include "pdft/utils/source_location.h"
 
 namespace pdft::core::trace {
 
@@ -29,28 +30,35 @@ inline constexpr const char* durationSuffix<std::chrono::minutes> = "m";
 }  // namespace detail
 
 template <typename Duration = std::chrono::milliseconds>
-inline auto makeLoggingTracer(const char* label, log::LoggerPtr logger = log::getLogger("trace")) {
+inline auto makeLoggingTracer(
+    const char* label, utils::SourceLocation loc, log::LoggerPtr logger = log::logger("trace")) {
     return utils::Overloaded{
         [=](DurationType duration) {
             auto dur = std::chrono::duration_cast<Duration>(duration);
-            LOG(logger,
-                trace,
-                "[{}] took {}{}",
+
+            logger->trace(
+                "[{}] {}{} {}:{}",
                 label,
                 dur.count(),
-                detail::durationSuffix<Duration>);
+                detail::durationSuffix<Duration>,
+                loc.function,
+                loc.line);
         },
         [=](DurationType duration, auto& self) {
             auto dur = std::chrono::duration_cast<Duration>(duration);
-            LOG(logger,
-                trace,
-                "@{} [{}] took {}{}",
-                self.depth(),
+
+            logger->trace(
+                "[{}] {}{}, @{}:{}",
                 label,
                 dur.count(),
-                detail::durationSuffix<Duration>);
+                detail::durationSuffix<Duration>,
+                loc.function,
+                loc.line);
         },
     };
 }
 
 }  // namespace pdft::core::trace
+
+#define PDFT_LOGGING_TRACER(label, ...) \
+    ::pdft::core::trace::makeLoggingTracer(label, PDFT_SOURCE_LOCATION, ##__VA_ARGS__)

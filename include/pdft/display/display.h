@@ -15,6 +15,7 @@ class Display {
     virtual bool isLoaded(ImageId id) const = 0;
     virtual void loadImage(ImageId id, const media::Image& image, core::OutBuffer& buffer) = 0;
     virtual void displayImage(ImageId id, Position position, core::OutBuffer& buffer) = 0;
+    virtual void clear(core::OutBuffer& buffer) const = 0;
 };
 
 }  // namespace pdft::display

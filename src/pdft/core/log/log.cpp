@@ -28,7 +28,7 @@ class GlobalLogger {
 
 }  // namespace
 
-LoggerPtr getLogger(const std::string& name) {
+LoggerPtr logger(const std::string& name) {
     if (auto logger = spdlog::get(name)) {
         return logger;
     }
@@ -40,7 +40,7 @@ void setGlobalLogger(std::shared_ptr<spdlog::logger> logger) {
     GlobalLogger::instance().set(std::move(logger));
 }
 
-LoggerPtr getGlobalLogger() {
+LoggerPtr global() {
     PDFT_VERIFY(GlobalLogger::instance().get());
     return GlobalLogger::instance().get();
 }

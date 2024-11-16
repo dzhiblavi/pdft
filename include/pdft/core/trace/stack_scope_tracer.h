@@ -7,7 +7,8 @@ namespace pdft::core::trace {
 class StackScopeTracerBase {
  public:
     explicit StackScopeTracerBase(StackScopeTracerBase* parent)
-        : parent_(parent), depth_(parent_ == nullptr ? 0 : parent->depth_ + 1) {}
+        : parent_(parent)
+        , depth_(parent_ == nullptr ? 0 : parent->depth_ + 1) {}
 
     uint32_t depth() const {
         return depth_;

@@ -5,7 +5,7 @@
 namespace pdft::controller::app {
 
 Action Controller::onKeyEvent(char key) {
-    GLOG(info, "controller: key={}", key);
+    core::log::global()->info("controller: key={}", key);
 
     switch (key) {
         using enum Action;
@@ -14,15 +14,19 @@ Action Controller::onKeyEvent(char key) {
             return Quit;
 
         case 'j':
-            state_->nextPage();
+            state_->scrollNext();
             return None;
 
         case 'k':
-            state_->prevPage();
+            state_->scrollPrev();
             return None;
 
         case 's':
             state_->nextLayout();
+            return ClearScreen;
+
+        case 'S':
+            state_->prevLayout();
             return ClearScreen;
 
         case 'l':
@@ -33,6 +37,14 @@ Action Controller::onKeyEvent(char key) {
             state_->prevDocument();
             return ClearScreen;
 
+        case '=':
+            state_->zoomIn();
+            return ClearScreen;
+
+        case '-':
+            state_->zoomOut();
+            return ClearScreen;
+
         default:
             return None;
     }
@@ -40,13 +52,14 @@ Action Controller::onKeyEvent(char key) {
 
 Action Controller::onFilesystemEvent(const notify::Event& event) {
     auto old_id = docs_->getIdByPath(event.path);
-    GLOG(info, "controller: fs event on path={}, old_id={}", event.path.c_str(), old_id);
+
+    core::log::global()->info(
+        "controller: fs event on path={}, old_id={}", event.path.c_str(), old_id);
 
     docs_->removeDocument(old_id);
     auto new_id = docs_->addDocument(media::pdf::Document::open(docs_->getContext(), event.path));
 
-    GLOG(
-        info,
+    core::log::global()->info(
         "controller: replaced document with path={} old_id={}, new_id={}",
         event.path.c_str(),
         old_id,

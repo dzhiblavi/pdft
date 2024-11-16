@@ -14,14 +14,17 @@ class State {
     virtual void addDocument(media::pdf::DocumentId id) = 0;
     virtual void onDocumentChanged(media::pdf::DocumentId from, media::pdf::DocumentId to) = 0;
 
-    virtual void nextPage() = 0;
-    virtual void prevPage() = 0;
+    virtual void scrollNext() = 0;
+    virtual void scrollPrev() = 0;
 
     virtual void nextDocument() = 0;
     virtual void prevDocument() = 0;
 
     virtual void nextLayout() = 0;
     virtual void prevLayout() = 0;
+
+    virtual void zoomIn() = 0;
+    virtual void zoomOut() = 0;
 };
 
 }  // namespace pdft::view

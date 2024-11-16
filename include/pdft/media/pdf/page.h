@@ -13,6 +13,7 @@ struct ImageProperties {
     float scale_x = 1.f;
     float scale_y = 1.f;
     float rotation_degrees = 0.f;
+    bool invert_colors = false;
 };
 
 struct PageSize {

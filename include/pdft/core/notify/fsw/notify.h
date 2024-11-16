@@ -62,21 +62,21 @@ class Notify : public notify::Notify {
 
  private:
     static void monitorRunLoop(Notify* self) {
-        GLOG(info, "start fswatch monitorRunLoop");
+        core::log::global()->info("start fswatch monitorRunLoop");
 
         while (!self->should_exit_.load(std::memory_order_relaxed)) {
             fsw_start_monitor(self->handle_);
         }
 
-        GLOG(info, "end fswatch monitorRunLoop");
+        core::log::global()->info("end fswatch monitorRunLoop");
     }
 
     static void processEvents(const fsw_cevent* const events, unsigned count, void* context) {
         auto* self = static_cast<Notify*>(context);
-        GLOG(info, "received {} events", count);
+        core::log::global()->info("received {} events", count);
 
         for (unsigned i = 0; i < count; ++i) {
-            GLOG(info, "received an event for path {}", events[i].path);
+            core::log::global()->info("received an event for path {}", events[i].path);
 
             self->channel_
                 .async_send(

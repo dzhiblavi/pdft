@@ -24,23 +24,22 @@ float Renderer::calcFactor(media::pdf::PageSize page_size) {
 }
 
 void Renderer::renderOne(core::OutBuffer& buffer, const Placement& layout) {
-    core::trace::StackScopeTracer trace_render_one(core::trace::makeLoggingTracer("render_one"));
+    core::trace::StackScopeTracer trace_render_one(PDFT_LOGGING_TRACER("render_one"));
 
     const auto& [pos, doc_id, page_index] = layout;
     const auto& document = docs_->getDocument(doc_id);
     display::ImageId id = utils::cantorPair(doc_id, page_index + 1);
 
-    GLOG(info, "rendering a page: doc_id={}, page_index={}, image_id={}", doc_id, page_index, id);
+    core::log::global()->info(
+        "rendering a page: doc_id={}, page_index={}, image_id={}", doc_id, page_index, id);
 
     if (!display_->isLoaded(id)) {
-        core::trace::StackScopeTracer _(
-            trace_render_one, core::trace::makeLoggingTracer("display_load_one"));
+        core::trace::StackScopeTracer _(trace_render_one, PDFT_LOGGING_TRACER("display_load_one"));
 
         auto page = document.getPage(page_index);
         auto factor = calcFactor(page.getDefaultSize());
 
-        GLOG(
-            info,
+        core::log::global()->info(
             "loading page to display: index={}, doc_id={}, image_id={}, factor={}",
             page_index,
             doc_id,
@@ -50,12 +49,13 @@ void Renderer::renderOne(core::OutBuffer& buffer, const Placement& layout) {
         auto image = page.getImage({
             .scale_x = factor,
             .scale_y = factor,
+            .invert_colors = false,
         });
+
         display_->loadImage(id, *image, buffer);
     }
 
-    core::trace::StackScopeTracer _(
-        trace_render_one, core::trace::makeLoggingTracer("display_display_one"));
+    core::trace::StackScopeTracer _(trace_render_one, PDFT_LOGGING_TRACER("display_display_one"));
 
     display_->displayImage(id, pos, buffer);
 }

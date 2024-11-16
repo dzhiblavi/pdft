@@ -20,22 +20,30 @@ Page::~Page() noexcept {
 
 std::unique_ptr<Image> Page::getImage(const ImageProperties& properties) {
     auto ctx = context_.native();
-    fz_pixmap* page = nullptr;
+    fz_pixmap* pix = nullptr;
 
     fz_matrix ctm = fz_scale(properties.scale_x, properties.scale_y);
     ctm = fz_pre_rotate(ctm, properties.rotation_degrees);
 
-    fz_try(ctx) page = fz_new_pixmap_from_page(ctx, page_, ctm, fz_device_rgb(ctx), /* alpha= */ 0);
+    fz_try(ctx) pix = fz_new_pixmap_from_page(ctx, page_, ctm, fz_device_rgb(ctx), /* alpha= */ 0);
 
     fz_catch(ctx) {
         core::fail("fz_new_pixmap_from_page");
     }
 
-    if (page == nullptr) {
+    if (pix == nullptr) {
         core::fail("fz_new_pixmap_from_page is null");
     }
 
-    return std::unique_ptr<Image>(new PixmapImage(context_, page));
+    if (properties.invert_colors) {
+        uint32_t n = pix->n * pix->w * pix->h;
+
+        for (uint32_t i = 0; i < n; ++i) {
+            pix->samples[i] = 255 - pix->samples[i];
+        }
+    }
+
+    return std::unique_ptr<Image>(new PixmapImage(context_, pix));
 }
 
 PageSize Page::getDefaultSize() const {

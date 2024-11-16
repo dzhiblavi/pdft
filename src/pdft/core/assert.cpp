@@ -6,8 +6,14 @@
 namespace pdft::core {
 
 void fail(const char* message, std::source_location location) {
-    GLOG(critical, message);
-    GLOG(critical, "stack trace: {}", cpptrace::generate_trace().to_string(true));
+    log::global()->critical(
+        "FAIL\n{}\nat {}:{}\n{}",
+        message,
+        location.file_name(),
+        location.line(),
+        cpptrace::generate_trace().to_string(true));
+
+    log::global()->flush();
     std::terminate();
 }
 

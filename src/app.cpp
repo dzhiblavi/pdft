@@ -40,11 +40,11 @@ namespace pdft {
 namespace {
 
 void warningCallback(void* user, const char* message) {
-    LOG(core::log::getLogger("mupdf"), warn, message);
+    core::log::logger("mupdf")->warn(message);
 }
 
 void errorCallback(void* user, const char* message) {
-    LOG(core::log::getLogger("mupdf"), warn, message);
+    core::log::logger("mupdf")->warn(message);
 }
 
 void setupLogger() {
@@ -74,13 +74,14 @@ void setupLogger() {
     };
 
     core::log::loadConfig(log_config);
-    GLOG(info, "loggers have been successfully initialized");
+    core::log::global()->info("loggers have been successfully initialized");
 }
 
 void setupMupdfLoggers(const media::pdf::Context& context) {
     fz_set_warning_callback(context.native(), warningCallback, nullptr);
     fz_set_error_callback(context.native(), errorCallback, nullptr);
-    GLOG(info, "mupdf loggers have been successfully initialized.");
+
+    core::log::global()->info("mupdf loggers have been successfully initialized");
 }
 
 struct KeyPressEvent {
@@ -178,12 +179,20 @@ asio::awaitable<void> main(asio::io_context& context, std::span<char const*> pat
         state->getLayout(screen, layout);
 
         {
-            core::trace::ScopeTracer _(core::trace::makeLoggingTracer("render_layout"));
+            core::trace::ScopeTracer _(PDFT_LOGGING_TRACER("clear_screen"));
+            core::OutBuffer cmd_buffer;
+            terminal->clear(cmd_buffer);
+            display->clear(cmd_buffer);
+            co_await console->write(cmd_buffer.view());
+        }
+
+        {
+            core::trace::ScopeTracer _(PDFT_LOGGING_TRACER("render_layout"));
             renderer->render(buffer, layout);
         }
 
         {
-            core::trace::ScopeTracer _(core::trace::makeLoggingTracer("frame_flush"));
+            core::trace::ScopeTracer _(PDFT_LOGGING_TRACER("frame_flush"));
             co_await console->write(buffer.view());
         }
 
@@ -198,8 +207,6 @@ asio::awaitable<void> main(asio::io_context& context, std::span<char const*> pat
                 return controller->onFilesystemEvent(event);
             });
 
-        core::OutBuffer cmd_buffer;
-
         switch (action) {
             using enum controller::Action;
 
@@ -208,13 +215,14 @@ asio::awaitable<void> main(asio::io_context& context, std::span<char const*> pat
 
             case ClearScreen:
             case Quit:
-                terminal->clear(cmd_buffer);
                 break;
         }
 
-        co_await console->write(cmd_buffer.view());
-
         if (action == controller::Action::Quit) {
+            core::trace::ScopeTracer _(PDFT_LOGGING_TRACER("clear_screen"));
+            core::OutBuffer cmd_buffer;
+            terminal->clear(cmd_buffer);
+            co_await console->write(cmd_buffer.view());
             break;
         }
     }

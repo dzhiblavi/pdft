@@ -9,9 +9,10 @@ namespace pdft::core {
 
 }  // namespace pdft::core
 
-#define PDFT_VERIFY(expr)                                                      \
-    do {                                                                       \
-        if (!static_cast<bool>(expr)) {                                        \
-            ::pdft::core::fail("PDFT_VERIFY failed: '" #expr "' is not true"); \
-        }                                                                      \
+#define PDFT_VERIFY(expr)                                                                        \
+    do {                                                                                         \
+        if (!static_cast<bool>(expr)) {                                                          \
+            ::pdft::core::fail(                                                                  \
+                "PDFT_VERIFY failed: '" #expr "' is not true", std::source_location::current()); \
+        }                                                                                        \
     } while (0)
