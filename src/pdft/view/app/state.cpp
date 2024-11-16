@@ -371,13 +371,13 @@ std::optional<State::DocumentId> State::getDocumentId() const {
 
 void State::zoomIn() {
     if (auto state = getState()) {
-        state->zoom *= 1.05;
+        state->zoom *= 1.10;
     }
 }
 
 void State::zoomOut() {
     if (auto state = getState()) {
-        state->zoom /= 1.05;
+        state->zoom /= 1.10;
     }
 }
 

@@ -11,7 +11,7 @@ namespace pdft::core {
 
 #define PDFT_VERIFY(expr)                                                                        \
     do {                                                                                         \
-        if (!static_cast<bool>(expr)) {                                                          \
+        if (!static_cast<bool>(expr)) [[unlikely]] {                                             \
             ::pdft::core::fail(                                                                  \
                 "PDFT_VERIFY failed: '" #expr "' is not true", std::source_location::current()); \
         }                                                                                        \

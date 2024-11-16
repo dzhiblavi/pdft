@@ -54,20 +54,38 @@ void setupLogger() {
                 {
                     "global",
                     {
-                        .sinks = {core::log::SimpleFileSink{.path = "../../../logs/app.log"}},
+                        .sinks =
+                            {
+                                core::log::SimpleFileSink{
+                                    .path =
+                                        "/Users/dzhiblavi/personal/projects/pdft-cxx/logs/app.log",
+                                },
+                            },
                     },
                 },
                 {
                     "mupdf",
                     {
-                        .sinks = {core::log::SimpleFileSink{.path = "../../../logs/mupdf.log"}},
+                        .sinks =
+                            {
+                                core::log::SimpleFileSink{
+                                    .path = "/Users/dzhiblavi/personal/projects/pdft-cxx/logs/"
+                                            "mupdf.log",
+                                },
+                            },
                     },
                 },
                 {
                     "trace",
                     {
                         .level = spdlog::level::level_enum::trace,
-                        .sinks = {core::log::SimpleFileSink{.path = "../../../logs/trace.log"}},
+                        .sinks =
+                            {
+                                core::log::SimpleFileSink{
+                                    .path = "/Users/dzhiblavi/personal/projects/pdft-cxx/logs/"
+                                            "trace.log",
+                                },
+                            },
                     },
                 },
             },
@@ -150,9 +168,10 @@ asio::awaitable<void> main(asio::io_context& context, std::span<char const*> pat
     auto notify = pdft::notify::fsw::Notify(queue.get_executor());
 
     for (size_t i = 1; i < paths.size(); ++i) {
-        auto doc_id = doc_storage->addDocument(media::pdf::Document::open(*pdf_context, paths[i]));
+        auto path = std::filesystem::absolute(paths[i]);
+        auto doc_id = doc_storage->addDocument(media::pdf::Document::open(*pdf_context, path));
         state->addDocument(doc_id);
-        notify.add(paths[i]);
+        notify.add(path);
     }
 
     // Start consuming keyboard inputs in background
@@ -178,13 +197,8 @@ asio::awaitable<void> main(asio::io_context& context, std::span<char const*> pat
 
         state->getLayout(screen, layout);
 
-        {
-            core::trace::ScopeTracer _(PDFT_LOGGING_TRACER("clear_screen"));
-            core::OutBuffer cmd_buffer;
-            terminal->clear(cmd_buffer);
-            display->clear(cmd_buffer);
-            co_await console->write(cmd_buffer.view());
-        }
+        terminal->clear(buffer);
+        display->clear(buffer);
 
         {
             core::trace::ScopeTracer _(PDFT_LOGGING_TRACER("render_layout"));
