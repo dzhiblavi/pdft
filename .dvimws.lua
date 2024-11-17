@@ -29,7 +29,7 @@ p.lsp.nvim_lspconfig.servers.clangd.cmd = {
     "--log=error",
     "--pretty",
     "-j=8",
-    "--compile-commands-dir=/Users/dzhiblavi/personal/projects/pdft-cxx/target/Debug/build",
+    "--compile-commands-dir=/Users/dzhiblavi/personal/projects/pdft-cxx/target/Release/build",
 }
 
 return c

@@ -24,14 +24,17 @@ deps-%: _prepare_target-%
 	$(CONAN) install .                     \
 		--output-folder=$(call depsdir,$*) \
 		--build=missing                    \
-		--profile=./conan/$*.profile
+		--profile:host=./conan/$*.profile  \
+		--profile:build=./conan/$*.profile
 
 configure-%: deps-%
-	cd $(call builddir,$*) && $(CMAKE) ../../../               \
-		-G "Unix Makefiles"                                    \
-		-DCMAKE_TOOLCHAIN_FILE="../deps/conan_toolchain.cmake" \
-		-DPDFT_BUILD_TESTS=Yes \
-		-DCMAKE_BUILD_TYPE=$*
+	cd $(call builddir,$*) && $(CMAKE) ../../../                   \
+		-G "Unix Makefiles"                                        \
+		-DCMAKE_TOOLCHAIN_FILE="../deps/conan_toolchain.cmake"     \
+		-DCMAKE_C_COMPILER=/opt/homebrew/opt/llvm@17/bin/clang     \
+		-DCMAKE_CXX_COMPILER=/opt/homebrew/opt/llvm@17/bin/clang++ \
+		-DCMAKE_BUILD_TYPE=$*                                      \
+		-DPDFT_BUILD_TESTS=Yes
 
 build-%: configure-%
 	cd $(call builddir,$*) && $(CMAKE) --build . --config $*
@@ -41,3 +44,6 @@ test: build-Debug
 
 run-%: build-%
 	cd $(call builddir,$*) && ./src/app $(path)
+
+run-lldb: build-Debug
+	cd $(call builddir,Debug) && lldb -- ./src/app $(path)

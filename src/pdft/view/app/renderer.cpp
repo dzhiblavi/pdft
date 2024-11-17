@@ -1,6 +1,6 @@
 #include "pdft/view/app/renderer.h"
 
-#include "pdft/core/trace/log_duration.h"
+#include "pdft/core/trace/log.h"
 #include "pdft/core/trace/stack_scope_tracer.h"
 #include "pdft/utils/cantor_pair.h"
 
@@ -24,7 +24,8 @@ float Renderer::calcFactor(media::pdf::PageSize page_size) {
 }
 
 void Renderer::renderOne(core::OutBuffer& buffer, const Placement& layout) {
-    core::trace::StackScopeTracer trace_render_one(PDFT_LOGGING_TRACER("render_one"));
+    core::trace::StackScopeTracer trace =
+        core::trace::getGlobalPool().getTracer(core::trace::stackTraceLogger(), "render_one");
 
     const auto& [pos, doc_id, page_index] = layout;
     const auto& document = docs_->getDocument(doc_id);
@@ -34,7 +35,7 @@ void Renderer::renderOne(core::OutBuffer& buffer, const Placement& layout) {
         "rendering a page: doc_id={}, page_index={}, image_id={}", doc_id, page_index, id);
 
     if (!display_->isLoaded(id)) {
-        core::trace::StackScopeTracer _(trace_render_one, PDFT_LOGGING_TRACER("display_load_one"));
+        auto _ = trace.addChild("load_image");
 
         auto page = document.getPage(page_index);
         auto factor = calcFactor(page.getDefaultSize());
@@ -55,9 +56,10 @@ void Renderer::renderOne(core::OutBuffer& buffer, const Placement& layout) {
         display_->loadImage(id, *image, buffer);
     }
 
-    core::trace::StackScopeTracer _(trace_render_one, PDFT_LOGGING_TRACER("display_display_one"));
-
-    display_->displayImage(id, pos, buffer);
+    {
+        auto _ = trace.addChild("display_image");
+        display_->displayImage(id, pos, buffer);
+    }
 }
 
 }  // namespace pdft::view::app

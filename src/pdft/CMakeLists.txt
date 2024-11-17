@@ -33,6 +33,7 @@ target_sources(
           ./core/assert.cpp
           ./core/log/load.cpp
           ./core/log/log.cpp
+          ./core/trace/stack_scope_tracer.cpp
           ./core/io/posix/console.cpp
           ./core/io/posix/terminal.cpp
           ./core/terminal/terminal.cpp

@@ -6,8 +6,10 @@
 #include "pdft/core/notify/fsw/notify.h"
 #include "pdft/core/terminal/ansi/terminal.h"
 #include "pdft/core/terminal/tmux/apc_executor.h"
+#include "pdft/core/trace/log.h"
 #include "pdft/core/trace/log_duration.h"
 #include "pdft/core/trace/scope_tracer.h"
+#include "pdft/core/trace/stack_scope_tracer.h"
 
 #include "pdft/display/kitty/display.h"
 
@@ -138,22 +140,39 @@ asio::awaitable<void> consumeFsEvents(EventQueue& queue, auto& notify) {
 }
 
 asio::awaitable<void> main(asio::io_context& context, std::span<char const*> paths) {
+    setupLogger();
+
     auto pdf_context =
         std::make_shared<media::pdf::Context>(media::pdf::Context::Builder().build());
-    pdf_context->registerDocumentHandlers();
-
-    setupLogger();
     setupMupdfLoggers(*pdf_context);
 
+    auto init = core::trace::getGlobalPool().getTracer(
+        core::trace::stackTraceLogger<std::chrono::microseconds>(), "init");
+
+    {
+        auto _ = init.addChild("pdf_context_register_doc_handlers");
+        pdf_context->registerDocumentHandlers();
+    }
+
     auto term_control = core::io::posix::TermControl();
-    term_control.ioControl(core::io::ControlType::Input, {.canonical = false, .echo = false});
+
+    {
+        auto _ = init.addChild("term_ioctl");
+        term_control.ioControl(core::io::ControlType::Input, {.canonical = false, .echo = false});
+    }
 
     auto terminal = std::make_shared<core::terminal::ansi::Terminal>();
     auto executor = std::make_shared<core::terminal::tmux::APCExecutor>();
-    auto console = std::make_shared<core::io::posix::Console>(
-        context, ::dup(STDIN_FILENO), ::dup(STDOUT_FILENO));
+
+    auto console = [&] {
+        auto _ = init.addChild("init_console");
+
+        return std::make_shared<core::io::posix::Console>(
+            context, ::dup(STDIN_FILENO), ::dup(STDOUT_FILENO));
+    }();
 
     {
+        auto _ = init.addChild("clear_screen");
         core::OutBuffer init_buffer;
         terminal->clear(init_buffer);
         co_await console->write(init_buffer.view());
@@ -168,10 +187,22 @@ asio::awaitable<void> main(asio::io_context& context, std::span<char const*> pat
     auto notify = pdft::notify::fsw::Notify(queue.get_executor());
 
     for (size_t i = 1; i < paths.size(); ++i) {
+        auto iter = init.addChild("add_path");
         auto path = std::filesystem::absolute(paths[i]);
-        auto doc_id = doc_storage->addDocument(media::pdf::Document::open(*pdf_context, path));
-        state->addDocument(doc_id);
-        notify.add(path);
+
+        auto doc_id = [&] {
+            auto _ = iter.addChild("add_path_open_document");
+            return doc_storage->addDocument(media::pdf::Document::open(*pdf_context, path));
+        }();
+
+        {
+            auto _ = iter.addChild("add_path_to_state");
+            state->addDocument(doc_id);
+        }
+        {
+            auto _ = iter.addChild("add_path_to_notify");
+            notify.add(path);
+        }
     }
 
     // Start consuming keyboard inputs in background
@@ -191,22 +222,25 @@ asio::awaitable<void> main(asio::io_context& context, std::span<char const*> pat
         .height = term_size.rows,
     };
 
+    init.manualExit();
+
     for (;;) {
-        buffer.str("");
-        buffer.clear();
+        auto tracer =
+            core::trace::getGlobalPool().getTracer(core::trace::stackTraceLogger(), "display_one");
 
-        state->getLayout(screen, layout);
-
+        core::clear(buffer);
         terminal->clear(buffer);
         display->clear(buffer);
 
+        state->getLayout(screen, layout);
+
         {
-            core::trace::ScopeTracer _(PDFT_LOGGING_TRACER("render_layout"));
+            auto _ = tracer.addChild("render");
             renderer->render(buffer, layout);
         }
 
         {
-            core::trace::ScopeTracer _(PDFT_LOGGING_TRACER("frame_flush"));
+            auto _ = tracer.addChild("flush");
             co_await console->write(buffer.view());
         }
 
@@ -233,16 +267,32 @@ asio::awaitable<void> main(asio::io_context& context, std::span<char const*> pat
         }
 
         if (action == controller::Action::Quit) {
-            core::trace::ScopeTracer _(PDFT_LOGGING_TRACER("clear_screen"));
-            core::OutBuffer cmd_buffer;
-            terminal->clear(cmd_buffer);
-            co_await console->write(cmd_buffer.view());
             break;
         }
     }
 
-    keyboard_consumer.stop();
-    notify.stop();
+    auto cleanup = core::trace::getGlobalPool().getTracer(
+        core::trace::stackTraceLogger<std::chrono::microseconds>(), "cleanup");
+
+    core::clear(buffer);
+    {
+        auto _ = cleanup.addChild("term_clear");
+        terminal->clear(buffer);
+        co_await console->write(buffer.view());
+    }
+
+    {
+        auto _ = cleanup.addChild("keyboard_stop");
+        keyboard_consumer.stop();
+    }
+
+    {
+        auto _ = cleanup.addChild("notify_stop");
+        notify.stop();
+    }
+
+    core::log::global()->info(
+        "total stack tracer allocations: {}", core::trace::getGlobalPool().numAllocations());
 }
 
 }  // namespace
