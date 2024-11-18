@@ -81,8 +81,11 @@ class Notify : public notify::Notify {
         core::log::global()->info("received {} events", count);
 
         for (unsigned i = 0; i < count; ++i) {
-            core::log::global()->info("received an event for path {}", events[i].path);
+            if (events[i].flags_num > 0 && events[i].flags[0] == NoOp) {
+                continue;
+            }
 
+            core::log::global()->info("received an event for path {}", events[i].path);
             for (unsigned j = 0; j < events[j].flags_num; ++j) {
                 core::log::global()->info("flag #{}: {}", j, unsigned(events[i].flags[j]));
             }
