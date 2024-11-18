@@ -139,8 +139,6 @@ asio::awaitable<void> consumeFsEvents(EventQueue& queue, auto& notify) {
         auto event = co_await notify.nextEvent();
         co_await queue.async_send({}, event);
     }
-
-    co_return;
 }
 
 asio::awaitable<void> main(asio::io_context& context, std::span<char const*> paths) {
