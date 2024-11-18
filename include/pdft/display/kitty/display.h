@@ -4,6 +4,9 @@
 #include "pdft/core/terminal/terminal.h"
 #include "pdft/display/display.h"
 
+#include <memory>
+#include <unordered_map>
+
 namespace pdft::display::kitty {
 
 class Display : public display::Display {

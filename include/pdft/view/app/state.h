@@ -2,6 +2,7 @@
 
 #include <optional>
 #include <unordered_map>
+#include <variant>
 #include <vector>
 
 namespace pdft::view::app {

@@ -2,6 +2,7 @@
 #include "pdft/core/log/log.h"
 #include "pdft/utils/visit.h"
 #include "pdft/view/layout.h"
+#include <algorithm>
 
 namespace pdft::view::app {
 
@@ -36,11 +37,11 @@ void State::getLayout(TwoPages, ViewState& state, IRect rect, std::vector<Placem
 
     auto rects =
         horizontal(
-            constraints::Fraction{0.05f / state.zoom},
+            constraints::Fraction{0.15f / state.zoom},
             constraints::Fill{1},
             constraints::Length{1},
             constraints::Fill{1},
-            constraints::Fraction{0.05f / state.zoom})
+            constraints::Fraction{0.15f / state.zoom})
             .split(rect);
 
     layout.push_back({
@@ -362,11 +363,9 @@ State::ViewState* State::getState() {
 }
 
 std::optional<State::DocumentId> State::getDocumentId() const {
-    if (const auto& idx = idx_) {
-        return ids_[*idx];
-    }
-
-    return std::nullopt;
+    return idx_.transform([this](auto idx) {
+        return ids_[idx];
+    });
 }
 
 void State::zoomIn() {
