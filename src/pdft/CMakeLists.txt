@@ -20,7 +20,6 @@ target_link_libraries(
          ZLIB::ZLIB
          libmupdf_ext
          libfswatch)
-         #"-framework Cocoa")
 
 target_sources(
   pdft
