@@ -3,13 +3,9 @@
 #include "pdft/core/log/log.h"
 #include "pdft/core/terminal/terminal.h"
 #include "pdft/utils/base64.h"
-
-#include "./detail/rowcolumn_diacritics.h"
 #include "pdft/utils/zlib.h"
 
-#include <zlib.h>
-
-#include <cassert>
+#include "./detail/rowcolumn_diacritics.h"
 
 namespace pdft::display::kitty {
 
@@ -39,7 +35,7 @@ struct KittyPosition {
 };
 
 uint32_t getOffset(uint32_t outer, uint32_t inner, FitStrategy strategy) {
-    assert(outer >= inner);
+    PDFT_VERIFY(outer >= inner);
 
     switch (strategy) {
         using enum FitStrategy;
