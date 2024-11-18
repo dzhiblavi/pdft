@@ -25,8 +25,15 @@ class Notify : public notify::Notify {
             return 0;
         }();
 
-        // XXX Default monitor type is not used because it behaves very strangely.
+#if defined(__APPLE__)
+        handle_ = fsw_init_session(system_default_monitor_type);
+#elif defined(__linux__)
+        // XXX FSW inotify support is kinda shit. When a file is updated
+        // it starts sending events in an infinite stream.
         handle_ = fsw_init_session(poll_monitor_type);
+#else
+#error "unsupported platform"
+#endif
 
         PDFT_VERIFY(fsw_set_latency(handle_, 0.1) == FSW_OK);
         PDFT_VERIFY(fsw_set_callback(handle_, processEvents, this) == FSW_OK);
