@@ -18,9 +18,9 @@ target_link_libraries(
          spdlog::spdlog
          cpptrace::cpptrace
          ZLIB::ZLIB
-         mupdf
-         libfswatch_ext
-         "-framework Cocoa")
+         libmupdf_ext
+         libfswatch)
+         #"-framework Cocoa")
 
 target_sources(
   pdft

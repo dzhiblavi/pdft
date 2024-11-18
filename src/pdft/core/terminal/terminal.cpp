@@ -1,13 +1,24 @@
 #include "pdft/core/terminal/terminal.h"
+#include "pdft/core/assert.h"
 
+#include <format>
 #include <stdio.h>
 #include <sys/ioctl.h>
+#include <unistd.h>
 
 namespace pdft::core::terminal {
 
 Dimensions getTerminalDimensions() {
     winsize sz;
-    ioctl(0, TIOCGWINSZ, &sz);
+
+    if (ioctl(STDIN_FILENO, TIOCGWINSZ, &sz) != 0) {
+        core::fail(std::format("ioctl failed, errno={} ({})", errno, strerror(errno)).c_str());
+    }
+
+    PDFT_VERIFY(sz.ws_row > 0);
+    PDFT_VERIFY(sz.ws_col > 0);
+    PDFT_VERIFY(sz.ws_ypixel > 0);
+    PDFT_VERIFY(sz.ws_xpixel > 0);
 
     return {
         .rows = sz.ws_row,

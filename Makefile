@@ -1,49 +1,59 @@
 MAKE = make
 CONAN = conan
 CMAKE = cmake
+BUILD_TYPE ?= Debug
+PROFILE ?= armv8-macos
+BUILD_IMAGE = pdft-build-image
 
-depsdir = ./target/$(1)/deps
-builddir = ./target/$(1)/build
+TARGET_DIR = ./target/$(PROFILE)/$(BUILD_TYPE)
+DEPS_DIR = $(TARGET_DIR)/deps
+BUILD_DIR = $(TARGET_DIR)/build
 
 all:
 	:
 
-clean-%:
-	rm -rf $(call builddir,$*)
+clean:
+	rm -rf $(TARGET_DIR)
 
-clean: clean-Debug clean-Release clean-RelWithDebInfo
-	$(MAKE) clean-Debug
-	$(MAKE) clean-Release
-	$(MAKE) clean-RelWithDebInfo
+_prepare_target_dirs:
+	mkdir -p $(DEPS_DIR)
+	mkdir -p $(BUILD_DIR)
 
-_prepare_target-%:
-	mkdir -p $(call depsdir,$*)
-	mkdir -p $(call builddir,$*)
+deps: _prepare_target_dirs
+	$(CONAN) install .                             \
+		--output-folder=$(DEPS_DIR)                \
+		--build=missing                            \
+		--profile:host=./conan/$(PROFILE).profile  \
+		--profile:build=./conan/$(PROFILE).profile \
+		--settings=build_type=$(BUILD_TYPE)
 
-deps-%: _prepare_target-%
-	$(CONAN) install .                     \
-		--output-folder=$(call depsdir,$*) \
-		--build=missing                    \
-		--profile:host=./conan/$*.profile  \
-		--profile:build=./conan/$*.profile
-
-configure-%: deps-%
-	cd $(call builddir,$*) && $(CMAKE) ../../../                   \
+configure: deps
+	cd $(BUILD_DIR) && $(CMAKE) ../../../../                       \
 		-G "Unix Makefiles"                                        \
 		-DCMAKE_TOOLCHAIN_FILE="../deps/conan_toolchain.cmake"     \
-		-DCMAKE_C_COMPILER=/opt/homebrew/opt/llvm@17/bin/clang     \
-		-DCMAKE_CXX_COMPILER=/opt/homebrew/opt/llvm@17/bin/clang++ \
-		-DCMAKE_BUILD_TYPE=$*                                      \
+		-DCMAKE_C_COMPILER=${CC}                                   \
+		-DCMAKE_CXX_COMPILER=${CXX}                                \
+		-DCMAKE_BUILD_TYPE=$(BUILD_TYPE)                           \
 		-DPDFT_BUILD_TESTS=Yes
 
-build-%: configure-%
-	cd $(call builddir,$*) && $(CMAKE) --build . --config $*
+build: configure
+	cd $(BUILD_DIR) && $(CMAKE) --build . --config $(BUILD_TYPE)
 
 test: build-Debug
-	cd $(call builddir,Debug) && ctest --output-on-failure
+	cd $(BUILD_DIR) && ctest --output-on-failure
 
-run-%: build-%
-	cd $(call builddir,$*) && ./src/app $(path)
+run-lldb: build
+	cd $(BUILD_DIR) && lldb -- ./src/app $(path)
 
-run-lldb: build-Debug
-	cd $(call builddir,Debug) && lldb -- ./src/app $(path)
+run-gdb: build
+	cd $(BUILD_DIR) && gdb --args ./src/app $(path)
+
+run: build
+	cd $(BUILD_DIR) && ./src/app $(path)
+
+docker-build:
+	docker build                           \
+		-t $(BUILD_IMAGE)                  \
+		-f docker/build.Dockerfile         \
+		--platform linux/amd64,linux/arm64 \
+		.

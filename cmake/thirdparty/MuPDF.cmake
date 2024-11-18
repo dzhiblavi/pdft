@@ -6,11 +6,14 @@ FetchContent_Declare(
   mupdf_ext
   GIT_REPOSITORY "https://github.com/ArtifexSoftware/mupdf.git"
   GIT_TAG 1.24.10
-  GIT_SUBMODULES_RECURSE 1)
+  GIT_SUBMODULES_RECURSE 1
+  GIT_PROGRESS TRUE)
 
 FetchContent_GetProperties(mupdf_ext)
 FetchContent_MakeAvailable(mupdf_ext)
-set(MUPDF_SRC_DIR ${CMAKE_BINARY_DIR}/_deps/mupdf_ext-src)
+
+# Release -> release, Debug -> debug
+string(TOLOWER "${CMAKE_BUILD_TYPE}" MUPDF_BUILD_TYPE)
 
 # Build mupdf using make
 ExternalProject_Add(
@@ -18,22 +21,25 @@ ExternalProject_Add(
   SOURCE_DIR "${mupdf_ext_SOURCE_DIR}"
   PREFIX ext
   BUILD_IN_SOURCE 1
-  BUILD_COMMAND make HAVE_GLUT=0 HAVE_X11=0 -j
+  BUILD_COMMAND make HAVE_GLUT=0 HAVE_X11=0 build=${MUPDF_BUILD_TYPE} -j
   CONFIGURE_COMMAND ""
   INSTALL_COMMAND "")
 
 # Add custom mupdf target
-add_library(mupdf STATIC IMPORTED GLOBAL)
-set_target_properties(
-  mupdf PROPERTIES IMPORTED_LOCATION
-                   "${MUPDF_SRC_DIR}/build/release/libmupdf.a")
+add_library(libmupdf_ext STATIC IMPORTED GLOBAL)
 
-set(MUPDF_ROOT ${CMAKE_BINARY_DIR}/mupdf_external-prefix)
-set(MUPDF_LIB_DIR "${MUPDF_SRC_DIR}/build/release")
+set(MUPDF_SRC_DIR ${CMAKE_BINARY_DIR}/_deps/mupdf_ext-src)
+set(MUPDF_LIB_DIR "${MUPDF_SRC_DIR}/build/${MUPDF_BUILD_TYPE}")
+
+set_target_properties(
+  libmupdf_ext
+  PROPERTIES IMPORTED_LOCATION
+             "${MUPDF_SRC_DIR}/build/${MUPDF_BUILD_TYPE}/libmupdf.a")
+
 target_link_libraries(
-  mupdf
+  libmupdf_ext
   INTERFACE "${MUPDF_LIB_DIR}/libmupdf-pkcs7.a"
             "${MUPDF_LIB_DIR}/libmupdf-third.a"
             "${MUPDF_LIB_DIR}/libmupdf-threads.a")
 
-target_include_directories(mupdf INTERFACE "${MUPDF_SRC_DIR}/include")
+target_include_directories(libmupdf_ext INTERFACE "${MUPDF_SRC_DIR}/include")

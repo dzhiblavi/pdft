@@ -1,7 +1,9 @@
 ---
 Checks: >
   -*,
-
+  cppcoreguidelines-*,
+  readability-identifier-length,
+  readability-identifier-naming,
   #*,
   #-android-*,
   #-abseil-*,
@@ -26,8 +28,6 @@ Checks: >
   #-hicpp-vararg,
   #-hicpp-move-const-arg,
   #-cppcoreguidelines-pro-type-vararg,
-  #-readability-identifier-length,
-  #-readability-identifier-naming,
   #-*-avoid-c-arrays,
   #-*-special-member-functions,
   #-*-magic-numbers,
@@ -39,7 +39,7 @@ Checks: >
 
 WarningsAsErrors: '*'
 HeaderFilterRegex: ''
-FormatStyle: none
+FormatStyle: file
 
 CheckOptions:
   - key: readability-identifier-naming.NamespaceCase
@@ -60,6 +60,8 @@ CheckOptions:
     value: snakeCase
   - key: readability-identifier-length.MinimumVariableNameLength
     value: 2
+  - key: readability-identifier-length.IgnoredVariableNames
+    value: [_]
   - key: readability-identifier-length.MinimumParameterNameLength
     value: 2
   - key: cppcoreguidelines-explicit-virtual-functions.IgnoreDestructors

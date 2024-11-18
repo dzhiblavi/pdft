@@ -22,6 +22,9 @@ class Context {
 
     Context(Context&& rhs);
     Context& operator=(Context&&) = delete;
+    Context(const Context&) = delete;
+    Context& operator=(const Context&) = delete;
+
     ~Context() noexcept;
 
     fz_context* native() const;

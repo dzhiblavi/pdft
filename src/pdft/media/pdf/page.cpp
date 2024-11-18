@@ -1,5 +1,6 @@
 #include "pdft/media/pdf/page.h"
 #include "pdft/core/assert.h"
+#include "pdft/core/log/log.h"
 #include "pdft/media/pdf/pixmap_image.h"
 
 extern "C" {
@@ -19,6 +20,9 @@ Page::~Page() noexcept {
 }
 
 std::unique_ptr<Image> Page::getImage(const ImageProperties& properties) {
+    PDFT_VERIFY(properties.scale_x > 0.f);
+    PDFT_VERIFY(properties.scale_y > 0.f);
+
     auto ctx = context_.native();
     fz_pixmap* pix = nullptr;
 
@@ -26,10 +30,12 @@ std::unique_ptr<Image> Page::getImage(const ImageProperties& properties) {
     ctm = fz_pre_rotate(ctm, properties.rotation_degrees);
 
     fz_try(ctx) pix = fz_new_pixmap_from_page(ctx, page_, ctm, fz_device_rgb(ctx), /* alpha= */ 0);
-
     fz_catch(ctx) {
         core::fail("fz_new_pixmap_from_page");
     }
+
+    PDFT_VERIFY(pix->w > 0 && pix->h > 0);
+    core::log::global()->info("loaded an image {}x{} pixels", pix->w, pix->h);
 
     if (pix == nullptr) {
         core::fail("fz_new_pixmap_from_page is null");

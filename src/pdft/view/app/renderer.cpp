@@ -13,6 +13,13 @@ void Renderer::render(core::OutBuffer& buffer, const std::vector<Placement>& lay
 }
 
 float Renderer::calcFactor(media::pdf::PageSize page_size) {
+    core::log::global()->info(
+        "calc factor for page {}x{}, term {}x{}",
+        page_size.width_px,
+        page_size.height_px,
+        term_dims_.width_px,
+        term_dims_.height_px);
+
     float dw = term_dims_.width_px;
     float dh = term_dims_.height_px;
     auto [pw, ph] = page_size;
@@ -26,6 +33,8 @@ float Renderer::calcFactor(media::pdf::PageSize page_size) {
 void Renderer::renderOne(core::OutBuffer& buffer, const Placement& layout) {
     core::trace::StackScopeTracer trace =
         core::trace::getGlobalPool().getTracer(core::trace::stackTraceLogger(), "render_one");
+
+    display_->clear(buffer);
 
     const auto& [pos, doc_id, page_index] = layout;
     const auto& document = docs_->getDocument(doc_id);

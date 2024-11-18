@@ -7,8 +7,6 @@
 #include "pdft/core/terminal/ansi/terminal.h"
 #include "pdft/core/terminal/tmux/apc_executor.h"
 #include "pdft/core/trace/log.h"
-#include "pdft/core/trace/log_duration.h"
-#include "pdft/core/trace/scope_tracer.h"
 #include "pdft/core/trace/stack_scope_tracer.h"
 
 #include "pdft/display/kitty/display.h"
@@ -50,6 +48,8 @@ void errorCallback(void* user, const char* message) {
 }
 
 void setupLogger() {
+    std::filesystem::path home = getenv("HOME");
+
     core::log::LogConfig log_config{
         .loggers =
             {
@@ -59,8 +59,7 @@ void setupLogger() {
                         .sinks =
                             {
                                 core::log::SimpleFileSink{
-                                    .path =
-                                        "/Users/dzhiblavi/personal/projects/pdft-cxx/logs/app.log",
+                                    .path = home / ".local/share/pdft/app.log",
                                 },
                             },
                     },
@@ -71,8 +70,7 @@ void setupLogger() {
                         .sinks =
                             {
                                 core::log::SimpleFileSink{
-                                    .path = "/Users/dzhiblavi/personal/projects/pdft-cxx/logs/"
-                                            "mupdf.log",
+                                    .path = home / ".local/share/pdft/mupdf.log",
                                 },
                             },
                     },
@@ -84,8 +82,7 @@ void setupLogger() {
                         .sinks =
                             {
                                 core::log::SimpleFileSink{
-                                    .path = "/Users/dzhiblavi/personal/projects/pdft-cxx/logs/"
-                                            "trace.log",
+                                    .path = home / ".local/share/pdft/trace.log",
                                 },
                             },
                     },
@@ -135,8 +132,10 @@ struct KeyboardConsumer {
 asio::awaitable<void> consumeFsEvents(EventQueue& queue, auto& notify) {
     while (!notify.isStopped()) {
         auto event = co_await notify.nextEvent();
-        co_await queue.async_send({}, event);
+        // co_await queue.async_send({}, event);
     }
+
+    co_return;
 }
 
 asio::awaitable<void> main(asio::io_context& context, std::span<char const*> paths) {
@@ -178,7 +177,8 @@ asio::awaitable<void> main(asio::io_context& context, std::span<char const*> pat
         co_await console->write(init_buffer.view());
     }
 
-    auto queue = EventQueue(context, /* max_buffer_size= */ 10);
+    const size_t MaxQueueBufferSize = 10;
+    auto queue = EventQueue(context, MaxQueueBufferSize);
     auto doc_storage = std::make_shared<media::pdf::DocumentStorage>(pdf_context);
     auto display = std::make_shared<display::kitty::Display>(terminal, executor);
     auto renderer = std::make_shared<view::app::Renderer>(doc_storage, display);
@@ -189,6 +189,11 @@ asio::awaitable<void> main(asio::io_context& context, std::span<char const*> pat
     for (size_t i = 1; i < paths.size(); ++i) {
         auto iter = init.addChild("add_path");
         auto path = std::filesystem::absolute(paths[i]);
+
+        if (!std::filesystem::exists(path)) {
+            core::log::global()->info("path {} does not exist, skipping", path.c_str());
+            continue;
+        }
 
         auto doc_id = [&] {
             auto _ = iter.addChild("add_path_open_document");
@@ -230,7 +235,6 @@ asio::awaitable<void> main(asio::io_context& context, std::span<char const*> pat
 
         core::clear(buffer);
         terminal->clear(buffer);
-        display->clear(buffer);
 
         state->getLayout(screen, layout);
 

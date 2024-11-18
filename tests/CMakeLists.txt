@@ -19,11 +19,9 @@ endfunction(add_test)
 # Add tests here
 
 add_test(./pdft/core/io/posix/test_console.cpp)
-
 add_test(./pdft/core/terminal/ansi/test_terminal.cpp)
 add_test(./pdft/core/terminal/tmux/test_apc_executor.cpp)
 add_test(./pdft/core/terminal/regular/test_apc_executor.cpp)
-
 add_test(./pdft/core/trace/test_scope_tracer.cpp)
 add_test(./pdft/core/trace/test_stack_scope_tracer.cpp)
 

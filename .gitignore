@@ -3,6 +3,7 @@ CMakeUserPresets.json
 /build*/
 /cmake-build-*
 /target
+/_target*
 /.dvimws.yaml
 lcov.info
 perf.*
