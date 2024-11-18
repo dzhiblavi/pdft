@@ -26,13 +26,28 @@ class Notify : public notify::Notify {
         }();
 
 #if defined(__APPLE__)
+
         handle_ = fsw_init_session(system_default_monitor_type);
+
 #elif defined(__linux__)
+
         // XXX FSW inotify support is kinda shit. When a file is updated
         // it starts sending events in an infinite stream.
+        // handle_ = fsw_init_session(inotify_monitor_type);
         handle_ = fsw_init_session(poll_monitor_type);
+
+#elif defined(_POSIX_VERSION)
+
+        handle_ = fsw_init_session(poll_monitor_type);
+
+#elif defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__NT__)
+
+        handle_ = fsw_init_session(windows_monitor_type);
+
 #else
+
 #error "unsupported platform"
+
 #endif
 
         PDFT_VERIFY(fsw_set_latency(handle_, 0.1) == FSW_OK);
