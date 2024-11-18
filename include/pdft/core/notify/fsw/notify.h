@@ -25,7 +25,9 @@ class Notify : public notify::Notify {
             return 0;
         }();
 
-        handle_ = fsw_init_session(system_default_monitor_type);
+        // XXX Default monitor type is not used because it behaves very strangely.
+        handle_ = fsw_init_session(poll_monitor_type);
+
         PDFT_VERIFY(fsw_set_latency(handle_, 0.1) == FSW_OK);
         PDFT_VERIFY(fsw_set_callback(handle_, processEvents, this) == FSW_OK);
 
@@ -48,7 +50,7 @@ class Notify : public notify::Notify {
     }
 
     void stop() override {
-        should_exit_.store(true, std::memory_order_relaxed);
+        should_exit_.store(true, std::memory_order_release);
         fsw_stop_monitor(handle_);
     }
 
@@ -69,7 +71,7 @@ class Notify : public notify::Notify {
     static void monitorRunLoop(Notify* self) {
         core::log::global()->info("start fswatch monitorRunLoop");
 
-        while (!self->should_exit_.load(std::memory_order_relaxed)) {
+        while (!self->should_exit_.load(std::memory_order_acquire)) {
             fsw_start_monitor(self->handle_);
         }
 
@@ -88,7 +90,9 @@ class Notify : public notify::Notify {
 
             core::log::global()->info("received an event for path {}", events[i].path);
             for (unsigned j = 0; j < events[i].flags_num; ++j) {
-                core::log::global()->info("flag #{}: {}", j, unsigned(events[i].flags[j]));
+                auto* flag_name = fsw_get_event_flag_name(events[i].flags[j]);
+                core::log::global()->info("flag #{}: {}", j, flag_name);
+                ::free(flag_name);
             }
 
             self->channel_
