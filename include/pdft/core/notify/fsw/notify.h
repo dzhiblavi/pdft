@@ -40,6 +40,8 @@ class Notify : public notify::Notify {
         if (fsw_thread_.joinable()) {
             fsw_thread_.join();
         }
+
+        PDFT_VERIFY(fsw_destroy_session(handle_) == FSW_OK);
     }
 
     void stop() override {
