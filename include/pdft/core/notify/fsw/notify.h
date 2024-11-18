@@ -30,7 +30,7 @@ class Notify : public notify::Notify {
         PDFT_VERIFY(fsw_set_callback(handle_, processEvents, this) == FSW_OK);
 
         PDFT_VERIFY(fsw_add_event_type_filter(handle_, {.flag = IsFile}) == FSW_OK);
-        PDFT_VERIFY(fsw_add_event_type_filter(handle_, {.flag = OwnerModified}) == FSW_OK);
+        PDFT_VERIFY(fsw_add_event_type_filter(handle_, {.flag = Updated}) == FSW_OK);
 
         fsw_thread_ = std::thread(monitorRunLoop, this);
     }
@@ -81,12 +81,13 @@ class Notify : public notify::Notify {
         core::log::global()->info("received {} events", count);
 
         for (unsigned i = 0; i < count; ++i) {
-            if (events[i].flags_num > 0 && events[i].flags[0] == NoOp) {
+            if (events[i].flags_num > 0 && events[i].flags[0] == NoOp ||
+                events[i].flags[0] == PlatformSpecific) {
                 continue;
             }
 
             core::log::global()->info("received an event for path {}", events[i].path);
-            for (unsigned j = 0; j < events[j].flags_num; ++j) {
+            for (unsigned j = 0; j < events[i].flags_num; ++j) {
                 core::log::global()->info("flag #{}: {}", j, unsigned(events[i].flags[j]));
             }
 
