@@ -1,5 +1,5 @@
 [settings]
-arch=amd64
+arch=x86_64
 compiler=clang
 compiler.cppstd=20
 compiler.libcxx=libc++

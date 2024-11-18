@@ -49,6 +49,11 @@ void errorCallback(void* user, const char* message) {
 
 void setupLogger() {
     std::filesystem::path home = getenv("HOME");
+    auto logs_dir = home / ".local/share/pdft";
+
+    if (!std::filesystem::exists(logs_dir)) {
+        std::filesystem::create_directories(logs_dir);
+    }
 
     core::log::LogConfig log_config{
         .loggers =
@@ -132,7 +137,7 @@ struct KeyboardConsumer {
 asio::awaitable<void> consumeFsEvents(EventQueue& queue, auto& notify) {
     while (!notify.isStopped()) {
         auto event = co_await notify.nextEvent();
-        // co_await queue.async_send({}, event);
+        co_await queue.async_send({}, event);
     }
 
     co_return;
