@@ -22,13 +22,13 @@ TEST_CASE("testKeytreeSingleSimple", "") {
     int b = 0;
     int c = 0;
 
-    k.bind("a", [&](auto) {
+    k.bind("a", [&] {
         ++a;
     });
-    k.bind("b", [&](auto) {
+    k.bind("b", [&] {
         ++b;
     });
-    k.bind("c", [&](auto) {
+    k.bind("c", [&] {
         ++c;
     });
 
@@ -54,13 +54,13 @@ TEST_CASE("testKeytreeMultiSimple", "") {
     int b = 0;
     int c = 0;
 
-    k.bind("aa", [&](auto) {
+    k.bind("aa", [&] {
         ++a;
     });
-    k.bind("ab", [&](auto) {
+    k.bind("ab", [&] {
         ++b;
     });
-    k.bind("ac", [&](auto) {
+    k.bind("ac", [&] {
         ++c;
     });
 
@@ -144,9 +144,8 @@ TEST_CASE("testKeytreeMixed", "") {
         ++a;
         na = n;
     });
-    k.bind("aa", [&](auto n) {
+    k.bind("aa", [&] {
         ++b;
-        CHECK(n == 0);
     });
 
     auto check = [&](int ea, int ena, int eb) {
@@ -182,10 +181,10 @@ TEST_CASE("testKeytreeFeedsAfterReset", "") {
     int a = 0;
     int b = 0;
 
-    k.bind("aaa", [&](auto) {
+    k.bind("aaa", [&] {
         ++a;
     });
-    k.bind("b", [&](auto) {
+    k.bind("b", [&] {
         ++b;
     });
 
@@ -206,7 +205,7 @@ TEST_CASE("testKeytreeFeedsAfterResetNumbers", "") {
     k.bind(KeyTree::number, "a", [&](auto) {
         ++a;
     });
-    k.bind("b", [&](auto) {
+    k.bind("b", [&] {
         ++b;
     });
 

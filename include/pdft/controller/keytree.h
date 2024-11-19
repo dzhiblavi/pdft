@@ -7,7 +7,8 @@ namespace pdft::controller {
 
 class KeyTree {
  public:
-    using CallbackType = std::function<void(uint32_t)>;
+    using CallbackType = std::function<void()>;
+    using NumberCallbackType = std::function<void(uint32_t)>;
 
     KeyTree() = default;
     ~KeyTree() noexcept;
@@ -16,14 +17,14 @@ class KeyTree {
     inline static constexpr NumberType number;
 
     void bind(std::string_view keys, CallbackType callback);
-    void bind(NumberType, std::string_view keys, CallbackType callback);
+    void bind(NumberType, std::string_view keys, NumberCallbackType callback);
 
     void feed(char key);
     void reset();
 
  private:
     struct Node {
-        CallbackType callback = {};
+        NumberCallbackType callback = {};
         std::unordered_map<char, Node*> children;
     };
 
@@ -37,7 +38,7 @@ class KeyTree {
     void feedChar(char key);
     void feedDigit(char key);
 
-    static void bindFrom(Node* root, std::string_view keys, CallbackType callback);
+    static void bindFrom(Node* root, std::string_view keys, NumberCallbackType callback);
 
     Node* num_root_ = nullptr;
     Node* root_ = nullptr;

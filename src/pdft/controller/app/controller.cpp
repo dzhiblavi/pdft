@@ -8,15 +8,15 @@ Controller::Controller(
     std::shared_ptr<state::State> state, std::shared_ptr<state::DocumentStorage> docs)
     : state_(std::move(state))
     , docs_(std::move(docs)) {
-    key_tree_.bind("q", [this](auto) {
+    key_tree_.bind("q", [this] {
         action_ = Action::Quit;
     });
 
-    key_tree_.bind("j", [this](auto) {
+    key_tree_.bind("j", [this] {
         state_->scrollNext(1);
         action_ = Action::Redraw;
     });
-    key_tree_.bind("k", [this](auto) {
+    key_tree_.bind("k", [this] {
         state_->scrollNext(-1);
         action_ = Action::Redraw;
     });
@@ -33,20 +33,20 @@ Controller::Controller(
         state_->setPageIndex(index);
         action_ = Action::Redraw;
     });
-    key_tree_.bind("gg", [this](auto index) {
+    key_tree_.bind("gg", [this] {
         state_->setPageIndex(0);
         action_ = Action::Redraw;
     });
-    key_tree_.bind("G", [this](auto index) {
+    key_tree_.bind("G", [this] {
         state_->setPageIndex(INT_MAX);
         action_ = Action::Redraw;
     });
 
-    key_tree_.bind("h", [this](auto) {
+    key_tree_.bind("h", [this] {
         state_->nextDocument(-1);
         action_ = Action::Redraw;
     });
-    key_tree_.bind("l", [this](auto) {
+    key_tree_.bind("l", [this] {
         state_->nextDocument(+1);
         action_ = Action::Redraw;
     });
@@ -59,20 +59,20 @@ Controller::Controller(
         action_ = Action::Redraw;
     });
 
-    key_tree_.bind("s", [this](auto) {
+    key_tree_.bind("s", [this] {
         state_->nextLayout(1);
         action_ = Action::Redraw;
     });
-    key_tree_.bind("S", [this](auto) {
+    key_tree_.bind("S", [this] {
         state_->nextLayout(-1);
         action_ = Action::Redraw;
     });
 
-    key_tree_.bind("=", [this](auto) {
+    key_tree_.bind("=", [this] {
         state_->updateZoom(1.10f);
         action_ = Action::Redraw;
     });
-    key_tree_.bind("-", [this](auto) {
+    key_tree_.bind("-", [this] {
         state_->updateZoom(1.f / 1.10f);
         action_ = Action::Redraw;
     });

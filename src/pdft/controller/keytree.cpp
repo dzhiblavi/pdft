@@ -33,10 +33,12 @@ void KeyTree::bind(std::string_view keys, CallbackType callback) {
         root_ = new Node;
     }
 
-    bindFrom(root_, keys, std::move(callback));
+    bindFrom(root_, keys, [cb = std::move(callback)](auto /*ignored*/) {
+        std::move(cb)();
+    });
 }
 
-void KeyTree::bind(NumberType, std::string_view keys, CallbackType callback) {
+void KeyTree::bind(NumberType, std::string_view keys, NumberCallbackType callback) {
     if (num_root_ == nullptr) {
         num_root_ = new Node;
     }
@@ -44,7 +46,7 @@ void KeyTree::bind(NumberType, std::string_view keys, CallbackType callback) {
     bindFrom(num_root_, keys, std::move(callback));
 }
 
-void KeyTree::bindFrom(Node* root, std::string_view keys, CallbackType callback) {
+void KeyTree::bindFrom(Node* root, std::string_view keys, NumberCallbackType callback) {
     PDFT_VERIFY(!keys.empty());
 
     Node* curr = root;
