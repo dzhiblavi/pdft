@@ -36,7 +36,9 @@ target_sources(
           ./view/app/fit_image.cpp
           ./view/app/fit_text.cpp
           ./view/app/renderer.cpp
-          ./view/image/kitty/display.cpp
+          ./view/image/kitty/display_base.cpp
+          ./view/image/kitty/unicode_display.cpp
+          ./view/image/kitty/native_display.cpp
           ./state/app/state.cpp
           ./state/app/document_state.cpp
           ./state/document_storage.cpp

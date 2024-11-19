@@ -2,6 +2,7 @@
 #include "consume_fs_events.h"
 #include "keyboard_consumer.h"
 #include "resolve_apc_executor.h"
+#include "resolve_display.h"
 #include "setup_logging.h"
 
 #include "pdft/core/io/posix/console.h"
@@ -13,9 +14,7 @@
 #include "pdft/core/trace/stack_scope_tracer.h"
 
 #include "pdft/controller/app/controller.h"
-
 #include "pdft/view/app/renderer.h"
-#include "pdft/view/image/kitty/display.h"
 
 #include "pdft/state/app/state.h"
 #include "pdft/state/document_storage.h"
@@ -57,7 +56,7 @@ void Application::setup() {
 
     keyboard_consumer_ = std::make_shared<KeyboardConsumer>(console_);
     document_storage_ = std::make_shared<state::DocumentStorage>(pdf_context_);
-    image_display_ = std::make_shared<view::image::kitty::Display>(terminal_, executor_);
+    image_display_ = resolveDisplay(terminal_, executor_);
     renderer_ = std::make_shared<view::app::Renderer>(document_storage_, image_display_, terminal_);
     state_ = std::make_shared<state::app::State>(document_storage_, renderer_);
     controller_ = std::make_shared<controller::app::Controller>(state_, document_storage_);

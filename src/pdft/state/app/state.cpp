@@ -10,8 +10,8 @@ namespace pdft::state::app {
 void State::render(view::IRect rect, core::io::OutBuffer& buffer) {
     namespace constr = view::constraints;
 
-    auto rects = view::vertical(constr::Fill(1), constr::Length(1)).split(rect);
-    auto info_rects = view::horizontal(constr::Fill(1), constr::Fill(1)).split(rects[1]);
+    auto rects = view::vertical(constr::Length(1), constr::Fill(1), constr::Length(1)).split(rect);
+    auto info_rects = view::horizontal(constr::Fill(1), constr::Fill(1)).split(rects[2]);
 
     renderer_->render(
         buffer,
@@ -27,7 +27,7 @@ void State::render(view::IRect rect, core::io::OutBuffer& buffer) {
         });
 
     if (auto state = getState()) {
-        state->render(rects[0], buffer);
+        state->render(rects[1], buffer);
 
         renderer_->render(
             buffer,

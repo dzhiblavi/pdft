@@ -9,6 +9,7 @@ add_executable(
   ./keyboard_consumer.cpp
   ./main.cpp
   ./cli_args.cpp
-  ./resolve_apc_executor.cpp)
+  ./resolve_apc_executor.cpp
+  ./resolve_display.cpp)
 
 target_link_libraries(app pdft tclap::tclap reflectcpp)
