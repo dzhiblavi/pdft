@@ -1,5 +1,5 @@
-#include "context.h"
 #include "pdft/media/image.h"
+#include "pdft/media/pdf/context.h"
 
 #include <memory>
 

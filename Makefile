@@ -39,7 +39,7 @@ configure: deps
 build: configure
 	cd $(BUILD_DIR) && $(CMAKE) --build . --config $(BUILD_TYPE)
 
-test: build-Debug
+test: build
 	cd $(BUILD_DIR) && ctest --output-on-failure
 
 run-lldb: build

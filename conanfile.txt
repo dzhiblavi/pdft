@@ -5,6 +5,8 @@ zlib/1.2.11
 catch2/3.6.0
 base64/0.5.2
 cpptrace/0.7.2
+magic_enum/0.9.6
+gtest/1.15.0
 
 [generators]
 CMakeDeps

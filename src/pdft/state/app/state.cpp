@@ -1,12 +1,14 @@
-#include "pdft/view/app/state.h"
+#include "pdft/state/app/state.h"
+#include "pdft/core/assert.h"
 #include "pdft/core/log/log.h"
 #include "pdft/utils/visit.h"
 #include "pdft/view/layout.h"
+
 #include <algorithm>
 
-namespace pdft::view::app {
+namespace pdft::state::app {
 
-void State::getLayout(IRect rect, std::vector<Placement>& layout) {
+void State::getLayout(view::IRect rect, std::vector<view::Placement>& layout) {
     layout.clear();
 
     if (auto* state = getState()) {
@@ -16,7 +18,8 @@ void State::getLayout(IRect rect, std::vector<Placement>& layout) {
     }
 }
 
-void State::getLayout(OnePage, ViewState& state, IRect rect, std::vector<Placement>& layout) {
+void State::getLayout(
+    OnePage, ViewState& state, view::IRect rect, std::vector<view::Placement>& layout) {
     auto doc_id = *getDocumentId();
     auto page_count = doc_storage_->getDocument(doc_id).pageCount();
 
@@ -24,31 +27,34 @@ void State::getLayout(OnePage, ViewState& state, IRect rect, std::vector<Placeme
         .position =
             {
                 .rect = rect,
-                .fit = display::FitStrategy::Center,
+                .hor = view::AxisFit::Center,
+                .vert = view::AxisFit::Center,
             },
         .document_id = doc_id,
         .page_index = state.page_index,
     });
 }
 
-void State::getLayout(TwoPages, ViewState& state, IRect rect, std::vector<Placement>& layout) {
+void State::getLayout(
+    TwoPages, ViewState& state, view::IRect rect, std::vector<view::Placement>& layout) {
     auto doc_id = *getDocumentId();
     auto page_count = doc_storage_->getDocument(doc_id).pageCount();
 
     auto rects =
-        horizontal(
-            constraints::Fraction{0.15f / state.zoom},
-            constraints::Fill{1},
-            constraints::Length{1},
-            constraints::Fill{1},
-            constraints::Fraction{0.15f / state.zoom})
+        view::horizontal(
+            view::constraints::Fraction{0.15f / state.zoom},
+            view::constraints::Fill{1},
+            view::constraints::Length{1},
+            view::constraints::Fill{1},
+            view::constraints::Fraction{0.15f / state.zoom})
             .split(rect);
 
     layout.push_back({
         .position =
             {
                 .rect = rects[1],
-                .fit = display::FitStrategy::Right,
+                .hor = view::AxisFit::Max,
+                .vert = view::AxisFit::Center,
             },
         .document_id = doc_id,
         .page_index = state.page_index,
@@ -62,7 +68,8 @@ void State::getLayout(TwoPages, ViewState& state, IRect rect, std::vector<Placem
         .position =
             {
                 .rect = rects[3],
-                .fit = display::FitStrategy::Left,
+                .hor = view::AxisFit::Min,
+                .vert = view::AxisFit::Center,
             },
         .document_id = doc_id,
         .page_index = state.page_index + 1,
@@ -70,26 +77,31 @@ void State::getLayout(TwoPages, ViewState& state, IRect rect, std::vector<Placem
 }
 
 void State::getLayout(
-    OnePageContinuous& page_state, ViewState& state, IRect rect, std::vector<Placement>& layout) {
+    OnePageContinuous& page_state,
+    ViewState& state,
+    view::IRect rect,
+    std::vector<view::Placement>& layout) {
     auto doc_id = *getDocumentId();
     auto page_count = doc_storage_->getDocument(doc_id).pageCount();
 
     fixRowOffset(page_state.row_offset, rect.height, 1, state);
 
-    rect = horizontal(
-               constraints::Fraction{0.10f / state.zoom},
-               constraints::Fill{1},
-               constraints::Fraction{0.10f / state.zoom})
+    rect = view::horizontal(
+               view::constraints::Fraction{0.10f / state.zoom},
+               view::constraints::Fill{1},
+               view::constraints::Fraction{0.10f / state.zoom})
                .split(rect)[1];
 
-    uint32_t top_height = rect.height - page_state.row_offset;
-    auto rects = vertical(constraints::Length{top_height}, constraints::Fill{1}).split(rect);
+    auto top_height = rect.height - page_state.row_offset;
+    auto top = offsetRect(rect, 0, -page_state.row_offset);
+    auto bottom = offsetRect(rect, 0, +top_height);
 
     layout.push_back({
         .position =
             {
-                .rect = rects[0],
-                .fit = display::FitStrategy::ClipRight,
+                .rect = top,
+                .hor = view::AxisFit::Center,
+                .vert = view::AxisFit::Max,
             },
         .document_id = doc_id,
         .page_index = state.page_index,
@@ -102,8 +114,9 @@ void State::getLayout(
     layout.push_back({
         .position =
             {
-                .rect = rects[1],
-                .fit = display::FitStrategy::ClipLeft,
+                .rect = bottom,
+                .hor = view::AxisFit::Center,
+                .vert = view::AxisFit::Min,
             },
         .document_id = doc_id,
         .page_index = state.page_index + 1,
@@ -111,29 +124,35 @@ void State::getLayout(
 }
 
 void State::getLayout(
-    TwoPagesContinuous& page_state, ViewState& state, IRect rect, std::vector<Placement>& layout) {
+    TwoPagesContinuous& page_state,
+    ViewState& state,
+    view::IRect rect,
+    std::vector<view::Placement>& layout) {
     auto doc_id = *getDocumentId();
     auto page_count = doc_storage_->getDocument(doc_id).pageCount();
 
     fixRowOffset(page_state.row_offset, rect.height, 2, state);
 
     auto rects =
-        horizontal(
-            constraints::Fraction{0.05f / state.zoom},
-            constraints::Fill{1},
-            constraints::Fill{1},
-            constraints::Fraction{0.05f / state.zoom})
+        view::horizontal(
+            view::constraints::Fraction{0.05f / state.zoom},
+            view::constraints::Fill{1},  // rects[1]
+            view::constraints::Fill{1},  // rects[2]
+            view::constraints::Fraction{0.05f / state.zoom})
             .split(rect);
 
     uint32_t top_height = rect.height - page_state.row_offset;
-    auto lrects = vertical(constraints::Length{top_height}, constraints::Fill{1}).split(rects[1]);
-    auto rrects = vertical(constraints::Length{top_height}, constraints::Fill{1}).split(rects[2]);
+    auto top_left = offsetRect(rects[1], 0, -page_state.row_offset);
+    auto top_right = offsetRect(rects[2], 0, -page_state.row_offset);
+    auto bottom_left = offsetRect(rects[1], 0, +top_height);
+    auto bottom_right = offsetRect(rects[2], 0, +top_height);
 
     layout.push_back({
         .position =
             {
-                .rect = lrects[0],
-                .fit = display::FitStrategy::ClipRight,
+                .rect = top_left,
+                .hor = view::AxisFit::Max,
+                .vert = view::AxisFit::Max,
             },
         .document_id = doc_id,
         .page_index = state.page_index,
@@ -146,8 +165,9 @@ void State::getLayout(
     layout.push_back({
         .position =
             {
-                .rect = rrects[0],
-                .fit = display::FitStrategy::ClipRight,
+                .rect = top_right,
+                .hor = view::AxisFit::Min,
+                .vert = view::AxisFit::Max,
             },
         .document_id = doc_id,
         .page_index = state.page_index + 1,
@@ -160,8 +180,9 @@ void State::getLayout(
     layout.push_back({
         .position =
             {
-                .rect = lrects[1],
-                .fit = display::FitStrategy::ClipLeft,
+                .rect = bottom_left,
+                .hor = view::AxisFit::Max,
+                .vert = view::AxisFit::Min,
             },
         .document_id = doc_id,
         .page_index = state.page_index + 2,
@@ -174,8 +195,9 @@ void State::getLayout(
     layout.push_back({
         .position =
             {
-                .rect = rrects[1],
-                .fit = display::FitStrategy::ClipLeft,
+                .rect = bottom_right,
+                .hor = view::AxisFit::Min,
+                .vert = view::AxisFit::Min,
             },
         .document_id = doc_id,
         .page_index = state.page_index + 3,
@@ -187,21 +209,23 @@ void State::fixRowOffset(int32_t& row_offset, uint32_t height, uint32_t delta, V
         "fixRowOffset before: row_offset={}, page_index={}", row_offset, state.page_index);
 
     // Fix row_offset when we know the rectangle
-    while (row_offset < 0) {
-        row_offset += height;
-        nextPage(-delta, state);
+    if (row_offset < 0) {
+        int count = 1 + -row_offset / int(height);
+        row_offset += count * height;
+        nextPage(-delta * count, state);
     }
 
-    while (row_offset >= height) {
-        row_offset -= height;
-        nextPage(delta, state);
+    if (row_offset >= height) {
+        int count = row_offset / int(height);
+        row_offset -= count * height;
+        nextPage(delta * count, state);
     }
 
     core::log::global()->info(
         "fixRowOffset after: row_offset={}, page_index={}", row_offset, state.page_index);
 }
 
-void State::addDocument(media::pdf::DocumentId id) {
+void State::addDocument(DocumentId id) {
     ids_.push_back(id);
 
     if (!idx_) {
@@ -210,7 +234,7 @@ void State::addDocument(media::pdf::DocumentId id) {
     }
 }
 
-void State::onDocumentChanged(media::pdf::DocumentId from, media::pdf::DocumentId to) {
+void State::onDocumentChanged(DocumentId from, DocumentId to) {
     auto it = std::ranges::find(ids_, from);
     *it = to;
 
@@ -223,52 +247,52 @@ void State::onDocumentChanged(media::pdf::DocumentId from, media::pdf::DocumentI
     }
 }
 
-void State::scrollNext() {
+void State::scrollNext(int times) {
     if (auto state = getState()) {
         utils::visit(state->page_state, [&](auto& page_state) {
-            scrollNext(page_state, *state);
+            scrollNext(page_state, times, *state);
         });
     }
 }
 
-void State::scrollNext(OnePage, ViewState& state) {
-    nextPage(1, state);
+void State::scrollNext(OnePage, int times, ViewState& state) {
+    nextPage(times, state);
 }
 
-void State::scrollNext(TwoPages, ViewState& state) {
-    nextPage(2, state);
+void State::scrollNext(TwoPages, int times, ViewState& state) {
+    nextPage(2 * times, state);
 }
 
-void State::scrollNext(OnePageContinuous& page_state, ViewState& state) {
-    page_state.row_offset += 10;
+void State::scrollNext(OnePageContinuous& page_state, int times, ViewState& state) {
+    page_state.row_offset += 10 * times;
 }
 
-void State::scrollNext(TwoPagesContinuous& page_state, ViewState& state) {
-    page_state.row_offset += 10;
+void State::scrollNext(TwoPagesContinuous& page_state, int times, ViewState& state) {
+    page_state.row_offset += 10 * times;
 }
 
-void State::scrollPrev() {
+void State::setPageIndex(uint32_t index) {
     if (auto state = getState()) {
-        utils::visit(state->page_state, [&](auto& page_state) {
-            scrollPrev(page_state, *state);
-        });
+        auto page_count = doc_storage_->getDocument(*getDocumentId()).pageCount();
+        state->page_index = std::min(page_count - 1, int(index));
+
+        utils::visit(
+            state->page_state,
+            [](auto&&) {
+            },
+            [](OnePageContinuous& p) {
+                p.row_offset = 0;
+            },
+            [](TwoPagesContinuous& p) {
+                p.row_offset = 0;
+            });
     }
 }
 
-void State::scrollPrev(OnePage, ViewState& state) {
-    nextPage(-1, state);
-}
-
-void State::scrollPrev(TwoPages, ViewState& state) {
-    nextPage(-2, state);
-}
-
-void State::scrollPrev(OnePageContinuous& page_state, ViewState& state) {
-    page_state.row_offset -= 10;
-}
-
-void State::scrollPrev(TwoPagesContinuous& page_state, ViewState& state) {
-    page_state.row_offset -= 10;
+void State::nextPage(int delta) {
+    if (auto state = getState()) {
+        nextPage(delta, *state);
+    }
 }
 
 void State::nextPage(int delta, ViewState& state) {
@@ -292,31 +316,25 @@ void State::nextPage(int delta, ViewState& state) {
     }
 }
 
-void State::nextDocument() {
+void State::nextDocument(int delta) {
     if (idx_) {
         auto& idx = *idx_;
+        int index = idx + delta;
 
-        if (idx + 1 < ids_.size()) {
-            ++idx;
-        } else {
-            idx = 0;
+        if (index < 0) {
+            index = ids_.size() - 1 - ((-index - 1) % ids_.size());
+        } else if (index >= ids_.size()) {
+            index = index % ids_.size();
         }
+
+        idx = index;
     }
 }
 
-void State::prevDocument() {
-    if (idx_) {
-        auto& idx = *idx_;
+void State::nextLayout(int delta) {
+    // XXX TODO: support delta other than |delta| = 1
+    PDFT_VERIFY(std::abs(delta) == 1);
 
-        if (idx > 0) {
-            --idx;
-        } else {
-            idx = ids_.size() - 1;
-        }
-    }
-}
-
-void State::nextLayout() {
     if (auto state = getState()) {
         state->page_state = utils::visit(
             state->page_state,
@@ -335,25 +353,6 @@ void State::nextLayout() {
     }
 }
 
-void State::prevLayout() {
-    if (auto state = getState()) {
-        state->page_state = utils::visit(
-            state->page_state,
-            [&](OnePage) -> PageState {
-                return TwoPagesContinuous{.row_offset = 0};
-            },
-            [&](TwoPages) -> PageState {
-                return OnePage{};
-            },
-            [&](OnePageContinuous) -> PageState {
-                return TwoPages{};
-            },
-            [&](TwoPagesContinuous state) -> PageState {
-                return OnePageContinuous{.row_offset = state.row_offset};
-            });
-    }
-}
-
 State::ViewState* State::getState() {
     if (auto doc_id = getDocumentId()) {
         return &state_[*doc_id];
@@ -362,22 +361,16 @@ State::ViewState* State::getState() {
     return nullptr;
 }
 
-std::optional<State::DocumentId> State::getDocumentId() const {
+std::optional<DocumentId> State::getDocumentId() const {
     return idx_.transform([this](auto idx) {
         return ids_[idx];
     });
 }
 
-void State::zoomIn() {
+void State::zoomIn(float coeff) {
     if (auto state = getState()) {
-        state->zoom *= 1.10;
+        state->zoom *= coeff;
     }
 }
 
-void State::zoomOut() {
-    if (auto state = getState()) {
-        state->zoom /= 1.10;
-    }
-}
-
-}  // namespace pdft::view::app
+}  // namespace pdft::state::app

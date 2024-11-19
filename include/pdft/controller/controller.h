@@ -7,7 +7,7 @@ namespace pdft::controller {
 enum class Action {
     None,
     Quit,
-    ClearScreen,
+    Redraw,
 };
 
 class Controller {

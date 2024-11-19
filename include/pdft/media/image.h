@@ -16,7 +16,6 @@ class Image {
     virtual ~Image() = default;
 
     virtual ImageSize size() const = 0;
-
     virtual std::string_view samples() const = 0;
 };
 

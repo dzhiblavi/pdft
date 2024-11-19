@@ -1,6 +1,6 @@
 #include "pdft/core/terminal/terminal.h"
 #include "pdft/display/display.h"
-#include "pdft/media/pdf/document_storage.h"
+#include "pdft/state/document_storage.h"
 #include "pdft/view/renderer.h"
 
 namespace pdft::view::app {
@@ -8,8 +8,7 @@ namespace pdft::view::app {
 class Renderer : public view::Renderer {
  public:
     Renderer(
-        std::shared_ptr<media::pdf::DocumentStorage> docs,
-        std::shared_ptr<display::Display> display)
+        std::shared_ptr<state::DocumentStorage> docs, std::shared_ptr<display::Display> display)
         : term_dims_(core::terminal::getTerminalDimensions())
         , docs_(std::move(docs))
         , display_(std::move(display)) {}
@@ -21,7 +20,7 @@ class Renderer : public view::Renderer {
     float calcFactor(media::pdf::PageSize page_size);
 
     core::terminal::Dimensions term_dims_;
-    std::shared_ptr<media::pdf::DocumentStorage> docs_;
+    std::shared_ptr<state::DocumentStorage> docs_;
     std::shared_ptr<display::Display> display_;
 };
 

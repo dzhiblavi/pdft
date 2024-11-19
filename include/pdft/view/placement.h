@@ -1,13 +1,15 @@
 #pragma once
 
-#include "pdft/display/position.h"
-#include "pdft/media/pdf/document.h"
+#include "pdft/state/document_storage.h"
+#include "pdft/view/position.h"
 
 namespace pdft::view {
 
 struct Placement {
-    display::Position position;
-    media::pdf::DocumentId document_id;
+    // The position which specifies where and how the page will be displayed
+    Position position;
+
+    state::DocumentId document_id;
     uint32_t page_index;
 };
 

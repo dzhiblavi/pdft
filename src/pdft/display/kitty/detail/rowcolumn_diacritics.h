@@ -19,6 +19,8 @@
 
 #include <string_view>
 
+namespace pdft::display::kitty::detail {
+
 std::string_view RowColDiacritics[] = {
     "\U00000305",  "\U0000030D",  "\U0000030E",  "\U00000310",  "\U00000312",  "\U0000033D",
     "\U0000033E",  "\U0000033F",  "\U00000346",  "\U0000034A",  "\U0000034B",  "\U0000034C",
@@ -71,3 +73,5 @@ std::string_view RowColDiacritics[] = {
     "\U00001D188", "\U00001D189", "\U00001D1AA", "\U00001D1AB", "\U00001D1AC", "\U00001D1AD",
     "\U00001D242", "\U00001D243", "\U00001D244",
 };
+
+}  // namespace pdft::display::kitty::detail

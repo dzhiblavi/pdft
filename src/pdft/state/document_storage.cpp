@@ -1,9 +1,9 @@
-#include "pdft/media/pdf/document_storage.h"
+#include "pdft/state/document_storage.h"
 #include "pdft/core/assert.h"
 
-namespace pdft::media::pdf {
+namespace pdft::state {
 
-DocumentId DocumentStorage::addDocument(Document document) {
+DocumentId DocumentStorage::addDocument(media::pdf::Document document) {
     static DocumentId next_id = 0;
 
     auto id = next_id++;
@@ -19,7 +19,7 @@ void DocumentStorage::removeDocument(DocumentId id) {
     documents_.erase(it);
 }
 
-const Document& DocumentStorage::getDocument(DocumentId id) const {
+const media::pdf::Document& DocumentStorage::getDocument(DocumentId id) const {
     auto it = documents_.find(id);
     PDFT_VERIFY(it != documents_.end());
     return it->second;
@@ -31,8 +31,8 @@ DocumentId DocumentStorage::getIdByPath(const std::filesystem::path& path) const
     return it->second;
 }
 
-Context& DocumentStorage::getContext() const {
+media::pdf::Context& DocumentStorage::getContext() const {
     return *context_;
 }
 
-}  // namespace pdft::media::pdf
+}  // namespace pdft::state

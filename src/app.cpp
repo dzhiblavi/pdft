@@ -14,11 +14,12 @@
 #include "pdft/controller/app/controller.h"
 
 #include "pdft/view/app/renderer.h"
-#include "pdft/view/app/state.h"
+
+#include "pdft/state/app/state.h"
+#include "pdft/state/document_storage.h"
 
 #include "pdft/media/pdf/context.h"
 #include "pdft/media/pdf/document.h"
-#include "pdft/media/pdf/document_storage.h"
 
 #include "pdft/utils/visit.h"
 
@@ -182,10 +183,10 @@ asio::awaitable<void> main(asio::io_context& context, std::span<char const*> pat
 
     const size_t MaxQueueBufferSize = 10;
     auto queue = EventQueue(context, MaxQueueBufferSize);
-    auto doc_storage = std::make_shared<media::pdf::DocumentStorage>(pdf_context);
+    auto doc_storage = std::make_shared<state::DocumentStorage>(pdf_context);
+    auto state = std::make_shared<state::app::State>(doc_storage);
     auto display = std::make_shared<display::kitty::Display>(terminal, executor);
     auto renderer = std::make_shared<view::app::Renderer>(doc_storage, display);
-    auto state = std::make_shared<view::app::State>(doc_storage);
     auto controller = std::make_shared<controller::app::Controller>(state, doc_storage);
     auto notify = pdft::notify::fsw::Notify(queue.get_executor());
 
@@ -233,6 +234,8 @@ asio::awaitable<void> main(asio::io_context& context, std::span<char const*> pat
     init.manualExit();
 
     for (;;) {
+        core::log::global()->info("========== NEW FRAME ===========");
+
         auto tracer =
             core::trace::getGlobalPool().getTracer(core::trace::stackTraceLogger(), "display_one");
 
@@ -251,29 +254,32 @@ asio::awaitable<void> main(asio::io_context& context, std::span<char const*> pat
             co_await console->write(buffer.view());
         }
 
-        auto event = co_await queue.async_receive(asio::use_awaitable);
+        bool quit = co_await [&]() -> asio::awaitable<bool> {
+            for (;;) {
+                auto event = co_await queue.async_receive(asio::use_awaitable);
 
-        auto action = utils::visit(
-            event,
-            [&](KeyPressEvent event) {
-                return controller->onKeyEvent(event.key);
-            },
-            [&](notify::Event event) {
-                return controller->onFilesystemEvent(event);
-            });
+                auto action = utils::visit(
+                    event,
+                    [&](KeyPressEvent event) {
+                        return controller->onKeyEvent(event.key);
+                    },
+                    [&](notify::Event event) {
+                        return controller->onFilesystemEvent(event);
+                    });
 
-        switch (action) {
-            using enum controller::Action;
+                using enum controller::Action;
 
-            case None:
-                break;
+                if (action == Quit) {
+                    co_return true;
+                }
 
-            case ClearScreen:
-            case Quit:
-                break;
-        }
+                if (action == Redraw) {
+                    co_return false;
+                }
+            }
+        }();
 
-        if (action == controller::Action::Quit) {
+        if (quit) {
             break;
         }
     }

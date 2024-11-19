@@ -1,15 +1,13 @@
 #pragma once
 
-#include "context.h"
-#include "page.h"
+#include "pdft/media/pdf/context.h"
+#include "pdft/media/pdf/page.h"
 
 #include <filesystem>
 
 struct fz_document;
 
 namespace pdft::media::pdf {
-
-using DocumentId = uint32_t;
 
 class Document {
  public:

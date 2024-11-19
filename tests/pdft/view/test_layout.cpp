@@ -1,25 +1,10 @@
 #include "pdft/view/layout.h"
 
 #include <catch2/catch_test_macros.hpp>
-#include <format>
-#include <iostream>
+
 #include <vector>
 
 namespace pdft::view {
-
-namespace {
-
-void printDebug(const IRect& r) {
-    std::cout << std::format("Rect(x={},y={},w={},h={})", r.x, r.y, r.width, r.height) << std::endl;
-}
-
-void printDebug(const std::vector<IRect>& rects) {
-    for (const auto& rect : rects) {
-        printDebug(rect);
-    }
-}
-
-}  // namespace
 
 inline const IRect TestRect = IRect{
     .x = 10,

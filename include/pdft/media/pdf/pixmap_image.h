@@ -1,7 +1,7 @@
 #pragma once
 
-#include "context.h"
 #include "pdft/media/image.h"
+#include "pdft/media/pdf/context.h"
 
 struct fz_pixmap;
 

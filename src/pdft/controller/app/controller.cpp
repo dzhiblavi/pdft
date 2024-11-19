@@ -4,50 +4,85 @@
 
 namespace pdft::controller::app {
 
+Controller::Controller(
+    std::shared_ptr<state::State> state, std::shared_ptr<state::DocumentStorage> docs)
+    : state_(std::move(state))
+    , docs_(std::move(docs)) {
+    key_tree_.bind("q", [this](auto) {
+        action_ = Action::Quit;
+    });
+
+    key_tree_.bind("j", [this](auto) {
+        state_->scrollNext(1);
+        action_ = Action::Redraw;
+    });
+    key_tree_.bind("k", [this](auto) {
+        state_->scrollNext(-1);
+        action_ = Action::Redraw;
+    });
+    key_tree_.bind(KeyTree::number, "j", [this](auto times) {
+        state_->nextPage(times);
+        action_ = Action::Redraw;
+    });
+    key_tree_.bind(KeyTree::number, "k", [this](auto times) {
+        state_->nextPage(-times);
+        action_ = Action::Redraw;
+    });
+
+    key_tree_.bind(KeyTree::number, "G", [this](auto index) {
+        state_->setPageIndex(index);
+        action_ = Action::Redraw;
+    });
+    key_tree_.bind("gg", [this](auto index) {
+        state_->setPageIndex(0);
+        action_ = Action::Redraw;
+    });
+    key_tree_.bind("G", [this](auto index) {
+        state_->setPageIndex(INT_MAX);
+        action_ = Action::Redraw;
+    });
+
+    key_tree_.bind("h", [this](auto) {
+        state_->nextDocument(-1);
+        action_ = Action::Redraw;
+    });
+    key_tree_.bind("l", [this](auto) {
+        state_->nextDocument(+1);
+        action_ = Action::Redraw;
+    });
+    key_tree_.bind(KeyTree::number, "h", [this](auto n) {
+        state_->nextDocument(-n);
+        action_ = Action::Redraw;
+    });
+    key_tree_.bind(KeyTree::number, "l", [this](auto n) {
+        state_->nextDocument(+n);
+        action_ = Action::Redraw;
+    });
+
+    key_tree_.bind("s", [this](auto) {
+        state_->nextLayout(1);
+        action_ = Action::Redraw;
+    });
+    key_tree_.bind("S", [this](auto) {
+        state_->nextLayout(-1);
+        action_ = Action::Redraw;
+    });
+
+    key_tree_.bind("=", [this](auto) {
+        state_->zoomIn(1.10f);
+        action_ = Action::Redraw;
+    });
+    key_tree_.bind("-", [this](auto) {
+        state_->zoomIn(1.f / 1.10f);
+        action_ = Action::Redraw;
+    });
+}
+
 Action Controller::onKeyEvent(char key) {
     core::log::global()->info("controller: key={}", key);
-
-    switch (key) {
-        using enum Action;
-
-        case 'q':
-            return Quit;
-
-        case 'j':
-            state_->scrollNext();
-            return None;
-
-        case 'k':
-            state_->scrollPrev();
-            return None;
-
-        case 's':
-            state_->nextLayout();
-            return ClearScreen;
-
-        case 'S':
-            state_->prevLayout();
-            return ClearScreen;
-
-        case 'l':
-            state_->nextDocument();
-            return ClearScreen;
-
-        case 'h':
-            state_->prevDocument();
-            return ClearScreen;
-
-        case '=':
-            state_->zoomIn();
-            return ClearScreen;
-
-        case '-':
-            state_->zoomOut();
-            return ClearScreen;
-
-        default:
-            return None;
-    }
+    action_ = Action::None;
+    key_tree_.feed(key);
+    return action_;
 }
 
 Action Controller::onFilesystemEvent(const notify::Event& event) {
@@ -66,7 +101,7 @@ Action Controller::onFilesystemEvent(const notify::Event& event) {
         new_id);
 
     state_->onDocumentChanged(old_id, new_id);
-    return Action::ClearScreen;
+    return Action::Redraw;
 }
 
 }  // namespace pdft::controller::app
