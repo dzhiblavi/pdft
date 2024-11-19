@@ -33,9 +33,7 @@ void KeyTree::bind(std::string_view keys, CallbackType callback) {
         root_ = new Node;
     }
 
-    bindFrom(root_, keys, [cb = std::move(callback)](auto /*ignored*/) {
-        std::move(cb)();
-    });
+    bindFrom(root_, keys, [cb = std::move(callback)](auto /*ignored*/) { std::move(cb)(); });
 }
 
 void KeyTree::bind(NumberType, std::string_view keys, NumberCallbackType callback) {
@@ -68,22 +66,19 @@ void KeyTree::bindFrom(Node* root, std::string_view keys, NumberCallbackType cal
     curr->callback = std::move(callback);
 }
 
-void KeyTree::feed(char key) {
+KeyTree::Result KeyTree::feed(char key) {
     if (std::isdigit(key)) {
-        feedDigit(key);
+        return feedDigit(key);
     } else {
-        feedChar(key);
+        return feedChar(key);
     }
 }
 
-void KeyTree::feedChar(char key) {
+KeyTree::Result KeyTree::feedChar(char key) {
     switch (state_) {
         case None:
-            if (root_ != nullptr) {
-                state_ = Simple;
-                curr_ = root_;
-            } else {
-                return;
+            if (root_ == nullptr) {
+                return Result::Rejected;
             }
             break;
 
@@ -95,29 +90,26 @@ void KeyTree::feedChar(char key) {
             break;
     }
 
-    auto it = curr_->children.find(key);
-    if (it == curr_->children.end()) {
-        auto* curr = curr_;
-        reset();
+    auto curr = curr_ != nullptr ? curr_ : root_;
+    auto it = curr->children.find(key);
 
-        bool is_digit = std::isdigit(key);
-        if ((is_digit && num_root_ != curr) || (!is_digit && root_ != curr)) {
-            feed(key);
-        }
-
-        return;
+    if (it == curr->children.end()) {
+        return Result::Rejected;
     }
 
-    auto* next = it->second;
-    if (next->callback) {
-        next->callback(number_);
-        reset();
-    } else {
-        curr_ = next;
+    curr_ = it->second;
+    state_ = Simple;
+
+    if (!curr_->callback) {
+        return Result::Accepted;
     }
+
+    curr_->callback(number_);
+    reset();
+    return Result::Terminated;
 }
 
-void KeyTree::feedDigit(char key) {
+KeyTree::Result KeyTree::feedDigit(char key) {
     int digit = key - '0';
 
     switch (state_) {
@@ -127,20 +119,19 @@ void KeyTree::feedDigit(char key) {
                 curr_ = num_root_;
                 state_ = Counting;
                 number_ = digit;
+                return Result::Accepted;
             } else {
-                feedChar(key);
+                return feedChar(key);
             }
-            break;
 
         case Simple:
             PDFT_VERIFY(curr_ != nullptr);
-            feedChar(key);
-            break;
+            return feedChar(key);
 
         case Counting:
             PDFT_VERIFY(curr_ == num_root_);
             number_ = number_ * 10 + digit;
-            break;
+            return Result::Accepted;
     }
 }
 

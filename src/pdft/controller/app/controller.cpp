@@ -8,81 +8,45 @@ Controller::Controller(
     std::shared_ptr<state::State> state, std::shared_ptr<state::DocumentStorage> docs)
     : state_(std::move(state))
     , docs_(std::move(docs)) {
-    key_tree_.bind("q", [this] {
-        action_ = Action::Quit;
-    });
+    key_tree_.bind("q", [this] { quit_ = true; });
 
-    key_tree_.bind("j", [this] {
-        state_->scrollNext(1);
-        action_ = Action::Redraw;
-    });
-    key_tree_.bind("k", [this] {
-        state_->scrollNext(-1);
-        action_ = Action::Redraw;
-    });
-    key_tree_.bind(KeyTree::number, "j", [this](auto times) {
-        state_->nextPage(times);
-        action_ = Action::Redraw;
-    });
-    key_tree_.bind(KeyTree::number, "k", [this](auto times) {
-        state_->nextPage(-times);
-        action_ = Action::Redraw;
-    });
+    key_tree_.bind("j", [this] { state_->scrollNext(1); });
+    key_tree_.bind("k", [this] { state_->scrollNext(-1); });
+    key_tree_.bind(KeyTree::number, "j", [this](auto times) { state_->nextPage(times); });
+    key_tree_.bind(KeyTree::number, "k", [this](auto times) { state_->nextPage(-times); });
 
-    key_tree_.bind(KeyTree::number, "G", [this](auto index) {
-        state_->setPageIndex(index);
-        action_ = Action::Redraw;
-    });
-    key_tree_.bind("gg", [this] {
-        state_->setPageIndex(0);
-        action_ = Action::Redraw;
-    });
-    key_tree_.bind("G", [this] {
-        state_->setPageIndex(INT_MAX);
-        action_ = Action::Redraw;
-    });
+    key_tree_.bind(KeyTree::number, "G", [this](auto index) { state_->setPageIndex(index); });
+    key_tree_.bind("gg", [this] { state_->setPageIndex(0); });
+    key_tree_.bind("G", [this] { state_->setPageIndex(INT_MAX); });
 
-    key_tree_.bind("h", [this] {
-        state_->nextDocument(-1);
-        action_ = Action::Redraw;
-    });
-    key_tree_.bind("l", [this] {
-        state_->nextDocument(+1);
-        action_ = Action::Redraw;
-    });
-    key_tree_.bind(KeyTree::number, "h", [this](auto n) {
-        state_->nextDocument(-n);
-        action_ = Action::Redraw;
-    });
-    key_tree_.bind(KeyTree::number, "l", [this](auto n) {
-        state_->nextDocument(+n);
-        action_ = Action::Redraw;
-    });
+    key_tree_.bind("h", [this] { state_->nextDocument(-1); });
+    key_tree_.bind("l", [this] { state_->nextDocument(+1); });
+    key_tree_.bind(KeyTree::number, "h", [this](auto n) { state_->nextDocument(-n); });
+    key_tree_.bind(KeyTree::number, "l", [this](auto n) { state_->nextDocument(+n); });
 
-    key_tree_.bind("s", [this] {
-        state_->nextLayout(1);
-        action_ = Action::Redraw;
-    });
-    key_tree_.bind("S", [this] {
-        state_->nextLayout(-1);
-        action_ = Action::Redraw;
-    });
+    key_tree_.bind("s", [this] { state_->nextLayout(1); });
+    key_tree_.bind("S", [this] { state_->nextLayout(-1); });
 
-    key_tree_.bind("=", [this] {
-        state_->updateZoom(1.10f);
-        action_ = Action::Redraw;
-    });
-    key_tree_.bind("-", [this] {
-        state_->updateZoom(1.f / 1.10f);
-        action_ = Action::Redraw;
-    });
+    key_tree_.bind("=", [this] { state_->updateZoom(1.10f); });
+    key_tree_.bind("-", [this] { state_->updateZoom(1.f / 1.10f); });
 }
 
 Action Controller::onKeyEvent(char key) {
     core::log::global()->info("controller: key={}", key);
-    action_ = Action::None;
-    key_tree_.feed(key);
-    return action_;
+
+    switch (key_tree_.feed(key)) {
+        using enum KeyTree::Result;
+
+        case Accepted:
+            return Action::None;
+
+        case Rejected:
+            key_tree_.reset();
+            return Action::None;
+
+        case Terminated:
+            return quit_ ? Action::Quit : Action::Redraw;
+    }
 }
 
 Action Controller::onFilesystemEvent(const notify::Event& event) {

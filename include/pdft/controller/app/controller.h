@@ -19,7 +19,7 @@ class Controller : public controller::Controller {
     KeyTree key_tree_;
     std::shared_ptr<state::State> state_;
     std::shared_ptr<state::DocumentStorage> docs_;
-    Action action_ = Action::None;
+    bool quit_ = false;
 };
 
 }  // namespace pdft::controller::app

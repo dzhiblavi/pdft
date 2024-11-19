@@ -7,6 +7,12 @@ namespace pdft::controller {
 
 class KeyTree {
  public:
+    enum class [[nodiscard]] Result {
+        Accepted,    // Key has been appended to the current sequence.
+        Rejected,    // Key has been rejected. The state is not affected.
+        Terminated,  // Key has been appended and the callback has been called. The state is reset.
+    };
+
     using CallbackType = std::function<void()>;
     using NumberCallbackType = std::function<void(uint32_t)>;
 
@@ -19,13 +25,13 @@ class KeyTree {
     void bind(std::string_view keys, CallbackType callback);
     void bind(NumberType, std::string_view keys, NumberCallbackType callback);
 
-    void feed(char key);
+    Result feed(char key);
     void reset();
 
  private:
     struct Node {
-        NumberCallbackType callback = {};
         std::unordered_map<char, Node*> children;
+        [[no_unique_address]] NumberCallbackType callback = {};
     };
 
     enum State {
@@ -35,8 +41,8 @@ class KeyTree {
         // Number otherwise
     };
 
-    void feedChar(char key);
-    void feedDigit(char key);
+    Result feedChar(char key);
+    Result feedDigit(char key);
 
     static void bindFrom(Node* root, std::string_view keys, NumberCallbackType callback);
 
