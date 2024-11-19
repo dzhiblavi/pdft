@@ -1,6 +1,7 @@
 #include "app.h"
 #include "consume_fs_events.h"
 #include "keyboard_consumer.h"
+#include "resolve_apc_executor.h"
 #include "setup_logging.h"
 
 #include "pdft/core/io/posix/console.h"
@@ -8,7 +9,6 @@
 #include "pdft/core/log/log.h"
 #include "pdft/core/notify/fsw/notify.h"
 #include "pdft/core/terminal/ansi/terminal.h"
-#include "pdft/core/terminal/tmux/apc_executor.h"
 #include "pdft/core/trace/log.h"
 #include "pdft/core/trace/stack_scope_tracer.h"
 
@@ -24,6 +24,7 @@
 #include "pdft/media/pdf/document.h"
 
 #include "pdft/utils/visit.h"
+#include "setup_signal_handlers.h"
 
 #include <asio/co_spawn.hpp>
 #include <asio/detached.hpp>
@@ -41,13 +42,16 @@ namespace app {
 using namespace pdft;
 
 void Application::setup() {
+    app::setupSignalHandlers();
+    app::setupLogging();
+
     pdf_context_ = std::make_shared<media::pdf::Context>(media::pdf::Context::Builder().build());
     app::setupMupdfLogging(*pdf_context_);
     pdf_context_->registerDocumentHandlers();
 
     term_control_ = std::make_shared<core::io::posix::TermControl>();
     terminal_ = std::make_shared<core::terminal::ansi::Terminal>();
-    executor_ = std::make_shared<core::terminal::tmux::APCExecutor>();
+    executor_ = resolveAPCExecutor();
     console_ = std::make_shared<core::io::posix::Console>(
         context_, ::dup(STDIN_FILENO), ::dup(STDOUT_FILENO));
 
@@ -57,11 +61,14 @@ void Application::setup() {
     renderer_ = std::make_shared<view::app::Renderer>(document_storage_, image_display_, terminal_);
     state_ = std::make_shared<state::app::State>(document_storage_, renderer_);
     controller_ = std::make_shared<controller::app::Controller>(state_, document_storage_);
-    fs_watcher_ = std::make_shared<pdft::notify::fsw::Notify<asio::io_context::executor_type>>(
-        context_.get_executor());
+
+    if (config_.system.enable_filesystem_watching) {
+        fs_watcher_ = std::make_shared<pdft::notify::fsw::Notify<asio::io_context::executor_type>>(
+            context_.get_executor());
+    }
 }
 
-asio::awaitable<void> Application::run(std::span<const char*> paths) {
+asio::awaitable<void> Application::run(const std::vector<std::string>& paths) {
     co_await prepareTerminal();
     loadPaths(paths);
     startEventsConsumption();
@@ -79,11 +86,8 @@ asio::awaitable<void> Application::prepareTerminal() {
     co_await console_->write(init_buffer.view());
 }
 
-void Application::loadPaths(std::span<const char*> paths) {
-    // Load files
-    for (size_t i = 1; i < paths.size(); ++i) {
-        auto path = std::filesystem::absolute(paths[i]);
-
+void Application::loadPaths(const std::vector<std::string>& paths) {
+    for (const auto& path : paths) {
         if (!std::filesystem::exists(path)) {
             core::log::global()->info("path {} does not exist, skipping", path.c_str());
             continue;
@@ -92,14 +96,26 @@ void Application::loadPaths(std::span<const char*> paths) {
         auto doc_id =
             document_storage_->addDocument(media::pdf::Document::open(*pdf_context_, path));
         state_->addDocument(doc_id);
-        fs_watcher_->add(path);
+
+        if (config_.system.enable_filesystem_watching) {
+            fs_watcher_->add(path);
+        }
+
+        core::log::global()->info("loaded path {}", path.c_str());
     }
 }
 
 void Application::startEventsConsumption() {
     // Start event consumption
     asio::co_spawn(context_, keyboard_consumer_->consumeInto(event_queue_), asio::detached);
-    asio::co_spawn(context_, consumeFsEvents(event_queue_, *fs_watcher_), asio::detached);
+
+    if (config_.system.enable_filesystem_watching) {
+        asio::co_spawn(context_, consumeFsEvents(event_queue_, *fs_watcher_), asio::detached);
+        core::log::global()->info("Started filesystem watcher");
+    } else {
+        core::log::global()->info(
+            "Filesystem watching has been disabled by config (.system.enable_filesystem_watching)");
+    }
 }
 
 asio::awaitable<void> Application::runEventLoop() {
@@ -175,7 +191,7 @@ asio::awaitable<void> Application::cleanup() {
         keyboard_consumer_->stop();
     }
 
-    {
+    if (config_.system.enable_filesystem_watching) {
         auto _ = cleanup.addChild("notify_stop");
         fs_watcher_->stop();
     }

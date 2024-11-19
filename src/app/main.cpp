@@ -1,18 +1,19 @@
 #include "app.h"
-#include "setup_logging.h"
-#include "setup_signal_handlers.h"
+#include "cli_args.h"
 
 #include <asio/co_spawn.hpp>
 #include <asio/detached.hpp>
 #include <asio/io_context.hpp>
 
 #include <iostream>
+#include <rfl/Processors.hpp>
+#include <rfl/yaml.hpp>
 
 namespace app {
 
-asio::awaitable<void> main(asio::io_context& context, std::span<const char*> paths) {
-    Application app(context);
-
+asio::awaitable<void> main(
+    asio::io_context& context, Config config, const std::vector<std::string>& paths) {
+    Application app(context, std::move(config));
     app.setup();
     co_await app.run(paths);
 }
@@ -20,16 +21,24 @@ asio::awaitable<void> main(asio::io_context& context, std::span<const char*> pat
 }  // namespace app
 
 int main(int argc, const char** argv) {
-    if (argc < 2) {
-        std::cerr << "Usage: ./app <file>.pdf [<file>.pdf...]" << std::endl;
+    auto args = std::span(argv, argc);
+
+    auto cli_args = app::parseCliArgs(args);
+    if (!cli_args.has_value()) {
+        std::cerr << std::format("Error while parsing CLI arguments: {}", cli_args.error())
+                  << std::endl;
         return 1;
     }
 
-    app::setupSignalHandlers();
-    app::setupLogging();
+    auto config = rfl::yaml::load<app::Config, rfl::DefaultIfMissing>(cli_args->config_path);
+    if (!config) {
+        std::cerr << std::format("Error while parsing configuration: {}", config.error()->what())
+                  << std::endl;
+        return 1;
+    }
 
     asio::io_context context(1);
-    asio::co_spawn(context, app::main(context, std::span(argv, argc)), asio::detached);
+    asio::co_spawn(context, app::main(context, *config, cli_args->paths), asio::detached);
     context.run();
     return 0;
 }

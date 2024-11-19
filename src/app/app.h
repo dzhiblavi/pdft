@@ -1,5 +1,6 @@
 #pragma once
 
+#include "config.h"
 #include "event_queue.h"
 #include "keyboard_consumer.h"
 #include "pdft/controller/controller.h"
@@ -19,19 +20,23 @@ namespace app {
 
 class Application {
  public:
-    Application(asio::io_context& context) : context_(context), event_queue_(context, 10) {}
+    Application(asio::io_context& context, Config config)
+        : context_(context)
+        , config_(config)
+        , event_queue_(context, config.system.max_event_queue_size) {}
 
     void setup();
-    asio::awaitable<void> run(std::span<const char*> paths);
+    asio::awaitable<void> run(const std::vector<std::string>& paths);
 
  private:
     asio::awaitable<void> prepareTerminal();
-    void loadPaths(std::span<const char*> paths);
+    void loadPaths(const std::vector<std::string>& paths);
     void startEventsConsumption();
     asio::awaitable<void> runEventLoop();
     asio::awaitable<void> cleanup();
 
     asio::io_context& context_;
+    Config config_;
 
     std::shared_ptr<pdft::media::pdf::Context> pdf_context_;
     std::shared_ptr<pdft::core::io::TermControl> term_control_;

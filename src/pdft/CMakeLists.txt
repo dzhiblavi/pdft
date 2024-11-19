@@ -23,13 +23,13 @@ target_link_libraries(
          libmupdf_ext
          libfswatch
          magic_enum::magic_enum
-         cppcoro::cppcoro
-         reflectcpp)
+         cppcoro::cppcoro)
 
 target_sources(
   pdft
   PRIVATE ./utils/base64.cpp
           ./utils/zlib.cpp
+          ./utils/get_home_dir.cpp
           ./view/rect.cpp
           ./view/layout.cpp
           ./view/position.cpp
