@@ -11,6 +11,18 @@ void State::getLayout(view::IRect rect, std::vector<view::Placement>& layout) {
     }
 }
 
+void State::onInput(char key) {
+    current_input_.push_back(key);
+}
+
+void State::resetInput() {
+    current_input_.clear();
+}
+
+std::string_view State::getCurrentInput() const {
+    return current_input_;
+}
+
 void State::addDocument(DocumentId id) {
     auto page_count = doc_storage_->getDocument(id).pageCount();
     states_.emplace_back(id, page_count);

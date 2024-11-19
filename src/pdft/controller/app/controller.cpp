@@ -38,13 +38,16 @@ Action Controller::onKeyEvent(char key) {
         using enum KeyTree::Result;
 
         case Accepted:
+            state_->onInput(key);
             return Action::None;
 
         case Rejected:
             key_tree_.reset();
+            state_->resetInput();
             return Action::None;
 
         case Terminated:
+            state_->resetInput();
             return quit_ ? Action::Quit : Action::Redraw;
     }
 }

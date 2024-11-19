@@ -11,6 +11,10 @@ class State {
 
     virtual void getLayout(view::IRect rect, std::vector<view::Placement>& layout) = 0;
 
+    virtual void onInput(char key) = 0;
+    virtual void resetInput() = 0;
+    virtual std::string_view getCurrentInput() const = 0;
+
     virtual void addDocument(DocumentId id) = 0;
     virtual void onDocumentChanged(DocumentId from, DocumentId to) = 0;
 

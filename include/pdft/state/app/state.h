@@ -13,6 +13,8 @@ class State : public state::State {
         : doc_storage_(std::move(doc_storage)) {}
 
     void getLayout(view::IRect rect, std::vector<view::Placement>& layout) override;
+    void onInput(char key) override;
+    void resetInput() override;
     void addDocument(DocumentId id) override;
     void onDocumentChanged(DocumentId from, DocumentId to) override;
     void scrollNext(int delta) override;
@@ -22,12 +24,15 @@ class State : public state::State {
     void nextLayout(int delta) override;
     void updateZoom(float coeff) override;
 
+    std::string_view getCurrentInput() const override;
+
  private:
     DocumentState* getState();
 
     std::shared_ptr<DocumentStorage> doc_storage_;
     std::optional<size_t> idx_ = std::nullopt;
     std::vector<DocumentState> states_;
+    std::string current_input_;
 };
 
 }  // namespace pdft::state::app
