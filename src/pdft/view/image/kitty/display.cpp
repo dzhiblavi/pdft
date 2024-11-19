@@ -144,7 +144,7 @@ void Display::displayImage(ImageId id, IRect rect, core::io::OutBuffer& buffer) 
         terminal_->moveCursor(
             core::terminal::CursorPosition{
                 .rows = row + 1,
-                .columns = left,
+                .columns = left + 1,
             },
             buffer);
 
