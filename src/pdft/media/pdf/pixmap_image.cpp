@@ -35,8 +35,8 @@ ImageSize PixmapImage::size() const {
     PDFT_VERIFY(pixmap_ != nullptr);
 
     return {
-        .width_px = pixmap_->w,
-        .height_px = pixmap_->h,
+        .width_px = static_cast<uint32_t>(pixmap_->w),
+        .height_px = static_cast<uint32_t>(pixmap_->h),
     };
 }
 

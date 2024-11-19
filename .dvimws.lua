@@ -11,8 +11,8 @@ p.debug.cc = {
     adapters = {
         codelldb = {
             command = home .. "/.local/share/nvim/mason/bin/codelldb",
-        }
-    }
+        },
+    },
 }
 
 p.lsp.none_ls.format_on_save = false
@@ -29,7 +29,7 @@ p.lsp.nvim_lspconfig.servers.clangd.cmd = {
     "--log=error",
     "--pretty",
     "-j=8",
-    "--compile-commands-dir=/Users/dzhiblavi/personal/projects/pdft-cxx/target/armv8-macos/Release/build",
+    "--compile-commands-dir=/Users/dzhiblavi/personal/projects/pdft-cxx/target/armv8-macos/Debug/build",
 }
 
 return c

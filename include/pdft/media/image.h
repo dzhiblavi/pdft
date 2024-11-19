@@ -7,8 +7,8 @@ namespace pdft::media {
 using ImageId = uint32_t;
 
 struct ImageSize {
-    int width_px;
-    int height_px;
+    uint32_t width_px;
+    uint32_t height_px;
 };
 
 class Image {

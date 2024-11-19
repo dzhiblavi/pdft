@@ -39,12 +39,12 @@ Action Controller::onKeyEvent(char key) {
 
         case Accepted:
             state_->onInput(key);
-            return Action::None;
+            return Action::Redraw;
 
         case Rejected:
             key_tree_.reset();
             state_->resetInput();
-            return Action::None;
+            return Action::Redraw;
 
         case Terminated:
             state_->resetInput();

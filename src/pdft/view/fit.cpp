@@ -1,8 +1,8 @@
-#include "pdft/display/fit.h"
+#include "pdft/view/fit.h"
 
 #include "pdft/core/assert.h"
 
-namespace pdft::display {
+namespace pdft::view {
 
 uint32_t getOffset(uint32_t outer, uint32_t inner, view::AxisFit strategy) {
     PDFT_VERIFY(outer >= inner);
@@ -27,7 +27,7 @@ struct Fitter {
     float height;
     float rect_ratio;
     view::Position position;
-    Position pos;
+    IRect pos;
     bool image_ratio_is_greater;
 
     Fitter(float width, float height, view::Position position)
@@ -58,28 +58,28 @@ struct Fitter {
             in_img_rows = adjustedHeight();
             in_img_cols = position.rect.width;
 
-            pos.left = position.rect.x;
-            pos.top = position.rect.y + getOffset(position.rect.height, in_img_rows, position.vert);
+            pos.x = position.rect.x;
+            pos.y = position.rect.y + getOffset(position.rect.height, in_img_rows, position.vert);
         } else {
             in_img_rows = position.rect.height;
             in_img_cols = adjustedWidth();
 
-            pos.left = position.rect.x + getOffset(position.rect.width, in_img_cols, position.hor);
-            pos.top = position.rect.y;
+            pos.x = position.rect.x + getOffset(position.rect.width, in_img_cols, position.hor);
+            pos.y = position.rect.y;
         }
 
-        pos.columns = in_img_cols;
-        pos.rows = in_img_rows;
+        pos.width = in_img_cols;
+        pos.height = in_img_rows;
     }
 
-    Position fit() {
+    IRect fit() {
         fitInside();
         return pos;
     }
 };
 
-Position fitPosition(float width, float height, view::Position position) {
+IRect fitPosition(float width, float height, Position position) {
     return Fitter(width, height, position).fit();
 }
 
-}  // namespace pdft::display
+}  // namespace pdft::view

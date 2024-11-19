@@ -1,7 +1,8 @@
 #pragma once
 
+#include "pdft/core/io/buffer.h"
 #include "pdft/state/document_storage.h"
-#include "pdft/view/placement.h"
+#include "pdft/view/rect.h"
 
 namespace pdft::state {
 
@@ -9,11 +10,10 @@ class State {
  public:
     virtual ~State() = default;
 
-    virtual void getLayout(view::IRect rect, std::vector<view::Placement>& layout) = 0;
+    virtual void render(view::IRect rect, core::OutBuffer& buffer) = 0;
 
     virtual void onInput(char key) = 0;
     virtual void resetInput() = 0;
-    virtual std::string_view getCurrentInput() const = 0;
 
     virtual void addDocument(DocumentId id) = 0;
     virtual void onDocumentChanged(DocumentId from, DocumentId to) = 0;

@@ -4,6 +4,7 @@ find_package(spdlog REQUIRED)
 find_package(cpptrace REQUIRED)
 find_package(ZLIB REQUIRED)
 find_package(magic_enum REQUIRED)
+find_package(cppcoro REQUIRED)
 
 add_library(pdft)
 
@@ -21,15 +22,18 @@ target_link_libraries(
          ZLIB::ZLIB
          libmupdf_ext
          libfswatch
-         magic_enum::magic_enum)
+         magic_enum::magic_enum
+         cppcoro::cppcoro)
 
 target_sources(
   pdft
   PRIVATE ./utils/base64.cpp
           ./utils/zlib.cpp
+          ./view/fit.cpp
           ./view/rect.cpp
           ./view/layout.cpp
           ./view/app/renderer.cpp
+          ./view/image/kitty/display.cpp
           ./state/app/state.cpp
           ./state/app/document_state.cpp
           ./state/document_storage.cpp
@@ -48,6 +52,4 @@ target_sources(
           ./media/pdf/context.cpp
           ./media/pdf/document.cpp
           ./media/pdf/page.cpp
-          ./media/pdf/pixmap_image.cpp
-          ./display/fit.cpp
-          ./display/kitty/display.cpp)
+          ./media/pdf/pixmap_image.cpp)

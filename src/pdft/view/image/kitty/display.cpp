@@ -1,14 +1,14 @@
-#include "pdft/display/kitty/display.h"
+#include "pdft/view/image/kitty/display.h"
+
 #include "pdft/core/assert.h"
 #include "pdft/core/log/log.h"
 #include "pdft/core/terminal/terminal.h"
-#include "pdft/display/fit.h"
 #include "pdft/utils/base64.h"
 #include "pdft/utils/zlib.h"
 
 #include "./detail/rowcolumn_diacritics.h"
 
-namespace pdft::display::kitty {
+namespace pdft::view::image::kitty {
 
 namespace {
 
@@ -31,9 +31,9 @@ bool Display::isLoaded(ImageId id) const {
 }
 
 void Display::loadImage(ImageId id, const media::Image& image, core::OutBuffer& buffer) {
-    auto term_size = core::terminal::getTerminalDimensions();
+    PDFT_VERIFY(!isLoaded(id));
     auto image_size = image.size();
-    loaded_.emplace(id, image_size);
+    loaded_.insert(id);
 
     auto samples = image.samples();
     auto samples_compressed = utils::zlibCompress(samples);
@@ -90,22 +90,11 @@ void Display::loadImage(ImageId id, const media::Image& image, core::OutBuffer& 
     }
 }
 
-void Display::displayImage(ImageId id, view::Position position, core::OutBuffer& buffer) {
+void Display::displayImage(ImageId id, IRect rect, core::OutBuffer& buffer) {
     auto term_size = core::terminal::getTerminalDimensions();
-    auto image_size = [&]() -> const media::ImageSize& {
-        auto it = loaded_.find(id);
-        PDFT_VERIFY(it != loaded_.end());
-        return it->second;
-    }();
 
-    float image_cols = float(image_size.width_px) / term_size.cell_width_px;
-    float image_rows = float(image_size.height_px) / term_size.cell_height_px;
-    auto pos = fitPosition(image_cols, image_rows, position);
-
-    {
-        const auto& [r, c, t, l] = pos;
-        core::log::global()->info("display @ r={},c={},t={},l={}", r, c, t, l);
-    }
+    const auto& [x, y, w, h] = rect;
+    core::log::global()->info("display @ x={},y={},w={},h={}", x, y, w, h);
 
     // x, y, w, h (pixels) control the subrectangle of the image (not in unicode mode btw).
     // In case of Unicode mode (U=1) the image subrectangle is controlled via placing
@@ -119,12 +108,12 @@ void Display::displayImage(ImageId id, view::Position position, core::OutBuffer&
         {"a", "p"},
         {"U", "1"},
         {"i", std::to_string(id)},
-        {"r", std::to_string(pos.rows)},
-        {"c", std::to_string(pos.columns)},
+        {"r", std::to_string(h)},
+        {"c", std::to_string(w)},
         {"C", "1"},
     };
 
-    // Create a virtual placement
+    // Create a virtual PagePlacement
     executor_->execute(
         {
             .command = "_G",
@@ -133,8 +122,8 @@ void Display::displayImage(ImageId id, view::Position position, core::OutBuffer&
         },
         buffer);
 
-    uint32_t left = static_cast<uint32_t>(std::max(0, pos.left));
-    uint32_t top = static_cast<uint32_t>(std::max(0, pos.top));
+    uint32_t left = static_cast<uint32_t>(std::max(0, x));
+    uint32_t top = static_cast<uint32_t>(std::max(0, y));
 
     // Position cursor to the to left corner
     terminal_->moveCursor(
@@ -151,7 +140,7 @@ void Display::displayImage(ImageId id, view::Position position, core::OutBuffer&
     core::write(
         buffer, "\033[38:2:", (id >> 16) & 255, ":", (id >> 8) & 255, ":", (id >> 0) & 255, "m");
 
-    for (uint32_t row = top; row < pos.top + pos.rows; ++row) {
+    for (uint32_t row = top; row < std::min(term_size.rows, y + h); ++row) {
         terminal_->moveCursor(
             core::terminal::CursorPosition{
                 .rows = row + 1,
@@ -159,12 +148,12 @@ void Display::displayImage(ImageId id, view::Position position, core::OutBuffer&
             },
             buffer);
 
-        for (uint32_t col = left; col < pos.left + pos.columns; ++col) {
+        for (uint32_t col = left; col < std::min(term_size.columns, x + w); ++col) {
             core::write(
                 buffer,
                 ImagePlaceholder,
-                detail::RowColDiacritics[row - pos.top],
-                detail::RowColDiacritics[col - pos.left],
+                detail::RowColDiacritics[row - y],
+                detail::RowColDiacritics[col - x],
                 IdChar);
         }
     }
@@ -186,4 +175,4 @@ void Display::clear(core::OutBuffer& buffer) const {
         buffer);
 }
 
-}  // namespace pdft::display::kitty
+}  // namespace pdft::view::image::kitty

@@ -1,6 +1,7 @@
 #include "pdft/state/app/document_state.h"
 #include "pdft/core/log/log.h"
 #include "pdft/view/layout.h"
+#include "pdft/view/position.h"
 
 #include <magic_enum.hpp>
 
@@ -93,38 +94,40 @@ void DocumentState::applyScrollOffset(uint32_t height, int32_t pages_per_height)
         "applyScrollOffset after: scroll_offset={}, page_index={}", scroll_offset_, page_index_);
 }
 
-void DocumentState::getLayout(view::IRect rect, std::vector<view::Placement>& layout) {
+void DocumentState::render(view::IRect rect, core::OutBuffer& buffer) {
     switch (view_mode_) {
         using enum ViewMode;
 
         case OnePage:
-            return getLayoutOnePage(rect, layout);
+            return renderOnePage(rect, buffer);
 
         case TwoPages:
-            return getLayoutTwoPages(rect, layout);
+            return renderTwoPages(rect, buffer);
 
         case OnePageContinuous:
-            return getLayoutOnePageContinuous(rect, layout);
+            return renderOnePageContinuous(rect, buffer);
 
         case TwoPagesContinuous:
-            return getLayoutTwoPagesContinuous(rect, layout);
+            return renderTwoPagesContinuous(rect, buffer);
     }
 }
 
-void DocumentState::getLayoutOnePage(view::IRect rect, std::vector<view::Placement>& layout) {
-    layout.push_back({
-        .position =
-            {
-                .rect = rect,
-                .hor = view::AxisFit::Center,
-                .vert = view::AxisFit::Center,
-            },
-        .document_id = document_id_,
-        .page_index = page_index_,
-    });
+void DocumentState::renderOnePage(view::IRect rect, core::OutBuffer& buffer) {
+    renderer_->render(
+        buffer,
+        {
+            .position =
+                {
+                    .rect = rect,
+                    .hor = view::AxisFit::Center,
+                    .vert = view::AxisFit::Center,
+                },
+            .document_id = document_id_,
+            .page_index = page_index_,
+        });
 }
 
-void DocumentState::getLayoutTwoPages(view::IRect rect, std::vector<view::Placement>& layout) {
+void DocumentState::renderTwoPages(view::IRect rect, core::OutBuffer& buffer) {
     auto rects =
         view::horizontal(
             view::constraints::Fraction{0.15f / zoom_},
@@ -134,35 +137,38 @@ void DocumentState::getLayoutTwoPages(view::IRect rect, std::vector<view::Placem
             view::constraints::Fraction{0.15f / zoom_})
             .split(rect);
 
-    layout.push_back({
-        .position =
-            {
-                .rect = rects[1],
-                .hor = view::AxisFit::Max,
-                .vert = view::AxisFit::Center,
-            },
-        .document_id = document_id_,
-        .page_index = page_index_,
-    });
+    renderer_->render(
+        buffer,
+        {
+            .position =
+                {
+                    .rect = rects[1],
+                    .hor = view::AxisFit::Max,
+                    .vert = view::AxisFit::Center,
+                },
+            .document_id = document_id_,
+            .page_index = page_index_,
+        });
 
     if (page_index_ + 1 >= page_count_) {
         return;
     }
 
-    layout.push_back({
-        .position =
-            {
-                .rect = rects[3],
-                .hor = view::AxisFit::Min,
-                .vert = view::AxisFit::Center,
-            },
-        .document_id = document_id_,
-        .page_index = page_index_ + 1,
-    });
+    renderer_->render(
+        buffer,
+        {
+            .position =
+                {
+                    .rect = rects[3],
+                    .hor = view::AxisFit::Min,
+                    .vert = view::AxisFit::Center,
+                },
+            .document_id = document_id_,
+            .page_index = page_index_ + 1,
+        });
 }
 
-void DocumentState::getLayoutOnePageContinuous(
-    view::IRect rect, std::vector<view::Placement>& layout) {
+void DocumentState::renderOnePageContinuous(view::IRect rect, core::OutBuffer& buffer) {
     applyScrollOffset(rect.height, 1);
 
     rect = view::horizontal(
@@ -175,35 +181,38 @@ void DocumentState::getLayoutOnePageContinuous(
     auto top = offsetRect(rect, 0, -scroll_offset_);
     auto bottom = offsetRect(rect, 0, +top_height);
 
-    layout.push_back({
-        .position =
-            {
-                .rect = top,
-                .hor = view::AxisFit::Center,
-                .vert = view::AxisFit::Max,
-            },
-        .document_id = document_id_,
-        .page_index = page_index_,
-    });
+    renderer_->render(
+        buffer,
+        {
+            .position =
+                {
+                    .rect = top,
+                    .hor = view::AxisFit::Center,
+                    .vert = view::AxisFit::Max,
+                },
+            .document_id = document_id_,
+            .page_index = page_index_,
+        });
 
     if (page_index_ + 1 >= page_count_) {
         return;
     }
 
-    layout.push_back({
-        .position =
-            {
-                .rect = bottom,
-                .hor = view::AxisFit::Center,
-                .vert = view::AxisFit::Min,
-            },
-        .document_id = document_id_,
-        .page_index = page_index_ + 1,
-    });
+    renderer_->render(
+        buffer,
+        {
+            .position =
+                {
+                    .rect = bottom,
+                    .hor = view::AxisFit::Center,
+                    .vert = view::AxisFit::Min,
+                },
+            .document_id = document_id_,
+            .page_index = page_index_ + 1,
+        });
 }
 
-void DocumentState::getLayoutTwoPagesContinuous(
-    view::IRect rect, std::vector<view::Placement>& layout) {
+void DocumentState::renderTwoPagesContinuous(view::IRect rect, core::OutBuffer& buffer) {
     applyScrollOffset(rect.height, 2);
 
     auto rects =
@@ -220,61 +229,69 @@ void DocumentState::getLayoutTwoPagesContinuous(
     auto bottom_left = offsetRect(rects[1], 0, +top_height);
     auto bottom_right = offsetRect(rects[2], 0, +top_height);
 
-    layout.push_back({
-        .position =
-            {
-                .rect = top_left,
-                .hor = view::AxisFit::Max,
-                .vert = view::AxisFit::Max,
-            },
-        .document_id = document_id_,
-        .page_index = page_index_,
-    });
+    renderer_->render(
+        buffer,
+        {
+            .position =
+                {
+                    .rect = top_left,
+                    .hor = view::AxisFit::Max,
+                    .vert = view::AxisFit::Max,
+                },
+            .document_id = document_id_,
+            .page_index = page_index_,
+        });
 
     if (page_index_ + 1 >= page_count_) {
         return;
     }
 
-    layout.push_back({
-        .position =
-            {
-                .rect = top_right,
-                .hor = view::AxisFit::Min,
-                .vert = view::AxisFit::Max,
-            },
-        .document_id = document_id_,
-        .page_index = page_index_ + 1,
-    });
+    renderer_->render(
+        buffer,
+        {
+            .position =
+                {
+                    .rect = top_right,
+                    .hor = view::AxisFit::Min,
+                    .vert = view::AxisFit::Max,
+                },
+            .document_id = document_id_,
+            .page_index = page_index_ + 1,
+        });
 
     if (page_index_ + 2 >= page_count_) {
         return;
     }
 
-    layout.push_back({
-        .position =
-            {
-                .rect = bottom_left,
-                .hor = view::AxisFit::Max,
-                .vert = view::AxisFit::Min,
-            },
-        .document_id = document_id_,
-        .page_index = page_index_ + 2,
-    });
+    renderer_->render(
+        buffer,
+        {
+            .position =
+                {
+                    .rect = bottom_left,
+                    .hor = view::AxisFit::Max,
+                    .vert = view::AxisFit::Min,
+                },
+            .document_id = document_id_,
+            .page_index = page_index_ + 2,
+        });
 
     if (page_index_ + 3 >= page_count_) {
         return;
     }
 
-    layout.push_back({
-        .position =
-            {
-                .rect = bottom_right,
-                .hor = view::AxisFit::Min,
-                .vert = view::AxisFit::Min,
-            },
-        .document_id = document_id_,
-        .page_index = page_index_ + 3,
-    });
+    renderer_->render(
+        buffer,
+        {
+            .position =
+                {
+                    .rect = bottom_right,
+                    .hor = view::AxisFit::Min,
+                    .vert = view::AxisFit::Min,
+                },
+            .document_id = document_id_,
+            .page_index = page_index_ + 3,
+        });
 }
 
 }  // namespace pdft::state::app

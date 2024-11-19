@@ -1,15 +1,19 @@
 #pragma once
 
 #include "pdft/state/document_storage.h"
-#include "pdft/view/placement.h"
+#include "pdft/view/rect.h"
+#include "pdft/view/renderer.h"
 
 namespace pdft::state::app {
 
 class DocumentState {
  public:
-    DocumentState(DocumentId id, uint32_t page_count) : document_id_(id), page_count_(page_count) {}
+    DocumentState(DocumentId id, uint32_t page_count, std::shared_ptr<view::Renderer> renderer)
+        : document_id_(id)
+        , page_count_(page_count)
+        , renderer_(std::move(renderer)) {}
 
-    void getLayout(view::IRect rect, std::vector<view::Placement>& layout);
+    void render(view::IRect rect, core::OutBuffer& buffer);
     void scrollNext(int32_t delta);
     void nextPage(int32_t delta);
     void setPageIndex(uint32_t index);
@@ -28,13 +32,14 @@ class DocumentState {
     };
 
     void applyScrollOffset(uint32_t height, int32_t pages_per_height);
-    void getLayoutOnePage(view::IRect rect, std::vector<view::Placement>& layout);
-    void getLayoutTwoPages(view::IRect rect, std::vector<view::Placement>& layout);
-    void getLayoutOnePageContinuous(view::IRect rect, std::vector<view::Placement>& layout);
-    void getLayoutTwoPagesContinuous(view::IRect rect, std::vector<view::Placement>& layout);
+    void renderOnePage(view::IRect rect, core::OutBuffer& buffer);
+    void renderTwoPages(view::IRect rect, core::OutBuffer& buffer);
+    void renderOnePageContinuous(view::IRect rect, core::OutBuffer& buffer);
+    void renderTwoPagesContinuous(view::IRect rect, core::OutBuffer& buffer);
 
     DocumentId document_id_;
     uint32_t page_count_;
+    std::shared_ptr<view::Renderer> renderer_;
     uint32_t page_index_ = 0;
     int32_t scroll_offset_ = 0;
     float zoom_ = 1.0f;

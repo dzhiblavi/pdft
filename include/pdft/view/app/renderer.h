@@ -1,27 +1,34 @@
 #include "pdft/core/terminal/terminal.h"
-#include "pdft/display/display.h"
 #include "pdft/state/document_storage.h"
+#include "pdft/view/image/display.h"
 #include "pdft/view/renderer.h"
+
+#include <unordered_map>
 
 namespace pdft::view::app {
 
 class Renderer : public view::Renderer {
  public:
     Renderer(
-        std::shared_ptr<state::DocumentStorage> docs, std::shared_ptr<display::Display> display)
+        std::shared_ptr<state::DocumentStorage> docs,
+        std::shared_ptr<image::Display> display,
+        std::shared_ptr<core::terminal::Terminal> terminal)
         : term_dims_(core::terminal::getTerminalDimensions())
         , docs_(std::move(docs))
-        , display_(std::move(display)) {}
+        , display_(std::move(display))
+        , terminal_(std::move(terminal)) {}
 
-    void render(core::OutBuffer& buffer, const std::vector<Placement>& layout) override;
+    void render(core::OutBuffer& buffer, const PagePlacement& placement) override;
+    void render(core::OutBuffer& buffer, const TextPlacement& placement) override;
 
  private:
-    void renderOne(core::OutBuffer& buffer, const Placement& layout);
     float calcFactor(media::pdf::PageSize page_size);
 
     core::terminal::Dimensions term_dims_;
     std::shared_ptr<state::DocumentStorage> docs_;
-    std::shared_ptr<display::Display> display_;
+    std::shared_ptr<image::Display> display_;
+    std::shared_ptr<core::terminal::Terminal> terminal_;
+    std::unordered_map<image::ImageId, std::pair<float, float>> image_size_cells_;
 };
 
 }  // namespace pdft::view::app

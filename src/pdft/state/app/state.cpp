@@ -1,14 +1,25 @@
 #include "pdft/state/app/state.h"
 #include "pdft/core/assert.h"
+#include "pdft/view/layout.h"
 
 #include <algorithm>
 
 namespace pdft::state::app {
 
-void State::getLayout(view::IRect rect, std::vector<view::Placement>& layout) {
+void State::render(view::IRect rect, core::OutBuffer& buffer) {
+    auto rects =
+        view::vertical(view::constraints::Fill(1), view::constraints::Length(1)).split(rect);
+
     if (auto state = getState()) {
-        state->getLayout(rect, layout);
+        state->render(rects[0], buffer);
     }
+
+    renderer_->render(
+        buffer,
+        view::TextPlacement{
+            .position = {.rect = rects[1]},
+            .text = current_input_,
+        });
 }
 
 void State::onInput(char key) {
@@ -19,13 +30,9 @@ void State::resetInput() {
     current_input_.clear();
 }
 
-std::string_view State::getCurrentInput() const {
-    return current_input_;
-}
-
 void State::addDocument(DocumentId id) {
     auto page_count = doc_storage_->getDocument(id).pageCount();
-    states_.emplace_back(id, page_count);
+    states_.emplace_back(id, page_count, renderer_);
     idx_ = idx_.value_or(0);
 }
 

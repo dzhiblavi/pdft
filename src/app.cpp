@@ -9,11 +9,10 @@
 #include "pdft/core/trace/log.h"
 #include "pdft/core/trace/stack_scope_tracer.h"
 
-#include "pdft/display/kitty/display.h"
-
 #include "pdft/controller/app/controller.h"
 
 #include "pdft/view/app/renderer.h"
+#include "pdft/view/image/kitty/display.h"
 
 #include "pdft/state/app/state.h"
 #include "pdft/state/document_storage.h"
@@ -142,7 +141,12 @@ asio::awaitable<void> consumeFsEvents(EventQueue& queue, auto& notify) {
     }
 }
 
+[[noreturn]] void sighandler(int sig) {
+    core::fail(std::format("signal {}", sig).c_str());
+}
+
 asio::awaitable<void> main(asio::io_context& context, std::span<char const*> paths) {
+    ::signal(SIGSEGV, sighandler);
     setupLogger();
 
     auto pdf_context =
@@ -184,9 +188,9 @@ asio::awaitable<void> main(asio::io_context& context, std::span<char const*> pat
     const size_t MaxQueueBufferSize = 10;
     auto queue = EventQueue(context, MaxQueueBufferSize);
     auto doc_storage = std::make_shared<state::DocumentStorage>(pdf_context);
-    auto state = std::make_shared<state::app::State>(doc_storage);
-    auto display = std::make_shared<display::kitty::Display>(terminal, executor);
-    auto renderer = std::make_shared<view::app::Renderer>(doc_storage, display);
+    auto display = std::make_shared<view::image::kitty::Display>(terminal, executor);
+    auto renderer = std::make_shared<view::app::Renderer>(doc_storage, display, terminal);
+    auto state = std::make_shared<state::app::State>(doc_storage, renderer);
     auto controller = std::make_shared<controller::app::Controller>(state, doc_storage);
     auto notify = pdft::notify::fsw::Notify(queue.get_executor());
 
@@ -222,7 +226,7 @@ asio::awaitable<void> main(asio::io_context& context, std::span<char const*> pat
     asio::co_spawn(context, consumeFsEvents(queue, notify), asio::detached);
 
     auto buffer = core::OutBuffer();
-    auto layout = std::vector<view::Placement>();
+    auto layout = std::vector<view::PagePlacement>();
     auto term_size = core::terminal::getTerminalDimensions();
     auto screen = view::IRect{
         .x = 0,
@@ -243,11 +247,9 @@ asio::awaitable<void> main(asio::io_context& context, std::span<char const*> pat
         layout.clear();
         terminal->clear(buffer);
 
-        state->getLayout(screen, layout);
-
         {
             auto _ = tracer.addChild("render");
-            renderer->render(buffer, layout);
+            state->render(screen, buffer);
         }
 
         {
@@ -261,12 +263,8 @@ asio::awaitable<void> main(asio::io_context& context, std::span<char const*> pat
 
                 auto action = utils::visit(
                     event,
-                    [&](KeyPressEvent event) {
-                        return controller->onKeyEvent(event.key);
-                    },
-                    [&](notify::Event event) {
-                        return controller->onFilesystemEvent(event);
-                    });
+                    [&](KeyPressEvent event) { return controller->onKeyEvent(event.key); },
+                    [&](notify::Event event) { return controller->onFilesystemEvent(event); });
 
                 using enum controller::Action;
 

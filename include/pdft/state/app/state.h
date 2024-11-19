@@ -9,10 +9,11 @@ namespace pdft::state::app {
 
 class State : public state::State {
  public:
-    explicit State(std::shared_ptr<DocumentStorage> doc_storage)
-        : doc_storage_(std::move(doc_storage)) {}
+    State(std::shared_ptr<DocumentStorage> doc_storage, std::shared_ptr<view::Renderer> renderer)
+        : doc_storage_(std::move(doc_storage))
+        , renderer_(std::move(renderer)) {}
 
-    void getLayout(view::IRect rect, std::vector<view::Placement>& layout) override;
+    void render(view::IRect rect, core::OutBuffer& buffer) override;
     void onInput(char key) override;
     void resetInput() override;
     void addDocument(DocumentId id) override;
@@ -24,12 +25,11 @@ class State : public state::State {
     void nextLayout(int delta) override;
     void updateZoom(float coeff) override;
 
-    std::string_view getCurrentInput() const override;
-
  private:
     DocumentState* getState();
 
     std::shared_ptr<DocumentStorage> doc_storage_;
+    std::shared_ptr<view::Renderer> renderer_;
     std::optional<size_t> idx_ = std::nullopt;
     std::vector<DocumentState> states_;
     std::string current_input_;

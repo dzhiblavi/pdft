@@ -9,7 +9,8 @@ class Renderer {
  public:
     virtual ~Renderer() = default;
 
-    virtual void render(core::OutBuffer& buffer, const std::vector<Placement>& layout) = 0;
+    virtual void render(core::OutBuffer& buffer, const PagePlacement& placement) = 0;
+    virtual void render(core::OutBuffer& buffer, const TextPlacement& placement) = 0;
 };
 
 }  // namespace pdft::view

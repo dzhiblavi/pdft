@@ -1,9 +1,9 @@
-#include "pdft/display/fit.h"
+#include "pdft/view/fit.h"
 
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/generators/catch_generators.hpp>
 
-namespace pdft::display {
+namespace pdft::view {
 
 TEST_CASE("testFitPositionExactlyMatchesProportions", "") {
     auto pos = view::Position{
@@ -18,11 +18,11 @@ TEST_CASE("testFitPositionExactlyMatchesProportions", "") {
         .vert = view::AxisFit::Max,
     };
 
-    auto expected = Position{
-        .rows = 40,
-        .columns = 30,
-        .top = 20,
-        .left = 10,
+    auto expected = IRect{
+        .x = 10,
+        .y = 20,
+        .width = 30,
+        .height = 40,
     };
 
     CHECK(fitPosition(3.0f, 4.0f, pos) == expected);
@@ -43,11 +43,11 @@ TEST_CASE("testFitPositionCenterVertically", "") {
         .vert = vert,
     };
 
-    auto expected = Position{
-        .rows = 40,
-        .columns = 20,
-        .top = 20,
-        .left = 15,
+    auto expected = IRect{
+        .x = 15,
+        .y = 20,
+        .width = 20,
+        .height = 40,
     };
 
     CHECK(fitPosition(2.0f, 4.0f, pos) == expected);
@@ -68,11 +68,11 @@ TEST_CASE("testFitPositionMinVertically", "") {
         .vert = vert,
     };
 
-    auto expected = Position{
-        .rows = 40,
-        .columns = 20,
-        .top = 20,
-        .left = 10,
+    auto expected = IRect{
+        .x = 10,
+        .y = 20,
+        .width = 20,
+        .height = 40,
     };
 
     CHECK(fitPosition(2.0f, 4.0f, pos) == expected);
@@ -93,11 +93,11 @@ TEST_CASE("testFitPositionMaxVertically", "") {
         .vert = vert,
     };
 
-    auto expected = Position{
-        .rows = 40,
-        .columns = 20,
-        .top = 20,
-        .left = 20,
+    auto expected = IRect{
+        .x = 20,
+        .y = 20,
+        .width = 20,
+        .height = 40,
     };
 
     CHECK(fitPosition(2.0f, 4.0f, pos) == expected);
@@ -118,11 +118,11 @@ TEST_CASE("testFitPositionCenterHorizontally", "") {
         .vert = view::AxisFit::Center,
     };
 
-    auto expected = Position{
-        .rows = 23,
-        .columns = 30,
-        .top = 28,
-        .left = 10,
+    auto expected = IRect{
+        .x = 10,
+        .y = 28,
+        .width = 30,
+        .height = 23,
     };
 
     CHECK(fitPosition(4.0f, 3.0f, pos) == expected);
@@ -143,11 +143,11 @@ TEST_CASE("testFitPositionMinHorizontally", "") {
         .vert = view::AxisFit::Min,
     };
 
-    auto expected = Position{
-        .rows = 23,
-        .columns = 30,
-        .top = 20,
-        .left = 10,
+    auto expected = IRect{
+        .x = 10,
+        .y = 20,
+        .width = 30,
+        .height = 23,
     };
 
     CHECK(fitPosition(4.0f, 3.0f, pos) == expected);
@@ -168,14 +168,14 @@ TEST_CASE("testFitPositionMaxHorizontally", "") {
         .vert = view::AxisFit::Max,
     };
 
-    auto expected = Position{
-        .rows = 23,
-        .columns = 30,
-        .top = 37,
-        .left = 10,
+    auto expected = IRect{
+        .x = 10,
+        .y = 37,
+        .width = 30,
+        .height = 23,
     };
 
     CHECK(fitPosition(4.0f, 3.0f, pos) == expected);
 }
 
-}  // namespace pdft::display
+}  // namespace pdft::view
