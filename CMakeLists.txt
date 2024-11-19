@@ -12,6 +12,7 @@ set(PDFT_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 # Third-party libraries
 include(./cmake/thirdparty/MuPDF.cmake)
 include(./cmake/thirdparty/fswatch.cmake)
+include(./cmake/thirdparty/reflect-cpp.cmake)
 
 # Project settings
 include(./cmake/StandardProjectSettings.cmake)
