@@ -4,6 +4,7 @@
 #include "pdft/core/trace/stack_scope_tracer.h"
 #include "pdft/utils/cantor_pair.h"
 #include "pdft/view/app/fit_image.h"
+#include "pdft/view/app/fit_text.h"
 
 namespace pdft::view::app {
 
@@ -57,14 +58,18 @@ void Renderer::render(core::io::OutBuffer& buffer, const PagePlacement& layout) 
 }
 
 void Renderer::render(core::io::OutBuffer& buffer, const TextPlacement& placement) {
-    terminal_->moveCursor(
-        core::terminal::CursorPosition{
-            .rows = static_cast<uint32_t>(placement.position.rect.y + 1),
-            .columns = static_cast<uint32_t>(placement.position.rect.x + 1),
-        },
-        buffer);
+    auto lines = fitText(placement);
 
-    core::io::write(buffer, placement.text);
+    for (auto line : lines) {
+        terminal_->moveCursor(
+            core::terminal::CursorPosition{
+                .rows = line.y + 1,
+                .columns = line.x + 1,
+            },
+            buffer);
+
+        core::io::write(buffer, line.text);
+    }
 }
 
 float Renderer::calcFactor(media::pdf::PageSize page_size) {

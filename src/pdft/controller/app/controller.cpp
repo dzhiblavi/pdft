@@ -15,7 +15,11 @@ Controller::Controller(
     key_tree_.bind(KeyTree::number, "j", [this](auto times) { state_->nextPage(times); });
     key_tree_.bind(KeyTree::number, "k", [this](auto times) { state_->nextPage(-times); });
 
-    key_tree_.bind(KeyTree::number, "G", [this](auto index) { state_->setPageIndex(index); });
+    key_tree_.bind(KeyTree::number, "G", [this](auto index) {
+        if (index > 0) {
+            state_->setPageIndex(index - 1);
+        }
+    });
     key_tree_.bind("gg", [this] { state_->setPageIndex(0); });
     key_tree_.bind("G", [this] { state_->setPageIndex(INT_MAX); });
 

@@ -31,7 +31,9 @@ target_sources(
           ./utils/zlib.cpp
           ./view/rect.cpp
           ./view/layout.cpp
+          ./view/position.cpp
           ./view/app/fit_image.cpp
+          ./view/app/fit_text.cpp
           ./view/app/renderer.cpp
           ./view/image/kitty/display.cpp
           ./state/app/state.cpp

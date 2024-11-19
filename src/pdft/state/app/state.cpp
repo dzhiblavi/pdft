@@ -3,24 +3,50 @@
 #include "pdft/view/layout.h"
 
 #include <algorithm>
+#include <format>
 
 namespace pdft::state::app {
 
 void State::render(view::IRect rect, core::io::OutBuffer& buffer) {
-    auto rects =
-        view::vertical(view::constraints::Fill(1), view::constraints::Length(1)).split(rect);
+    namespace constr = view::constraints;
 
-    if (auto state = getState()) {
-        state->render(rects[0], buffer);
-    }
+    auto rects = view::vertical(constr::Fill(1), constr::Length(1)).split(rect);
+    auto info_rects = view::horizontal(constr::Fill(1), constr::Fill(1)).split(rects[1]);
 
     renderer_->render(
         buffer,
         view::TextPlacement{
-            .position = {.rect = rects[1]},
+            .position =
+                {
+                    .rect = info_rects[0],
+                    .hor = view::AxisFit::Min,
+                    .vert = view::AxisFit::Center,
+                },
             .overflow = view::TextPlacement::OverflowMode::Truncate,
             .text = current_input_,
         });
+
+    if (auto state = getState()) {
+        state->render(rects[0], buffer);
+
+        renderer_->render(
+            buffer,
+            view::TextPlacement{
+                .position =
+                    {
+                        .rect = info_rects[1],
+                        .hor = view::AxisFit::Max,
+                        .vert = view::AxisFit::Center,
+                    },
+                .overflow = view::TextPlacement::OverflowMode::Truncate,
+                .text = std::format(
+                            "document {}: {}/{}",
+                            state->getDocumentId(),
+                            state->getPageIndex() + 1,
+                            state->getPageCount())
+                            .c_str(),
+            });
+    }
 }
 
 void State::onInput(char key) {

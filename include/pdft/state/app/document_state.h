@@ -23,6 +23,9 @@ class DocumentState {
     DocumentId getDocumentId() const;
     void setDocument(DocumentId id, uint32_t page_count);
 
+    uint32_t getPageIndex() const;
+    uint32_t getPageCount() const;
+
  private:
     enum class ViewMode {
         OnePage = 0,

@@ -74,6 +74,14 @@ void DocumentState::setDocument(DocumentId id, uint32_t page_count) {
     }
 }
 
+uint32_t DocumentState::getPageIndex() const {
+    return page_index_;
+}
+
+uint32_t DocumentState::getPageCount() const {
+    return page_count_;
+}
+
 void DocumentState::applyScrollOffset(uint32_t height, int32_t pages_per_height) {
     core::log::global()->info(
         "applyScrollOffset before: scroll_offset={}, page_index={}", scroll_offset_, page_index_);

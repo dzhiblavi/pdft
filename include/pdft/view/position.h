@@ -22,4 +22,6 @@ struct Position {
     bool operator==(const Position&) const = default;
 };
 
+uint32_t getOffset(uint32_t outer, uint32_t inner, view::AxisFit strategy);
+
 }  // namespace pdft::view

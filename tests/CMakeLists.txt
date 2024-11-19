@@ -31,5 +31,6 @@ add_test(./pdft/utils/test_intrusive_forward_list.cpp)
 
 add_test(./pdft/view/test_layout.cpp)
 add_test(./pdft/view/app/test_fit_image.cpp)
+add_test(./pdft/view/app/test_fit_text.cpp)
 
 add_test(./pdft/controller/test_keytree.cpp)
