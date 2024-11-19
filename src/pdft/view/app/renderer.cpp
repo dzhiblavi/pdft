@@ -3,7 +3,7 @@
 #include "pdft/core/trace/log.h"
 #include "pdft/core/trace/stack_scope_tracer.h"
 #include "pdft/utils/cantor_pair.h"
-#include "pdft/view/fit.h"
+#include "pdft/view/app/fit_image.h"
 
 namespace pdft::view::app {
 
@@ -52,7 +52,7 @@ void Renderer::render(core::OutBuffer& buffer, const PagePlacement& layout) {
 
         PDFT_VERIFY(image_size_cells_.contains(id));
         auto [width, height] = image_size_cells_[id];
-        display_->displayImage(id, fitPosition(width, height, pos), buffer);
+        display_->displayImage(id, fitImage(width, height, pos), buffer);
     }
 }
 

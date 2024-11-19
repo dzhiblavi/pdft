@@ -18,6 +18,7 @@ void State::render(view::IRect rect, core::OutBuffer& buffer) {
         buffer,
         view::TextPlacement{
             .position = {.rect = rects[1]},
+            .overflow = view::TextPlacement::OverflowMode::Truncate,
             .text = current_input_,
         });
 }

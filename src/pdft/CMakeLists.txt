@@ -29,9 +29,9 @@ target_sources(
   pdft
   PRIVATE ./utils/base64.cpp
           ./utils/zlib.cpp
-          ./view/fit.cpp
           ./view/rect.cpp
           ./view/layout.cpp
+          ./view/app/fit_image.cpp
           ./view/app/renderer.cpp
           ./view/image/kitty/display.cpp
           ./state/app/state.cpp

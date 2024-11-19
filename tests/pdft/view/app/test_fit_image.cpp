@@ -1,9 +1,9 @@
-#include "pdft/view/fit.h"
+#include "pdft/view/app/fit_image.h"
 
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/generators/catch_generators.hpp>
 
-namespace pdft::view {
+namespace pdft::view::app {
 
 TEST_CASE("testFitPositionExactlyMatchesProportions", "") {
     auto pos = view::Position{
@@ -25,7 +25,7 @@ TEST_CASE("testFitPositionExactlyMatchesProportions", "") {
         .height = 40,
     };
 
-    CHECK(fitPosition(3.0f, 4.0f, pos) == expected);
+    CHECK(fitImage(3.0f, 4.0f, pos) == expected);
 }
 
 TEST_CASE("testFitPositionCenterVertically", "") {
@@ -50,7 +50,7 @@ TEST_CASE("testFitPositionCenterVertically", "") {
         .height = 40,
     };
 
-    CHECK(fitPosition(2.0f, 4.0f, pos) == expected);
+    CHECK(fitImage(2.0f, 4.0f, pos) == expected);
 }
 
 TEST_CASE("testFitPositionMinVertically", "") {
@@ -75,7 +75,7 @@ TEST_CASE("testFitPositionMinVertically", "") {
         .height = 40,
     };
 
-    CHECK(fitPosition(2.0f, 4.0f, pos) == expected);
+    CHECK(fitImage(2.0f, 4.0f, pos) == expected);
 }
 
 TEST_CASE("testFitPositionMaxVertically", "") {
@@ -100,7 +100,7 @@ TEST_CASE("testFitPositionMaxVertically", "") {
         .height = 40,
     };
 
-    CHECK(fitPosition(2.0f, 4.0f, pos) == expected);
+    CHECK(fitImage(2.0f, 4.0f, pos) == expected);
 }
 
 TEST_CASE("testFitPositionCenterHorizontally", "") {
@@ -125,7 +125,7 @@ TEST_CASE("testFitPositionCenterHorizontally", "") {
         .height = 23,
     };
 
-    CHECK(fitPosition(4.0f, 3.0f, pos) == expected);
+    CHECK(fitImage(4.0f, 3.0f, pos) == expected);
 }
 
 TEST_CASE("testFitPositionMinHorizontally", "") {
@@ -150,7 +150,7 @@ TEST_CASE("testFitPositionMinHorizontally", "") {
         .height = 23,
     };
 
-    CHECK(fitPosition(4.0f, 3.0f, pos) == expected);
+    CHECK(fitImage(4.0f, 3.0f, pos) == expected);
 }
 
 TEST_CASE("testFitPositionMaxHorizontally", "") {
@@ -175,7 +175,7 @@ TEST_CASE("testFitPositionMaxHorizontally", "") {
         .height = 23,
     };
 
-    CHECK(fitPosition(4.0f, 3.0f, pos) == expected);
+    CHECK(fitImage(4.0f, 3.0f, pos) == expected);
 }
 
-}  // namespace pdft::view
+}  // namespace pdft::view::app

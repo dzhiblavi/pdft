@@ -1,8 +1,8 @@
-#include "pdft/view/fit.h"
+#include "pdft/view/app/fit_image.h"
 
 #include "pdft/core/assert.h"
 
-namespace pdft::view {
+namespace pdft::view::app {
 
 uint32_t getOffset(uint32_t outer, uint32_t inner, view::AxisFit strategy) {
     PDFT_VERIFY(outer >= inner);
@@ -78,8 +78,8 @@ struct Fitter {
     }
 };
 
-IRect fitPosition(float width, float height, Position position) {
+IRect fitImage(float width, float height, Position position) {
     return Fitter(width, height, position).fit();
 }
 
-}  // namespace pdft::view
+}  // namespace pdft::view::app
