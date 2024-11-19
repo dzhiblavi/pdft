@@ -240,6 +240,7 @@ asio::awaitable<void> main(asio::io_context& context, std::span<char const*> pat
             core::trace::getGlobalPool().getTracer(core::trace::stackTraceLogger(), "display_one");
 
         core::clear(buffer);
+        layout.clear();
         terminal->clear(buffer);
 
         state->getLayout(screen, layout);

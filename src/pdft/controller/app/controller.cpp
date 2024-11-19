@@ -69,11 +69,11 @@ Controller::Controller(
     });
 
     key_tree_.bind("=", [this](auto) {
-        state_->zoomIn(1.10f);
+        state_->updateZoom(1.10f);
         action_ = Action::Redraw;
     });
     key_tree_.bind("-", [this](auto) {
-        state_->zoomIn(1.f / 1.10f);
+        state_->updateZoom(1.f / 1.10f);
         action_ = Action::Redraw;
     });
 }

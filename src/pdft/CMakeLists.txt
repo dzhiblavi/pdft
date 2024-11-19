@@ -31,6 +31,7 @@ target_sources(
           ./view/layout.cpp
           ./view/app/renderer.cpp
           ./state/app/state.cpp
+          ./state/app/document_state.cpp
           ./state/document_storage.cpp
           ./controller/keytree.cpp
           ./controller/app/controller.cpp

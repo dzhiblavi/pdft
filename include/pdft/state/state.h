@@ -21,7 +21,7 @@ class State {
     virtual void nextDocument(int delta) = 0;
     virtual void nextLayout(int delta) = 0;
 
-    virtual void zoomIn(float coeff) = 0;
+    virtual void updateZoom(float coeff) = 0;
 };
 
 }  // namespace pdft::state
