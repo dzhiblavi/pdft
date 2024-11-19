@@ -6,7 +6,7 @@
 
 namespace pdft::state::app {
 
-void State::render(view::IRect rect, core::OutBuffer& buffer) {
+void State::render(view::IRect rect, core::io::OutBuffer& buffer) {
     auto rects =
         view::vertical(view::constraints::Fill(1), view::constraints::Length(1)).split(rect);
 

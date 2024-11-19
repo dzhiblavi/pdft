@@ -5,7 +5,7 @@
 namespace pdft::core::terminal::tmux {
 
 TEST_CASE("testExecuteNoPayload", "") {
-    OutBuffer buffer;
+    io::OutBuffer buffer;
     auto executor = APCExecutor();
 
     std::pair<std::string_view, std::string> control_data[] = {
@@ -26,7 +26,7 @@ TEST_CASE("testExecuteNoPayload", "") {
 }
 
 TEST_CASE("testExecuteWithPayload", "") {
-    OutBuffer buffer;
+    io::OutBuffer buffer;
     auto executor = APCExecutor();
 
     std::pair<std::string_view, std::string> control_data[] = {

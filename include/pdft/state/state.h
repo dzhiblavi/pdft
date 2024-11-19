@@ -10,7 +10,7 @@ class State {
  public:
     virtual ~State() = default;
 
-    virtual void render(view::IRect rect, core::OutBuffer& buffer) = 0;
+    virtual void render(view::IRect rect, core::io::OutBuffer& buffer) = 0;
 
     virtual void onInput(char key) = 0;
     virtual void resetInput() = 0;

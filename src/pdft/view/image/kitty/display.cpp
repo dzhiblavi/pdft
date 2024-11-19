@@ -30,7 +30,7 @@ bool Display::isLoaded(ImageId id) const {
     return loaded_.contains(id);
 }
 
-void Display::loadImage(ImageId id, const media::Image& image, core::OutBuffer& buffer) {
+void Display::loadImage(ImageId id, const media::Image& image, core::io::OutBuffer& buffer) {
     PDFT_VERIFY(!isLoaded(id));
     auto image_size = image.size();
     loaded_.insert(id);
@@ -90,7 +90,7 @@ void Display::loadImage(ImageId id, const media::Image& image, core::OutBuffer& 
     }
 }
 
-void Display::displayImage(ImageId id, IRect rect, core::OutBuffer& buffer) {
+void Display::displayImage(ImageId id, IRect rect, core::io::OutBuffer& buffer) {
     auto term_size = core::terminal::getTerminalDimensions();
 
     const auto& [x, y, w, h] = rect;
@@ -137,7 +137,7 @@ void Display::displayImage(ImageId id, IRect rect, core::OutBuffer& buffer) {
     const std::string_view ImagePlaceholder = "\U0010EEEE";
     const std::string_view IdChar = detail::RowColDiacritics[(id >> 24) & 255];
 
-    core::write(
+    core::io::write(
         buffer, "\033[38:2:", (id >> 16) & 255, ":", (id >> 8) & 255, ":", (id >> 0) & 255, "m");
 
     for (uint32_t row = top; row < std::min(term_size.rows, y + h); ++row) {
@@ -149,7 +149,7 @@ void Display::displayImage(ImageId id, IRect rect, core::OutBuffer& buffer) {
             buffer);
 
         for (uint32_t col = left; col < std::min(term_size.columns, x + w); ++col) {
-            core::write(
+            core::io::write(
                 buffer,
                 ImagePlaceholder,
                 detail::RowColDiacritics[row - y],
@@ -158,10 +158,10 @@ void Display::displayImage(ImageId id, IRect rect, core::OutBuffer& buffer) {
         }
     }
 
-    core::write(buffer, "\033[39m");
+    core::io::write(buffer, "\033[39m");
 }
 
-void Display::clear(core::OutBuffer& buffer) const {
+void Display::clear(core::io::OutBuffer& buffer) const {
     std::pair<std::string_view, std::string> control_data[] = {
         {"q", "2"},
         {"a", "d"},

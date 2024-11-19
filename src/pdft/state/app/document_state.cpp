@@ -94,7 +94,7 @@ void DocumentState::applyScrollOffset(uint32_t height, int32_t pages_per_height)
         "applyScrollOffset after: scroll_offset={}, page_index={}", scroll_offset_, page_index_);
 }
 
-void DocumentState::render(view::IRect rect, core::OutBuffer& buffer) {
+void DocumentState::render(view::IRect rect, core::io::OutBuffer& buffer) {
     switch (view_mode_) {
         using enum ViewMode;
 
@@ -112,7 +112,7 @@ void DocumentState::render(view::IRect rect, core::OutBuffer& buffer) {
     }
 }
 
-void DocumentState::renderOnePage(view::IRect rect, core::OutBuffer& buffer) {
+void DocumentState::renderOnePage(view::IRect rect, core::io::OutBuffer& buffer) {
     renderer_->render(
         buffer,
         {
@@ -127,7 +127,7 @@ void DocumentState::renderOnePage(view::IRect rect, core::OutBuffer& buffer) {
         });
 }
 
-void DocumentState::renderTwoPages(view::IRect rect, core::OutBuffer& buffer) {
+void DocumentState::renderTwoPages(view::IRect rect, core::io::OutBuffer& buffer) {
     auto rects =
         view::horizontal(
             view::constraints::Fraction{0.15f / zoom_},
@@ -168,7 +168,7 @@ void DocumentState::renderTwoPages(view::IRect rect, core::OutBuffer& buffer) {
         });
 }
 
-void DocumentState::renderOnePageContinuous(view::IRect rect, core::OutBuffer& buffer) {
+void DocumentState::renderOnePageContinuous(view::IRect rect, core::io::OutBuffer& buffer) {
     applyScrollOffset(rect.height, 1);
 
     rect = view::horizontal(
@@ -212,7 +212,7 @@ void DocumentState::renderOnePageContinuous(view::IRect rect, core::OutBuffer& b
         });
 }
 
-void DocumentState::renderTwoPagesContinuous(view::IRect rect, core::OutBuffer& buffer) {
+void DocumentState::renderTwoPagesContinuous(view::IRect rect, core::io::OutBuffer& buffer) {
     applyScrollOffset(rect.height, 2);
 
     auto rects =

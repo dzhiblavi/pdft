@@ -180,7 +180,7 @@ asio::awaitable<void> main(asio::io_context& context, std::span<char const*> pat
 
     {
         auto _ = init.addChild("clear_screen");
-        core::OutBuffer init_buffer;
+        core::io::OutBuffer init_buffer;
         terminal->clear(init_buffer);
         co_await console->write(init_buffer.view());
     }
@@ -225,7 +225,7 @@ asio::awaitable<void> main(asio::io_context& context, std::span<char const*> pat
     // Start listening for filesystem events for the given path
     asio::co_spawn(context, consumeFsEvents(queue, notify), asio::detached);
 
-    auto buffer = core::OutBuffer();
+    auto buffer = core::io::OutBuffer();
     auto layout = std::vector<view::PagePlacement>();
     auto term_size = core::terminal::getTerminalDimensions();
     auto screen = view::IRect{
@@ -243,7 +243,7 @@ asio::awaitable<void> main(asio::io_context& context, std::span<char const*> pat
         auto tracer =
             core::trace::getGlobalPool().getTracer(core::trace::stackTraceLogger(), "display_one");
 
-        core::clear(buffer);
+        core::io::clear(buffer);
         layout.clear();
         terminal->clear(buffer);
 
@@ -286,7 +286,7 @@ asio::awaitable<void> main(asio::io_context& context, std::span<char const*> pat
     auto cleanup = core::trace::getGlobalPool().getTracer(
         core::trace::stackTraceLogger<std::chrono::microseconds>(), "cleanup");
 
-    core::clear(buffer);
+    core::io::clear(buffer);
     {
         auto _ = cleanup.addChild("term_clear");
         terminal->clear(buffer);

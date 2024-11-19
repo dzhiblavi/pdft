@@ -5,7 +5,7 @@
 namespace pdft::core::terminal::ansi {
 
 TEST_CASE("testMoveCursor", "") {
-    OutBuffer buffer;
+    io::OutBuffer buffer;
     auto terminal = Terminal();
 
     terminal.moveCursor(CursorPosition{10, 20}, buffer);
@@ -13,7 +13,7 @@ TEST_CASE("testMoveCursor", "") {
 }
 
 TEST_CASE("testClearScreen", "") {
-    OutBuffer buffer;
+    io::OutBuffer buffer;
     auto terminal = Terminal();
 
     terminal.clear(buffer);

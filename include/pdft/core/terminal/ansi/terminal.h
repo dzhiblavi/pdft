@@ -6,8 +6,8 @@ namespace pdft::core::terminal::ansi {
 
 class Terminal : public terminal::Terminal {
  public:
-    void clear(OutBuffer& buffer) override;
-    void moveCursor(CursorPosition position, OutBuffer& buffer) override;
+    void clear(io::OutBuffer& buffer) override;
+    void moveCursor(CursorPosition position, io::OutBuffer& buffer) override;
 };
 
 }  // namespace pdft::core::terminal::ansi

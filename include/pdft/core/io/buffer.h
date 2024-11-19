@@ -2,7 +2,7 @@
 
 #include <sstream>
 
-namespace pdft::core {
+namespace pdft::core::io {
 
 using OutBuffer = std::ostringstream;
 
@@ -16,4 +16,4 @@ inline void clear(OutBuffer& buffer) {
     buffer.clear();
 }
 
-}  // namespace pdft::core
+}  // namespace pdft::core::io

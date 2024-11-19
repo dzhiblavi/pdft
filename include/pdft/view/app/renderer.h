@@ -18,8 +18,8 @@ class Renderer : public view::Renderer {
         , display_(std::move(display))
         , terminal_(std::move(terminal)) {}
 
-    void render(core::OutBuffer& buffer, const PagePlacement& placement) override;
-    void render(core::OutBuffer& buffer, const TextPlacement& placement) override;
+    void render(core::io::OutBuffer& buffer, const PagePlacement& placement) override;
+    void render(core::io::OutBuffer& buffer, const TextPlacement& placement) override;
 
  private:
     float calcFactor(media::pdf::PageSize page_size);

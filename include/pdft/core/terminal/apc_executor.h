@@ -9,7 +9,7 @@ class APCExecutor {
  public:
     virtual ~APCExecutor() = default;
 
-    virtual void execute(ApplciationProgrammingCommandView apc, OutBuffer& buffer) = 0;
+    virtual void execute(ApplciationProgrammingCommandView apc, io::OutBuffer& buffer) = 0;
 };
 
 }  // namespace pdft::core::terminal

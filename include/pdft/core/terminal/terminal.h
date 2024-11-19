@@ -18,8 +18,8 @@ class Terminal {
  public:
     virtual ~Terminal() = default;
 
-    virtual void clear(OutBuffer& buffer) = 0;
-    virtual void moveCursor(CursorPosition position, OutBuffer& buffer) = 0;
+    virtual void clear(io::OutBuffer& buffer) = 0;
+    virtual void moveCursor(CursorPosition position, io::OutBuffer& buffer) = 0;
 };
 
 Dimensions getTerminalDimensions();

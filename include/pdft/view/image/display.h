@@ -12,11 +12,11 @@ class Display {
  public:
     virtual ~Display() = default;
 
-    virtual void loadImage(ImageId id, const media::Image& image, core::OutBuffer& buffer) = 0;
-    virtual void displayImage(ImageId id, IRect rect, core::OutBuffer& buffer) = 0;
+    virtual void loadImage(ImageId id, const media::Image& image, core::io::OutBuffer& buffer) = 0;
+    virtual void displayImage(ImageId id, IRect rect, core::io::OutBuffer& buffer) = 0;
 
     virtual bool isLoaded(ImageId id) const = 0;
-    virtual void clear(core::OutBuffer& buffer) const = 0;
+    virtual void clear(core::io::OutBuffer& buffer) const = 0;
 };
 
 }  // namespace pdft::view::image

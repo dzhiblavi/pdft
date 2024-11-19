@@ -7,7 +7,7 @@
 
 namespace pdft::view::app {
 
-void Renderer::render(core::OutBuffer& buffer, const PagePlacement& layout) {
+void Renderer::render(core::io::OutBuffer& buffer, const PagePlacement& layout) {
     core::trace::StackScopeTracer trace =
         core::trace::getGlobalPool().getTracer(core::trace::stackTraceLogger(), "render_one");
 
@@ -56,7 +56,7 @@ void Renderer::render(core::OutBuffer& buffer, const PagePlacement& layout) {
     }
 }
 
-void Renderer::render(core::OutBuffer& buffer, const TextPlacement& placement) {
+void Renderer::render(core::io::OutBuffer& buffer, const TextPlacement& placement) {
     terminal_->moveCursor(
         core::terminal::CursorPosition{
             .rows = static_cast<uint32_t>(placement.position.rect.y + 1),
@@ -64,7 +64,7 @@ void Renderer::render(core::OutBuffer& buffer, const TextPlacement& placement) {
         },
         buffer);
 
-    core::write(buffer, placement.text);
+    core::io::write(buffer, placement.text);
 }
 
 float Renderer::calcFactor(media::pdf::PageSize page_size) {

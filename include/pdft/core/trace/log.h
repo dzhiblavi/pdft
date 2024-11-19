@@ -10,16 +10,16 @@ namespace pdft::core::trace {
 namespace detail {
 
 template <typename Duration>
-void logStackTrace(const StackScopeTracerBase& info, OutBuffer& out) {
+void logStackTrace(const StackScopeTracerBase& info, io::OutBuffer& out) {
     const auto& loc = info.loc;
 
-    core::write(out, '\n');
+    core::io::write(out, '\n');
     for (int d = info.depth; d > 0; d--) {
-        core::write(out, '\t');
+        core::io::write(out, '\t');
     }
 
     auto dur = std::chrono::duration_cast<Duration>(info.duration);
-    core::write(
+    core::io::write(
         out,
         std::format(
             "[{}] {}{} loc={}:{}",
@@ -39,7 +39,7 @@ void logStackTrace(const StackScopeTracerBase& info, OutBuffer& out) {
 template <typename Duration = std::chrono::milliseconds>
 inline auto stackTraceLogger(log::LoggerPtr logger = log::logger("trace")) {
     return [logger](const StackScopeTracerBase& info) {
-        OutBuffer out;
+        io::OutBuffer out;
         detail::logStackTrace<Duration>(info, out);
         logger->trace(out.view());
     };

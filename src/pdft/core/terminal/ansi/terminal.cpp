@@ -2,12 +2,12 @@
 
 namespace pdft::core::terminal::ansi {
 
-void Terminal::clear(OutBuffer& buffer) {
-    write(buffer, "\x1b[2J\x1b[H");
+void Terminal::clear(io::OutBuffer& buffer) {
+    io::write(buffer, "\x1b[2J\x1b[H");
 }
 
-void Terminal::moveCursor(CursorPosition position, OutBuffer& buffer) {
-    write(buffer, "\x1b[", position.rows, ';', position.columns, "H");
+void Terminal::moveCursor(CursorPosition position, io::OutBuffer& buffer) {
+    io::write(buffer, "\x1b[", position.rows, ';', position.columns, "H");
 }
 
 }  // namespace pdft::core::terminal::ansi

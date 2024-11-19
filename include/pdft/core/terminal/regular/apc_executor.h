@@ -6,7 +6,7 @@ namespace pdft::core::terminal::regular {
 
 class APCExecutor : public terminal::APCExecutor {
  public:
-    void execute(ApplciationProgrammingCommandView apc, OutBuffer& buffer) override;
+    void execute(ApplciationProgrammingCommandView apc, io::OutBuffer& buffer) override;
 };
 
 }  // namespace pdft::core::terminal::regular

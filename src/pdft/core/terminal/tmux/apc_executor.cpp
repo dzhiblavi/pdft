@@ -4,7 +4,7 @@
 
 namespace pdft::core::terminal::tmux {
 
-void APCExecutor::execute(ApplciationProgrammingCommandView apc, OutBuffer& out) {
+void APCExecutor::execute(ApplciationProgrammingCommandView apc, io::OutBuffer& out) {
     const size_t MaxPayloadSize = 4096;
     assert(apc.payload_b64.size() <= MaxPayloadSize);
 
