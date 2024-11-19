@@ -12,11 +12,11 @@ void DocumentState::scrollNext(int32_t delta) {
         using enum ViewMode;
 
         case OnePage:
-            nextPage(+1);
+            nextPage(delta);
             break;
 
         case TwoPages:
-            nextPage(+2);
+            nextPage(2 * delta);
             break;
 
         case OnePageContinuous:
