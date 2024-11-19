@@ -43,13 +43,13 @@ test: build
 	cd $(BUILD_DIR) && ctest --output-on-failure
 
 run-lldb: build
-	cd $(BUILD_DIR) && lldb -- ./src/app $(path)
+	cd $(BUILD_DIR) && lldb -- ./src/app/app $(path)
 
 run-gdb: build
-	cd $(BUILD_DIR) && gdb --args ./src/app $(path)
+	cd $(BUILD_DIR) && gdb --args ./src/app/app $(path)
 
 run: build
-	cd $(BUILD_DIR) && ./src/app $(path)
+	cd $(BUILD_DIR) && ./src/app/app $(path)
 
 docker-build:
 	docker build                           \
