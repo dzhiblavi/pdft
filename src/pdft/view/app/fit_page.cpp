@@ -12,6 +12,7 @@ struct Fitter {
 
     // The result
     IRect pos;
+    IRect image;
 
     Fitter(float width, float height, const IRect& rect, const PagePlacement& place)
         : width(width)
@@ -22,16 +23,12 @@ struct Fitter {
         image_ratio_is_greater = width * rect.height > height * rect.width;
     }
 
-    uint32_t ceil(uint64_t a, uint32_t b) {
-        return (a + b - 1) / b;
-    }
-
     uint32_t adjustedHeight() {
-        return ceil(uint64_t(rect.width) * height, width);
+        return std::ceil(float(rect.width) * height / width);
     }
 
     uint32_t adjustedWidth() {
-        return ceil(uint64_t(rect.height) * width, height);
+        return std::ceil(float(rect.height) * width / height);
     }
 
     void fitInside() {
@@ -52,17 +49,50 @@ struct Fitter {
             pos.y = rect.y;
         }
 
-        pos.width = in_img_cols;
-        pos.height = in_img_rows;
+        image.width = pos.width = in_img_cols;
+        image.height = pos.height = in_img_rows;
+        image.x = image.y = 0;
     }
 
-    IRect fit() {
-        fitInside();
-        return pos;
+    void fitCropAndFill() {
+        pos = rect;
+
+        if (image_ratio_is_greater) {
+            image = {
+                .x = static_cast<int32_t>(getOffset(adjustedWidth(), rect.width, place.hor)),
+                .y = 0,
+                .width = adjustedWidth(),
+                .height = rect.height,
+            };
+        } else {
+            image = {
+                .x = 0,
+                .y = static_cast<int32_t>(getOffset(adjustedHeight(), rect.height, place.vert)),
+                .width = rect.width,
+                .height = adjustedHeight(),
+            };
+        }
+    }
+
+    std::tuple<IRect, IRect> fit() {
+        switch (place.fit) {
+            using enum PagePlacement::FitMode;
+
+            case FitInside:
+                fitInside();
+                break;
+
+            case CropAndFill:
+                fitCropAndFill();
+                break;
+        }
+
+        return std::make_tuple(pos, image);
     }
 };
 
-IRect fitPage(float width, float height, const IRect& rect, const PagePlacement& place) {
+std::tuple<IRect, IRect> fitPage(
+    float width, float height, const IRect& rect, const PagePlacement& place) {
     return Fitter(width, height, rect, place).fit();
 }
 

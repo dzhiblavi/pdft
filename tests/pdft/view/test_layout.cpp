@@ -113,6 +113,18 @@ TEST_CASE("testLengthMultipleVertical", "") {
         });
 }
 
+TEST_CASE("testLengthAndFillVertical", "") {
+    using namespace constraints;
+
+    auto layout = vertical(Length{35}, Fill{1});
+    CHECK(
+        layout.split(TestRect) ==
+        std::vector{
+            IRect{10, 20, 30, 35},
+            IRect{10, 55, 30, 5},
+        });
+}
+
 TEST_CASE("testMixedMultipleHorizontal", "") {
     using namespace constraints;
     auto layout = horizontal(Length{2}, Fill{1}, Fraction{0.5f}, Fill{2}, Length{3});

@@ -57,9 +57,9 @@ void DocumentState::nextLayout(int32_t delta) {
 }
 
 void DocumentState::updateZoom(float coeff) {
-    constexpr float MinZoom = 0.1f;
-    constexpr float MaxZoom = 2.0f;
-    zoom_ = std::fmin(MaxZoom, std::fmax(MinZoom, coeff));
+    constexpr float MinZoom = 0.001f;
+    constexpr float MaxZoom = 200.0f;
+    zoom_ = std::fmin(MaxZoom, std::fmax(MinZoom, zoom_ * coeff));
 }
 
 DocumentId DocumentState::getDocumentId() const {
@@ -178,22 +178,28 @@ void DocumentState::renderTwoPages(view::IRect rect, core::io::OutBuffer& buffer
 void DocumentState::renderOnePageContinuous(view::IRect rect, core::io::OutBuffer& buffer) {
     applyScrollOffset(rect.height, 1);
 
+    core::log::global()->info(
+        "zoom is {}, pad fraction is {}", zoom_, std::fmin(0.47f, 0.30f / zoom_));
+
     rect = view::horizontal(
-               view::constraints::Fraction{0.10f / zoom_},
+               view::constraints::Fraction{std::fmin(0.47f, 0.30f / zoom_)},
                view::constraints::Fill{1},
-               view::constraints::Fraction{0.10f / zoom_})
+               view::constraints::Fraction{std::fmin(0.47f, 0.30f / zoom_)})
                .split(rect)[1];
 
     auto top_height = rect.height - scroll_offset_;
-    auto top = offsetRect(rect, 0, -scroll_offset_);
-    auto bottom = offsetRect(rect, 0, +top_height);
+
+    auto page_rects =
+        view::vertical(view::constraints::Length(top_height), view::constraints::Fill(1))
+            .split(rect);
 
     renderer_->render(
         buffer,
-        top,
+        page_rects[0],
         {
             .hor = view::AxisFit::Center,
             .vert = view::AxisFit::Max,
+            .fit = view::PagePlacement::FitMode::CropAndFill,
         },
         {
             .document_id = document_id_,
@@ -206,10 +212,11 @@ void DocumentState::renderOnePageContinuous(view::IRect rect, core::io::OutBuffe
 
     renderer_->render(
         buffer,
-        bottom,
+        page_rects[1],
         {
             .hor = view::AxisFit::Center,
             .vert = view::AxisFit::Min,
+            .fit = view::PagePlacement::FitMode::CropAndFill,
         },
         {
             .document_id = document_id_,
@@ -222,24 +229,28 @@ void DocumentState::renderTwoPagesContinuous(view::IRect rect, core::io::OutBuff
 
     auto rects =
         view::horizontal(
-            view::constraints::Fraction{0.05f / zoom_},
+            view::constraints::Fraction{std::fmin(0.47f, 0.1f / zoom_)},
             view::constraints::Fill{1},  // rects[1]
             view::constraints::Fill{1},  // rects[2]
-            view::constraints::Fraction{0.05f / zoom_})
+            view::constraints::Fraction{std::fmin(0.47f, 0.10f / zoom_)})
             .split(rect);
 
     uint32_t top_height = rect.height - scroll_offset_;
-    auto top_left = offsetRect(rects[1], 0, -scroll_offset_);
-    auto top_right = offsetRect(rects[2], 0, -scroll_offset_);
-    auto bottom_left = offsetRect(rects[1], 0, +top_height);
-    auto bottom_right = offsetRect(rects[2], 0, +top_height);
+
+    auto left_rects =
+        view::vertical(view::constraints::Length(top_height), view::constraints::Fill(1))
+            .split(rects[1]);
+    auto right_rects =
+        view::vertical(view::constraints::Length(top_height), view::constraints::Fill(1))
+            .split(rects[2]);
 
     renderer_->render(
         buffer,
-        top_left,
+        left_rects[0],
         {
             .hor = view::AxisFit::Max,
             .vert = view::AxisFit::Max,
+            .fit = view::PagePlacement::FitMode::CropAndFill,
         },
         {
             .document_id = document_id_,
@@ -252,10 +263,11 @@ void DocumentState::renderTwoPagesContinuous(view::IRect rect, core::io::OutBuff
 
     renderer_->render(
         buffer,
-        top_right,
+        right_rects[0],
         {
             .hor = view::AxisFit::Min,
             .vert = view::AxisFit::Max,
+            .fit = view::PagePlacement::FitMode::CropAndFill,
         },
         {
             .document_id = document_id_,
@@ -268,10 +280,11 @@ void DocumentState::renderTwoPagesContinuous(view::IRect rect, core::io::OutBuff
 
     renderer_->render(
         buffer,
-        bottom_left,
+        left_rects[1],
         {
             .hor = view::AxisFit::Max,
             .vert = view::AxisFit::Min,
+            .fit = view::PagePlacement::FitMode::CropAndFill,
         },
         {
             .document_id = document_id_,
@@ -284,10 +297,11 @@ void DocumentState::renderTwoPagesContinuous(view::IRect rect, core::io::OutBuff
 
     renderer_->render(
         buffer,
-        bottom_right,
+        right_rects[1],
         {
             .hor = view::AxisFit::Min,
             .vert = view::AxisFit::Min,
+            .fit = view::PagePlacement::FitMode::CropAndFill,
         },
         {
             .document_id = document_id_,

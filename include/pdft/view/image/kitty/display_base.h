@@ -17,14 +17,16 @@ class DisplayBase : public image::Display {
         : terminal_(std::move(terminal))
         , executor_(std::move(executor)) {}
 
-    void loadImage(ImageId id, const media::Image& image, core::io::OutBuffer& buffer) override;
-    bool isLoaded(ImageId id) const override;
+    void loadImage(
+        media::ImageId id, const media::Image& image, core::io::OutBuffer& buffer) override;
+
+    bool isLoaded(media::ImageId id) const override;
     void clear(core::io::OutBuffer& buffer) const override;
 
  protected:
     std::shared_ptr<core::terminal::Terminal> terminal_;
     std::shared_ptr<core::terminal::APCExecutor> executor_;
-    std::unordered_set<ImageId> loaded_;
+    std::unordered_set<media::ImageId> loaded_;
 };
 
 }  // namespace pdft::view::image::kitty

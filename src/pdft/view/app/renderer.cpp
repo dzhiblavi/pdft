@@ -15,7 +15,7 @@ void Renderer::render(
 
     display_->clear(buffer);
 
-    const auto& [hor, vert] = place;
+    const auto& [hor, vert, _fit] = place;
     const auto& [doc_id, page_index] = page;
     const auto& document = docs_->getDocument(doc_id);
     media::ImageId id = utils::cantorPair(doc_id, page_index + 1);
@@ -52,10 +52,14 @@ void Renderer::render(
 
     {
         auto _ = trace.addChild("display_image");
-
         PDFT_VERIFY(image_size_cells_.contains(id));
+
+        auto [x, y, w, h] = rect;
+        core::log::global()->info("renderer @ x={},y={},w={},h={}", x, y, w, h);
+
         auto [width, height] = image_size_cells_[id];
-        display_->displayImage(id, fitPage(width, height, rect, place), buffer);
+        auto [irect, image] = fitPage(width, height, rect, place);
+        display_->displayImage(id, irect, image, buffer);
     }
 }
 

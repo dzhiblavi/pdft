@@ -8,7 +8,11 @@ class NativeDisplay : public DisplayBase {
  public:
     using DisplayBase::DisplayBase;
 
-    void displayImage(ImageId id, IRect rect, core::io::OutBuffer& buffer) override;
+    void displayImage(
+        media::ImageId id,
+        const IRect& rect,
+        const IRect& image,
+        core::io::OutBuffer& buffer) override;
 };
 
 }  // namespace pdft::view::image::kitty

@@ -5,9 +5,17 @@
 namespace pdft::view {
 
 struct PagePlacement {
+    enum class FitMode {
+        FitInside,
+        CropAndFill,
+    };
+
     // The strategy which defines how the image will be displayed inside the rect.
     AxisFit hor = AxisFit::Center;
     AxisFit vert = AxisFit::Center;
+
+    // How to display the image inside the rect.
+    FitMode fit = FitMode::FitInside;
 };
 
 struct TextPlacement {

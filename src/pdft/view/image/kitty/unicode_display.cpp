@@ -1,30 +1,30 @@
 #include "pdft/view/image/kitty/unicode_display.h"
+#include "pdft/core/assert.h"
 #include "pdft/core/log/log.h"
 
 #include "./detail/rowcolumn_diacritics.h"
 
 namespace pdft::view::image::kitty {
 
-void UnicodeDisplay::displayImage(ImageId id, IRect rect, core::io::OutBuffer& buffer) {
+void UnicodeDisplay::displayImage(
+    media::ImageId id, const IRect& rect, const IRect& image, core::io::OutBuffer& buffer) {
     auto term_size = core::terminal::getTerminalDimensions();
 
     const auto& [x, y, w, h] = rect;
+    const auto& [ix, iy, iw, ih] = image;
     core::log::global()->info("display @ x={},y={},w={},h={}", x, y, w, h);
+    core::log::global()->info("display I x={},y={},w={},h={}", ix, iy, iw, ih);
 
-    // x, y, w, h (pixels) control the subrectangle of the image (not in unicode mode btw).
-    // In case of Unicode mode (U=1) the image subrectangle is controlled via placing
-    // the correct row and column indices.
-    //
-    // c, r (columns and rows) control the rectangle at which the image will be displayed
-    // The rectangle position in achieved via moving the cursor to the top-left corner
-    // before displaying the image.
+    PDFT_VERIFY(x >= 0 && y >= 0);
+    PDFT_VERIFY(ix >= 0 && iy >= 0);
+
     std::pair<std::string_view, std::string> control_data[] = {
         {"q", "2"},
         {"a", "p"},
         {"U", "1"},
         {"i", std::to_string(id)},
-        {"r", std::to_string(h)},
-        {"c", std::to_string(w)},
+        {"r", std::to_string(ih)},
+        {"c", std::to_string(iw)},
         {"C", "1"},
     };
 
@@ -37,10 +37,10 @@ void UnicodeDisplay::displayImage(ImageId id, IRect rect, core::io::OutBuffer& b
         },
         buffer);
 
-    uint32_t left = static_cast<uint32_t>(std::max(0, x));
-    uint32_t top = static_cast<uint32_t>(std::max(0, y));
-    uint32_t num_rows = h + std::min(0, y);
-    uint32_t num_cols = w + std::min(0, x);
+    uint32_t left = x;
+    uint32_t top = y;
+    uint32_t num_rows = h;
+    uint32_t num_cols = w;
 
     // Fill the image space with special unicode characters
     const std::string_view ImagePlaceholder = "\U0010EEEE";
@@ -61,8 +61,8 @@ void UnicodeDisplay::displayImage(ImageId id, IRect rect, core::io::OutBuffer& b
             core::io::write(
                 buffer,
                 ImagePlaceholder,
-                detail::RowColDiacritics[row - y],
-                detail::RowColDiacritics[col - x],
+                detail::RowColDiacritics[iy + row - top],
+                detail::RowColDiacritics[ix + col - left],
                 IdChar);
         }
     }

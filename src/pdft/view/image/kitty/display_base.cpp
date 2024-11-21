@@ -1,8 +1,6 @@
 #include "pdft/view/image/kitty/display_base.h"
 
 #include "pdft/core/assert.h"
-#include "pdft/core/log/log.h"
-#include "pdft/core/terminal/terminal.h"
 #include "pdft/utils/base64.h"
 #include "pdft/utils/zlib.h"
 
@@ -24,11 +22,12 @@ std::string_view nextChunk(std::string_view& data, size_t max_chunk_size) {
 
 }  // namespace
 
-bool DisplayBase::isLoaded(ImageId id) const {
+bool DisplayBase::isLoaded(media::ImageId id) const {
     return loaded_.contains(id);
 }
 
-void DisplayBase::loadImage(ImageId id, const media::Image& image, core::io::OutBuffer& buffer) {
+void DisplayBase::loadImage(
+    media::ImageId id, const media::Image& image, core::io::OutBuffer& buffer) {
     PDFT_VERIFY(!isLoaded(id));
     auto image_size = image.size();
     loaded_.insert(id);

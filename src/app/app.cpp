@@ -130,6 +130,8 @@ asio::awaitable<void> Application::runEventLoop() {
         .height = term_size.rows,
     };
 
+    core::log::global()->info("Display size: c={},r={}", term_size.columns, term_size.rows);
+
     for (;;) {
         core::log::global()->info("========== NEW FRAME ===========");
 

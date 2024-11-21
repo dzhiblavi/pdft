@@ -3,6 +3,8 @@
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/generators/catch_generators.hpp>
 
+#include <iostream>
+
 namespace pdft::view::app {
 
 inline const IRect Rect = {
@@ -12,10 +14,23 @@ inline const IRect Rect = {
     .height = 40,
 };
 
+inline const IRect ZeroOffset = {
+    .x = 0,
+    .y = 0,
+    .width = 30,
+    .height = 40,
+};
+
+void dump(const IRect& rect) {
+    auto [x, y, w, h] = rect;
+    std::cout << std::format("IRect[x={},y={},w={},h={}]", x, y, w, h) << std::endl;
+}
+
 TEST_CASE("testFitPositionExactlyMatchesProportions", "") {
     auto pos = PagePlacement{
         .hor = view::AxisFit::Center,
         .vert = view::AxisFit::Max,
+        .fit = PagePlacement::FitMode::FitInside,
     };
 
     auto expected = IRect{
@@ -25,7 +40,16 @@ TEST_CASE("testFitPositionExactlyMatchesProportions", "") {
         .height = 40,
     };
 
-    CHECK(fitPage(3.0f, 4.0f, Rect, pos) == expected);
+    auto expected_image = IRect{
+        .x = 0,
+        .y = 0,
+        .width = 30,
+        .height = 40,
+    };
+
+    auto [rect, offset] = fitPage(3.0f, 4.0f, Rect, pos);
+    CHECK(rect == expected);
+    CHECK(offset == expected_image);
 }
 
 TEST_CASE("testFitPositionCenterVertically", "") {
@@ -34,6 +58,7 @@ TEST_CASE("testFitPositionCenterVertically", "") {
     auto pos = PagePlacement{
         .hor = view::AxisFit::Center,
         .vert = vert,
+        .fit = PagePlacement::FitMode::FitInside,
     };
 
     auto expected = IRect{
@@ -43,7 +68,16 @@ TEST_CASE("testFitPositionCenterVertically", "") {
         .height = 40,
     };
 
-    CHECK(fitPage(2.0f, 4.0f, Rect, pos) == expected);
+    auto expected_image = IRect{
+        .x = 0,
+        .y = 0,
+        .width = 20,
+        .height = 40,
+    };
+
+    auto [rect, offset] = fitPage(2.0f, 4.0f, Rect, pos);
+    CHECK(rect == expected);
+    CHECK(offset == expected_image);
 }
 
 TEST_CASE("testFitPositionMinVertically", "") {
@@ -52,6 +86,7 @@ TEST_CASE("testFitPositionMinVertically", "") {
     auto pos = PagePlacement{
         .hor = view::AxisFit::Min,
         .vert = vert,
+        .fit = PagePlacement::FitMode::FitInside,
     };
 
     auto expected = IRect{
@@ -61,7 +96,16 @@ TEST_CASE("testFitPositionMinVertically", "") {
         .height = 40,
     };
 
-    CHECK(fitPage(2.0f, 4.0f, Rect, pos) == expected);
+    auto expected_image = IRect{
+        .x = 0,
+        .y = 0,
+        .width = 20,
+        .height = 40,
+    };
+
+    auto [rect, offset] = fitPage(2.0f, 4.0f, Rect, pos);
+    CHECK(rect == expected);
+    CHECK(offset == expected_image);
 }
 
 TEST_CASE("testFitPositionMaxVertically", "") {
@@ -70,6 +114,7 @@ TEST_CASE("testFitPositionMaxVertically", "") {
     auto pos = PagePlacement{
         .hor = view::AxisFit::Max,
         .vert = vert,
+        .fit = PagePlacement::FitMode::FitInside,
     };
 
     auto expected = IRect{
@@ -79,7 +124,16 @@ TEST_CASE("testFitPositionMaxVertically", "") {
         .height = 40,
     };
 
-    CHECK(fitPage(2.0f, 4.0f, Rect, pos) == expected);
+    auto expected_image = IRect{
+        .x = 0,
+        .y = 0,
+        .width = 20,
+        .height = 40,
+    };
+
+    auto [rect, offset] = fitPage(2.0f, 4.0f, Rect, pos);
+    CHECK(rect == expected);
+    CHECK(offset == expected_image);
 }
 
 TEST_CASE("testFitPositionCenterHorizontally", "") {
@@ -88,6 +142,7 @@ TEST_CASE("testFitPositionCenterHorizontally", "") {
     auto pos = PagePlacement{
         .hor = hor,
         .vert = view::AxisFit::Center,
+        .fit = PagePlacement::FitMode::FitInside,
     };
 
     auto expected = IRect{
@@ -97,7 +152,16 @@ TEST_CASE("testFitPositionCenterHorizontally", "") {
         .height = 23,
     };
 
-    CHECK(fitPage(4.0f, 3.0f, Rect, pos) == expected);
+    auto expected_image = IRect{
+        .x = 0,
+        .y = 0,
+        .width = 30,
+        .height = 23,
+    };
+
+    auto [rect, offset] = fitPage(4.0f, 3.0f, Rect, pos);
+    CHECK(rect == expected);
+    CHECK(offset == expected_image);
 }
 
 TEST_CASE("testFitPositionMinHorizontally", "") {
@@ -106,6 +170,7 @@ TEST_CASE("testFitPositionMinHorizontally", "") {
     auto pos = PagePlacement{
         .hor = hor,
         .vert = view::AxisFit::Min,
+        .fit = PagePlacement::FitMode::FitInside,
     };
 
     auto expected = IRect{
@@ -115,7 +180,23 @@ TEST_CASE("testFitPositionMinHorizontally", "") {
         .height = 23,
     };
 
-    CHECK(fitPage(4.0f, 3.0f, Rect, pos) == expected);
+    auto expected_image = IRect{
+        .x = 0,
+        .y = 0,
+        .width = 30,
+        .height = 23,
+    };
+
+    auto [rect, offset] = fitPage(4.0f, 3.0f, Rect, pos);
+
+    dump(rect);
+    dump(expected);
+
+    dump(offset);
+    dump(expected_image);
+
+    CHECK(rect == expected);
+    CHECK(offset == expected_image);
 }
 
 TEST_CASE("testFitPositionMaxHorizontally", "") {
@@ -124,6 +205,7 @@ TEST_CASE("testFitPositionMaxHorizontally", "") {
     auto pos = PagePlacement{
         .hor = hor,
         .vert = view::AxisFit::Max,
+        .fit = PagePlacement::FitMode::FitInside,
     };
 
     auto expected = IRect{
@@ -133,7 +215,16 @@ TEST_CASE("testFitPositionMaxHorizontally", "") {
         .height = 23,
     };
 
-    CHECK(fitPage(4.0f, 3.0f, Rect, pos) == expected);
+    auto expected_image = IRect{
+        .x = 0,
+        .y = 0,
+        .width = 30,
+        .height = 23,
+    };
+
+    auto [rect, offset] = fitPage(4.0f, 3.0f, Rect, pos);
+    CHECK(rect == expected);
+    CHECK(offset == expected_image);
 }
 
 }  // namespace pdft::view::app

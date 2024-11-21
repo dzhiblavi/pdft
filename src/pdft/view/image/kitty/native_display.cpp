@@ -3,7 +3,8 @@
 
 namespace pdft::view::image::kitty {
 
-void NativeDisplay::displayImage(ImageId id, IRect rect, core::io::OutBuffer& buffer) {
+void NativeDisplay::displayImage(
+    media::ImageId id, const IRect& rect, const IRect& image, core::io::OutBuffer& buffer) {
     auto term_size = core::terminal::getTerminalDimensions();
 
     const auto& [x, y, w, h] = rect;
