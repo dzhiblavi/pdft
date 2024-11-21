@@ -1,9 +1,9 @@
 #include "app.h"
 #include "consume_fs_events.h"
 #include "keyboard_consumer.h"
+#include "logging.h"
 #include "resolve_apc_executor.h"
 #include "resolve_display.h"
-#include "setup_logging.h"
 
 #include "pdft/core/io/posix/console.h"
 #include "pdft/core/io/posix/termctl.h"
@@ -49,7 +49,7 @@ Application::Application(asio::io_context& context, Config config)
 
 void Application::setup() {
     app::setupSignalHandlers();
-    app::setupLogging();
+    app::setupLogging(config_.logging);
 
     pdf_context_ = std::make_shared<media::pdf::Context>(media::pdf::Context::Builder().build());
     app::setupMupdfLogging(*pdf_context_);

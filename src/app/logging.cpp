@@ -1,4 +1,4 @@
-#include "setup_logging.h"
+#include "logging.h"
 
 #include "pdft/core/log/config.h"
 #include "pdft/core/log/load.h"
@@ -14,12 +14,29 @@ namespace app {
 
 using namespace pdft;
 
-void setupLogging() {
-    std::filesystem::path home = getenv("HOME");
-    auto logs_dir = home / ".local/share/pdft";
+namespace {
 
-    if (!std::filesystem::exists(logs_dir)) {
-        std::filesystem::create_directories(logs_dir);
+spdlog::level::level_enum toSpdlogLevel(LogLevel level) {
+    return static_cast<spdlog::level::level_enum>(level);
+}
+
+std::filesystem::path expandHome(const std::filesystem::path& path) {
+    std::string str = path;
+
+    if (str.starts_with('~')) {
+        str.replace(0, 1, pdft::utils::getHomeDirectory());
+    }
+
+    return str;
+}
+
+}  // namespace
+
+void setupLogging(const LoggingConfig& config) {
+    auto directory = expandHome(config.directory);
+
+    if (!std::filesystem::exists(directory)) {
+        std::filesystem::create_directories(directory);
     }
 
     core::log::LogConfig log_config{
@@ -28,10 +45,11 @@ void setupLogging() {
                 {
                     "global",
                     {
+                        .level = toSpdlogLevel(config.level),
                         .sinks =
                             {
                                 core::log::SimpleFileSink{
-                                    .path = home / ".local/share/pdft/app.log",
+                                    .path = directory / "app.log",
                                 },
                             },
                     },
@@ -39,10 +57,11 @@ void setupLogging() {
                 {
                     "mupdf",
                     {
+                        .level = toSpdlogLevel(config.level),
                         .sinks =
                             {
                                 core::log::SimpleFileSink{
-                                    .path = home / ".local/share/pdft/mupdf.log",
+                                    .path = directory / "mupdf.log",
                                 },
                             },
                     },
@@ -50,11 +69,12 @@ void setupLogging() {
                 {
                     "trace",
                     {
+                        // Trace logger always has the trace logging level
                         .level = spdlog::level::level_enum::trace,
                         .sinks =
                             {
                                 core::log::SimpleFileSink{
-                                    .path = home / ".local/share/pdft/trace.log",
+                                    .path = directory / "trace.log",
                                 },
                             },
                     },
