@@ -15,8 +15,8 @@ void UnicodeDisplay::displayImage(
     core::log::global()->info("display @ x={},y={},w={},h={}", x, y, w, h);
     core::log::global()->info("display I x={},y={},w={},h={}", ix, iy, iw, ih);
 
-    PDFT_VERIFY(x >= 0 && y >= 0);
-    PDFT_VERIFY(ix >= 0 && iy >= 0);
+    PDFT_VERIFY(x >= 0 && y >= 0, "rect offset must not be negative: x={},y={}", x, y);
+    PDFT_VERIFY(ix >= 0 && iy >= 0, "image offset must not be negative: x={},y={}", x, y);
 
     std::pair<std::string_view, std::string> control_data[] = {
         {"q", "2"},

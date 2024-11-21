@@ -41,7 +41,7 @@ void setGlobalLogger(std::shared_ptr<spdlog::logger> logger) {
 }
 
 LoggerPtr global() {
-    PDFT_VERIFY(GlobalLogger::instance().get());
+    PDFT_VERIFY(GlobalLogger::instance().get(), "global logger is not configured");
     return GlobalLogger::instance().get();
 }
 

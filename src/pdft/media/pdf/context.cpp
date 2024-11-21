@@ -18,7 +18,7 @@ Context::Builder& Context::Builder::setStorageSize(int size) {
 
 Context Context::Builder::build() {
     auto* context = fz_new_context(NULL, NULL, size_);
-    PDFT_VERIFY(context);
+    PDFT_VERIFY(context, "failed to create new fz_context");
     return Context{context};
 }
 

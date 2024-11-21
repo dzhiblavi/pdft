@@ -4,7 +4,7 @@
 namespace pdft::view {
 
 uint32_t getOffset(uint32_t outer, uint32_t inner, view::AxisFit strategy) {
-    PDFT_VERIFY(outer >= inner);
+    PDFT_VERIFY(outer >= inner, "outer cannot be smaller than inner one");
 
     switch (strategy) {
         using enum view::AxisFit;

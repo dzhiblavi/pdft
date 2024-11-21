@@ -15,10 +15,9 @@ Dimensions getTerminalDimensions() {
         core::fail(std::format("ioctl failed, errno={} ({})", errno, strerror(errno)).c_str());
     }
 
-    PDFT_VERIFY(sz.ws_row > 0);
-    PDFT_VERIFY(sz.ws_col > 0);
-    PDFT_VERIFY(sz.ws_ypixel > 0);
-    PDFT_VERIFY(sz.ws_xpixel > 0);
+    PDFT_VERIFY(sz.ws_row > 0 && sz.ws_col > 0, "terminal does not support ioctl TIOCGWINSZ fully");
+    PDFT_VERIFY(
+        sz.ws_ypixel > 0 && sz.ws_xpixel > 0, "terminal does not support ioctl TIOCGWINSZ fully");
 
     return {
         .rows = sz.ws_row,

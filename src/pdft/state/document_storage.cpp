@@ -14,20 +14,21 @@ DocumentId DocumentStorage::addDocument(media::pdf::Document document) {
 
 void DocumentStorage::removeDocument(DocumentId id) {
     auto it = documents_.find(id);
-    PDFT_VERIFY(it != documents_.end());
+    PDFT_VERIFY(it != documents_.end(), "trying to delete an unknown document with id={}", id);
     ids_by_path_.erase(it->second.getPath());
     documents_.erase(it);
 }
 
 const media::pdf::Document& DocumentStorage::getDocument(DocumentId id) const {
     auto it = documents_.find(id);
-    PDFT_VERIFY(it != documents_.end());
+    PDFT_VERIFY(it != documents_.end(), "trying to get an unknown document with id={}", id);
     return it->second;
 }
 
 DocumentId DocumentStorage::getIdByPath(const std::filesystem::path& path) const {
     auto it = ids_by_path_.find(path);
-    PDFT_VERIFY(it != ids_by_path_.end());
+    PDFT_VERIFY(
+        it != ids_by_path_.end(), "no document with exists with this path={}", path.c_str());
     return it->second;
 }
 

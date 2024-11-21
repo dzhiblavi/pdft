@@ -45,7 +45,7 @@ void KeyTree::bind(NumberType, std::string_view keys, NumberCallbackType callbac
 }
 
 void KeyTree::bindFrom(Node* root, std::string_view keys, NumberCallbackType callback) {
-    PDFT_VERIFY(!keys.empty());
+    PDFT_VERIFY(!keys.empty(), "cannot bind empty key sequence");
 
     Node* curr = root;
 
@@ -60,7 +60,7 @@ void KeyTree::bindFrom(Node* root, std::string_view keys, NumberCallbackType cal
             curr = next;
         }
 
-        PDFT_VERIFY(!curr->callback);
+        PDFT_VERIFY(!curr->callback, "old keybinding is a prefix of new one: {}", keys);
     }
 
     curr->callback = std::move(callback);
@@ -114,7 +114,7 @@ KeyTree::Result KeyTree::feedDigit(char key) {
 
     switch (state_) {
         case None:
-            PDFT_VERIFY(curr_ == nullptr);
+            PDFT_VERIFY(curr_ == nullptr, "invalid state");
             if (num_root_ != nullptr) {
                 curr_ = num_root_;
                 state_ = Counting;
@@ -125,11 +125,11 @@ KeyTree::Result KeyTree::feedDigit(char key) {
             }
 
         case Simple:
-            PDFT_VERIFY(curr_ != nullptr);
+            PDFT_VERIFY(curr_ != nullptr, "invalid state");
             return feedChar(key);
 
         case Counting:
-            PDFT_VERIFY(curr_ == num_root_);
+            PDFT_VERIFY(curr_ == num_root_, "invalid state");
             number_ = number_ * 10 + digit;
             return Result::Accepted;
     }

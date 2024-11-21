@@ -32,7 +32,7 @@ PixmapImage::~PixmapImage() noexcept {
 }
 
 ImageSize PixmapImage::size() const {
-    PDFT_VERIFY(pixmap_ != nullptr);
+    PDFT_VERIFY(pixmap_ != nullptr, "invalid pixmap image");
 
     return {
         .width_px = static_cast<uint32_t>(pixmap_->w),
@@ -41,7 +41,7 @@ ImageSize PixmapImage::size() const {
 }
 
 std::string_view PixmapImage::samples() const {
-    assert(pixmap_);
+    PDFT_VERIFY(pixmap_ != nullptr, "invalid pixmap image");
 
     return {
         (char*)pixmap_->samples,

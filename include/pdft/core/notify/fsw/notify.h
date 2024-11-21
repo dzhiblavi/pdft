@@ -53,8 +53,11 @@ class Notify : public notify::Notify {
         PDFT_VERIFY(fsw_set_latency(handle_, 0.1) == FSW_OK);
         PDFT_VERIFY(fsw_set_callback(handle_, processEvents, this) == FSW_OK);
 
-        PDFT_VERIFY(fsw_add_event_type_filter(handle_, {.flag = IsFile}) == FSW_OK);
-        PDFT_VERIFY(fsw_add_event_type_filter(handle_, {.flag = Updated}) == FSW_OK);
+        fsw_event_type_filter filter;
+        filter.flag = IsFile;
+        PDFT_VERIFY(fsw_add_event_type_filter(handle_, filter) == FSW_OK);
+        filter.flag = Updated;
+        PDFT_VERIFY(fsw_add_event_type_filter(handle_, filter) == FSW_OK);
 
         fsw_thread_ = std::thread(monitorRunLoop, this);
     }

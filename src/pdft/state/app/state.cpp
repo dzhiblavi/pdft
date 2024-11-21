@@ -60,7 +60,7 @@ void State::addDocument(DocumentId id) {
 void State::onDocumentChanged(DocumentId from, DocumentId to) {
     auto page_count = doc_storage_->getDocument(to).pageCount();
     auto it = std::ranges::find(states_, from, &DocumentState::getDocumentId);
-    PDFT_VERIFY(it != states_.end());
+    PDFT_VERIFY(it != states_.end(), "failed to find the old document with id={}", from);
     it->setDocument(to, page_count);
 }
 

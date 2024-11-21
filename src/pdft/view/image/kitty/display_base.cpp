@@ -28,7 +28,7 @@ bool DisplayBase::isLoaded(media::ImageId id) const {
 
 void DisplayBase::loadImage(
     media::ImageId id, const media::Image& image, core::io::OutBuffer& buffer) {
-    PDFT_VERIFY(!isLoaded(id));
+    PDFT_VERIFY(!isLoaded(id), "image with id={} is already loaded", id);
     auto image_size = image.size();
     loaded_.insert(id);
 

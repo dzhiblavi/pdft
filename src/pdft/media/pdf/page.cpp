@@ -20,8 +20,8 @@ Page::~Page() noexcept {
 }
 
 std::unique_ptr<Image> Page::getImage(const ImageProperties& properties) {
-    PDFT_VERIFY(properties.scale_x > 0.f);
-    PDFT_VERIFY(properties.scale_y > 0.f);
+    PDFT_VERIFY(properties.scale_x > 0.f, "scale factor should be positive");
+    PDFT_VERIFY(properties.scale_y > 0.f, "scale factor should be positive");
 
     auto ctx = context_.native();
     fz_pixmap* pix = nullptr;
@@ -34,7 +34,7 @@ std::unique_ptr<Image> Page::getImage(const ImageProperties& properties) {
         core::fail("fz_new_pixmap_from_page");
     }
 
-    PDFT_VERIFY(pix->w > 0 && pix->h > 0);
+    PDFT_VERIFY(pix->w > 0 && pix->h > 0, "loaded an image with negative size");
     core::log::global()->info("loaded an image {}x{} pixels", pix->w, pix->h);
 
     if (pix == nullptr) {
