@@ -5,34 +5,88 @@
 namespace pdft::controller::app {
 
 Controller::Controller(
-    std::shared_ptr<state::State> state, std::shared_ptr<state::DocumentStorage> docs)
+    const Config& config,
+    std::shared_ptr<state::State> state,
+    std::shared_ptr<state::DocumentStorage> docs)
     : state_(std::move(state))
     , docs_(std::move(docs)) {
-    key_tree_.bind("q", [this] { quit_ = true; });
+    for (const auto& [command, keys] : config.key_mappings) {
+        bindKey(command, keys);
+    }
+}
 
-    key_tree_.bind("j", [this] { state_->scrollNext(1); });
-    key_tree_.bind("k", [this] { state_->scrollNext(-1); });
-    key_tree_.bind(KeyTree::number, "j", [this](auto times) { state_->nextPage(times); });
-    key_tree_.bind(KeyTree::number, "k", [this](auto times) { state_->nextPage(-times); });
+void Controller::bindKey(Command command, std::string_view keys) {
+    switch (command) {
+        using enum Command;
 
-    key_tree_.bind(KeyTree::number, "G", [this](auto index) {
-        if (index > 0) {
-            state_->setPageIndex(index - 1);
-        }
-    });
-    key_tree_.bind("gg", [this] { state_->setPageIndex(0); });
-    key_tree_.bind("G", [this] { state_->setPageIndex(INT_MAX); });
+        case Quit:
+            key_tree_.bind(keys, [this] { quit_ = true; });
+            break;
 
-    key_tree_.bind("h", [this] { state_->nextDocument(-1); });
-    key_tree_.bind("l", [this] { state_->nextDocument(+1); });
-    key_tree_.bind(KeyTree::number, "h", [this](auto n) { state_->nextDocument(-n); });
-    key_tree_.bind(KeyTree::number, "l", [this](auto n) { state_->nextDocument(+n); });
+        case ScrollNext:
+            key_tree_.bind(keys, [this] { state_->scrollNext(1); });
+            break;
 
-    key_tree_.bind("s", [this] { state_->nextLayout(1); });
-    key_tree_.bind("S", [this] { state_->nextLayout(-1); });
+        case ScrollPrev:
+            key_tree_.bind(keys, [this] { state_->scrollNext(-1); });
+            break;
 
-    key_tree_.bind("=", [this] { state_->updateZoom(1.10f); });
-    key_tree_.bind("-", [this] { state_->updateZoom(1.f / 1.10f); });
+        case NumNextPage:
+            key_tree_.bind(KeyTree::number, keys, [this](auto times) { state_->nextPage(times); });
+            break;
+
+        case NumPrevPage:
+            key_tree_.bind(KeyTree::number, keys, [this](auto times) { state_->nextPage(-times); });
+            break;
+
+        case GoToFirstPage:
+            key_tree_.bind(keys, [this] { state_->setPageIndex(0); });
+            break;
+
+        case GoToLastPage:
+            key_tree_.bind(keys, [this] { state_->setPageIndex(INT_MAX); });
+            break;
+
+        case NumGoToPage:
+            key_tree_.bind(KeyTree::number, keys, [this](auto index) {
+                if (index > 0) {
+                    state_->setPageIndex(index - 1);
+                }
+            });
+            break;
+
+        case NextDocument:
+            key_tree_.bind(keys, [this] { state_->nextDocument(+1); });
+            break;
+
+        case PrevDocument:
+            key_tree_.bind(keys, [this] { state_->nextDocument(-1); });
+            break;
+
+        case NumNextDocument:
+            key_tree_.bind(KeyTree::number, keys, [this](auto n) { state_->nextDocument(+n); });
+            break;
+
+        case NumPrevDocument:
+            key_tree_.bind(KeyTree::number, keys, [this](auto n) { state_->nextDocument(-n); });
+            break;
+
+        case NextLayout:
+            key_tree_.bind(keys, [this] { state_->nextLayout(1); });
+            break;
+
+        case PrevLayout:
+            key_tree_.bind(keys, [this] { state_->nextLayout(-1); });
+            break;
+
+        case ZoomIn:
+            key_tree_.bind(keys, [this] { state_->updateZoom(1.10f); });
+            break;
+
+        case ZoomOut:
+            key_tree_.bind(keys, [this] { state_->updateZoom(1.f / 1.10f); });
+            break;
+    }
 }
 
 Action Controller::onKeyEvent(char key) {

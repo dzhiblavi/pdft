@@ -66,7 +66,8 @@ void Application::setup() {
     image_display_ = resolveDisplay(terminal_, executor_);
     renderer_ = std::make_shared<view::app::Renderer>(document_storage_, image_display_, terminal_);
     state_ = std::make_shared<state::app::State>(document_storage_, renderer_);
-    controller_ = std::make_shared<controller::app::Controller>(state_, document_storage_);
+    controller_ = std::make_shared<controller::app::Controller>(
+        config_.controller, state_, document_storage_);
 
     if (config_.system.enable_filesystem_watching) {
         fs_watcher_ = std::make_shared<pdft::notify::fsw::Notify<asio::io_context::executor_type>>(

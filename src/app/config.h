@@ -1,5 +1,7 @@
 #pragma once
 
+#include "pdft/controller/app/controller.h"
+
 #include <spdlog/common.h>
 
 #include <cstdint>
@@ -30,6 +32,7 @@ struct Logging {
 struct Config {
     SystemConfig system = {};
     Logging logging = {};
+    pdft::controller::app::Controller::Config controller = {};
 };
 
 }  // namespace app
