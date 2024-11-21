@@ -1,11 +1,12 @@
 #pragma once
 
 #include <source_location>
+#include <string_view>
 
 namespace pdft::core {
 
 [[noreturn]] void fail(
-    const char* message, std::source_location location = std::source_location::current());
+    std::string_view message, std::source_location location = std::source_location::current());
 
 }  // namespace pdft::core
 

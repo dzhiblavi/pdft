@@ -5,14 +5,10 @@
 
 namespace pdft::core {
 
-void fail(const char* message, std::source_location location) {
-    std::cerr << std::format(
-                     "FAIL\n{}\nat {}:{}\n{}",
-                     message,
-                     location.file_name(),
-                     location.line(),
-                     cpptrace::generate_trace().to_string(true))
-              << std::endl;
+void fail(std::string_view message, std::source_location location) {
+    std::cerr << "FAIL\n"
+              << message << "\nat " << location.file_name() << ':' << location.line() << '\n'
+              << cpptrace::generate_trace().to_string(true) << std::endl;
 
     std::terminate();
 }
