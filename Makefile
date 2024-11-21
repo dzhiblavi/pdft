@@ -51,6 +51,9 @@ run-gdb: build
 run: build
 	cd $(BUILD_DIR) && ./src/app/app $(path)
 
+install-local: build
+	cd $(BUILD_DIR) && cp ./src/app/app ~/.bin/pdft
+
 docker-build:
 	docker build                           \
 		-t $(BUILD_IMAGE)                  \
