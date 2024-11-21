@@ -40,6 +40,13 @@ namespace app {
 
 using namespace pdft;
 
+Application::Application(asio::io_context& context, Config config)
+    : context_(context)
+    , config_(config)
+    , event_queue_(context, config.system.max_event_queue_size) {
+    setup();
+}
+
 void Application::setup() {
     app::setupSignalHandlers();
     app::setupLogging();

@@ -13,9 +13,7 @@ namespace app {
 
 asio::awaitable<void> main(
     asio::io_context& context, Config config, const std::vector<std::string>& paths) {
-    Application app(context, std::move(config));
-    app.setup();
-    co_await app.run(paths);
+    co_await Application(context, std::move(config)).run(paths);
 }
 
 }  // namespace app

@@ -20,15 +20,12 @@ namespace app {
 
 class Application {
  public:
-    Application(asio::io_context& context, Config config)
-        : context_(context)
-        , config_(config)
-        , event_queue_(context, config.system.max_event_queue_size) {}
+    Application(asio::io_context& context, Config config);
 
-    void setup();
     asio::awaitable<void> run(const std::vector<std::string>& paths);
 
  private:
+    void setup();
     asio::awaitable<void> prepareTerminal();
     void loadPaths(const std::vector<std::string>& paths);
     void startEventsConsumption();
