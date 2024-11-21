@@ -38,6 +38,8 @@ class Controller : public controller::Controller {
 
     struct Config {
         std::vector<KeyMapping> key_mappings;
+        int32_t rows_per_scroll = 10;
+        float zoom_multiplier = 1.1f;
     };
 
     Controller(
@@ -49,7 +51,7 @@ class Controller : public controller::Controller {
     Action onFilesystemEvent(const notify::Event& event) override;
 
  private:
-    void bindKey(Command command, std::string_view keys);
+    void bindKey(Command command, std::string_view keys, const Config& config);
 
     KeyTree key_tree_;
     std::shared_ptr<state::State> state_;

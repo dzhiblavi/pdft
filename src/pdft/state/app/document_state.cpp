@@ -6,21 +6,21 @@
 
 namespace pdft::state::app {
 
-void DocumentState::scrollNext(int32_t delta) {
+void DocumentState::scrollNext(int32_t rows) {
     switch (view_mode_) {
         using enum ViewMode;
 
         case OnePage:
-            nextPage(delta);
+            nextPage(rows > 0 ? 1 : -1);
             break;
 
         case TwoPages:
-            nextPage(2 * delta);
+            nextPage(rows > 0 ? 2 : -2);
             break;
 
         case OnePageContinuous:
         case TwoPagesContinuous:
-            scroll_offset_ += 10 * delta;
+            scroll_offset_ += rows;
             break;
     }
 }

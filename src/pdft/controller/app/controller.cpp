@@ -11,11 +11,11 @@ Controller::Controller(
     : state_(std::move(state))
     , docs_(std::move(docs)) {
     for (const auto& [command, keys] : config.key_mappings) {
-        bindKey(command, keys);
+        bindKey(command, keys, config);
     }
 }
 
-void Controller::bindKey(Command command, std::string_view keys) {
+void Controller::bindKey(Command command, std::string_view keys, const Config& config) {
     switch (command) {
         using enum Command;
 
@@ -24,11 +24,11 @@ void Controller::bindKey(Command command, std::string_view keys) {
             break;
 
         case ScrollNext:
-            key_tree_.bind(keys, [this] { state_->scrollNext(1); });
+            key_tree_.bind(keys, [&] { state_->scrollNext(config.rows_per_scroll); });
             break;
 
         case ScrollPrev:
-            key_tree_.bind(keys, [this] { state_->scrollNext(-1); });
+            key_tree_.bind(keys, [&] { state_->scrollNext(-config.rows_per_scroll); });
             break;
 
         case NumNextPage:
@@ -80,11 +80,11 @@ void Controller::bindKey(Command command, std::string_view keys) {
             break;
 
         case ZoomIn:
-            key_tree_.bind(keys, [this] { state_->updateZoom(1.10f); });
+            key_tree_.bind(keys, [&] { state_->updateZoom(config.zoom_multiplier); });
             break;
 
         case ZoomOut:
-            key_tree_.bind(keys, [this] { state_->updateZoom(1.f / 1.10f); });
+            key_tree_.bind(keys, [&] { state_->updateZoom(1.f / config.zoom_multiplier); });
             break;
     }
 }

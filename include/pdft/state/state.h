@@ -20,11 +20,9 @@ class State {
 
     virtual void scrollNext(int times) = 0;
     virtual void nextPage(int delta) = 0;
-
     virtual void setPageIndex(uint32_t index) = 0;
     virtual void nextDocument(int delta) = 0;
     virtual void nextLayout(int delta) = 0;
-
     virtual void updateZoom(float coeff) = 0;
 };
 

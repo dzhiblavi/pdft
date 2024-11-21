@@ -64,9 +64,9 @@ void State::onDocumentChanged(DocumentId from, DocumentId to) {
     it->setDocument(to, page_count);
 }
 
-void State::scrollNext(int times) {
+void State::scrollNext(int rows) {
     if (auto state = getState()) {
-        state->scrollNext(times);
+        state->scrollNext(rows);
     }
 }
 
