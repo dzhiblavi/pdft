@@ -1,19 +1,19 @@
-#include "pdft/view/app/fit_image.h"
+#include "pdft/view/app/fit_page.h"
 
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/generators/catch_generators.hpp>
 
 namespace pdft::view::app {
 
+inline const IRect Rect = {
+    .x = 10,
+    .y = 20,
+    .width = 30,
+    .height = 40,
+};
+
 TEST_CASE("testFitPositionExactlyMatchesProportions", "") {
-    auto pos = view::Position{
-        .rect =
-            {
-                .x = 10,
-                .y = 20,
-                .width = 30,
-                .height = 40,
-            },
+    auto pos = PagePlacement{
         .hor = view::AxisFit::Center,
         .vert = view::AxisFit::Max,
     };
@@ -25,20 +25,13 @@ TEST_CASE("testFitPositionExactlyMatchesProportions", "") {
         .height = 40,
     };
 
-    CHECK(fitImage(3.0f, 4.0f, pos) == expected);
+    CHECK(fitPage(3.0f, 4.0f, Rect, pos) == expected);
 }
 
 TEST_CASE("testFitPositionCenterVertically", "") {
     auto vert = GENERATE(view::AxisFit::Center, view::AxisFit::Max, view::AxisFit::Min);
 
-    auto pos = view::Position{
-        .rect =
-            {
-                .x = 10,
-                .y = 20,
-                .width = 30,
-                .height = 40,
-            },
+    auto pos = PagePlacement{
         .hor = view::AxisFit::Center,
         .vert = vert,
     };
@@ -50,20 +43,13 @@ TEST_CASE("testFitPositionCenterVertically", "") {
         .height = 40,
     };
 
-    CHECK(fitImage(2.0f, 4.0f, pos) == expected);
+    CHECK(fitPage(2.0f, 4.0f, Rect, pos) == expected);
 }
 
 TEST_CASE("testFitPositionMinVertically", "") {
     auto vert = GENERATE(view::AxisFit::Center, view::AxisFit::Max, view::AxisFit::Min);
 
-    auto pos = view::Position{
-        .rect =
-            {
-                .x = 10,
-                .y = 20,
-                .width = 30,
-                .height = 40,
-            },
+    auto pos = PagePlacement{
         .hor = view::AxisFit::Min,
         .vert = vert,
     };
@@ -75,20 +61,13 @@ TEST_CASE("testFitPositionMinVertically", "") {
         .height = 40,
     };
 
-    CHECK(fitImage(2.0f, 4.0f, pos) == expected);
+    CHECK(fitPage(2.0f, 4.0f, Rect, pos) == expected);
 }
 
 TEST_CASE("testFitPositionMaxVertically", "") {
     auto vert = GENERATE(view::AxisFit::Center, view::AxisFit::Max, view::AxisFit::Min);
 
-    auto pos = view::Position{
-        .rect =
-            {
-                .x = 10,
-                .y = 20,
-                .width = 30,
-                .height = 40,
-            },
+    auto pos = PagePlacement{
         .hor = view::AxisFit::Max,
         .vert = vert,
     };
@@ -100,20 +79,13 @@ TEST_CASE("testFitPositionMaxVertically", "") {
         .height = 40,
     };
 
-    CHECK(fitImage(2.0f, 4.0f, pos) == expected);
+    CHECK(fitPage(2.0f, 4.0f, Rect, pos) == expected);
 }
 
 TEST_CASE("testFitPositionCenterHorizontally", "") {
     auto hor = GENERATE(view::AxisFit::Center, view::AxisFit::Max, view::AxisFit::Min);
 
-    auto pos = view::Position{
-        .rect =
-            {
-                .x = 10,
-                .y = 20,
-                .width = 30,
-                .height = 40,
-            },
+    auto pos = PagePlacement{
         .hor = hor,
         .vert = view::AxisFit::Center,
     };
@@ -125,20 +97,13 @@ TEST_CASE("testFitPositionCenterHorizontally", "") {
         .height = 23,
     };
 
-    CHECK(fitImage(4.0f, 3.0f, pos) == expected);
+    CHECK(fitPage(4.0f, 3.0f, Rect, pos) == expected);
 }
 
 TEST_CASE("testFitPositionMinHorizontally", "") {
     auto hor = GENERATE(view::AxisFit::Center, view::AxisFit::Max, view::AxisFit::Min);
 
-    auto pos = view::Position{
-        .rect =
-            {
-                .x = 10,
-                .y = 20,
-                .width = 30,
-                .height = 40,
-            },
+    auto pos = PagePlacement{
         .hor = hor,
         .vert = view::AxisFit::Min,
     };
@@ -150,20 +115,13 @@ TEST_CASE("testFitPositionMinHorizontally", "") {
         .height = 23,
     };
 
-    CHECK(fitImage(4.0f, 3.0f, pos) == expected);
+    CHECK(fitPage(4.0f, 3.0f, Rect, pos) == expected);
 }
 
 TEST_CASE("testFitPositionMaxHorizontally", "") {
     auto hor = GENERATE(view::AxisFit::Center, view::AxisFit::Max, view::AxisFit::Min);
 
-    auto pos = view::Position{
-        .rect =
-            {
-                .x = 10,
-                .y = 20,
-                .width = 30,
-                .height = 40,
-            },
+    auto pos = PagePlacement{
         .hor = hor,
         .vert = view::AxisFit::Max,
     };
@@ -175,7 +133,7 @@ TEST_CASE("testFitPositionMaxHorizontally", "") {
         .height = 23,
     };
 
-    CHECK(fitImage(4.0f, 3.0f, pos) == expected);
+    CHECK(fitPage(4.0f, 3.0f, Rect, pos) == expected);
 }
 
 }  // namespace pdft::view::app

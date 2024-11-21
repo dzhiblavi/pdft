@@ -1,4 +1,4 @@
-#include "pdft/view/position.h"
+#include "pdft/view/axis_fit.h"
 #include "pdft/core/assert.h"
 
 namespace pdft::view {

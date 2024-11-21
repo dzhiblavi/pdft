@@ -1,6 +1,7 @@
 #pragma once
 
 #include "pdft/view/placement.h"
+#include "pdft/view/rect.h"
 
 #include <cppcoro/generator.hpp>
 
@@ -14,6 +15,7 @@ struct Line {
     bool operator==(const Line&) const = default;
 };
 
-cppcoro::generator<Line> fitText(const TextPlacement& placement);
+cppcoro::generator<Line> fitText(
+    const IRect& rect, const TextPlacement& placement, std::string_view text);
 
 }  // namespace pdft::view::app

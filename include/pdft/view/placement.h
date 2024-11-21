@@ -1,16 +1,13 @@
 #pragma once
 
-#include "pdft/state/document_storage.h"
-#include "pdft/view/position.h"
+#include "pdft/view/axis_fit.h"
 
 namespace pdft::view {
 
 struct PagePlacement {
-    // The position which specifies where and how the page will be displayed
-    Position position;
-
-    state::DocumentId document_id;
-    uint32_t page_index;
+    // The strategy which defines how the image will be displayed inside the rect.
+    AxisFit hor = AxisFit::Center;
+    AxisFit vert = AxisFit::Center;
 };
 
 struct TextPlacement {
@@ -19,14 +16,12 @@ struct TextPlacement {
         Wrap,      // Wrap excessive text to the next line(s)
     };
 
-    // The position which specifies where and how the text will be displayed
-    Position position;
+    // The strategy which defines how the text will be displayed inside the rect.
+    AxisFit hor = AxisFit::Center;
+    AxisFit vert = AxisFit::Center;
 
     // What to do with text that overflows
     OverflowMode overflow;
-
-    // The text to be displayed. It may include newline characters
-    std::string_view text;
 };
 
 }  // namespace pdft::view

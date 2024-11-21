@@ -3,18 +3,20 @@
 #include "pdft/core/trace/log.h"
 #include "pdft/core/trace/stack_scope_tracer.h"
 #include "pdft/utils/cantor_pair.h"
-#include "pdft/view/app/fit_image.h"
+#include "pdft/view/app/fit_page.h"
 #include "pdft/view/app/fit_text.h"
 
 namespace pdft::view::app {
 
-void Renderer::render(core::io::OutBuffer& buffer, const PagePlacement& layout) {
+void Renderer::render(
+    core::io::OutBuffer& buffer, const IRect& rect, const PagePlacement& place, const Page& page) {
     core::trace::StackScopeTracer trace =
         core::trace::getGlobalPool().getTracer(core::trace::stackTraceLogger(), "render_one");
 
     display_->clear(buffer);
 
-    const auto& [pos, doc_id, page_index] = layout;
+    const auto& [hor, vert] = place;
+    const auto& [doc_id, page_index] = page;
     const auto& document = docs_->getDocument(doc_id);
     media::ImageId id = utils::cantorPair(doc_id, page_index + 1);
 
@@ -53,12 +55,16 @@ void Renderer::render(core::io::OutBuffer& buffer, const PagePlacement& layout) 
 
         PDFT_VERIFY(image_size_cells_.contains(id));
         auto [width, height] = image_size_cells_[id];
-        display_->displayImage(id, fitImage(width, height, pos), buffer);
+        display_->displayImage(id, fitPage(width, height, rect, place), buffer);
     }
 }
 
-void Renderer::render(core::io::OutBuffer& buffer, const TextPlacement& placement) {
-    auto lines = fitText(placement);
+void Renderer::render(
+    core::io::OutBuffer& buffer,
+    const IRect& rect,
+    const TextPlacement& placement,
+    std::string_view text) {
+    auto lines = fitText(rect, placement, text);
 
     for (auto line : lines) {
         terminal_->moveCursor(

@@ -15,37 +15,31 @@ void State::render(view::IRect rect, core::io::OutBuffer& buffer) {
 
     renderer_->render(
         buffer,
+        info_rects[0],
         view::TextPlacement{
-            .position =
-                {
-                    .rect = info_rects[0],
-                    .hor = view::AxisFit::Min,
-                    .vert = view::AxisFit::Center,
-                },
+            .hor = view::AxisFit::Min,
+            .vert = view::AxisFit::Center,
             .overflow = view::TextPlacement::OverflowMode::Truncate,
-            .text = current_input_,
-        });
+        },
+        current_input_);
 
     if (auto state = getState()) {
         state->render(rects[1], buffer);
 
         renderer_->render(
             buffer,
+            info_rects[1],
             view::TextPlacement{
-                .position =
-                    {
-                        .rect = info_rects[1],
-                        .hor = view::AxisFit::Max,
-                        .vert = view::AxisFit::Center,
-                    },
+                .hor = view::AxisFit::Max,
+                .vert = view::AxisFit::Center,
                 .overflow = view::TextPlacement::OverflowMode::Truncate,
-                .text = std::format(
-                            "document {}: {}/{}",
-                            state->getDocumentId(),
-                            state->getPageIndex() + 1,
-                            state->getPageCount())
-                            .c_str(),
-            });
+            },
+            std::format(
+                "document {}: {}/{}",
+                state->getDocumentId(),
+                state->getPageIndex() + 1,
+                state->getPageCount())
+                .c_str());
     }
 }
 

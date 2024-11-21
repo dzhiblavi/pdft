@@ -65,19 +65,20 @@ auto countLinesAndWidth(std::string_view text, uint32_t width, TextPlacement::Ov
 
 }  // namespace
 
-cppcoro::generator<Line> fitText(const TextPlacement& placement) {
-    const auto& [pos, overflow, text] = placement;
+cppcoro::generator<Line> fitText(
+    const IRect& rect, const TextPlacement& placement, std::string_view text) {
+    const auto& [hor, vert, overflow] = placement;
 
-    auto [num_lines, max_width] = countLinesAndWidth(text, pos.rect.width, overflow);
-    num_lines = std::min(num_lines, pos.rect.height);
+    auto [num_lines, max_width] = countLinesAndWidth(text, rect.width, overflow);
+    num_lines = std::min(num_lines, rect.height);
 
-    uint32_t x = pos.rect.x + getOffset(pos.rect.width, max_width, pos.hor);
-    uint32_t y = pos.rect.y + getOffset(pos.rect.height, num_lines, pos.vert);
+    uint32_t x = rect.x + getOffset(rect.width, max_width, hor);
+    uint32_t y = rect.y + getOffset(rect.height, num_lines, vert);
     uint32_t line_idx = 0;
 
-    for (auto line : lines(text, pos.rect.width, overflow)) {
+    for (auto line : lines(text, rect.width, overflow)) {
         co_yield Line{
-            .x = x + getOffset(max_width, line.size(), pos.hor),
+            .x = x + getOffset(max_width, line.size(), hor),
             .y = y + line_idx,
             .text = line,
         };

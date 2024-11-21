@@ -1,7 +1,6 @@
 #include "pdft/state/app/document_state.h"
 #include "pdft/core/log/log.h"
 #include "pdft/view/layout.h"
-#include "pdft/view/position.h"
 
 #include <magic_enum.hpp>
 
@@ -126,13 +125,12 @@ void DocumentState::render(view::IRect rect, core::io::OutBuffer& buffer) {
 void DocumentState::renderOnePage(view::IRect rect, core::io::OutBuffer& buffer) {
     renderer_->render(
         buffer,
+        rect,
         {
-            .position =
-                {
-                    .rect = rect,
-                    .hor = view::AxisFit::Center,
-                    .vert = view::AxisFit::Center,
-                },
+            .hor = view::AxisFit::Center,
+            .vert = view::AxisFit::Center,
+        },
+        {
             .document_id = document_id_,
             .page_index = page_index_,
         });
@@ -150,13 +148,12 @@ void DocumentState::renderTwoPages(view::IRect rect, core::io::OutBuffer& buffer
 
     renderer_->render(
         buffer,
+        rects[1],
         {
-            .position =
-                {
-                    .rect = rects[1],
-                    .hor = view::AxisFit::Max,
-                    .vert = view::AxisFit::Center,
-                },
+            .hor = view::AxisFit::Max,
+            .vert = view::AxisFit::Center,
+        },
+        {
             .document_id = document_id_,
             .page_index = page_index_,
         });
@@ -167,13 +164,12 @@ void DocumentState::renderTwoPages(view::IRect rect, core::io::OutBuffer& buffer
 
     renderer_->render(
         buffer,
+        rects[3],
         {
-            .position =
-                {
-                    .rect = rects[3],
-                    .hor = view::AxisFit::Min,
-                    .vert = view::AxisFit::Center,
-                },
+            .hor = view::AxisFit::Min,
+            .vert = view::AxisFit::Center,
+        },
+        {
             .document_id = document_id_,
             .page_index = page_index_ + 1,
         });
@@ -194,13 +190,12 @@ void DocumentState::renderOnePageContinuous(view::IRect rect, core::io::OutBuffe
 
     renderer_->render(
         buffer,
+        top,
         {
-            .position =
-                {
-                    .rect = top,
-                    .hor = view::AxisFit::Center,
-                    .vert = view::AxisFit::Max,
-                },
+            .hor = view::AxisFit::Center,
+            .vert = view::AxisFit::Max,
+        },
+        {
             .document_id = document_id_,
             .page_index = page_index_,
         });
@@ -211,13 +206,12 @@ void DocumentState::renderOnePageContinuous(view::IRect rect, core::io::OutBuffe
 
     renderer_->render(
         buffer,
+        bottom,
         {
-            .position =
-                {
-                    .rect = bottom,
-                    .hor = view::AxisFit::Center,
-                    .vert = view::AxisFit::Min,
-                },
+            .hor = view::AxisFit::Center,
+            .vert = view::AxisFit::Min,
+        },
+        {
             .document_id = document_id_,
             .page_index = page_index_ + 1,
         });
@@ -242,13 +236,12 @@ void DocumentState::renderTwoPagesContinuous(view::IRect rect, core::io::OutBuff
 
     renderer_->render(
         buffer,
+        top_left,
         {
-            .position =
-                {
-                    .rect = top_left,
-                    .hor = view::AxisFit::Max,
-                    .vert = view::AxisFit::Max,
-                },
+            .hor = view::AxisFit::Max,
+            .vert = view::AxisFit::Max,
+        },
+        {
             .document_id = document_id_,
             .page_index = page_index_,
         });
@@ -259,13 +252,12 @@ void DocumentState::renderTwoPagesContinuous(view::IRect rect, core::io::OutBuff
 
     renderer_->render(
         buffer,
+        top_right,
         {
-            .position =
-                {
-                    .rect = top_right,
-                    .hor = view::AxisFit::Min,
-                    .vert = view::AxisFit::Max,
-                },
+            .hor = view::AxisFit::Min,
+            .vert = view::AxisFit::Max,
+        },
+        {
             .document_id = document_id_,
             .page_index = page_index_ + 1,
         });
@@ -276,13 +268,12 @@ void DocumentState::renderTwoPagesContinuous(view::IRect rect, core::io::OutBuff
 
     renderer_->render(
         buffer,
+        bottom_left,
         {
-            .position =
-                {
-                    .rect = bottom_left,
-                    .hor = view::AxisFit::Max,
-                    .vert = view::AxisFit::Min,
-                },
+            .hor = view::AxisFit::Max,
+            .vert = view::AxisFit::Min,
+        },
+        {
             .document_id = document_id_,
             .page_index = page_index_ + 2,
         });
@@ -293,13 +284,12 @@ void DocumentState::renderTwoPagesContinuous(view::IRect rect, core::io::OutBuff
 
     renderer_->render(
         buffer,
+        bottom_right,
         {
-            .position =
-                {
-                    .rect = bottom_right,
-                    .hor = view::AxisFit::Min,
-                    .vert = view::AxisFit::Min,
-                },
+            .hor = view::AxisFit::Min,
+            .vert = view::AxisFit::Min,
+        },
+        {
             .document_id = document_id_,
             .page_index = page_index_ + 3,
         });

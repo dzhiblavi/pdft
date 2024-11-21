@@ -13,15 +13,28 @@ using enum TextPlacement::OverflowMode;
 
 namespace {
 
+IRect makeRect(uint32_t num_lines) {
+    return {
+        .x = 1,
+        .y = 2,
+        .width = 3,
+        .height = num_lines,
+    };
+}
+
 void dump(const Line& line) {
     auto [x, y, text] = line;
     std::cout << std::format("Line[x={},y={},text={}]", x, y, text) << std::endl;
 }
 
-void check(const TextPlacement& placement, const std::vector<Line>& expected_lines) {
+void check(
+    const IRect& rect,
+    const TextPlacement& placement,
+    std::string_view text,
+    const std::vector<Line>& expected_lines) {
     size_t index = 0;
 
-    for (auto line : fitText(placement)) {
+    for (auto line : fitText(rect, placement, text)) {
         dump(line);
         CHECK(index < expected_lines.size());
         dump(expected_lines[index]);
@@ -30,59 +43,79 @@ void check(const TextPlacement& placement, const std::vector<Line>& expected_lin
     }
 }
 
-TextPlacement testCase(
-    view::AxisFit hor,
-    view::AxisFit vert,
-    TextPlacement::OverflowMode mode,
-    std::string_view text = "1234567890",
-    uint32_t num_lines = 4) {
-    return {
-        .position =
-            {
-                .rect =
-                    {
-                        .x = 1,
-                        .y = 2,
-                        .width = 3,
-                        .height = num_lines,
-                    },
-                .hor = hor,
-                .vert = vert,
-            },
-        .overflow = mode,
-        .text = text,
+struct TestCase {
+    AxisFit hor;
+    AxisFit vert;
+    TextPlacement::OverflowMode overflow;
+    uint32_t num_lines = 4;
+    std::string_view text = "1234567890";
+};
+
+void run(const TestCase& test_case, const std::vector<Line>& expected_lines) {
+    auto rect = makeRect(test_case.num_lines);
+
+    auto place = TextPlacement{
+        .hor = test_case.hor,
+        .vert = test_case.vert,
+        .overflow = test_case.overflow,
     };
+
+    check(rect, place, test_case.text, expected_lines);
 }
 
 }  // namespace
 
 TEST_CASE("testFitTextShortLineHorMin", "") {
-    check(
-        testCase(Min, GENERATE(Min, Center, Max), Truncate, "1", 1),
+    run(
+        {
+            .hor = Min,
+            .vert = GENERATE(Min, Center, Max),
+            .overflow = Truncate,
+            .num_lines = 1,
+            .text = "1",
+        },
         {
             {.x = 1, .y = 2, .text = "1"},
         });
 }
 
 TEST_CASE("testFitTextShortLineHorCenter", "") {
-    check(
-        testCase(Center, GENERATE(Min, Center, Max), Truncate, "1", 1),
+    run(
+        {
+            .hor = Center,
+            .vert = GENERATE(Min, Center, Max),
+            .overflow = Truncate,
+            .num_lines = 1,
+            .text = "1",
+        },
         {
             {.x = 2, .y = 2, .text = "1"},
         });
 }
 
 TEST_CASE("testFitTextShortLineHorMax", "") {
-    check(
-        testCase(Max, GENERATE(Min, Center, Max), Truncate, "1", 1),
+    run(
+        {
+            .hor = Max,
+            .vert = GENERATE(Min, Center, Max),
+            .overflow = Truncate,
+            .num_lines = 1,
+            .text = "1",
+        },
         {
             {.x = 3, .y = 2, .text = "1"},
         });
 }
 
 TEST_CASE("testFitTextRespectsEmptyLines", "") {
-    check(
-        testCase(Min, GENERATE(Min, Center, Max), Truncate, "\n\n\n", 3),
+    run(
+        {
+            .hor = Min,
+            .vert = GENERATE(Min, Center, Max),
+            .overflow = Truncate,
+            .num_lines = 3,
+            .text = "\n\n\n",
+        },
         {
             {.x = 1, .y = 2, .text = ""},
             {.x = 1, .y = 3, .text = ""},
@@ -91,32 +124,48 @@ TEST_CASE("testFitTextRespectsEmptyLines", "") {
 }
 
 TEST_CASE("testFitTextTruncateLongLineVertMin", "") {
-    check(
-        testCase(GENERATE(Min, Center, Max), Min, Truncate),
+    run(
+        {
+            .hor = GENERATE(Min, Center, Max),
+            .vert = Min,
+            .overflow = Truncate,
+        },
         {
             {.x = 1, .y = 2, .text = "123"},
         });
 }
 
 TEST_CASE("testFitTextTruncateLongLineVertCenter", "") {
-    check(
-        testCase(GENERATE(Min, Center, Max), Center, Truncate),
+    run(
+        {
+            .hor = GENERATE(Min, Center, Max),
+            .vert = Center,
+            .overflow = Truncate,
+        },
         {
             {.x = 1, .y = 3, .text = "123"},
         });
 }
 
 TEST_CASE("testFitTextTruncateLongLineVertMax", "") {
-    check(
-        testCase(GENERATE(Min, Center, Max), Max, Truncate),
+    run(
+        {
+            .hor = GENERATE(Min, Center, Max),
+            .vert = Max,
+            .overflow = Truncate,
+        },
         {
             {.x = 1, .y = 5, .text = "123"},
         });
 }
 
 TEST_CASE("testFitTextWrapLongLineLeft", "") {
-    check(
-        testCase(Min, GENERATE(Min, Center, Max), Wrap),
+    run(
+        {
+            .hor = Min,
+            .vert = GENERATE(Min, Center, Max),
+            .overflow = Wrap,
+        },
         {
             {.x = 1, .y = 2, .text = "123"},
             {.x = 1, .y = 3, .text = "456"},
@@ -126,8 +175,12 @@ TEST_CASE("testFitTextWrapLongLineLeft", "") {
 }
 
 TEST_CASE("testFitTextWrapLongLineRight", "") {
-    check(
-        testCase(Max, GENERATE(Min, Center, Max), Wrap),
+    run(
+        {
+            .hor = Max,
+            .vert = GENERATE(Min, Center, Max),
+            .overflow = Wrap,
+        },
         {
             {.x = 1, .y = 2, .text = "123"},
             {.x = 1, .y = 3, .text = "456"},
@@ -137,8 +190,13 @@ TEST_CASE("testFitTextWrapLongLineRight", "") {
 }
 
 TEST_CASE("testFitTextMultilineHorMin", "") {
-    check(
-        testCase(Min, GENERATE(Min, Center, Max), GENERATE(Wrap, Truncate), "1\n23\n456\n7890"),
+    run(
+        {
+            .hor = Min,
+            .vert = GENERATE(Min, Center, Max),
+            .overflow = GENERATE(Wrap, Truncate),
+            .text = "1\n23\n456\n7890",
+        },
         {
             {.x = 1, .y = 2, .text = "1"},
             {.x = 1, .y = 3, .text = "23"},
@@ -148,8 +206,13 @@ TEST_CASE("testFitTextMultilineHorMin", "") {
 }
 
 TEST_CASE("testFitTextMultilineHorCenter", "") {
-    check(
-        testCase(Center, GENERATE(Min, Center, Max), GENERATE(Wrap, Truncate), "1\n23\n456\n7890"),
+    run(
+        {
+            .hor = Center,
+            .vert = GENERATE(Min, Center, Max),
+            .overflow = GENERATE(Wrap, Truncate),
+            .text = "1\n23\n456\n7890",
+        },
         {
             {.x = 2, .y = 2, .text = "1"},
             {.x = 1, .y = 3, .text = "23"},
@@ -159,8 +222,13 @@ TEST_CASE("testFitTextMultilineHorCenter", "") {
 }
 
 TEST_CASE("testFitTextMultilineHorMax", "") {
-    check(
-        testCase(Max, GENERATE(Min, Center, Max), GENERATE(Wrap, Truncate), "1\n23\n456\n7890"),
+    run(
+        {
+            .hor = Max,
+            .vert = GENERATE(Min, Center, Max),
+            .overflow = GENERATE(Wrap, Truncate),
+            .text = "1\n23\n456\n7890",
+        },
         {
             {.x = 3, .y = 2, .text = "1"},
             {.x = 2, .y = 3, .text = "23"},
@@ -170,8 +238,14 @@ TEST_CASE("testFitTextMultilineHorMax", "") {
 }
 
 TEST_CASE("testFitTextTruncateMultiline", "") {
-    check(
-        testCase(GENERATE(Min, Center, Max), GENERATE(Min, Center, Max), Truncate, "1234\n5678", 2),
+    run(
+        {
+            .hor = GENERATE(Min, Center, Max),
+            .vert = GENERATE(Min, Center, Max),
+            .overflow = Truncate,
+            .num_lines = 2,
+            .text = "1234\n5678",
+        },
         {
             {.x = 1, .y = 2, .text = "123"},
             {.x = 1, .y = 3, .text = "567"},
@@ -179,8 +253,13 @@ TEST_CASE("testFitTextTruncateMultiline", "") {
 }
 
 TEST_CASE("testFitTextWrapMultilineHorMin", "") {
-    check(
-        testCase(Min, GENERATE(Min, Center, Max), Wrap, "1234\n5678"),
+    run(
+        {
+            .hor = Min,
+            .vert = GENERATE(Min, Center, Max),
+            .overflow = Wrap,
+            .text = "1234\n5678",
+        },
         {
             {.x = 1, .y = 2, .text = "123"},
             {.x = 1, .y = 3, .text = "4"},
@@ -190,8 +269,13 @@ TEST_CASE("testFitTextWrapMultilineHorMin", "") {
 }
 
 TEST_CASE("testFitTextWrapMultilineHorCenter", "") {
-    check(
-        testCase(Center, GENERATE(Min, Center, Max), Wrap, "1234\n5678"),
+    run(
+        {
+            .hor = Center,
+            .vert = GENERATE(Min, Center, Max),
+            .overflow = Wrap,
+            .text = "1234\n5678",
+        },
         {
             {.x = 1, .y = 2, .text = "123"},
             {.x = 2, .y = 3, .text = "4"},
@@ -201,8 +285,13 @@ TEST_CASE("testFitTextWrapMultilineHorCenter", "") {
 }
 
 TEST_CASE("testFitTextWrapMultilineHorMax", "") {
-    check(
-        testCase(Max, GENERATE(Min, Center, Max), Wrap, "1234\n5678"),
+    run(
+        {
+            .hor = Max,
+            .vert = GENERATE(Min, Center, Max),
+            .overflow = Wrap,
+            .text = "1234\n5678",
+        },
         {
             {.x = 1, .y = 2, .text = "123"},
             {.x = 3, .y = 3, .text = "4"},
@@ -212,8 +301,14 @@ TEST_CASE("testFitTextWrapMultilineHorMax", "") {
 }
 
 TEST_CASE("testFitTextComplex1", "") {
-    check(
-        testCase(Max, Center, Wrap, "abacaba\ndabacaba\nk\n\naa", 20),
+    run(
+        {
+            .hor = Max,
+            .vert = Center,
+            .overflow = Wrap,
+            .num_lines = 20,
+            .text = "abacaba\ndabacaba\nk\n\naa",
+        },
         {
             {.x = 1, .y = 7, .text = "aba"},
             {.x = 1, .y = 8, .text = "cab"},
