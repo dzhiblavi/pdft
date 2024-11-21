@@ -21,7 +21,7 @@ struct TextPlacement {
     AxisFit vert = AxisFit::Center;
 
     // What to do with text that overflows
-    OverflowMode overflow;
+    OverflowMode overflow = OverflowMode::Wrap;
 };
 
 }  // namespace pdft::view
