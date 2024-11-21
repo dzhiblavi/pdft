@@ -86,11 +86,13 @@ asio::awaitable<void> Application::prepareTerminal() {
 }
 
 void Application::loadPaths(const std::vector<std::string>& paths) {
-    for (const auto& path : paths) {
+    for (auto path : paths) {
         if (!std::filesystem::exists(path)) {
             core::log::global()->info("path {} does not exist, skipping", path.c_str());
             continue;
         }
+
+        path = std::filesystem::absolute(path);
 
         auto doc_id =
             document_storage_->addDocument(media::pdf::Document::open(*pdf_context_, path));

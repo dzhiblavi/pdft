@@ -68,6 +68,9 @@ DocumentId DocumentState::getDocumentId() const {
 }
 
 void DocumentState::setDocument(DocumentId id, uint32_t page_count) {
+    document_id_ = id;
+    page_count_ = page_count;
+
     if (page_index_ >= page_count) {
         scroll_offset_ = 0;
         page_index_ = page_count - 1;
