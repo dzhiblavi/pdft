@@ -5,6 +5,8 @@
 #include "pdft/view/placement.h"
 #include "pdft/view/rect.h"
 
+#include <asio/awaitable.hpp>
+
 namespace pdft::view {
 
 struct Page {
@@ -16,7 +18,7 @@ class Renderer {
  public:
     virtual ~Renderer() = default;
 
-    virtual void render(
+    virtual asio::awaitable<void> render(
         core::io::OutBuffer& buffer,
         const IRect& rect,
         const PagePlacement& placement,

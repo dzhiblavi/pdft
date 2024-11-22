@@ -104,26 +104,26 @@ void DocumentState::applyScrollOffset(uint32_t height, int32_t pages_per_height)
         "applyScrollOffset after: scroll_offset={}, page_index={}", scroll_offset_, page_index_);
 }
 
-void DocumentState::render(view::IRect rect, core::io::OutBuffer& buffer) {
+asio::awaitable<void> DocumentState::render(view::IRect rect, core::io::OutBuffer& buffer) {
     switch (view_mode_) {
         using enum ViewMode;
 
         case OnePage:
-            return renderOnePage(rect, buffer);
+            co_return co_await renderOnePage(rect, buffer);
 
         case TwoPages:
-            return renderTwoPages(rect, buffer);
+            co_return co_await renderTwoPages(rect, buffer);
 
         case OnePageContinuous:
-            return renderOnePageContinuous(rect, buffer);
+            co_return co_await renderOnePageContinuous(rect, buffer);
 
         case TwoPagesContinuous:
-            return renderTwoPagesContinuous(rect, buffer);
+            co_return co_await renderTwoPagesContinuous(rect, buffer);
     }
 }
 
-void DocumentState::renderOnePage(view::IRect rect, core::io::OutBuffer& buffer) {
-    renderer_->render(
+asio::awaitable<void> DocumentState::renderOnePage(view::IRect rect, core::io::OutBuffer& buffer) {
+    co_await renderer_->render(
         buffer,
         rect,
         {
@@ -136,7 +136,7 @@ void DocumentState::renderOnePage(view::IRect rect, core::io::OutBuffer& buffer)
         });
 }
 
-void DocumentState::renderTwoPages(view::IRect rect, core::io::OutBuffer& buffer) {
+asio::awaitable<void> DocumentState::renderTwoPages(view::IRect rect, core::io::OutBuffer& buffer) {
     auto rects =
         view::horizontal(
             view::constraints::Fraction{0.15f / zoom_},
@@ -146,7 +146,7 @@ void DocumentState::renderTwoPages(view::IRect rect, core::io::OutBuffer& buffer
             view::constraints::Fraction{0.15f / zoom_})
             .split(rect);
 
-    renderer_->render(
+    co_await renderer_->render(
         buffer,
         rects[1],
         {
@@ -159,10 +159,10 @@ void DocumentState::renderTwoPages(view::IRect rect, core::io::OutBuffer& buffer
         });
 
     if (page_index_ + 1 >= page_count_) {
-        return;
+        co_return;
     }
 
-    renderer_->render(
+    co_await renderer_->render(
         buffer,
         rects[3],
         {
@@ -175,7 +175,8 @@ void DocumentState::renderTwoPages(view::IRect rect, core::io::OutBuffer& buffer
         });
 }
 
-void DocumentState::renderOnePageContinuous(view::IRect rect, core::io::OutBuffer& buffer) {
+asio::awaitable<void> DocumentState::renderOnePageContinuous(
+    view::IRect rect, core::io::OutBuffer& buffer) {
     applyScrollOffset(rect.height, 1);
 
     core::log::global()->info(
@@ -193,7 +194,7 @@ void DocumentState::renderOnePageContinuous(view::IRect rect, core::io::OutBuffe
         view::vertical(view::constraints::Length(top_height), view::constraints::Fill(1))
             .split(rect);
 
-    renderer_->render(
+    co_await renderer_->render(
         buffer,
         page_rects[0],
         {
@@ -207,10 +208,10 @@ void DocumentState::renderOnePageContinuous(view::IRect rect, core::io::OutBuffe
         });
 
     if (page_index_ + 1 >= page_count_) {
-        return;
+        co_return;
     }
 
-    renderer_->render(
+    co_await renderer_->render(
         buffer,
         page_rects[1],
         {
@@ -224,7 +225,8 @@ void DocumentState::renderOnePageContinuous(view::IRect rect, core::io::OutBuffe
         });
 }
 
-void DocumentState::renderTwoPagesContinuous(view::IRect rect, core::io::OutBuffer& buffer) {
+asio::awaitable<void> DocumentState::renderTwoPagesContinuous(
+    view::IRect rect, core::io::OutBuffer& buffer) {
     applyScrollOffset(rect.height, 2);
 
     auto rects =
@@ -244,7 +246,7 @@ void DocumentState::renderTwoPagesContinuous(view::IRect rect, core::io::OutBuff
         view::vertical(view::constraints::Length(top_height), view::constraints::Fill(1))
             .split(rects[2]);
 
-    renderer_->render(
+    co_await renderer_->render(
         buffer,
         left_rects[0],
         {
@@ -258,10 +260,10 @@ void DocumentState::renderTwoPagesContinuous(view::IRect rect, core::io::OutBuff
         });
 
     if (page_index_ + 1 >= page_count_) {
-        return;
+        co_return;
     }
 
-    renderer_->render(
+    co_await renderer_->render(
         buffer,
         right_rects[0],
         {
@@ -275,10 +277,10 @@ void DocumentState::renderTwoPagesContinuous(view::IRect rect, core::io::OutBuff
         });
 
     if (page_index_ + 2 >= page_count_) {
-        return;
+        co_return;
     }
 
-    renderer_->render(
+    co_await renderer_->render(
         buffer,
         left_rects[1],
         {
@@ -292,10 +294,10 @@ void DocumentState::renderTwoPagesContinuous(view::IRect rect, core::io::OutBuff
         });
 
     if (page_index_ + 3 >= page_count_) {
-        return;
+        co_return;
     }
 
-    renderer_->render(
+    co_await renderer_->render(
         buffer,
         right_rects[1],
         {

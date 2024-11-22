@@ -13,7 +13,8 @@ class State : public state::State {
         : doc_storage_(std::move(doc_storage))
         , renderer_(std::move(renderer)) {}
 
-    void render(view::IRect rect, core::io::OutBuffer& buffer) override;
+    asio::awaitable<void> render(view::IRect rect, core::io::OutBuffer& buffer) override;
+
     void onInput(char key) override;
     void resetInput() override;
     void addDocument(DocumentId id) override;

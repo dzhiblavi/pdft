@@ -4,16 +4,18 @@
 #include "pdft/media/image.h"
 #include "pdft/view/rect.h"
 
+#include <asio/awaitable.hpp>
+
 namespace pdft::display {
 
 class Display {
  public:
     virtual ~Display() = default;
 
-    virtual void loadImage(
+    virtual asio::awaitable<void> loadImage(
         media::ImageId id, const media::Image& image, core::io::OutBuffer& buffer) = 0;
 
-    virtual void displayImage(
+    virtual asio::awaitable<void> displayImage(
         media::ImageId id,
         const view::IRect& rect,
         const view::FRect& image_subarea,

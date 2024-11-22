@@ -13,7 +13,8 @@ class DocumentState {
         , page_count_(page_count)
         , renderer_(std::move(renderer)) {}
 
-    void render(view::IRect rect, core::io::OutBuffer& buffer);
+    asio::awaitable<void> render(view::IRect rect, core::io::OutBuffer& buffer);
+
     void scrollNext(int32_t delta);
     void nextPage(int32_t delta);
     void setPageIndex(uint32_t index);
@@ -35,10 +36,10 @@ class DocumentState {
     };
 
     void applyScrollOffset(uint32_t height, int32_t pages_per_height);
-    void renderOnePage(view::IRect rect, core::io::OutBuffer& buffer);
-    void renderTwoPages(view::IRect rect, core::io::OutBuffer& buffer);
-    void renderOnePageContinuous(view::IRect rect, core::io::OutBuffer& buffer);
-    void renderTwoPagesContinuous(view::IRect rect, core::io::OutBuffer& buffer);
+    asio::awaitable<void> renderOnePage(view::IRect rect, core::io::OutBuffer& buffer);
+    asio::awaitable<void> renderTwoPages(view::IRect rect, core::io::OutBuffer& buffer);
+    asio::awaitable<void> renderOnePageContinuous(view::IRect rect, core::io::OutBuffer& buffer);
+    asio::awaitable<void> renderTwoPagesContinuous(view::IRect rect, core::io::OutBuffer& buffer);
 
     DocumentId document_id_;
     uint32_t page_count_;

@@ -26,7 +26,7 @@ bool DisplayBase::isLoaded(media::ImageId id) const {
     return loaded_.contains(id);
 }
 
-void DisplayBase::loadImage(
+asio::awaitable<void> DisplayBase::loadImage(
     media::ImageId id, const media::Image& image, core::io::OutBuffer& buffer) {
     PDFT_VERIFY(!isLoaded(id), "image with id={} is already loaded", id);
     auto image_size = image.size();
@@ -85,6 +85,8 @@ void DisplayBase::loadImage(
             },
             buffer);
     }
+
+    co_return;
 }
 
 void DisplayBase::clear(core::io::OutBuffer& buffer) const {

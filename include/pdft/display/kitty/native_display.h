@@ -8,7 +8,7 @@ class NativeDisplay : public DisplayBase {
  public:
     using DisplayBase::DisplayBase;
 
-    void displayImage(
+    asio::awaitable<void> displayImage(
         media::ImageId id,
         const view::IRect& rect,
         const view::FRect& image_subarea,

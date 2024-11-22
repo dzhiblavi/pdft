@@ -63,7 +63,7 @@ void Application::setup() {
 
     keyboard_consumer_ = std::make_shared<KeyboardConsumer>(console_);
     document_storage_ = std::make_shared<state::DocumentStorage>(pdf_context_);
-    image_display_ = resolveDisplay(terminal_, executor_);
+    image_display_ = resolveDisplay(terminal_, executor_, console_);
     renderer_ = std::make_shared<view::app::Renderer>(document_storage_, image_display_, terminal_);
     state_ = std::make_shared<state::app::State>(document_storage_, renderer_);
     controller_ = std::make_shared<controller::app::Controller>(
@@ -152,7 +152,7 @@ asio::awaitable<void> Application::runEventLoop() {
 
         {
             auto _ = tracer.addChild("render");
-            state_->render(screen, buffer);
+            co_await state_->render(screen, buffer);
         }
 
         {

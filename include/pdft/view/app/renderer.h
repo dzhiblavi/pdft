@@ -18,7 +18,7 @@ class Renderer : public view::Renderer {
         , display_(std::move(display))
         , terminal_(std::move(terminal)) {}
 
-    void render(
+    asio::awaitable<void> render(
         core::io::OutBuffer& buffer,
         const IRect& rect,
         const PagePlacement& placement,

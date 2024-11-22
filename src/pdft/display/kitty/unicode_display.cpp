@@ -6,7 +6,7 @@
 
 namespace pdft::display::kitty {
 
-void UnicodeDisplay::displayImage(
+asio::awaitable<void> UnicodeDisplay::displayImage(
     media::ImageId id,
     const view::IRect& rect,
     const view::FRect& image_subarea,
@@ -19,7 +19,7 @@ void UnicodeDisplay::displayImage(
     PDFT_VERIFY(w >= 0 && h >= 0, "rect dimensions must not be negative: w={},h={}", w, h);
 
     if (w == 0 || h == 0) {
-        return;
+        co_return;
     }
 
     const auto& [rix, riy, riw, rih] = image_subarea;

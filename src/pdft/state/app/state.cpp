@@ -1,5 +1,6 @@
 #include "pdft/state/app/state.h"
 #include "pdft/core/assert.h"
+#include "pdft/core/log/log.h"
 #include "pdft/view/layout.h"
 
 #include <algorithm>
@@ -7,7 +8,7 @@
 
 namespace pdft::state::app {
 
-void State::render(view::IRect rect, core::io::OutBuffer& buffer) {
+asio::awaitable<void> State::render(view::IRect rect, core::io::OutBuffer& buffer) {
     namespace constr = view::constraints;
 
     auto rects = view::vertical(constr::Length(1), constr::Fill(1), constr::Length(1)).split(rect);
@@ -24,7 +25,9 @@ void State::render(view::IRect rect, core::io::OutBuffer& buffer) {
         current_input_);
 
     if (auto state = getState()) {
-        state->render(rects[1], buffer);
+        core::log::global()->info("2 render claled");
+        co_await state->render(rects[1], buffer);
+        core::log::global()->info("3 render claled");
 
         renderer_->render(
             buffer,

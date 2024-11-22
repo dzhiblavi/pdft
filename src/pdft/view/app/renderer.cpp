@@ -8,7 +8,7 @@
 
 namespace pdft::view::app {
 
-void Renderer::render(
+asio::awaitable<void> Renderer::render(
     core::io::OutBuffer& buffer, const IRect& rect, const PagePlacement& place, const Page& page) {
     core::trace::StackScopeTracer trace =
         core::trace::getGlobalPool().getTracer(core::trace::stackTraceLogger(), "render_one");
@@ -39,7 +39,7 @@ void Renderer::render(
             .invert_colors = false,
         });
 
-        display_->loadImage(id, *image, buffer);
+        co_await display_->loadImage(id, *image, buffer);
 
         auto size = image->size();
         float image_cols = float(size.width_px) / term_dims_.cell_width_px;
@@ -55,7 +55,7 @@ void Renderer::render(
         core::log::global()->info("renderer @ x={},y={},w={},h={}", x, y, w, h);
 
         auto [irect, image] = fitPage(image_ratio_[id], rect, place);
-        display_->displayImage(id, irect, image, buffer);
+        co_await display_->displayImage(id, irect, image, buffer);
     }
 }
 
