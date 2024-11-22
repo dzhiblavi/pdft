@@ -1,11 +1,13 @@
 MAKE = make
 CONAN = conan
 CMAKE = cmake
+
 BUILD_TYPE ?= Debug
 PROFILE ?= armv8-macos
 ASAN ?= OFF
 TSAN ?= OFF
 UBSAN ?= OFF
+
 BUILD_IMAGE = pdft-build-image
 
 TARGET_DIR = ./target/$(PROFILE)/$(BUILD_TYPE)
