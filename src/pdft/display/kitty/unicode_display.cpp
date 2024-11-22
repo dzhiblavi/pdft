@@ -36,7 +36,7 @@ asio::awaitable<void> UnicodeDisplay::displayImage(
     core::log::global()->info("display IOF c={},r={}", offset_cols, offset_rows);
 
     std::pair<std::string_view, std::string> control_data[] = {
-        //{"q", "2"},
+        {"q", "2"},
         {"a", "p"},
         {"U", "1"},
         {"i", std::to_string(id)},
@@ -46,19 +46,13 @@ asio::awaitable<void> UnicodeDisplay::displayImage(
     };
 
     // Create a virtual PagePlacement
-    auto resp = co_await executor_->executeWithResponse(
+    executor_->execute(
         {
             .command = "_G",
             .payload_b64 = "",
             .control_data = control_data,
         },
         buffer);
-
-    if (resp.has_value()) {
-        core::log::global()->info("APC executor placement response payload: '{}'", resp->payload);
-    } else {
-        core::log::global()->info("APC executor placement error: '{}'", resp.error());
-    }
 
     // Fill the image space with special unicode characters
     const std::string_view ImagePlaceholder = "\U0010EEEE";

@@ -1,6 +1,4 @@
 #include "app.h"
-#include "consume_fs_events.h"
-#include "keyboard_consumer.h"
 #include "logging.h"
 #include "resolve_apc_executor.h"
 #include "resolve_display.h"
@@ -44,8 +42,7 @@ using namespace asio::experimental::awaitable_operators;
 
 Application::Application(asio::io_context& context, Config config)
     : context_(context)
-    , config_(config)
-    , event_queue_(context, config.system.max_event_queue_size) {
+    , config_(config) {
     setup();
 }
 
@@ -63,7 +60,6 @@ void Application::setup() {
         context_, ::dup(STDIN_FILENO), ::dup(STDOUT_FILENO));
     executor_ = resolveAPCExecutor(console_);
 
-    keyboard_consumer_ = std::make_shared<KeyboardConsumer>(console_);
     document_storage_ = std::make_shared<state::DocumentStorage>(pdf_context_);
     image_display_ = resolveDisplay(terminal_, executor_, console_);
     renderer_ = std::make_shared<view::app::Renderer>(document_storage_, image_display_, terminal_);
@@ -80,7 +76,6 @@ void Application::setup() {
 asio::awaitable<void> Application::run(const std::vector<std::string>& paths) {
     co_await prepareTerminal();
     loadPaths(paths);
-    startEventsConsumption();
     co_await runEventLoop();
     co_await cleanup();
 }
@@ -113,19 +108,6 @@ void Application::loadPaths(const std::vector<std::string>& paths) {
         }
 
         core::log::global()->info("loaded path {}", path.c_str());
-    }
-}
-
-void Application::startEventsConsumption() {
-    // Start event consumption
-    // asio::co_spawn(context_, keyboard_consumer_->consumeInto(event_queue_), asio::detached);
-
-    if (config_.system.enable_filesystem_watching) {
-        asio::co_spawn(context_, consumeFsEvents(event_queue_, *fs_watcher_), asio::detached);
-        core::log::global()->info("Started filesystem watcher");
-    } else {
-        core::log::global()->info(
-            "Filesystem watching has been disabled by config (.system.enable_filesystem_watching)");
     }
 }
 
@@ -164,9 +146,7 @@ asio::awaitable<void> Application::runEventLoop() {
 
         bool quit = co_await [&]() -> asio::awaitable<bool> {
             for (;;) {
-                core::log::global()->info("initiate read");
                 auto event = co_await (console_->read(1) || fs_watcher_->nextEvent());
-                core::log::global()->info("read completed");
 
                 auto action = utils::visit(
                     event,
@@ -200,11 +180,6 @@ asio::awaitable<void> Application::cleanup() {
         auto _ = cleanup.addChild("term_clear");
         terminal_->clear(buffer);
         co_await console_->write(buffer.view());
-    }
-
-    {
-        auto _ = cleanup.addChild("keyboard_stop");
-        keyboard_consumer_->stop();
     }
 
     if (config_.system.enable_filesystem_watching) {

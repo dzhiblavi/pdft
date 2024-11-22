@@ -1,8 +1,6 @@
 #pragma once
 
 #include "config.h"
-#include "event_queue.h"
-#include "keyboard_consumer.h"
 #include "pdft/controller/controller.h"
 #include "pdft/core/apc/apc_executor.h"
 #include "pdft/core/io/console.h"
@@ -28,7 +26,6 @@ class Application {
     void setup();
     asio::awaitable<void> prepareTerminal();
     void loadPaths(const std::vector<std::string>& paths);
-    void startEventsConsumption();
     asio::awaitable<void> runEventLoop();
     asio::awaitable<void> cleanup();
 
@@ -40,6 +37,7 @@ class Application {
     std::shared_ptr<pdft::core::terminal::Terminal> terminal_;
     std::shared_ptr<pdft::core::apc::APCExecutor> executor_;
     std::shared_ptr<pdft::core::io::Console> console_;
+    std::shared_ptr<pdft::notify::Notify> fs_watcher_;
 
     // View
     std::shared_ptr<pdft::display::Display> image_display_;
@@ -51,11 +49,6 @@ class Application {
 
     // Controller
     std::shared_ptr<pdft::controller::Controller> controller_;
-
-    // Events
-    EventQueue event_queue_;
-    std::shared_ptr<pdft::notify::Notify> fs_watcher_;
-    std::shared_ptr<KeyboardConsumer> keyboard_consumer_;
 };
 
 }  // namespace app

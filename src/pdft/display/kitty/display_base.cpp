@@ -1,7 +1,6 @@
 #include "pdft/display/kitty/display_base.h"
 
 #include "pdft/core/assert.h"
-#include "pdft/core/log/log.h"
 #include "pdft/utils/base64.h"
 #include "pdft/utils/zlib.h"
 
@@ -44,7 +43,7 @@ asio::awaitable<void> DisplayBase::loadImage(
 
     {  // Execute the first request with the control data
         std::pair<std::string_view, std::string> control_data[] = {
-            //{"q", "2"},
+            {"q", "2"},
             {"a", "t"},
             {"t", "d"},
             {"o", "z"},
@@ -55,56 +54,36 @@ asio::awaitable<void> DisplayBase::loadImage(
             {"m", payload_left.empty() ? "0" : "1"},
         };
 
-        if (payload_left.empty()) {
-            auto response = co_await executor_->executeWithResponse(
-                {
-                    .command = "_G",
-                    .payload_b64 = first_chunk,
-                    .control_data = control_data,
-                },
-                buffer);
-            core::log::global()->info("load image terminal response: '{}'", response->payload);
-        } else {
-            executor_->execute(
-                {
-                    .command = "_G",
-                    .payload_b64 = first_chunk,
-                    .control_data = control_data,
-                },
-                buffer);
-        }
+        executor_->execute(
+            {
+                .command = "_G",
+                .payload_b64 = first_chunk,
+                .control_data = control_data,
+            },
+            buffer);
     }
 
     // Transmit the rest of the payload silently
     std::pair<std::string_view, std::string> control_data[] = {
-        //{"q", "2"},
+        {"q", "2"},
         {"m", "1"},
     };
-    auto& [_, mv] = control_data[0];
+    auto& [_, mv] = control_data[1];
 
     while (!payload_left.empty()) {
         auto chunk = nextChunk(payload_left, MaxChunkSize);
 
         if (payload_left.empty()) {
             mv = "0";
-
-            auto response = co_await executor_->executeWithResponse(
-                {
-                    .command = "_G",
-                    .payload_b64 = chunk,
-                    .control_data = control_data,
-                },
-                buffer);
-            core::log::global()->info("load image terminal response: '{}'", response->payload);
-        } else {
-            executor_->execute(
-                {
-                    .command = "_G",
-                    .payload_b64 = chunk,
-                    .control_data = control_data,
-                },
-                buffer);
         }
+
+        executor_->execute(
+            {
+                .command = "_G",
+                .payload_b64 = chunk,
+                .control_data = control_data,
+            },
+            buffer);
     }
 
     co_return;
