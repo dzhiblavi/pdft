@@ -10,7 +10,7 @@ using namespace pdft;
 
 std::shared_ptr<pdft::display::Display> resolveDisplay(
     std::shared_ptr<pdft::core::terminal::Terminal> terminal,
-    std::shared_ptr<pdft::core::terminal::APCExecutor> executor,
+    std::shared_ptr<pdft::core::apc::APCExecutor> executor,
     std::shared_ptr<pdft::core::io::Console> console) {
     if (auto _ = ::getenv("TMUX")) {
         core::log::global()->info("Resolved Unicode Kitty display");

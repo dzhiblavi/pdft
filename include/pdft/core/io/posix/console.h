@@ -11,8 +11,11 @@ class Console : public io::Console {
  public:
     explicit Console(asio::io_context& context, int stdin_fd, int stdout_fd);
 
+    using io::Console::read;
+    using io::Console::write;
+
     asio::awaitable<void> write(std::string_view bytes) override;
-    asio::awaitable<std::string> read(size_t num_bytes) override;
+    asio::awaitable<void> read(size_t num_bytes, std::string& buffer) override;
 
  private:
     asio::posix::stream_descriptor stdin_;

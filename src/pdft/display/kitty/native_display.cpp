@@ -39,7 +39,7 @@ asio::awaitable<void> NativeDisplay::displayImage(
     // x, y, w, h (pixels) control the subrectangle of the image
     // c, r (columns and rows) control the rectangle at which the image will be displayed
     std::pair<std::string_view, std::string> control_data[] = {
-        {"q", "2"},
+        //{"q", "2"},
         {"a", "p"},
         {"C", "1"},
         {"i", std::to_string(id)},
@@ -60,13 +60,14 @@ asio::awaitable<void> NativeDisplay::displayImage(
         buffer);
 
     // Create a placement
-    executor_->execute(
+    auto response = co_await executor_->executeWithResponse(
         {
             .command = "_G",
             .payload_b64 = "",
             .control_data = control_data,
         },
         buffer);
+    core::log::global()->info("APC response for display: {}", response->payload);
 }
 
 }  // namespace pdft::display::kitty

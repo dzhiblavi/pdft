@@ -6,17 +6,21 @@
 namespace pdft::core::io::test {
 
 struct MockConsole : Console {
+    using Console::read;
+    using Console::write;
+
     asio::awaitable<void> write(std::string_view bytes) override {
         std::cerr << std::format("write '{}' to console", bytes) << std::endl;
         out_ += bytes;
         co_return;
     }
 
-    asio::awaitable<std::string> read(size_t num_bytes) override {
+    asio::awaitable<void> read(size_t num_bytes, std::string& out) override {
         auto result = readFrom(in_, num_bytes);
         std::cerr << std::format("read '{}' from console (requested {} bytes)", result, num_bytes)
                   << std::endl;
-        co_return result;
+        out = result;
+        co_return;
     }
 
     void put(std::string s) {

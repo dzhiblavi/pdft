@@ -34,11 +34,13 @@ extern "C" {
 }
 
 #include <asio/awaitable.hpp>
+#include <asio/experimental/awaitable_operators.hpp>
 #include <asio/experimental/channel.hpp>
 
 namespace app {
 
 using namespace pdft;
+using namespace asio::experimental::awaitable_operators;
 
 Application::Application(asio::io_context& context, Config config)
     : context_(context)
@@ -57,9 +59,9 @@ void Application::setup() {
 
     term_control_ = std::make_shared<core::io::posix::TermControl>();
     terminal_ = std::make_shared<core::terminal::ansi::Terminal>();
-    executor_ = resolveAPCExecutor();
     console_ = std::make_shared<core::io::posix::Console>(
         context_, ::dup(STDIN_FILENO), ::dup(STDOUT_FILENO));
+    executor_ = resolveAPCExecutor(console_);
 
     keyboard_consumer_ = std::make_shared<KeyboardConsumer>(console_);
     document_storage_ = std::make_shared<state::DocumentStorage>(pdf_context_);
@@ -116,7 +118,7 @@ void Application::loadPaths(const std::vector<std::string>& paths) {
 
 void Application::startEventsConsumption() {
     // Start event consumption
-    asio::co_spawn(context_, keyboard_consumer_->consumeInto(event_queue_), asio::detached);
+    // asio::co_spawn(context_, keyboard_consumer_->consumeInto(event_queue_), asio::detached);
 
     if (config_.system.enable_filesystem_watching) {
         asio::co_spawn(context_, consumeFsEvents(event_queue_, *fs_watcher_), asio::detached);
@@ -162,11 +164,13 @@ asio::awaitable<void> Application::runEventLoop() {
 
         bool quit = co_await [&]() -> asio::awaitable<bool> {
             for (;;) {
-                auto event = co_await event_queue_.async_receive(asio::use_awaitable);
+                core::log::global()->info("initiate read");
+                auto event = co_await (console_->read(1) || fs_watcher_->nextEvent());
+                core::log::global()->info("read completed");
 
                 auto action = utils::visit(
                     event,
-                    [&](KeyPressEvent event) { return controller_->onKeyEvent(event.key); },
+                    [&](std::string event) { return controller_->onKeyEvent(event[0]); },
                     [&](notify::Event event) { return controller_->onFilesystemEvent(event); });
 
                 using enum controller::Action;

@@ -1,4 +1,5 @@
 #include "pdft/core/io/posix/console.h"
+#include "pdft/core/log/log.h"
 
 #include <asio/read.hpp>
 #include <asio/streambuf.hpp>
@@ -15,11 +16,11 @@ asio::awaitable<void> Console::write(std::string_view bytes) {
     co_await asio::async_write(stdout_, asio::buffer(bytes), asio::use_awaitable);
 }
 
-asio::awaitable<std::string> Console::read(size_t num_bytes) {
-    std::string out;
+asio::awaitable<void> Console::read(size_t num_bytes, std::string& out) {
     out.resize(num_bytes);
+    core::log::global()->info("initiate read of {} bytes", num_bytes);
     co_await asio::async_read(stdin_, asio::buffer(out), asio::use_awaitable);
-    co_return out;
+    core::log::global()->info("read {} bytes", out.size());
 }
 
 }  // namespace pdft::core::io::posix

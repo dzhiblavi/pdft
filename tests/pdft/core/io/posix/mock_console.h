@@ -54,13 +54,17 @@ struct MockConsole : Console {
         , out_fd_r(out_fd[0])
         , out_fd_w(out_fd[1]) {}
 
+    using Console::read;
+    using Console::write;
+
     asio::awaitable<void> write(std::string_view bytes) override {
         out_fd_w.write(bytes);
         co_return;
     }
 
-    asio::awaitable<std::string> read(size_t num_bytes) override {
-        co_return in_fd_r.read(num_bytes);
+    asio::awaitable<void> read(size_t num_bytes, std::string& out) override {
+        out = in_fd_r.read(num_bytes);
+        co_return;
     }
 
     void put(std::string s) {

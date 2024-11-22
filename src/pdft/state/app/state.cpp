@@ -1,6 +1,5 @@
 #include "pdft/state/app/state.h"
 #include "pdft/core/assert.h"
-#include "pdft/core/log/log.h"
 #include "pdft/view/layout.h"
 
 #include <algorithm>
@@ -25,9 +24,7 @@ asio::awaitable<void> State::render(view::IRect rect, core::io::OutBuffer& buffe
         current_input_);
 
     if (auto state = getState()) {
-        core::log::global()->info("2 render claled");
         co_await state->render(rects[1], buffer);
-        core::log::global()->info("3 render claled");
 
         renderer_->render(
             buffer,
