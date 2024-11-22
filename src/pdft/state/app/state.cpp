@@ -90,7 +90,7 @@ void State::nextDocument(int delta) {
 
         if (index < 0) {
             index = n - 1 - ((-index - 1) % n);
-        } else if (index >= n) {
+        } else if (index >= static_cast<int>(n)) {
             index = index % n;
         }
 

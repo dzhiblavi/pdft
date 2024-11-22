@@ -4,10 +4,6 @@ namespace pdft::view::app {
 
 namespace {
 
-uint32_t ceilDiv(uint32_t a, uint32_t b) {
-    return (a + b - 1) / b;
-}
-
 cppcoro::generator<std::string_view> lines(
     std::string_view text, uint32_t width, TextPlacement::OverflowMode mode) {
     size_t pos = 0;

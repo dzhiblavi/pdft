@@ -8,16 +8,17 @@
 namespace pdft::core::io::posix {
 
 Console::Console(asio::io_context& context, int stdin_fd, int stdout_fd)
-    : stdin_(context, stdin_fd), stdout_(context, stdout_fd) {}
+    : stdin_(context, stdin_fd)
+    , stdout_(context, stdout_fd) {}
 
 asio::awaitable<void> Console::write(std::string_view bytes) {
-    auto _ = co_await asio::async_write(stdout_, asio::buffer(bytes), asio::use_awaitable);
+    co_await asio::async_write(stdout_, asio::buffer(bytes), asio::use_awaitable);
 }
 
 asio::awaitable<std::string> Console::read(size_t num_bytes) {
     std::string out;
     out.resize(num_bytes);
-    auto _ = co_await asio::async_read(stdin_, asio::buffer(out), asio::use_awaitable);
+    co_await asio::async_read(stdin_, asio::buffer(out), asio::use_awaitable);
     co_return out;
 }
 

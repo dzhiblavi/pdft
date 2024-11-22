@@ -136,7 +136,7 @@ class StackScopeTracerPool {
 
     utils::IntrusiveForwardList<StackScopeTracerBase> free_list_;
 
-    friend class StackScopeTracerBase;
+    friend struct StackScopeTracerBase;
 
     size_t num_allocations_ = 0;
 };

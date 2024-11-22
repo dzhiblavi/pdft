@@ -23,3 +23,10 @@ FetchContent_MakeAvailable(reflect_cpp)
 
 # Link reflectcpp to yaml-cpp to it finds the library
 target_link_libraries(reflectcpp PUBLIC yaml-cpp::yaml-cpp)
+
+# Set library's include directory as SYSTEM so it does not raise unneeded
+# warnings
+set_target_properties(
+  reflectcpp
+  PROPERTIES INTERFACE_SYSTEM_INCLUDE_DIRECTORIES
+             $<TARGET_PROPERTY:reflectcpp,INTERFACE_INCLUDE_DIRECTORIES>)

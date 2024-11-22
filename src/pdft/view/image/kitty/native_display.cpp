@@ -4,9 +4,7 @@
 namespace pdft::view::image::kitty {
 
 void NativeDisplay::displayImage(
-    media::ImageId id, const IRect& rect, const IRect& image, core::io::OutBuffer& buffer) {
-    auto term_size = core::terminal::getTerminalDimensions();
-
+    media::ImageId id, const IRect& rect, const IRect&, core::io::OutBuffer& buffer) {
     const auto& [x, y, w, h] = rect;
     core::log::global()->info("display @ x={},y={},w={},h={}", x, y, w, h);
 

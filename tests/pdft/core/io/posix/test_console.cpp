@@ -10,7 +10,7 @@ namespace pdft::core::io {
 
 TEST_CASE("testPosixConsoleWrite", "") {
     tests::runCoroutine([](auto& context) -> asio::awaitable<void> {
-        auto mock = test::makeMockConsole(context);
+        auto mock = test::makeMockConsole();
         auto console = posix::Console(context, mock->inFd(), mock->outFd());
 
         co_await console.write("hello, world!");
@@ -20,7 +20,7 @@ TEST_CASE("testPosixConsoleWrite", "") {
 
 TEST_CASE("testPosixConsoleRead", "") {
     tests::runCoroutine([](auto& context) -> asio::awaitable<void> {
-        auto mock = test::makeMockConsole(context);
+        auto mock = test::makeMockConsole();
         auto console = posix::Console(context, mock->inFd(), mock->outFd());
 
         mock->put("abacaba");
@@ -31,7 +31,7 @@ TEST_CASE("testPosixConsoleRead", "") {
 
 TEST_CASE("testPosixConsoleMixed", "") {
     tests::runCoroutine([](auto& context) -> asio::awaitable<void> {
-        auto mock = test::makeMockConsole(context);
+        auto mock = test::makeMockConsole();
         auto console = posix::Console(context, mock->inFd(), mock->outFd());
 
         mock->put("hello");

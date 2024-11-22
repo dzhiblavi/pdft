@@ -86,11 +86,11 @@ void setupLogging(const LoggingConfig& config) {
     core::log::global()->info("loggers have been successfully initialized");
 }
 
-void warningCallback(void* user, const char* message) {
+void warningCallback(void*, const char* message) {
     core::log::logger("mupdf")->warn(message);
 }
 
-void errorCallback(void* user, const char* message) {
+void errorCallback(void*, const char* message) {
     core::log::logger("mupdf")->warn(message);
 }
 

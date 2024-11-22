@@ -44,7 +44,7 @@ struct MockConsole : Console {
     std::string out_;
 };
 
-std::shared_ptr<MockConsole> makeMockConsole(asio::io_context& context) {
+inline std::shared_ptr<MockConsole> makeMockConsole() {
     return std::make_shared<MockConsole>();
 }
 

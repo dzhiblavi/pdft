@@ -15,7 +15,6 @@ void Renderer::render(
 
     display_->clear(buffer);
 
-    const auto& [hor, vert, _fit] = place;
     const auto& [doc_id, page_index] = page;
     const auto& document = docs_->getDocument(doc_id);
     media::ImageId id = utils::cantorPair(doc_id, page_index + 1);

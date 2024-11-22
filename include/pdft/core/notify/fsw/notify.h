@@ -20,7 +20,7 @@ class Notify : public notify::Notify {
 
  public:
     explicit Notify(const Executor& executor) : channel_(executor, 10) {
-        static auto _ = [] {
+        [[maybe_unused]] static auto _ = [] {
             PDFT_VERIFY(fsw_init_library() == FSW_OK);
             return 0;
         }();
@@ -108,8 +108,8 @@ class Notify : public notify::Notify {
         core::log::global()->info("received {} events", count);
 
         for (unsigned i = 0; i < count; ++i) {
-            if (events[i].flags_num > 0 && events[i].flags[0] == NoOp ||
-                events[i].flags[0] == PlatformSpecific) {
+            if (events[i].flags_num > 0 &&
+                (events[i].flags[0] == NoOp || events[i].flags[0] == PlatformSpecific)) {
                 continue;
             }
 

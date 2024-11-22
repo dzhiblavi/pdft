@@ -35,7 +35,7 @@ void DocumentState::nextPage(int32_t delta) {
     } else {
         delta = -delta;
 
-        if (page_index_ >= delta) {
+        if (page_index_ >= static_cast<uint32_t>(delta)) {
             page_index_ -= delta;
         } else {
             page_index_ = page_count_ - 1;
@@ -94,7 +94,7 @@ void DocumentState::applyScrollOffset(uint32_t height, int32_t pages_per_height)
         nextPage(-pages_per_height * count);
     }
 
-    if (scroll_offset_ >= height) {
+    if (scroll_offset_ >= static_cast<int32_t>(height)) {
         int count = scroll_offset_ / int(height);
         scroll_offset_ -= count * height;
         nextPage(pages_per_height * count);

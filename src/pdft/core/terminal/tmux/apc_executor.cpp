@@ -1,12 +1,11 @@
 #include "pdft/core/terminal/tmux/apc_executor.h"
-
-#include <cassert>
+#include "pdft/core/assert.h"
 
 namespace pdft::core::terminal::tmux {
 
 void APCExecutor::execute(ApplciationProgrammingCommandView apc, io::OutBuffer& out) {
     const size_t MaxPayloadSize = 4096;
-    assert(apc.payload_b64.size() <= MaxPayloadSize);
+    PDFT_VERIFY(apc.payload_b64.size() <= MaxPayloadSize);
 
     out << "\033Ptmux;\033\033" << apc.command;
 

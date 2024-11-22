@@ -9,3 +9,10 @@ FetchContent_Declare(
 
 FetchContent_GetProperties(fswatch_ext)
 FetchContent_MakeAvailable(fswatch_ext)
+
+# Set library's include directory as SYSTEM so it does not raise unneeded
+# warnings
+set_target_properties(
+  libfswatch
+  PROPERTIES INTERFACE_SYSTEM_INCLUDE_DIRECTORIES
+             $<TARGET_PROPERTY:libfswatch,INTERFACE_INCLUDE_DIRECTORIES>)

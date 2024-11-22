@@ -43,3 +43,10 @@ target_link_libraries(
             "${MUPDF_LIB_DIR}/libmupdf-threads.a")
 
 target_include_directories(libmupdf_ext INTERFACE "${MUPDF_SRC_DIR}/include")
+
+# Set library's include directory as SYSTEM so it does not raise unneeded
+# warnings
+set_target_properties(
+  libmupdf_ext
+  PROPERTIES INTERFACE_SYSTEM_INCLUDE_DIRECTORIES
+             $<TARGET_PROPERTY:libmupdf_ext,INTERFACE_INCLUDE_DIRECTORIES>)

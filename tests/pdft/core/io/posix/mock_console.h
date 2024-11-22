@@ -10,7 +10,7 @@ namespace pdft::core::io::test {
 
 namespace detail {
 
-void setNonBlocking(int fd) {
+inline void setNonBlocking(int fd) {
     int flags = fcntl(fd, F_GETFL, 0);
     fcntl(fd, F_SETFL, flags | O_NONBLOCK);
 }
@@ -37,7 +37,8 @@ struct FileDescriptor {
         buf.resize(max_bytes + 1);
         std::cout << std::format("call read max_bytes={}", max_bytes) << std::endl;
         auto read = ::read(fd, buf.data(), max_bytes);
-        buf.back() = '\0';
+        buf[read] = '\0';
+        buf.resize(read);
         return std::string(buf.data());
     }
 
@@ -48,7 +49,10 @@ struct FileDescriptor {
 
 struct MockConsole : Console {
     MockConsole(int in_fd[2], int out_fd[2])
-        : in_fd_r(in_fd[0]), in_fd_w(in_fd[1]), out_fd_r(out_fd[0]), out_fd_w(out_fd[1]) {}
+        : in_fd_r(in_fd[0])
+        , in_fd_w(in_fd[1])
+        , out_fd_r(out_fd[0])
+        , out_fd_w(out_fd[1]) {}
 
     asio::awaitable<void> write(std::string_view bytes) override {
         out_fd_w.write(bytes);
@@ -78,7 +82,7 @@ struct MockConsole : Console {
     detail::FileDescriptor in_fd_r, in_fd_w, out_fd_r, out_fd_w;
 };
 
-std::shared_ptr<MockConsole> makeMockConsole(asio::io_context& context) {
+inline std::shared_ptr<MockConsole> makeMockConsole() {
     int in_fds[2];
     (void)pipe(in_fds);
 

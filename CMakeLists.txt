@@ -5,20 +5,24 @@ project(
   VERSION 0.1
   LANGUAGES CXX)
 
-set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
-set(CMAKE_CXX_EXTENSIONS OFF)
 set(PDFT_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR})
+
+# Global settings
+include(./cmake/Ccache.cmake)
+include(./cmake/CheckCompiler.cmake)
+include(./cmake/Development.cmake)
+include(./cmake/Platform.cmake)
+include(./cmake/Sanitizers.cmake)
 
 # Third-party libraries
 include(./cmake/thirdparty/MuPDF.cmake)
 include(./cmake/thirdparty/fswatch.cmake)
 include(./cmake/thirdparty/reflect-cpp.cmake)
 
-# Project settings
-include(./cmake/StandardProjectSettings.cmake)
-include(./cmake/EnableCompilerWarnings.cmake)
+# Enable warnings for core of the project
+include(./cmake/CompileOptions.cmake)
+include(./cmake/Werror.cmake)
 
 add_subdirectory(src)
 
-# Enable testing if needed
 include(./cmake/Testing.cmake)

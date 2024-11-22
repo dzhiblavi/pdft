@@ -8,8 +8,6 @@ namespace pdft::view::image::kitty {
 
 void UnicodeDisplay::displayImage(
     media::ImageId id, const IRect& rect, const IRect& image, core::io::OutBuffer& buffer) {
-    auto term_size = core::terminal::getTerminalDimensions();
-
     const auto& [x, y, w, h] = rect;
     const auto& [ix, iy, iw, ih] = image;
     core::log::global()->info("display @ x={},y={},w={},h={}", x, y, w, h);
