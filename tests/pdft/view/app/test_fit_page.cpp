@@ -7,16 +7,12 @@
 
 namespace pdft::view::app {
 
+using enum PagePlacement::FitMode;
+using enum view::AxisFit;
+
 inline const IRect Rect = {
     .x = 10,
     .y = 20,
-    .width = 30,
-    .height = 40,
-};
-
-inline const IRect ZeroOffset = {
-    .x = 0,
-    .y = 0,
     .width = 30,
     .height = 40,
 };
@@ -26,11 +22,11 @@ void dump(const IRect& rect) {
     std::cout << std::format("IRect[x={},y={},w={},h={}]", x, y, w, h) << std::endl;
 }
 
-TEST_CASE("testFitPositionExactlyMatchesProportions", "") {
+TEST_CASE("testFitPageExactlyMatchesProportions", "") {
     auto pos = PagePlacement{
-        .hor = view::AxisFit::Center,
-        .vert = view::AxisFit::Max,
-        .fit = PagePlacement::FitMode::FitInside,
+        .hor = GENERATE(Min, Center, Max),        // indifferent
+        .vert = GENERATE(Min, Center, Max),       // indifferent
+        .fit = GENERATE(FitInside, CropAndFill),  // indifferent
     };
 
     auto expected = IRect{
@@ -52,13 +48,37 @@ TEST_CASE("testFitPositionExactlyMatchesProportions", "") {
     CHECK(offset == expected_image);
 }
 
-TEST_CASE("testFitPositionCenterVertically", "") {
-    auto vert = GENERATE(view::AxisFit::Center, view::AxisFit::Max, view::AxisFit::Min);
-
+TEST_CASE("testFitPageInsideNarrowMin", "") {
     auto pos = PagePlacement{
-        .hor = view::AxisFit::Center,
-        .vert = vert,
-        .fit = PagePlacement::FitMode::FitInside,
+        .hor = Min,
+        .vert = GENERATE(Min, Center, Max),  // indifferent
+        .fit = FitInside,
+    };
+
+    auto expected = IRect{
+        .x = 10,
+        .y = 20,
+        .width = 20,
+        .height = 40,
+    };
+
+    auto expected_image = IRect{
+        .x = 0,
+        .y = 0,
+        .width = 20,
+        .height = 40,
+    };
+
+    auto [rect, offset] = fitPage(2.0f, 4.0f, Rect, pos);
+    CHECK(rect == expected);
+    CHECK(offset == expected_image);
+}
+
+TEST_CASE("testFitPageInsideNarrowCenter", "") {
+    auto pos = PagePlacement{
+        .hor = Center,
+        .vert = GENERATE(Min, Center, Max),  // indifferent
+        .fit = FitInside,
     };
 
     auto expected = IRect{
@@ -80,41 +100,11 @@ TEST_CASE("testFitPositionCenterVertically", "") {
     CHECK(offset == expected_image);
 }
 
-TEST_CASE("testFitPositionMinVertically", "") {
-    auto vert = GENERATE(view::AxisFit::Center, view::AxisFit::Max, view::AxisFit::Min);
-
+TEST_CASE("testFitPageInsideNarrowMax", "") {
     auto pos = PagePlacement{
-        .hor = view::AxisFit::Min,
-        .vert = vert,
-        .fit = PagePlacement::FitMode::FitInside,
-    };
-
-    auto expected = IRect{
-        .x = 10,
-        .y = 20,
-        .width = 20,
-        .height = 40,
-    };
-
-    auto expected_image = IRect{
-        .x = 0,
-        .y = 0,
-        .width = 20,
-        .height = 40,
-    };
-
-    auto [rect, offset] = fitPage(2.0f, 4.0f, Rect, pos);
-    CHECK(rect == expected);
-    CHECK(offset == expected_image);
-}
-
-TEST_CASE("testFitPositionMaxVertically", "") {
-    auto vert = GENERATE(view::AxisFit::Center, view::AxisFit::Max, view::AxisFit::Min);
-
-    auto pos = PagePlacement{
-        .hor = view::AxisFit::Max,
-        .vert = vert,
-        .fit = PagePlacement::FitMode::FitInside,
+        .hor = Max,
+        .vert = GENERATE(Min, Center, Max),  // indifferent
+        .fit = FitInside,
     };
 
     auto expected = IRect{
@@ -136,94 +126,195 @@ TEST_CASE("testFitPositionMaxVertically", "") {
     CHECK(offset == expected_image);
 }
 
-TEST_CASE("testFitPositionCenterHorizontally", "") {
-    auto hor = GENERATE(view::AxisFit::Center, view::AxisFit::Max, view::AxisFit::Min);
-
+TEST_CASE("testFitPageInsideWideMin", "") {
     auto pos = PagePlacement{
-        .hor = hor,
-        .vert = view::AxisFit::Center,
-        .fit = PagePlacement::FitMode::FitInside,
-    };
-
-    auto expected = IRect{
-        .x = 10,
-        .y = 28,
-        .width = 30,
-        .height = 23,
-    };
-
-    auto expected_image = IRect{
-        .x = 0,
-        .y = 0,
-        .width = 30,
-        .height = 23,
-    };
-
-    auto [rect, offset] = fitPage(4.0f, 3.0f, Rect, pos);
-    CHECK(rect == expected);
-    CHECK(offset == expected_image);
-}
-
-TEST_CASE("testFitPositionMinHorizontally", "") {
-    auto hor = GENERATE(view::AxisFit::Center, view::AxisFit::Max, view::AxisFit::Min);
-
-    auto pos = PagePlacement{
-        .hor = hor,
-        .vert = view::AxisFit::Min,
-        .fit = PagePlacement::FitMode::FitInside,
+        .hor = GENERATE(Min, Center, Max),  // indifferent
+        .vert = Min,
+        .fit = FitInside,
     };
 
     auto expected = IRect{
         .x = 10,
         .y = 20,
         .width = 30,
-        .height = 23,
+        .height = 20,
     };
 
     auto expected_image = IRect{
         .x = 0,
         .y = 0,
         .width = 30,
-        .height = 23,
+        .height = 20,
     };
 
-    auto [rect, offset] = fitPage(4.0f, 3.0f, Rect, pos);
-
-    dump(rect);
-    dump(expected);
-
-    dump(offset);
-    dump(expected_image);
-
+    auto [rect, offset] = fitPage(3.0f, 2.0f, Rect, pos);
     CHECK(rect == expected);
     CHECK(offset == expected_image);
 }
 
-TEST_CASE("testFitPositionMaxHorizontally", "") {
-    auto hor = GENERATE(view::AxisFit::Center, view::AxisFit::Max, view::AxisFit::Min);
-
+TEST_CASE("testFitPageInsideWideCenter", "") {
     auto pos = PagePlacement{
-        .hor = hor,
-        .vert = view::AxisFit::Max,
-        .fit = PagePlacement::FitMode::FitInside,
+        .hor = GENERATE(Min, Center, Max),  // indifferent
+        .vert = Center,
+        .fit = FitInside,
     };
 
     auto expected = IRect{
         .x = 10,
-        .y = 37,
+        .y = 30,
         .width = 30,
-        .height = 23,
+        .height = 20,
     };
 
     auto expected_image = IRect{
         .x = 0,
         .y = 0,
         .width = 30,
-        .height = 23,
+        .height = 20,
     };
 
-    auto [rect, offset] = fitPage(4.0f, 3.0f, Rect, pos);
+    auto [rect, offset] = fitPage(3.0f, 2.0f, Rect, pos);
     CHECK(rect == expected);
+    CHECK(offset == expected_image);
+}
+
+TEST_CASE("testFitPageInsideWideMax", "") {
+    auto pos = PagePlacement{
+        .hor = GENERATE(Min, Center, Max),  // indifferent
+        .vert = Max,
+        .fit = FitInside,
+    };
+
+    auto expected = IRect{
+        .x = 10,
+        .y = 40,
+        .width = 30,
+        .height = 20,
+    };
+
+    auto expected_image = IRect{
+        .x = 0,
+        .y = 0,
+        .width = 30,
+        .height = 20,
+    };
+
+    auto [rect, offset] = fitPage(3.0f, 2.0f, Rect, pos);
+    CHECK(rect == expected);
+    CHECK(offset == expected_image);
+}
+
+TEST_CASE("testFitPageCropNarrowMin", "") {
+    auto pos = PagePlacement{
+        .hor = GENERATE(Min, Center, Max),  // indifferent
+        .vert = Min,
+        .fit = CropAndFill,
+    };
+
+    auto expected_image = IRect{
+        .x = 0,
+        .y = 0,
+        .width = 30,
+        .height = 60,
+    };
+
+    auto [rect, offset] = fitPage(2.0f, 4.0f, Rect, pos);
+    CHECK(rect == Rect);
+    CHECK(offset == expected_image);
+}
+
+TEST_CASE("testFitPageCropNarrowCenter", "") {
+    auto pos = PagePlacement{
+        .hor = GENERATE(Min, Center, Max),  // indifferent
+        .vert = Center,
+        .fit = CropAndFill,
+    };
+
+    auto expected_image = IRect{
+        .x = 0,
+        .y = 10,
+        .width = 30,
+        .height = 60,
+    };
+
+    auto [rect, offset] = fitPage(2.0f, 4.0f, Rect, pos);
+    CHECK(rect == Rect);
+    CHECK(offset == expected_image);
+}
+
+TEST_CASE("testFitPageCropNarrowMax", "") {
+    auto pos = PagePlacement{
+        .hor = GENERATE(Min, Center, Max),  // indifferent
+        .vert = Max,
+        .fit = CropAndFill,
+    };
+
+    auto expected_image = IRect{
+        .x = 0,
+        .y = 20,
+        .width = 30,
+        .height = 60,
+    };
+
+    auto [rect, offset] = fitPage(2.0f, 4.0f, Rect, pos);
+    CHECK(rect == Rect);
+    CHECK(offset == expected_image);
+}
+
+TEST_CASE("testFitPageCropWideMin", "") {
+    auto pos = PagePlacement{
+        .hor = Min,
+        .vert = GENERATE(Min, Center, Max),  // indifferent
+        .fit = CropAndFill,
+    };
+
+    auto expected_image = IRect{
+        .x = 0,
+        .y = 0,
+        .width = 60,
+        .height = 40,
+    };
+
+    auto [rect, offset] = fitPage(3.0f, 2.0f, Rect, pos);
+    CHECK(rect == Rect);
+    CHECK(offset == expected_image);
+}
+
+TEST_CASE("testFitPageCropWideCenter", "") {
+    auto pos = PagePlacement{
+        .hor = Center,
+        .vert = GENERATE(Min, Center, Max),  // indifferent
+        .fit = CropAndFill,
+    };
+
+    auto expected_image = IRect{
+        .x = 15,
+        .y = 0,
+        .width = 60,
+        .height = 40,
+    };
+
+    auto [rect, offset] = fitPage(3.0f, 2.0f, Rect, pos);
+    CHECK(rect == Rect);
+    CHECK(offset == expected_image);
+}
+
+TEST_CASE("testFitPageCropWideMax", "") {
+    auto pos = PagePlacement{
+        .hor = Max,
+        .vert = GENERATE(Min, Center, Max),  // indifferent
+        .fit = CropAndFill,
+    };
+
+    auto expected_image = IRect{
+        .x = 30,
+        .y = 0,
+        .width = 60,
+        .height = 40,
+    };
+
+    auto [rect, offset] = fitPage(3.0f, 2.0f, Rect, pos);
+    CHECK(rect == Rect);
     CHECK(offset == expected_image);
 }
 
