@@ -9,8 +9,14 @@ namespace pdft::core::apc {
 
 struct APC {
     std::string_view command;
-    std::string_view payload_b64;
+    std::string_view payload = "";
     std::span<std::pair<std::string_view, std::string>> control_data;
+
+    // Whether to encode payload in base64 format
+    bool b64_encode = false;
+
+    // Whether to compress payload
+    bool compress = false;
 };
 
 struct APCResponse {

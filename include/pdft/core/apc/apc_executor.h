@@ -14,10 +14,10 @@ class APCExecutor {
  public:
     virtual ~APCExecutor() = default;
 
-    virtual void execute(APC apc, io::OutBuffer& buffer) = 0;
+    virtual void execute(const APC& apc, io::OutBuffer& buffer) = 0;
 
     virtual asio::awaitable<Result<APCResponse>> executeWithResponse(
-        APC apc, io::OutBuffer& buffer) = 0;
+        const APC& apc, io::OutBuffer& buffer) = 0;
 };
 
 }  // namespace pdft::core::apc

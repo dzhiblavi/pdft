@@ -49,7 +49,6 @@ asio::awaitable<void> UnicodeDisplay::displayImage(
     executor_->execute(
         {
             .command = "_G",
-            .payload_b64 = "",
             .control_data = control_data,
         },
         buffer);

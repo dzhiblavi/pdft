@@ -25,6 +25,7 @@ add_test(./pdft/core/io/posix/test_console.cpp)
 add_test(./pdft/core/terminal/ansi/test_terminal.cpp)
 
 add_test(./pdft/core/apc/test_parse_response.cpp)
+add_test(./pdft/core/apc/test_apc_executor_base.cpp)
 add_test(./pdft/core/apc/tmux/test_apc_executor.cpp)
 add_test(./pdft/core/apc/regular/test_apc_executor.cpp)
 

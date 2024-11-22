@@ -5,15 +5,27 @@
 
 namespace pdft::core::apc {
 
+struct Config {
+    size_t max_chunk_size_bytes = 4096;
+};
+
 class APCExecutorBase : public APCExecutor {
  public:
-    explicit APCExecutorBase(std::shared_ptr<core::io::Console> console)
-        : console_(std::move(console)) {}
+    APCExecutorBase(const Config& config, std::shared_ptr<core::io::Console> console)
+        : max_chunk_size_(config.max_chunk_size_bytes)
+        , console_(std::move(console)) {}
+
+    void execute(const APC& apc, io::OutBuffer& buffer) override;
 
     asio::awaitable<Result<APCResponse>> executeWithResponse(
-        APC apc, io::OutBuffer& buffer) override;
+        const APC& apc, io::OutBuffer& buffer) override;
+
+ protected:
+    virtual void writePrefix(io::OutBuffer& buffer) const = 0;
+    virtual void writeSuffix(io::OutBuffer& buffer) const = 0;
 
  private:
+    const size_t max_chunk_size_;
     std::shared_ptr<core::io::Console> console_;
 };
 

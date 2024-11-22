@@ -1,10 +1,100 @@
 #include "pdft/core/apc/apc_executor_base.h"
 #include "pdft/core/apc/parse_response.h"
+#include "pdft/utils/base64.h"
+#include "pdft/utils/zlib.h"
 
 namespace pdft::core::apc {
 
-asio::awaitable<std::expected<APCResponse, std::string>> APCExecutorBase::executeWithResponse(
-    APC apc, io::OutBuffer& buffer) {
+namespace {
+
+std::string_view nextChunk(std::string_view& data, size_t max_chunk_size) {
+    if (data.size() <= max_chunk_size) {
+        auto result = data;
+        data = "";
+        return result;
+    }
+
+    auto result = data.substr(0, max_chunk_size);
+    data = data.substr(max_chunk_size);
+    return result;
+}
+
+template <typename Arg>
+void writeControlData(io::OutBuffer& buffer, Arg&& value) {
+    auto&& [k, v] = value;
+    buffer << k << '=' << v;
+}
+
+template <typename Arg, typename... Args>
+void writeControlData(io::OutBuffer& buffer, Arg&& arg, Args&&... rest) {
+    writeControlData(buffer, std::forward<Arg>(arg));
+    buffer << ',';
+    writeControlData(buffer, std::forward<Args>(rest)...);
+}
+
+void writeControlData(const APC& apc, io::OutBuffer& buffer) {
+    for (size_t i = 0; i < apc.control_data.size(); ++i) {
+        auto&& [key, value] = apc.control_data[i];
+        buffer << key << '=' << value;
+
+        if (i + 1 < apc.control_data.size()) {
+            buffer << ',';
+        }
+    }
+}
+
+std::string_view preparePayload(const APC& apc, std::string& encoded_payload) {
+    std::string_view payload = apc.payload;
+
+    if (apc.compress) {
+        encoded_payload = utils::zlibCompress(payload);
+        payload = encoded_payload;
+    }
+
+    if (apc.b64_encode) {
+        encoded_payload = utils::encodeBase64(payload);
+        payload = encoded_payload;
+    }
+
+    return payload;
+}
+
+}  // namespace
+
+void APCExecutorBase::execute(const APC& apc, io::OutBuffer& buffer) {
+    std::string encoded_payload;
+    auto payload = preparePayload(apc, encoded_payload);
+    auto first_chunk = nextChunk(payload, max_chunk_size_);
+
+    // Write the first chunk
+    writePrefix(buffer);
+    buffer << apc.command;
+    writeControlData(apc, buffer);
+    if (apc.compress) {
+        buffer << ',';
+        writeControlData(buffer, std::make_pair("o", "z"));
+    }
+    if (!payload.empty()) {
+        buffer << ',';
+        writeControlData(buffer, std::make_pair("m", "1"));
+    }
+    buffer << ';' << first_chunk;
+    writeSuffix(buffer);
+
+    // Write the rest of the data
+    while (!payload.empty()) {
+        auto chunk = nextChunk(payload, max_chunk_size_);
+
+        writePrefix(buffer);
+        buffer << apc.command;
+        writeControlData(buffer, std::make_pair("m", payload.empty() ? "0" : "1"));
+        buffer << ';' << chunk;
+        writeSuffix(buffer);
+    }
+}
+
+asio::awaitable<Result<APCResponse>> APCExecutorBase::executeWithResponse(
+    const APC& apc, io::OutBuffer& buffer) {
     execute(std::move(apc), buffer);
 
     // Flush command and receive the response

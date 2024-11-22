@@ -6,7 +6,7 @@ namespace pdft::core::apc::regular {
 
 TEST_CASE("testExecuteNoPayload", "") {
     io::OutBuffer buffer;
-    auto executor = APCExecutor(nullptr);
+    auto executor = APCExecutor({}, nullptr);
 
     std::pair<std::string_view, std::string> control_data[] = {
         {"m", "1"},
@@ -17,7 +17,6 @@ TEST_CASE("testExecuteNoPayload", "") {
     executor.execute(
         {
             .command = "_G",
-            .payload_b64 = "",
             .control_data = control_data,
         },
         buffer);
@@ -27,7 +26,7 @@ TEST_CASE("testExecuteNoPayload", "") {
 
 TEST_CASE("testExecuteWithPayload", "") {
     io::OutBuffer buffer;
-    auto executor = APCExecutor(nullptr);
+    auto executor = APCExecutor({}, nullptr);
 
     std::pair<std::string_view, std::string> control_data[] = {
         {"m", "1"},
@@ -38,7 +37,7 @@ TEST_CASE("testExecuteWithPayload", "") {
     executor.execute(
         {
             .command = "_G",
-            .payload_b64 = "hello",
+            .payload = "hello",
             .control_data = control_data,
         },
         buffer);
