@@ -17,9 +17,7 @@ TEST_CASE("testIntrusiveForwardListEmpty", "") {
     CHECK(list.isEmpty());
 
     int count = 0;
-    list.forEach([&](auto&&) {
-        ++count;
-    });
+    list.forEach([&](auto&&) { ++count; });
     CHECK(count == 0);
 }
 

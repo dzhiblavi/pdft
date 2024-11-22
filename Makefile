@@ -3,6 +3,9 @@ CONAN = conan
 CMAKE = cmake
 BUILD_TYPE ?= Debug
 PROFILE ?= armv8-macos
+ASAN ?= OFF
+TSAN ?= OFF
+UBSAN ?= OFF
 BUILD_IMAGE = pdft-build-image
 
 TARGET_DIR = ./target/$(PROFILE)/$(BUILD_TYPE)
@@ -34,7 +37,10 @@ configure: deps
 		-DCMAKE_C_COMPILER=${CC}                                   \
 		-DCMAKE_CXX_COMPILER=${CXX}                                \
 		-DCMAKE_BUILD_TYPE=$(BUILD_TYPE)                           \
-		-DPDFT_BUILD_TESTS=Yes
+		-DPDFT_BUILD_TESTS=ON                                      \
+		-DASAN=$(ASAN)                                             \
+		-DTSAN=$(TSAN)                                             \
+		-DUBSAN=$(UBSAN)
 
 build: configure
 	cd $(BUILD_DIR) && $(CMAKE) --build . --config $(BUILD_TYPE)
