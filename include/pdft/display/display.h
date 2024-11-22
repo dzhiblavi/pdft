@@ -4,7 +4,7 @@
 #include "pdft/media/image.h"
 #include "pdft/view/rect.h"
 
-namespace pdft::view::image {
+namespace pdft::display {
 
 class Display {
  public:
@@ -15,12 +15,12 @@ class Display {
 
     virtual void displayImage(
         media::ImageId id,
-        const IRect& rect,
-        const IRect& image_size,
+        const view::IRect& rect,
+        const view::IRect& image_size,
         core::io::OutBuffer& buffer) = 0;
 
     virtual bool isLoaded(media::ImageId id) const = 0;
     virtual void clear(core::io::OutBuffer& buffer) const = 0;
 };
 
-}  // namespace pdft::view::image
+}  // namespace pdft::display

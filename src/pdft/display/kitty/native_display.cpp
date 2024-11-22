@@ -1,10 +1,10 @@
-#include "pdft/view/image/kitty/native_display.h"
+#include "pdft/display/kitty/native_display.h"
 #include "pdft/core/log/log.h"
 
-namespace pdft::view::image::kitty {
+namespace pdft::display::kitty {
 
 void NativeDisplay::displayImage(
-    media::ImageId id, const IRect& rect, const IRect&, core::io::OutBuffer& buffer) {
+    media::ImageId id, const view::IRect& rect, const view::IRect&, core::io::OutBuffer& buffer) {
     const auto& [x, y, w, h] = rect;
     core::log::global()->info("display @ x={},y={},w={},h={}", x, y, w, h);
 
@@ -46,4 +46,4 @@ void NativeDisplay::displayImage(
         buffer);
 }
 
-}  // namespace pdft::view::image::kitty
+}  // namespace pdft::display::kitty

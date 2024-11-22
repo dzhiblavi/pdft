@@ -1,13 +1,13 @@
-#include "pdft/view/image/kitty/unicode_display.h"
+#include "pdft/display/kitty/unicode_display.h"
 #include "pdft/core/assert.h"
 #include "pdft/core/log/log.h"
 
 #include "./detail/rowcolumn_diacritics.h"
 
-namespace pdft::view::image::kitty {
+namespace pdft::display::kitty {
 
 void UnicodeDisplay::displayImage(
-    media::ImageId id, const IRect& rect, const IRect& image, core::io::OutBuffer& buffer) {
+    media::ImageId id, const view::IRect& rect, const view::IRect& image, core::io::OutBuffer& buffer) {
     const auto& [x, y, w, h] = rect;
     const auto& [ix, iy, iw, ih] = image;
     core::log::global()->info("display @ x={},y={},w={},h={}", x, y, w, h);

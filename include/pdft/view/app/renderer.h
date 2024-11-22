@@ -1,6 +1,6 @@
 #include "pdft/core/terminal/terminal.h"
 #include "pdft/state/document_storage.h"
-#include "pdft/view/image/display.h"
+#include "pdft/display/display.h"
 #include "pdft/view/renderer.h"
 
 #include <unordered_map>
@@ -11,7 +11,7 @@ class Renderer : public view::Renderer {
  public:
     Renderer(
         std::shared_ptr<state::DocumentStorage> docs,
-        std::shared_ptr<image::Display> display,
+        std::shared_ptr<display::Display> display,
         std::shared_ptr<core::terminal::Terminal> terminal)
         : term_dims_(core::terminal::getTerminalDimensions())
         , docs_(std::move(docs))
@@ -35,7 +35,7 @@ class Renderer : public view::Renderer {
 
     core::terminal::Dimensions term_dims_;
     std::shared_ptr<state::DocumentStorage> docs_;
-    std::shared_ptr<image::Display> display_;
+    std::shared_ptr<display::Display> display_;
     std::shared_ptr<core::terminal::Terminal> terminal_;
     std::unordered_map<media::ImageId, std::pair<float, float>> image_size_cells_;
 };

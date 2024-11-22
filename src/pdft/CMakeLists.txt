@@ -36,9 +36,6 @@ target_sources(
           ./view/app/fit_page.cpp
           ./view/app/fit_text.cpp
           ./view/app/renderer.cpp
-          ./view/image/kitty/display_base.cpp
-          ./view/image/kitty/unicode_display.cpp
-          ./view/image/kitty/native_display.cpp
           ./state/app/state.cpp
           ./state/app/document_state.cpp
           ./state/document_storage.cpp
@@ -54,6 +51,9 @@ target_sources(
           ./core/terminal/ansi/terminal.cpp
           ./core/terminal/regular/apc_executor.cpp
           ./core/terminal/tmux/apc_executor.cpp
+          ./display/kitty/display_base.cpp
+          ./display/kitty/unicode_display.cpp
+          ./display/kitty/native_display.cpp
           ./media/pdf/context.cpp
           ./media/pdf/document.cpp
           ./media/pdf/page.cpp

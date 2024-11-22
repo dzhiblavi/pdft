@@ -2,14 +2,14 @@
 
 #include "pdft/core/terminal/apc_executor.h"
 #include "pdft/core/terminal/terminal.h"
-#include "pdft/view/image/display.h"
+#include "pdft/display/display.h"
 
 #include <memory>
 #include <unordered_set>
 
-namespace pdft::view::image::kitty {
+namespace pdft::display::kitty {
 
-class DisplayBase : public image::Display {
+class DisplayBase : public display::Display {
  public:
     DisplayBase(
         std::shared_ptr<core::terminal::Terminal> terminal,

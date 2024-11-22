@@ -8,10 +8,10 @@
 #include "pdft/core/io/termctl.h"
 #include "pdft/core/terminal/apc_executor.h"
 #include "pdft/core/terminal/terminal.h"
+#include "pdft/display/display.h"
 #include "pdft/media/pdf/context.h"
 #include "pdft/state/document_storage.h"
 #include "pdft/state/state.h"
-#include "pdft/view/image/display.h"
 #include "pdft/view/renderer.h"
 
 #include <asio/awaitable.hpp>
@@ -42,7 +42,7 @@ class Application {
     std::shared_ptr<pdft::core::io::Console> console_;
 
     // View
-    std::shared_ptr<pdft::view::image::Display> image_display_;
+    std::shared_ptr<pdft::display::Display> image_display_;
     std::shared_ptr<pdft::view::Renderer> renderer_;
 
     // State

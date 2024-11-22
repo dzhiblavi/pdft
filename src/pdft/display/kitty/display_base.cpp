@@ -1,10 +1,10 @@
-#include "pdft/view/image/kitty/display_base.h"
+#include "pdft/display/kitty/display_base.h"
 
 #include "pdft/core/assert.h"
 #include "pdft/utils/base64.h"
 #include "pdft/utils/zlib.h"
 
-namespace pdft::view::image::kitty {
+namespace pdft::display::kitty {
 
 namespace {
 
@@ -96,9 +96,10 @@ void DisplayBase::clear(core::io::OutBuffer& buffer) const {
     executor_->execute(
         {
             .command = "_G",
+            .payload_b64 = "",
             .control_data = control_data,
         },
         buffer);
 }
 
-}  // namespace pdft::view::image::kitty
+}  // namespace pdft::display::kitty

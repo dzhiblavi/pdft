@@ -1,8 +1,8 @@
 #pragma once
 
-#include "pdft/view/image/kitty/display_base.h"
+#include "pdft/display/kitty/display_base.h"
 
-namespace pdft::view::image::kitty {
+namespace pdft::display::kitty {
 
 class UnicodeDisplay : public DisplayBase {
  public:
@@ -10,9 +10,9 @@ class UnicodeDisplay : public DisplayBase {
 
     void displayImage(
         media::ImageId id,
-        const IRect& rect,
-        const IRect& image,
+        const view::IRect& rect,
+        const view::IRect& image,
         core::io::OutBuffer& buffer) override;
 };
 
-}  // namespace pdft::view::image::kitty
+}  // namespace pdft::display::kitty
