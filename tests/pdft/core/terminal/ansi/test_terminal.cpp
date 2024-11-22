@@ -9,7 +9,7 @@ TEST_CASE("testMoveCursor", "") {
     auto terminal = Terminal();
 
     terminal.moveCursor(CursorPosition{10, 20}, buffer);
-    CHECK(buffer.view() == "\x1b[10;20H");
+    CHECK(buffer.view() == "\x1b[11;21H");
 }
 
 TEST_CASE("testClearScreen", "") {

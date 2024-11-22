@@ -7,22 +7,41 @@
 namespace pdft::display::kitty {
 
 void UnicodeDisplay::displayImage(
-    media::ImageId id, const view::IRect& rect, const view::IRect& image, core::io::OutBuffer& buffer) {
-    const auto& [x, y, w, h] = rect;
-    const auto& [ix, iy, iw, ih] = image;
-    core::log::global()->info("display @ x={},y={},w={},h={}", x, y, w, h);
-    core::log::global()->info("display I x={},y={},w={},h={}", ix, iy, iw, ih);
+    media::ImageId id,
+    const view::IRect& rect,
+    const view::FRect& image_subarea,
+    core::io::OutBuffer& buffer) {
+    PDFT_VERIFY(isLoaded(id));
 
+    const auto& [x, y, w, h] = rect;
+    core::log::global()->info("display @ x={},y={},w={},h={}", x, y, w, h);
     PDFT_VERIFY(x >= 0 && y >= 0, "rect offset must not be negative: x={},y={}", x, y);
-    PDFT_VERIFY(ix >= 0 && iy >= 0, "image offset must not be negative: x={},y={}", x, y);
+    PDFT_VERIFY(w >= 0 && h >= 0, "rect dimensions must not be negative: w={},h={}", w, h);
+
+    if (w == 0 || h == 0) {
+        return;
+    }
+
+    const auto& [rix, riy, riw, rih] = image_subarea;
+    core::log::global()->info("display I rx={},ry={},rw={},rh={}", rix, riy, riw, rih);
+    PDFT_VERIFY(rix >= 0 && riy >= 0, "image offset must not be negative: x={},y={}", rix, riy);
+    PDFT_VERIFY(riw > 0 && rih > 0, "image dimensions must be positive: w={},h={}", riw, rih);
+
+    uint32_t image_cols = std::roundf(w / riw);
+    uint32_t image_rows = std::roundf(h / rih);
+    core::log::global()->info("display ISZ wc={},hc={}", image_cols, image_rows);
+
+    uint32_t offset_cols = image_cols * rix;
+    uint32_t offset_rows = image_rows * riy;
+    core::log::global()->info("display IOF c={},r={}", offset_cols, offset_rows);
 
     std::pair<std::string_view, std::string> control_data[] = {
         {"q", "2"},
         {"a", "p"},
         {"U", "1"},
         {"i", std::to_string(id)},
-        {"r", std::to_string(ih)},
-        {"c", std::to_string(iw)},
+        {"r", std::to_string(image_rows)},
+        {"c", std::to_string(image_cols)},
         {"C", "1"},
     };
 
@@ -35,11 +54,6 @@ void UnicodeDisplay::displayImage(
         },
         buffer);
 
-    uint32_t left = x;
-    uint32_t top = y;
-    uint32_t num_rows = h;
-    uint32_t num_cols = w;
-
     // Fill the image space with special unicode characters
     const std::string_view ImagePlaceholder = "\U0010EEEE";
     const std::string_view IdChar = detail::RowColDiacritics[(id >> 24) & 255];
@@ -47,20 +61,20 @@ void UnicodeDisplay::displayImage(
     core::io::write(
         buffer, "\033[38:2:", (id >> 16) & 255, ":", (id >> 8) & 255, ":", (id >> 0) & 255, "m");
 
-    for (uint32_t row = top; row < top + num_rows; ++row) {
+    for (uint32_t row = 0; row < h; ++row) {
         terminal_->moveCursor(
             core::terminal::CursorPosition{
-                .rows = row + 1,
-                .columns = left + 1,
+                .rows = y + row,
+                .columns = static_cast<uint32_t>(x),
             },
             buffer);
 
-        for (uint32_t col = left; col < left + num_cols; ++col) {
+        for (uint32_t col = 0; col < w; ++col) {
             core::io::write(
                 buffer,
                 ImagePlaceholder,
-                detail::RowColDiacritics[iy + row - top],
-                detail::RowColDiacritics[ix + col - left],
+                detail::RowColDiacritics[offset_rows + row],
+                detail::RowColDiacritics[offset_cols + col],
                 IdChar);
         }
     }
@@ -68,4 +82,4 @@ void UnicodeDisplay::displayImage(
     core::io::write(buffer, "\033[39m");
 }
 
-}  // namespace pdft::view::image::kitty
+}  // namespace pdft::display::kitty

@@ -13,8 +13,6 @@ void Renderer::render(
     core::trace::StackScopeTracer trace =
         core::trace::getGlobalPool().getTracer(core::trace::stackTraceLogger(), "render_one");
 
-    display_->clear(buffer);
-
     const auto& [doc_id, page_index] = page;
     const auto& document = docs_->getDocument(doc_id);
     media::ImageId id = utils::cantorPair(doc_id, page_index + 1);
@@ -46,18 +44,17 @@ void Renderer::render(
         auto size = image->size();
         float image_cols = float(size.width_px) / term_dims_.cell_width_px;
         float image_rows = float(size.height_px) / term_dims_.cell_height_px;
-        image_size_cells_[id] = std::make_pair(image_cols, image_rows);
+        image_ratio_[id] = image_cols / image_rows;
     }
 
     {
         auto _ = trace.addChild("display_image");
-        PDFT_VERIFY(image_size_cells_.contains(id));
+        PDFT_VERIFY(image_ratio_.contains(id), "unknown image id={}", id);
 
         auto [x, y, w, h] = rect;
         core::log::global()->info("renderer @ x={},y={},w={},h={}", x, y, w, h);
 
-        auto [width, height] = image_size_cells_[id];
-        auto [irect, image] = fitPage(width, height, rect, place);
+        auto [irect, image] = fitPage(image_ratio_[id], rect, place);
         display_->displayImage(id, irect, image, buffer);
     }
 }
@@ -72,8 +69,8 @@ void Renderer::render(
     for (auto line : lines) {
         terminal_->moveCursor(
             core::terminal::CursorPosition{
-                .rows = line.y + 1,
-                .columns = line.x + 1,
+                .rows = line.y,
+                .columns = line.x,
             },
             buffer);
 

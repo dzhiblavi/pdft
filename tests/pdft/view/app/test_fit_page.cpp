@@ -17,6 +17,13 @@ inline const IRect Rect = {
     .height = 40,
 };
 
+inline const FRect FullImage = {
+    .x = 0.f,
+    .y = 0.f,
+    .width = 1.f,
+    .height = 1.f,
+};
+
 void dump(const IRect& rect) {
     auto [x, y, w, h] = rect;
     std::cout << std::format("IRect[x={},y={},w={},h={}]", x, y, w, h) << std::endl;
@@ -36,16 +43,9 @@ TEST_CASE("testFitPageExactlyMatchesProportions", "") {
         .height = 40,
     };
 
-    auto expected_image = IRect{
-        .x = 0,
-        .y = 0,
-        .width = 30,
-        .height = 40,
-    };
-
-    auto [rect, offset] = fitPage(3.0f, 4.0f, Rect, pos);
+    auto [rect, offset] = fitPage(3.0f / 4.0f, Rect, pos);
     CHECK(rect == expected);
-    CHECK(offset == expected_image);
+    CHECK(offset == FullImage);
 }
 
 TEST_CASE("testFitPageInsideNarrowMin", "") {
@@ -62,16 +62,9 @@ TEST_CASE("testFitPageInsideNarrowMin", "") {
         .height = 40,
     };
 
-    auto expected_image = IRect{
-        .x = 0,
-        .y = 0,
-        .width = 20,
-        .height = 40,
-    };
-
-    auto [rect, offset] = fitPage(2.0f, 4.0f, Rect, pos);
+    auto [rect, offset] = fitPage(2.0f / 4.0f, Rect, pos);
     CHECK(rect == expected);
-    CHECK(offset == expected_image);
+    CHECK(offset == FullImage);
 }
 
 TEST_CASE("testFitPageInsideNarrowCenter", "") {
@@ -88,16 +81,9 @@ TEST_CASE("testFitPageInsideNarrowCenter", "") {
         .height = 40,
     };
 
-    auto expected_image = IRect{
-        .x = 0,
-        .y = 0,
-        .width = 20,
-        .height = 40,
-    };
-
-    auto [rect, offset] = fitPage(2.0f, 4.0f, Rect, pos);
+    auto [rect, offset] = fitPage(2.0f / 4.0f, Rect, pos);
     CHECK(rect == expected);
-    CHECK(offset == expected_image);
+    CHECK(offset == FullImage);
 }
 
 TEST_CASE("testFitPageInsideNarrowMax", "") {
@@ -114,16 +100,9 @@ TEST_CASE("testFitPageInsideNarrowMax", "") {
         .height = 40,
     };
 
-    auto expected_image = IRect{
-        .x = 0,
-        .y = 0,
-        .width = 20,
-        .height = 40,
-    };
-
-    auto [rect, offset] = fitPage(2.0f, 4.0f, Rect, pos);
+    auto [rect, offset] = fitPage(2.0f / 4.0f, Rect, pos);
     CHECK(rect == expected);
-    CHECK(offset == expected_image);
+    CHECK(offset == FullImage);
 }
 
 TEST_CASE("testFitPageInsideWideMin", "") {
@@ -140,16 +119,9 @@ TEST_CASE("testFitPageInsideWideMin", "") {
         .height = 20,
     };
 
-    auto expected_image = IRect{
-        .x = 0,
-        .y = 0,
-        .width = 30,
-        .height = 20,
-    };
-
-    auto [rect, offset] = fitPage(3.0f, 2.0f, Rect, pos);
+    auto [rect, offset] = fitPage(3.0f / 2.0f, Rect, pos);
     CHECK(rect == expected);
-    CHECK(offset == expected_image);
+    CHECK(offset == FullImage);
 }
 
 TEST_CASE("testFitPageInsideWideCenter", "") {
@@ -166,16 +138,9 @@ TEST_CASE("testFitPageInsideWideCenter", "") {
         .height = 20,
     };
 
-    auto expected_image = IRect{
-        .x = 0,
-        .y = 0,
-        .width = 30,
-        .height = 20,
-    };
-
-    auto [rect, offset] = fitPage(3.0f, 2.0f, Rect, pos);
+    auto [rect, offset] = fitPage(3.0f / 2.0f, Rect, pos);
     CHECK(rect == expected);
-    CHECK(offset == expected_image);
+    CHECK(offset == FullImage);
 }
 
 TEST_CASE("testFitPageInsideWideMax", "") {
@@ -192,16 +157,9 @@ TEST_CASE("testFitPageInsideWideMax", "") {
         .height = 20,
     };
 
-    auto expected_image = IRect{
-        .x = 0,
-        .y = 0,
-        .width = 30,
-        .height = 20,
-    };
-
-    auto [rect, offset] = fitPage(3.0f, 2.0f, Rect, pos);
+    auto [rect, offset] = fitPage(3.0f / 2.0f, Rect, pos);
     CHECK(rect == expected);
-    CHECK(offset == expected_image);
+    CHECK(offset == FullImage);
 }
 
 TEST_CASE("testFitPageCropNarrowMin", "") {
@@ -211,14 +169,14 @@ TEST_CASE("testFitPageCropNarrowMin", "") {
         .fit = CropAndFill,
     };
 
-    auto expected_image = IRect{
-        .x = 0,
-        .y = 0,
-        .width = 30,
-        .height = 60,
+    auto expected_image = FRect{
+        .x = 0.f,
+        .y = 0.f,
+        .width = 1.f,
+        .height = 2.f / 3.f,
     };
 
-    auto [rect, offset] = fitPage(2.0f, 4.0f, Rect, pos);
+    auto [rect, offset] = fitPage(2.0f / 4.0f, Rect, pos);
     CHECK(rect == Rect);
     CHECK(offset == expected_image);
 }
@@ -230,14 +188,14 @@ TEST_CASE("testFitPageCropNarrowCenter", "") {
         .fit = CropAndFill,
     };
 
-    auto expected_image = IRect{
-        .x = 0,
-        .y = 10,
-        .width = 30,
-        .height = 60,
+    auto expected_image = FRect{
+        .x = 0.f,
+        .y = 1.f / 6.f,
+        .width = 1.f,
+        .height = 2.f / 3.f,
     };
 
-    auto [rect, offset] = fitPage(2.0f, 4.0f, Rect, pos);
+    auto [rect, offset] = fitPage(2.0f / 4.0f, Rect, pos);
     CHECK(rect == Rect);
     CHECK(offset == expected_image);
 }
@@ -249,14 +207,14 @@ TEST_CASE("testFitPageCropNarrowMax", "") {
         .fit = CropAndFill,
     };
 
-    auto expected_image = IRect{
-        .x = 0,
-        .y = 20,
-        .width = 30,
-        .height = 60,
+    auto expected_image = FRect{
+        .x = 0.f,
+        .y = 1.f / 3.f,
+        .width = 1.f,
+        .height = 2.f / 3.f,
     };
 
-    auto [rect, offset] = fitPage(2.0f, 4.0f, Rect, pos);
+    auto [rect, offset] = fitPage(2.0f / 4.0f, Rect, pos);
     CHECK(rect == Rect);
     CHECK(offset == expected_image);
 }
@@ -268,14 +226,14 @@ TEST_CASE("testFitPageCropWideMin", "") {
         .fit = CropAndFill,
     };
 
-    auto expected_image = IRect{
-        .x = 0,
-        .y = 0,
-        .width = 60,
-        .height = 40,
+    auto expected_image = FRect{
+        .x = 0.f,
+        .y = 0.f,
+        .width = 1.f / 2.f,
+        .height = 1.f,
     };
 
-    auto [rect, offset] = fitPage(3.0f, 2.0f, Rect, pos);
+    auto [rect, offset] = fitPage(3.0f / 2.0f, Rect, pos);
     CHECK(rect == Rect);
     CHECK(offset == expected_image);
 }
@@ -287,14 +245,14 @@ TEST_CASE("testFitPageCropWideCenter", "") {
         .fit = CropAndFill,
     };
 
-    auto expected_image = IRect{
-        .x = 15,
-        .y = 0,
-        .width = 60,
-        .height = 40,
+    auto expected_image = FRect{
+        .x = 1.f / 4.f,
+        .y = 0.f,
+        .width = 1.f / 2.f,
+        .height = 1.f,
     };
 
-    auto [rect, offset] = fitPage(3.0f, 2.0f, Rect, pos);
+    auto [rect, offset] = fitPage(3.0f / 2.0f, Rect, pos);
     CHECK(rect == Rect);
     CHECK(offset == expected_image);
 }
@@ -306,14 +264,14 @@ TEST_CASE("testFitPageCropWideMax", "") {
         .fit = CropAndFill,
     };
 
-    auto expected_image = IRect{
-        .x = 30,
-        .y = 0,
-        .width = 60,
-        .height = 40,
+    auto expected_image = FRect{
+        .x = 1.f / 2.f,
+        .y = 0.f,
+        .width = 1.f / 2.f,
+        .height = 1.f,
     };
 
-    auto [rect, offset] = fitPage(3.0f, 2.0f, Rect, pos);
+    auto [rect, offset] = fitPage(3.0f / 2.0f, Rect, pos);
     CHECK(rect == Rect);
     CHECK(offset == expected_image);
 }

@@ -30,7 +30,7 @@ void DisplayBase::loadImage(
     media::ImageId id, const media::Image& image, core::io::OutBuffer& buffer) {
     PDFT_VERIFY(!isLoaded(id), "image with id={} is already loaded", id);
     auto image_size = image.size();
-    loaded_.insert(id);
+    loaded_.emplace(id, image_size);
 
     auto samples = image.samples();
     auto samples_compressed = utils::zlibCompress(samples);

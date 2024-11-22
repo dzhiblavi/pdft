@@ -7,7 +7,7 @@ void Terminal::clear(io::OutBuffer& buffer) {
 }
 
 void Terminal::moveCursor(CursorPosition position, io::OutBuffer& buffer) {
-    io::write(buffer, "\x1b[", position.rows, ';', position.columns, "H");
+    io::write(buffer, "\x1b[", position.rows + 1, ';', position.columns + 1, "H");
 }
 
 }  // namespace pdft::core::terminal::ansi

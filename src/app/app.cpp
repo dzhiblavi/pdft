@@ -148,6 +148,7 @@ asio::awaitable<void> Application::runEventLoop() {
 
         core::io::clear(buffer);
         terminal_->clear(buffer);
+        image_display_->clear(buffer);
 
         {
             auto _ = tracer.addChild("render");

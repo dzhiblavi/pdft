@@ -11,7 +11,7 @@ class NativeDisplay : public DisplayBase {
     void displayImage(
         media::ImageId id,
         const view::IRect& rect,
-        const view::IRect& image,
+        const view::FRect& image_subarea,
         core::io::OutBuffer& buffer) override;
 };
 

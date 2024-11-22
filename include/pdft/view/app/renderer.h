@@ -37,7 +37,7 @@ class Renderer : public view::Renderer {
     std::shared_ptr<state::DocumentStorage> docs_;
     std::shared_ptr<display::Display> display_;
     std::shared_ptr<core::terminal::Terminal> terminal_;
-    std::unordered_map<media::ImageId, std::pair<float, float>> image_size_cells_;
+    std::unordered_map<media::ImageId, float> image_ratio_;
 };
 
 }  // namespace pdft::view::app

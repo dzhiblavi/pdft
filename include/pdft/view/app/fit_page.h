@@ -7,7 +7,6 @@
 
 namespace pdft::view::app {
 
-std::tuple<IRect, IRect> fitPage(
-    float width, float height, const IRect& rect, const PagePlacement& position);
+std::tuple<IRect, FRect> fitPage(float wh_ratio, const IRect& rect, const PagePlacement& position);
 
 }  // namespace pdft::view::app

@@ -11,5 +11,6 @@ enum class AxisFit {
 };
 
 uint32_t getOffset(uint32_t outer, uint32_t inner, view::AxisFit strategy);
+float getOffset(float outer, float inner, view::AxisFit strategy);
 
 }  // namespace pdft::view

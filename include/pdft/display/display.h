@@ -16,7 +16,7 @@ class Display {
     virtual void displayImage(
         media::ImageId id,
         const view::IRect& rect,
-        const view::IRect& image_size,
+        const view::FRect& image_subarea,
         core::io::OutBuffer& buffer) = 0;
 
     virtual bool isLoaded(media::ImageId id) const = 0;

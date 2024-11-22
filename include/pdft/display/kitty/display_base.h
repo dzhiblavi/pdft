@@ -5,7 +5,7 @@
 #include "pdft/display/display.h"
 
 #include <memory>
-#include <unordered_set>
+#include <unordered_map>
 
 namespace pdft::display::kitty {
 
@@ -26,7 +26,7 @@ class DisplayBase : public display::Display {
  protected:
     std::shared_ptr<core::terminal::Terminal> terminal_;
     std::shared_ptr<core::terminal::APCExecutor> executor_;
-    std::unordered_set<media::ImageId> loaded_;
+    std::unordered_map<media::ImageId, media::ImageSize> loaded_;
 };
 
 }  // namespace pdft::view::image::kitty
