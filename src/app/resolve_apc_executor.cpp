@@ -7,7 +7,6 @@
 namespace app {
 
 using namespace pdft;
-using namespace pdft::core::log::exported;
 
 std::shared_ptr<core::apc::APCExecutor> resolveAPCExecutor(
     std::shared_ptr<pdft::core::io::Console> console) {

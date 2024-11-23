@@ -4,8 +4,6 @@
 
 namespace pdft::controller::app {
 
-using namespace core::log::exported;
-
 Controller::Controller(
     const Config& config,
     std::shared_ptr<state::State> state,

@@ -41,7 +41,6 @@ extern "C" {
 namespace app {
 
 using namespace pdft;
-using namespace pdft::core::log::exported;
 using namespace asio::experimental::awaitable_operators;
 
 Application::Application(asio::io_context& context, Config config)

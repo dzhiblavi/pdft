@@ -4,8 +4,6 @@
 
 namespace pdft::display::kitty {
 
-using namespace core::log::exported;
-
 asio::awaitable<void> NativeDisplay::displayImage(
     media::ImageId id,
     const view::IRect& rect,

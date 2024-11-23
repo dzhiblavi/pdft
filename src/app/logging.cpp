@@ -13,7 +13,6 @@ extern "C" {
 namespace app {
 
 using namespace pdft;
-using namespace pdft::core::log::exported;
 
 namespace {
 

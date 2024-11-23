@@ -8,8 +8,6 @@
 
 namespace pdft::view::app {
 
-using namespace core::log::exported;
-
 asio::awaitable<void> Renderer::render(
     core::io::OutBuffer& buffer, const IRect& rect, const PagePlacement& place, const Page& page) {
     core::trace::StackScopeTracer trace =

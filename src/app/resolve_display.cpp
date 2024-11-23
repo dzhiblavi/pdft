@@ -7,7 +7,6 @@
 namespace app {
 
 using namespace pdft;
-using namespace pdft::core::log::exported;
 
 std::shared_ptr<pdft::display::Display> resolveDisplay(
     std::shared_ptr<pdft::core::terminal::Terminal> terminal,

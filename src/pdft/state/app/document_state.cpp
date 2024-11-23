@@ -6,8 +6,6 @@
 
 namespace pdft::state::app {
 
-using namespace core::log::exported;
-
 void DocumentState::scrollNext(int32_t rows) {
     switch (view_mode_) {
         using enum ViewMode;

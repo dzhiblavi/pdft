@@ -13,8 +13,6 @@ extern "C" {
 
 namespace pdft::media::pdf {
 
-using namespace core::log::exported;
-
 Page::Page(Page&& rhs) : context_(rhs.context_), page_(std::exchange(rhs.page_, nullptr)) {}
 
 Page::~Page() noexcept {

@@ -25,10 +25,10 @@ using impl::log;
 using impl::trace;
 using impl::warn;
 
-namespace exported {
+}  // namespace pdft::core::log
+
+namespace pdft {
 
 namespace log = core::log;
 
-}  // namespace exported
-
-}  // namespace pdft::core::log
+}  // namespace pdft
