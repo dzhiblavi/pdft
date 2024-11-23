@@ -39,12 +39,12 @@ asio::awaitable<void> UnicodeDisplay::displayImage(
 
     std::pair<std::string_view, std::string> control_data[] = {
         {"q", "2"},
-        {"a", "p"},
-        {"U", "1"},
-        {"i", std::to_string(id)},
-        {"r", std::to_string(image_rows)},
-        {"c", std::to_string(image_cols)},
-        {"C", "1"},
+        {"a", "p"},                 // put image to the display
+        {"U", "1"},                 // use unicode placeholders (create a *virtual* placement)
+        {"C", "1"},                 // do not move the cursor
+        {"i", std::to_string(id)},  // image id
+        {"r", std::to_string(image_rows)},  // rows occupied by the image
+        {"c", std::to_string(image_cols)},  // columns occupied by the image
     };
 
     // Create a virtual PagePlacement

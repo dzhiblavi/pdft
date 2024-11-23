@@ -58,7 +58,7 @@ void DisplayBase::clear(core::io::OutBuffer& buffer) {
 }
 
 void DisplayBase::unload(media::ImageId id, core::io::OutBuffer& buffer) {
-    log::debug("unloading an image with id {} from the display", id);
+    log::debug("unloading an image with id={} from the display", id);
 
     auto it = loaded_.find(id);
     PDFT_VERIFY(it != loaded_.end(), "tried to unload an image with unknown id {}", id);
@@ -80,7 +80,7 @@ void DisplayBase::unload(media::ImageId id, core::io::OutBuffer& buffer) {
 }
 
 void DisplayBase::unloadAll(core::io::OutBuffer& buffer) {
-    log::debug("unloading all images from the display");
+    log::debug("unloading all {} images from the display", loaded_.size());
     loaded_.clear();
 
     std::pair<std::string_view, std::string> control_data[] = {

@@ -38,15 +38,15 @@ asio::awaitable<void> NativeDisplay::displayImage(
     // c, r (columns and rows) control the rectangle at which the image will be displayed
     std::pair<std::string_view, std::string> control_data[] = {
         {"q", "2"},
-        {"a", "p"},
-        {"C", "1"},
-        {"i", std::to_string(id)},
-        {"c", std::to_string(w - 1)},
-        {"r", std::to_string(h - 1)},
-        {"y", std::to_string(iy_px)},
-        {"x", std::to_string(ix_px)},
-        {"w", std::to_string(iw_px)},
-        {"h", std::to_string(ih_px)},
+        {"a", "p"},                    // put image to the display
+        {"C", "1"},                    // do not move the cursor
+        {"i", std::to_string(id)},     // image id
+        {"c", std::to_string(w - 1)},  // columns occupied by the image
+        {"r", std::to_string(h - 1)},  // rows occupied by the image
+        {"y", std::to_string(iy_px)},  // vertical offset inside the image in pixels
+        {"x", std::to_string(ix_px)},  // horizontal offset inside the image in pixels
+        {"w", std::to_string(iw_px)},  // height of the image subarea in pixels
+        {"h", std::to_string(ih_px)},  // width of the image subarea in pixels
     };
 
     // Position cursor to the top left corner

@@ -22,7 +22,9 @@ class Display {
         core::io::OutBuffer& buffer) = 0;
 
     virtual void clear(core::io::OutBuffer& buffer) = 0;
+
     virtual void unload(media::ImageId id, core::io::OutBuffer& buffer) = 0;
+
     virtual void unloadAll(core::io::OutBuffer& buffer) = 0;
 
     virtual bool isLoaded(media::ImageId id) const = 0;
