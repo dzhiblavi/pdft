@@ -14,6 +14,7 @@ class Controller : public controller::Controller {
  public:
     enum class Command {
         Quit,
+        Reload,
         ScrollNext,
         ScrollPrev,
         NumNextPage,
@@ -52,6 +53,7 @@ class Controller : public controller::Controller {
 
  private:
     void bindKey(Command command, std::string_view keys, const Config& config);
+    void reloadDocument(state::DocumentId id, std::filesystem::path path);
 
     KeyTree key_tree_;
     std::shared_ptr<state::State> state_;

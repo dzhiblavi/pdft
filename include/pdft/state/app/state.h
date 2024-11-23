@@ -26,6 +26,8 @@ class State : public state::State {
     void nextLayout(int delta) override;
     void updateZoom(float coeff) override;
 
+    std::optional<DocumentId> getCurrentDocumentId() const override;
+
  private:
     DocumentState* getState();
 

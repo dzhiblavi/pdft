@@ -118,4 +118,8 @@ DocumentState* State::getState() {
     return nullptr;
 }
 
+std::optional<DocumentId> State::getCurrentDocumentId() const {
+    return idx_.transform([this](auto i) { return states_[i].getDocumentId(); });
+}
+
 }  // namespace pdft::state::app

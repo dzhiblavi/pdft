@@ -23,6 +23,14 @@ void Controller::bindKey(Command command, std::string_view keys, const Config& c
             key_tree_.bind(keys, [this] { quit_ = true; });
             break;
 
+        case Reload:
+            key_tree_.bind(keys, [this] {
+                if (auto id = state_->getCurrentDocumentId()) {
+                    reloadDocument(*id, docs_->getDocument(*id).getPath());
+                }
+            });
+            break;
+
         case ScrollNext:
             key_tree_.bind(keys, [&] { state_->scrollNext(config.rows_per_scroll); });
             break;
@@ -114,22 +122,26 @@ Action Controller::onFilesystemEvent(const notify::Event& event) {
     log::info("controller: fs event on path={}", event.path.c_str());
 
     auto old_id = docs_->getIdByPath(event.path);
+    reloadDocument(old_id, event.path);
+    return Action::Redraw;
+}
+
+void Controller::reloadDocument(state::DocumentId old_id, std::filesystem::path path) {
     log::info("controller: old_id={}", old_id);
 
     docs_->removeDocument(old_id);
     log::info("controller: removed document with id={}", old_id);
 
-    auto new_id = docs_->addDocument(media::pdf::Document::open(docs_->getContext(), event.path));
+    auto new_id = docs_->addDocument(media::pdf::Document::open(docs_->getContext(), path));
     log::info("controller: added document with id={}", new_id);
 
     log::info(
         "controller: replaced document with path={} old_id={}, new_id={}",
-        event.path.c_str(),
+        path.c_str(),
         old_id,
         new_id);
 
     state_->onDocumentChanged(old_id, new_id);
-    return Action::Redraw;
 }
 
 }  // namespace pdft::controller::app

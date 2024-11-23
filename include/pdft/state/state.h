@@ -26,6 +26,8 @@ class State {
     virtual void nextDocument(int delta) = 0;
     virtual void nextLayout(int delta) = 0;
     virtual void updateZoom(float coeff) = 0;
+
+    virtual std::optional<DocumentId> getCurrentDocumentId() const = 0;
 };
 
 }  // namespace pdft::state
