@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.20 FATAL_ERROR)
 
 project(
   pdft
-  VERSION 0.1
+  VERSION 0.0.1
   LANGUAGES CXX)
 
 set(PDFT_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR})
@@ -11,7 +11,6 @@ set(PDFT_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 include(./cmake/Ccache.cmake)
 include(./cmake/CheckCompiler.cmake)
 include(./cmake/Development.cmake)
-include(./cmake/Platform.cmake)
 include(./cmake/Sanitizers.cmake)
 
 # Third-party libraries
@@ -22,6 +21,8 @@ include(./cmake/thirdparty/reflect-cpp.cmake)
 # Enable warnings for core of the project
 include(./cmake/CompileOptions.cmake)
 include(./cmake/Werror.cmake)
+
+include(./cmake/GenerateBuildInfo.cmake)
 
 add_subdirectory(src)
 

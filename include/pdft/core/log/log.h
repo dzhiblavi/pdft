@@ -1,20 +1,34 @@
 #pragma once
 
-#include <spdlog/common.h>
-#include <spdlog/logger.h>
-
-#include <memory>
+#include "./impl/log.h"
 
 namespace pdft::core::log {
 
-using LoggerPtr = std::shared_ptr<spdlog::logger>;
+using impl::Level;
+using impl::LoggerPtr;
 
-namespace level = spdlog::level;
+// Get current global logger
+using impl::global;
 
+// Get logger by name
 LoggerPtr logger(const std::string& name);
 
-LoggerPtr global();
-
+// Set logger by name
 void setGlobalLogger(LoggerPtr logger);
+
+// Helper functions
+using impl::critical;
+using impl::debug;
+using impl::err;
+using impl::info;
+using impl::log;
+using impl::trace;
+using impl::warn;
+
+namespace exported {
+
+namespace log = core::log;
+
+}  // namespace exported
 
 }  // namespace pdft::core::log

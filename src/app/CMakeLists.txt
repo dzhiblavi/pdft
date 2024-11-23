@@ -8,6 +8,7 @@ add_executable(
   ./setup_signal_handlers.cpp
   ./cli_args.cpp
   ./resolve_apc_executor.cpp
-  ./resolve_display.cpp)
+  ./resolve_display.cpp
+  ./version.cpp)
 
 target_link_libraries(app pdft tclap::tclap reflectcpp)

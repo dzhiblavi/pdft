@@ -4,6 +4,8 @@
 
 namespace pdft::controller::app {
 
+using namespace core::log::exported;
+
 Controller::Controller(
     const Config& config,
     std::shared_ptr<state::State> state,
@@ -90,7 +92,7 @@ void Controller::bindKey(Command command, std::string_view keys, const Config& c
 }
 
 Action Controller::onKeyEvent(char key) {
-    core::log::global()->info("controller: key={}", key);
+    log::info("controller: key={}", key);
 
     switch (key_tree_.feed(key)) {
         using enum KeyTree::Result;
@@ -111,18 +113,18 @@ Action Controller::onKeyEvent(char key) {
 }
 
 Action Controller::onFilesystemEvent(const notify::Event& event) {
-    core::log::global()->info("controller: fs event on path={}", event.path.c_str());
+    log::info("controller: fs event on path={}", event.path.c_str());
 
     auto old_id = docs_->getIdByPath(event.path);
-    core::log::global()->info("controller: old_id={}", old_id);
+    log::info("controller: old_id={}", old_id);
 
     docs_->removeDocument(old_id);
-    core::log::global()->info("controller: removed document with id={}", old_id);
+    log::info("controller: removed document with id={}", old_id);
 
     auto new_id = docs_->addDocument(media::pdf::Document::open(docs_->getContext(), event.path));
-    core::log::global()->info("controller: added document with id={}", new_id);
+    log::info("controller: added document with id={}", new_id);
 
-    core::log::global()->info(
+    log::info(
         "controller: replaced document with path={} old_id={}, new_id={}",
         event.path.c_str(),
         old_id,

@@ -3,6 +3,7 @@
 #include "pdft/core/assert.h"
 #include "pdft/core/log/log.h"
 #include "pdft/core/notify/notify.h"
+#include "pdft/utils/build_info.h"
 
 #include <asio/experimental/channel.hpp>
 #include <asio/use_awaitable.hpp>
@@ -25,30 +26,32 @@ class Notify : public notify::Notify {
             return 0;
         }();
 
-#if defined(__APPLE__)
+        switch (utils::getCurrentPlatform()) {
+            using enum utils::Platform;
 
-        handle_ = fsw_init_session(system_default_monitor_type);
+            case Linux:
+                // XXX FSW inotify support is kinda shit. When a file is updated
+                // it starts sending events in an infinite stream.
+                // handle_ = fsw_init_session(inotify_monitor_type);
+                handle_ = fsw_init_session(poll_monitor_type);
+                break;
 
-#elif defined(__linux__)
+            case MacOS:
+                handle_ = fsw_init_session(system_default_monitor_type);
+                break;
 
-        // XXX FSW inotify support is kinda shit. When a file is updated
-        // it starts sending events in an infinite stream.
-        // handle_ = fsw_init_session(inotify_monitor_type);
-        handle_ = fsw_init_session(poll_monitor_type);
+            case Posix:
+                handle_ = fsw_init_session(poll_monitor_type);
+                break;
 
-#elif defined(_POSIX_VERSION)
+            case Windows:
+                handle_ = fsw_init_session(windows_monitor_type);
+                break;
 
-        handle_ = fsw_init_session(poll_monitor_type);
-
-#elif defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__NT__)
-
-        handle_ = fsw_init_session(windows_monitor_type);
-
-#else
-
-#error "unsupported platform"
-
-#endif
+            case Unknown:
+                core::fail("this platform is not supported by filesystem watcher");
+                break;
+        }
 
         PDFT_VERIFY(fsw_set_latency(handle_, 0.1) == FSW_OK);
         PDFT_VERIFY(fsw_set_callback(handle_, processEvents, this) == FSW_OK);
@@ -94,18 +97,18 @@ class Notify : public notify::Notify {
 
  private:
     static void monitorRunLoop(Notify* self) {
-        core::log::global()->info("start fswatch monitorRunLoop");
+        core::log::info("start fswatch monitorRunLoop");
 
         while (!self->should_exit_.load(std::memory_order_acquire)) {
             fsw_start_monitor(self->handle_);
         }
 
-        core::log::global()->info("end fswatch monitorRunLoop");
+        core::log::info("end fswatch monitorRunLoop");
     }
 
     static void processEvents(const fsw_cevent* const events, unsigned count, void* context) {
         auto* self = static_cast<Notify*>(context);
-        core::log::global()->info("received {} events", count);
+        core::log::info("received {} events", count);
 
         for (unsigned i = 0; i < count; ++i) {
             if (events[i].flags_num > 0 &&
@@ -113,10 +116,10 @@ class Notify : public notify::Notify {
                 continue;
             }
 
-            core::log::global()->info("received an event for path {}", events[i].path);
+            core::log::info("received an event for path {}", events[i].path);
             for (unsigned j = 0; j < events[i].flags_num; ++j) {
                 auto* flag_name = fsw_get_event_flag_name(events[i].flags[j]);
-                core::log::global()->info("flag #{}: {}", j, flag_name);
+                core::log::info("flag #{}: {}", j, flag_name);
                 ::free(flag_name);
             }
 

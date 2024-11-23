@@ -13,6 +13,7 @@ extern "C" {
 namespace app {
 
 using namespace pdft;
+using namespace pdft::core::log::exported;
 
 namespace {
 
@@ -46,6 +47,7 @@ void setupLogging(const LoggingConfig& config) {
                     "global",
                     {
                         .level = toSpdlogLevel(config.level),
+                        .format = "%Y-%m-%dT%T %z %^%s:%#%$ %L %v",
                         .sinks =
                             {
                                 core::log::SimpleFileSink{
@@ -83,7 +85,7 @@ void setupLogging(const LoggingConfig& config) {
     };
 
     core::log::loadConfig(log_config);
-    core::log::global()->info("loggers have been successfully initialized");
+    log::info("loggers have been successfully initialized");
 }
 
 void warningCallback(void*, const char* message) {
@@ -98,7 +100,7 @@ void setupMupdfLogging(const pdft::media::pdf::Context& context) {
     fz_set_warning_callback(context.native(), warningCallback, nullptr);
     fz_set_error_callback(context.native(), errorCallback, nullptr);
 
-    core::log::global()->info("mupdf loggers have been successfully initialized");
+    log::info("mupdf loggers have been successfully initialized");
 }
 
 }  // namespace app

@@ -40,7 +40,7 @@ enum SyncMode {
 
 struct LoggerConfig {
     spdlog::level::level_enum level = spdlog::level::level_enum::info;
-    std::string format;
+    std::string format = "";
     SyncMode sync_mode = SyncMode::Sync;
     bool force_flush = true;
     std::vector<SinkConfig> sinks;

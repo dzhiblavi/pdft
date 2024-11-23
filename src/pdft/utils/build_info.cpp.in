@@ -1,0 +1,73 @@
+#include "pdft/utils/build_info.h"
+
+// clang-format off
+
+#define PDFT_VERSION_MAJOR @CMAKE_PROJECT_VERSION_MAJOR@
+#define PDFT_VERSION_MINOR @CMAKE_PROJECT_VERSION_MINOR@
+#define PDFT_VERSION_PATCH @CMAKE_PROJECT_VERSION_PATCH@
+#define PDFT_BUILD_TYPE @CMAKE_BUILD_TYPE@
+#define PDFT_ASAN @ASAN@
+#define PDFT_TSAN @TSAN@
+#define PDFT_UBSAN @UBSAN@
+#define PDFT_BUILD_TIMESTAMP "@PDFT_BUILD_TIMESTAMP@"
+#define PDFT_GIT_SHA1 "@GIT_SHA1@"
+
+// clang-format on
+
+namespace pdft::utils {
+
+std::string_view getGitCommitSHA1() {
+    return PDFT_GIT_SHA1;
+}
+
+ProjectVersion getProjectVersion() {
+    return {
+        .major = PDFT_VERSION_MAJOR,
+        .minor = PDFT_VERSION_MINOR,
+        .patch = PDFT_VERSION_PATCH,
+    };
+}
+
+std::string_view getBuildTimestamp() {
+    return PDFT_BUILD_TIMESTAMP;
+}
+
+BuildType getBuildType() {
+    using enum BuildType;
+    return PDFT_BUILD_TYPE;
+}
+
+Platform getCurrentPlatform() {
+    using enum Platform;
+
+#if defined(__APPLE__)
+    return MacOS;
+#elif defined(__linux__)
+    return Linux;
+#elif defined(_POSIX_VERSION)
+    return Posix;
+#elif defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__NT__)
+    return Windows;
+#else
+    return Unknown;
+#endif
+}
+
+Toggle isBuiltWithASAN() {
+    using enum Toggle;
+    return PDFT_ASAN;
+}
+
+Toggle isBuiltWithUBSAN() {
+    using enum Toggle;
+    return PDFT_UBSAN;
+}
+
+Toggle isBuiltWithTSAN() {
+    using enum Toggle;
+    return PDFT_TSAN;
+}
+
+// clang-format on
+
+}  // namespace pdft::utils

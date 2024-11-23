@@ -13,6 +13,8 @@ extern "C" {
 
 namespace pdft::media::pdf {
 
+using namespace core::log::exported;
+
 Page::Page(Page&& rhs) : context_(rhs.context_), page_(std::exchange(rhs.page_, nullptr)) {}
 
 Page::~Page() noexcept {
@@ -35,7 +37,7 @@ std::unique_ptr<Image> Page::getImage(const ImageProperties& properties) {
     }
 
     PDFT_VERIFY(pix->w > 0 && pix->h > 0, "loaded an image with negative size");
-    core::log::global()->info("loaded an image {}x{} pixels", pix->w, pix->h);
+    log::info("loaded an image {}x{} pixels", pix->w, pix->h);
 
     if (pix == nullptr) {
         core::fail("fz_new_pixmap_from_page is null");

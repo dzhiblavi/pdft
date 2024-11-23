@@ -6,6 +6,8 @@
 
 namespace pdft::state::app {
 
+using namespace core::log::exported;
+
 void DocumentState::scrollNext(int32_t rows) {
     switch (view_mode_) {
         using enum ViewMode;
@@ -85,7 +87,7 @@ uint32_t DocumentState::getPageCount() const {
 }
 
 void DocumentState::applyScrollOffset(uint32_t height, int32_t pages_per_height) {
-    core::log::global()->info(
+    log::info(
         "applyScrollOffset before: scroll_offset={}, page_index={}", scroll_offset_, page_index_);
 
     if (scroll_offset_ < 0) {
@@ -100,7 +102,7 @@ void DocumentState::applyScrollOffset(uint32_t height, int32_t pages_per_height)
         nextPage(pages_per_height * count);
     }
 
-    core::log::global()->info(
+    log::info(
         "applyScrollOffset after: scroll_offset={}, page_index={}", scroll_offset_, page_index_);
 }
 
@@ -179,8 +181,7 @@ asio::awaitable<void> DocumentState::renderOnePageContinuous(
     view::IRect rect, core::io::OutBuffer& buffer) {
     applyScrollOffset(rect.height, 1);
 
-    core::log::global()->info(
-        "zoom is {}, pad fraction is {}", zoom_, std::fmin(0.47f, 0.30f / zoom_));
+    log::info("zoom is {}, pad fraction is {}", zoom_, std::fmin(0.47f, 0.30f / zoom_));
 
     rect = view::horizontal(
                view::constraints::Fraction{std::fmin(0.47f, 0.30f / zoom_)},

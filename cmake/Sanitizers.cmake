@@ -12,6 +12,7 @@ if(UBSAN)
     message(STATUS "Sanitize with UB Sanitizer (UBSAN)")
     add_compile_options(${UBSAN_COMPILE_FLAGS})
     set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${UBSAN_LINK_FLAGS}")
+    add_compile_definitions(UBSAN_ENABLED)
 endif()
 
 # --------------------------------------------------------------------
@@ -26,6 +27,7 @@ if(ASAN)
     message(STATUS "Sanitize with Address Sanitizer (ASAN)")
     add_compile_options(${ASAN_COMPILE_FLAGS})
     set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${ASAN_LINK_FLAGS}")
+    add_compile_definitions(ASAN_ENABLED)
 endif()
 
 # --------------------------------------------------------------------
@@ -40,4 +42,5 @@ if(TSAN)
     message(STATUS "Sanitize with Thread Sanitizer (TSAN)")
     add_compile_options(${TSAN_COMPILE_FLAGS})
     set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${TSAN_LINK_FLAGS}")
+    add_compile_definitions(TSAN_ENABLED)
 endif()

@@ -2,6 +2,8 @@
 #include "logging.h"
 #include "resolve_apc_executor.h"
 #include "resolve_display.h"
+#include "setup_signal_handlers.h"
+#include "version.h"
 
 #include "pdft/core/io/posix/console.h"
 #include "pdft/core/io/posix/termctl.h"
@@ -20,12 +22,13 @@
 #include "pdft/media/pdf/context.h"
 #include "pdft/media/pdf/document.h"
 
+#include "pdft/utils/build_info.h"
 #include "pdft/utils/visit.h"
-#include "setup_signal_handlers.h"
 
 #include <asio/co_spawn.hpp>
 #include <asio/detached.hpp>
 #include <asio/io_context.hpp>
+#include <magic_enum.hpp>
 
 extern "C" {
 #include <mupdf/fitz/context.h>
@@ -38,6 +41,7 @@ extern "C" {
 namespace app {
 
 using namespace pdft;
+using namespace pdft::core::log::exported;
 using namespace asio::experimental::awaitable_operators;
 
 Application::Application(asio::io_context& context, Config config)
@@ -93,7 +97,7 @@ asio::awaitable<void> Application::prepareTerminal() {
 void Application::loadPaths(const std::vector<std::string>& paths) {
     for (auto path : paths) {
         if (!std::filesystem::exists(path)) {
-            core::log::global()->info("path {} does not exist, skipping", path.c_str());
+            log::info("path {} does not exist, skipping", path.c_str());
             continue;
         }
 
@@ -107,7 +111,7 @@ void Application::loadPaths(const std::vector<std::string>& paths) {
             fs_watcher_->add(path);
         }
 
-        core::log::global()->info("loaded path {}", path.c_str());
+        log::info("loaded path {}", path.c_str());
     }
 }
 
@@ -122,10 +126,21 @@ asio::awaitable<void> Application::runEventLoop() {
         .height = term_size.rows,
     };
 
-    core::log::global()->info("Display size: c={},r={}", term_size.columns, term_size.rows);
+    using namespace utils;
+    using magic_enum::enum_name;
+
+    log::info("PDFT {}", getFullVersionString());
+    log::info(
+        "Platform={}, ASAN={}, TSAN={}, UBSAN={}",
+        enum_name(getCurrentPlatform()),
+        enum_name(isBuiltWithASAN()),
+        enum_name(isBuiltWithTSAN()),
+        enum_name(isBuiltWithUBSAN()));
+
+    log::info("Display size is {}x{} cells", term_size.columns, term_size.rows);
 
     for (;;) {
-        core::log::global()->info("========== NEW FRAME ===========");
+        log::info("========== NEW FRAME ===========");
 
         auto tracer =
             core::trace::getGlobalPool().getTracer(core::trace::stackTraceLogger(), "display_one");
@@ -187,8 +202,7 @@ asio::awaitable<void> Application::cleanup() {
         fs_watcher_->stop();
     }
 
-    core::log::global()->info(
-        "total stack tracer allocations: {}", core::trace::getGlobalPool().numAllocations());
+    log::info("total stack tracer allocations: {}", core::trace::getGlobalPool().numAllocations());
 }
 
 }  // namespace app

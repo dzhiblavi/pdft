@@ -6,6 +6,11 @@ find_package(ZLIB REQUIRED)
 find_package(magic_enum REQUIRED)
 find_package(cppcoro REQUIRED)
 
+add_library(pdft-buildinfo)
+target_include_directories(
+  pdft-buildinfo PUBLIC $<BUILD_INTERFACE:${PDFT_SOURCE_DIR}/include/>)
+target_sources(pdft-buildinfo PRIVATE ${BUILD_INFO_SOURCE_PATH})
+
 add_library(pdft)
 
 target_include_directories(
@@ -15,7 +20,8 @@ target_include_directories(
 
 target_link_libraries(
   pdft
-  PUBLIC asio::asio
+  PUBLIC pdft-buildinfo
+         asio::asio
          aklomp::base64
          spdlog::spdlog
          cpptrace::cpptrace

@@ -1,5 +1,7 @@
 #include "cli_args.h"
 
+#include "version.h"
+
 #include <format>
 #include <tclap/CmdLine.h>
 
@@ -9,7 +11,7 @@ std::expected<CliArgs, std::string> parseCliArgs(std::span<const char*> args) {
     try {
         CliArgs result;
 
-        TCLAP::CmdLine cmd("pdft: A terminal PDF viewer", ' ', "0.0.1");
+        TCLAP::CmdLine cmd("pdft: A terminal PDF viewer", ' ', getFullVersionString());
         TCLAP::ValueArg<std::string> config_param(
             "c", "config-file", "Path to a configuration file", false, "", "path", cmd);
         TCLAP::UnlabeledMultiArg<std::string> paths_param(

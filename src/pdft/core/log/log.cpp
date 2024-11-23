@@ -40,9 +40,13 @@ void setGlobalLogger(std::shared_ptr<spdlog::logger> logger) {
     GlobalLogger::instance().set(std::move(logger));
 }
 
+namespace impl {
+
 LoggerPtr global() {
     PDFT_VERIFY(GlobalLogger::instance().get(), "global logger is not configured");
     return GlobalLogger::instance().get();
 }
+
+}  // namespace impl
 
 }  // namespace pdft::core::log
