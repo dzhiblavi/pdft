@@ -44,8 +44,30 @@ void DisplayBase::clear(core::io::OutBuffer& buffer) {
 
     std::pair<std::string_view, std::string> control_data[] = {
         {"q", "2"},
-        {"a", "d"}, // Action = delete.
-        {"d", "a"}, // Delete all visible placements. Do not free images' data.
+        {"a", "d"},  // Action = delete.
+        {"d", "a"},  // Delete all visible placements. Do not free images' data.
+    };
+
+    executor_->execute(
+        {
+            .command = "_G",
+            .control_data = control_data,
+        },
+        buffer);
+}
+
+void DisplayBase::unload(media::ImageId id, core::io::OutBuffer& buffer) {
+    log::debug("unloading an image with id {} from the display", id);
+
+    auto it = loaded_.find(id);
+    PDFT_VERIFY(it != loaded_.end(), "tried to unload an image with unknown id {}", id);
+    loaded_.erase(it);
+
+    std::pair<std::string_view, std::string> control_data[] = {
+        {"q", "2"},
+        {"a", "d"},  // Action = delete.
+        {"d", "I"},  // Delete an image specified by its id "i".
+        {"i", std::to_string(id)},
     };
 
     executor_->execute(

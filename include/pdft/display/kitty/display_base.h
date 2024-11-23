@@ -25,6 +25,8 @@ class DisplayBase : public display::Display {
 
     void clear(core::io::OutBuffer& buffer) override;
 
+    void unload(media::ImageId id, core::io::OutBuffer& buffer) override;
+
     void unloadAll(core::io::OutBuffer& buffer) override;
 
     bool isLoaded(media::ImageId id) const override;
