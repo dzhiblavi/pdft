@@ -63,3 +63,9 @@ controller:
 
     - command: InvertColors
       keys: i
+
+    - command: IncreaseScalingFactor
+      keys: z=
+
+    - command: DecreaseScalingFactor
+      keys: z-

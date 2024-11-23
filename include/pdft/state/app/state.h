@@ -26,6 +26,7 @@ class State : public state::State {
     void nextLayout(int delta) override;
     void updateZoom(float coeff) override;
     void invertColors() override;
+    void updateScalingFactor(float coeff) override;
 
     std::optional<DocumentId> getCurrentDocumentId() const override;
 
@@ -37,7 +38,7 @@ class State : public state::State {
     std::optional<size_t> idx_ = std::nullopt;
     std::vector<DocumentState> states_;
     std::string current_input_;
-    bool invert_colors_ = false;
+    view::ImageProperties image_properties_;
 };
 
 }  // namespace pdft::state::app

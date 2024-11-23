@@ -31,6 +31,8 @@ class Controller : public controller::Controller {
         ZoomIn,
         ZoomOut,
         InvertColors,
+        IncreaseScalingFactor,
+        DecreaseScalingFactor,
     };
 
     struct KeyMapping {
