@@ -11,13 +11,7 @@ namespace pdft::view::app {
 
 class Renderer : public view::Renderer {
  public:
-    struct Config {
-        bool invert_colors = false;
-        float scaling_factor = 1.0f;
-    };
-
     Renderer(
-        Config config,
         std::shared_ptr<state::DocumentStorage> docs,
         std::shared_ptr<display::Display> display,
         std::shared_ptr<core::terminal::Terminal> terminal);
@@ -26,6 +20,7 @@ class Renderer : public view::Renderer {
         core::io::OutBuffer& buffer,
         const IRect& rect,
         const PagePlacement& placement,
+        const ImageProperties& properties,
         const Page& page) override;
 
     void render(
@@ -35,15 +30,19 @@ class Renderer : public view::Renderer {
         std::string_view text) override;
 
  private:
-    float calcFactor(media::pdf::PageSize page_size);
+    float calcFactor(media::pdf::PageSize page_size, float scaling_factor);
 
-    const Config config_;
+    struct LoadedImage {
+        float cell_wh_ratio;
+        ImageProperties properties;
+    };
+
     const uint32_t image_id_salt_;
     core::terminal::Dimensions term_dims_;
     std::shared_ptr<state::DocumentStorage> docs_;
     std::shared_ptr<display::Display> display_;
     std::shared_ptr<core::terminal::Terminal> terminal_;
-    std::unordered_map<media::ImageId, float> image_ratio_;
+    std::unordered_map<media::ImageId, LoadedImage> loaded_;
 };
 
 }  // namespace pdft::view::app

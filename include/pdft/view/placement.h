@@ -4,6 +4,13 @@
 
 namespace pdft::view {
 
+struct ImageProperties {
+    float scaling_factor = 1.f;
+    bool invert_colors = false;
+
+    bool operator==(const ImageProperties&) const = default;
+};
+
 struct PagePlacement {
     enum class FitMode {
         FitInside,

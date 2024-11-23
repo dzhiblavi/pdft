@@ -24,7 +24,13 @@ asio::awaitable<void> State::render(view::IRect rect, core::io::OutBuffer& buffe
         current_input_);
 
     if (auto state = getState()) {
-        co_await state->render(rects[1], buffer);
+        co_await state->render(
+            rects[1],
+            {
+                .scaling_factor = 1.f,
+                .invert_colors = invert_colors_,
+            },
+            buffer);
 
         renderer_->render(
             buffer,
@@ -116,6 +122,10 @@ DocumentState* State::getState() {
     }
 
     return nullptr;
+}
+
+void State::invertColors() {
+    invert_colors_ = !invert_colors_;
 }
 
 std::optional<DocumentId> State::getCurrentDocumentId() const {

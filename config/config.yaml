@@ -5,10 +5,6 @@ logging:
   directory: ../../../../logs/
   level: Trace
 
-renderer:
-  invert_colors: true
-  scaling_factor: 1.2
-
 controller:
   rows_per_scroll: 15
   zoom_multipler: 1.5
@@ -64,3 +60,6 @@ controller:
 
     - command: ZoomOut
       keys: '-'
+
+    - command: InvertColors
+      keys: i

@@ -30,6 +30,7 @@ class Controller : public controller::Controller {
         PrevLayout,
         ZoomIn,
         ZoomOut,
+        InvertColors,
     };
 
     struct KeyMapping {

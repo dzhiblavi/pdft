@@ -11,6 +11,7 @@ bool DisplayBase::isLoaded(media::ImageId id) const {
 
 asio::awaitable<void> DisplayBase::loadImage(
     media::ImageId id, const media::Image& image, core::io::OutBuffer& buffer) {
+    log::debug("loading an image with id={} to the display", id);
     PDFT_VERIFY(!isLoaded(id), "image with id={} is already loaded", id);
 
     auto image_size = image.size();

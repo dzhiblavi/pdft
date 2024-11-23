@@ -104,25 +104,27 @@ void DocumentState::applyScrollOffset(uint32_t height, int32_t pages_per_height)
         "applyScrollOffset after: scroll_offset={}, page_index={}", scroll_offset_, page_index_);
 }
 
-asio::awaitable<void> DocumentState::render(view::IRect rect, core::io::OutBuffer& buffer) {
+asio::awaitable<void> DocumentState::render(
+    view::IRect rect, const view::ImageProperties& properties, core::io::OutBuffer& buffer) {
     switch (view_mode_) {
         using enum ViewMode;
 
         case OnePage:
-            co_return co_await renderOnePage(rect, buffer);
+            co_return co_await renderOnePage(rect, properties, buffer);
 
         case TwoPages:
-            co_return co_await renderTwoPages(rect, buffer);
+            co_return co_await renderTwoPages(rect, properties, buffer);
 
         case OnePageContinuous:
-            co_return co_await renderOnePageContinuous(rect, buffer);
+            co_return co_await renderOnePageContinuous(rect, properties, buffer);
 
         case TwoPagesContinuous:
-            co_return co_await renderTwoPagesContinuous(rect, buffer);
+            co_return co_await renderTwoPagesContinuous(rect, properties, buffer);
     }
 }
 
-asio::awaitable<void> DocumentState::renderOnePage(view::IRect rect, core::io::OutBuffer& buffer) {
+asio::awaitable<void> DocumentState::renderOnePage(
+    view::IRect rect, const view::ImageProperties& properties, core::io::OutBuffer& buffer) {
     co_await renderer_->render(
         buffer,
         rect,
@@ -130,13 +132,15 @@ asio::awaitable<void> DocumentState::renderOnePage(view::IRect rect, core::io::O
             .hor = view::AxisFit::Center,
             .vert = view::AxisFit::Center,
         },
+        properties,
         {
             .document_id = document_id_,
             .page_index = page_index_,
         });
 }
 
-asio::awaitable<void> DocumentState::renderTwoPages(view::IRect rect, core::io::OutBuffer& buffer) {
+asio::awaitable<void> DocumentState::renderTwoPages(
+    view::IRect rect, const view::ImageProperties& properties, core::io::OutBuffer& buffer) {
     auto rects =
         view::horizontal(
             view::constraints::Fraction{0.15f / zoom_},
@@ -153,6 +157,7 @@ asio::awaitable<void> DocumentState::renderTwoPages(view::IRect rect, core::io::
             .hor = view::AxisFit::Max,
             .vert = view::AxisFit::Center,
         },
+        properties,
         {
             .document_id = document_id_,
             .page_index = page_index_,
@@ -169,6 +174,7 @@ asio::awaitable<void> DocumentState::renderTwoPages(view::IRect rect, core::io::
             .hor = view::AxisFit::Min,
             .vert = view::AxisFit::Center,
         },
+        properties,
         {
             .document_id = document_id_,
             .page_index = page_index_ + 1,
@@ -176,7 +182,7 @@ asio::awaitable<void> DocumentState::renderTwoPages(view::IRect rect, core::io::
 }
 
 asio::awaitable<void> DocumentState::renderOnePageContinuous(
-    view::IRect rect, core::io::OutBuffer& buffer) {
+    view::IRect rect, const view::ImageProperties& properties, core::io::OutBuffer& buffer) {
     applyScrollOffset(rect.height, 1);
 
     log::debug("zoom is {}, pad fraction is {}", zoom_, std::fmin(0.47f, 0.30f / zoom_));
@@ -201,6 +207,7 @@ asio::awaitable<void> DocumentState::renderOnePageContinuous(
             .vert = view::AxisFit::Max,
             .fit = view::PagePlacement::FitMode::CropAndFill,
         },
+        properties,
         {
             .document_id = document_id_,
             .page_index = page_index_,
@@ -218,6 +225,7 @@ asio::awaitable<void> DocumentState::renderOnePageContinuous(
             .vert = view::AxisFit::Min,
             .fit = view::PagePlacement::FitMode::CropAndFill,
         },
+        properties,
         {
             .document_id = document_id_,
             .page_index = page_index_ + 1,
@@ -225,7 +233,7 @@ asio::awaitable<void> DocumentState::renderOnePageContinuous(
 }
 
 asio::awaitable<void> DocumentState::renderTwoPagesContinuous(
-    view::IRect rect, core::io::OutBuffer& buffer) {
+    view::IRect rect, const view::ImageProperties& properties, core::io::OutBuffer& buffer) {
     applyScrollOffset(rect.height, 2);
 
     auto rects =
@@ -253,6 +261,7 @@ asio::awaitable<void> DocumentState::renderTwoPagesContinuous(
             .vert = view::AxisFit::Max,
             .fit = view::PagePlacement::FitMode::CropAndFill,
         },
+        properties,
         {
             .document_id = document_id_,
             .page_index = page_index_,
@@ -270,6 +279,7 @@ asio::awaitable<void> DocumentState::renderTwoPagesContinuous(
             .vert = view::AxisFit::Max,
             .fit = view::PagePlacement::FitMode::CropAndFill,
         },
+        properties,
         {
             .document_id = document_id_,
             .page_index = page_index_ + 1,
@@ -287,6 +297,7 @@ asio::awaitable<void> DocumentState::renderTwoPagesContinuous(
             .vert = view::AxisFit::Min,
             .fit = view::PagePlacement::FitMode::CropAndFill,
         },
+        properties,
         {
             .document_id = document_id_,
             .page_index = page_index_ + 2,
@@ -304,6 +315,7 @@ asio::awaitable<void> DocumentState::renderTwoPagesContinuous(
             .vert = view::AxisFit::Min,
             .fit = view::PagePlacement::FitMode::CropAndFill,
         },
+        properties,
         {
             .document_id = document_id_,
             .page_index = page_index_ + 3,

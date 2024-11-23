@@ -22,6 +22,7 @@ class Renderer {
         core::io::OutBuffer& buffer,
         const IRect& rect,
         const PagePlacement& placement,
+        const ImageProperties& properties,
         const Page& page) = 0;
 
     virtual void render(
