@@ -23,8 +23,11 @@ class DisplayBase : public display::Display {
     asio::awaitable<void> loadImage(
         media::ImageId id, const media::Image& image, core::io::OutBuffer& buffer) override;
 
+    void clear(core::io::OutBuffer& buffer) override;
+
+    void unloadAll(core::io::OutBuffer& buffer) override;
+
     bool isLoaded(media::ImageId id) const override;
-    void clear(core::io::OutBuffer& buffer) const override;
 
  protected:
     std::shared_ptr<core::terminal::Terminal> terminal_;

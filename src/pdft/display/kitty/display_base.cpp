@@ -1,6 +1,7 @@
 #include "pdft/display/kitty/display_base.h"
 
 #include "pdft/core/assert.h"
+#include "pdft/core/log/log.h"
 
 namespace pdft::display::kitty {
 
@@ -38,10 +39,33 @@ asio::awaitable<void> DisplayBase::loadImage(
     co_return;
 }
 
-void DisplayBase::clear(core::io::OutBuffer& buffer) const {
+void DisplayBase::clear(core::io::OutBuffer& buffer) {
+    log::debug("clearing all placements from the display");
+
     std::pair<std::string_view, std::string> control_data[] = {
         {"q", "2"},
-        {"a", "d"},
+        {"a", "d"}, // Action = delete.
+        {"d", "a"}, // Delete all visible placements. Do not free images' data.
+    };
+
+    executor_->execute(
+        {
+            .command = "_G",
+            .control_data = control_data,
+        },
+        buffer);
+}
+
+void DisplayBase::unloadAll(core::io::OutBuffer& buffer) {
+    log::debug("unloading all images from the display");
+    loaded_.clear();
+
+    std::pair<std::string_view, std::string> control_data[] = {
+        {"q", "2"},
+        {"a", "d"},  // Action = delete.
+        {"d", "R"},  // Delete images with ids in [x, y]. Uppercase = remove images' data.
+        {"x", "0"},
+        {"y", std::to_string(std::numeric_limits<uint32_t>::max())},
     };
 
     executor_->execute(

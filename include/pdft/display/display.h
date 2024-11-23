@@ -21,8 +21,10 @@ class Display {
         const view::FRect& image_subarea,
         core::io::OutBuffer& buffer) = 0;
 
+    virtual void clear(core::io::OutBuffer& buffer) = 0;
+    virtual void unloadAll(core::io::OutBuffer& buffer) = 0;
+
     virtual bool isLoaded(media::ImageId id) const = 0;
-    virtual void clear(core::io::OutBuffer& buffer) const = 0;
 };
 
 }  // namespace pdft::display
