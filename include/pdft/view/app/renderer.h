@@ -1,6 +1,6 @@
 #include "pdft/core/terminal/terminal.h"
-#include "pdft/state/document_storage.h"
 #include "pdft/display/display.h"
+#include "pdft/state/document_storage.h"
 #include "pdft/view/renderer.h"
 
 #include <unordered_map>
@@ -12,11 +12,7 @@ class Renderer : public view::Renderer {
     Renderer(
         std::shared_ptr<state::DocumentStorage> docs,
         std::shared_ptr<display::Display> display,
-        std::shared_ptr<core::terminal::Terminal> terminal)
-        : term_dims_(core::terminal::getTerminalDimensions())
-        , docs_(std::move(docs))
-        , display_(std::move(display))
-        , terminal_(std::move(terminal)) {}
+        std::shared_ptr<core::terminal::Terminal> terminal);
 
     asio::awaitable<void> render(
         core::io::OutBuffer& buffer,
@@ -33,6 +29,7 @@ class Renderer : public view::Renderer {
  private:
     float calcFactor(media::pdf::PageSize page_size);
 
+    const uint32_t image_id_salt_;
     core::terminal::Dimensions term_dims_;
     std::shared_ptr<state::DocumentStorage> docs_;
     std::shared_ptr<display::Display> display_;

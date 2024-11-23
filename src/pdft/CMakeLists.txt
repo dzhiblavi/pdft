@@ -36,6 +36,7 @@ target_sources(
   PRIVATE ./utils/base64.cpp
           ./utils/zlib.cpp
           ./utils/get_home_dir.cpp
+          ./utils/random.cpp
           ./view/rect.cpp
           ./view/layout.cpp
           ./view/axis_fit.cpp

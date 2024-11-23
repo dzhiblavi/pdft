@@ -3,10 +3,21 @@
 #include "pdft/core/trace/log.h"
 #include "pdft/core/trace/stack_scope_tracer.h"
 #include "pdft/utils/cantor_pair.h"
+#include "pdft/utils/random.h"
 #include "pdft/view/app/fit_page.h"
 #include "pdft/view/app/fit_text.h"
 
 namespace pdft::view::app {
+
+Renderer::Renderer(
+    std::shared_ptr<state::DocumentStorage> docs,
+    std::shared_ptr<display::Display> display,
+    std::shared_ptr<core::terminal::Terminal> terminal)
+    : image_id_salt_(utils::random<uint32_t>(0))
+    , term_dims_(core::terminal::getTerminalDimensions())
+    , docs_(std::move(docs))
+    , display_(std::move(display))
+    , terminal_(std::move(terminal)) {}
 
 asio::awaitable<void> Renderer::render(
     core::io::OutBuffer& buffer, const IRect& rect, const PagePlacement& place, const Page& page) {
@@ -15,7 +26,7 @@ asio::awaitable<void> Renderer::render(
 
     const auto& [doc_id, page_index] = page;
     const auto& document = docs_->getDocument(doc_id);
-    media::ImageId id = utils::cantorPair(doc_id, page_index + 1);
+    media::ImageId id = image_id_salt_ + utils::cantorPair(doc_id, page_index + 1);
 
     log::debug("rendering a page: doc_id={}, page_index={}, image_id={}", doc_id, page_index, id);
 
