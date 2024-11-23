@@ -1,3 +1,5 @@
+#pragma once
+
 #include "pdft/core/terminal/terminal.h"
 #include "pdft/display/display.h"
 #include "pdft/state/document_storage.h"
@@ -9,7 +11,13 @@ namespace pdft::view::app {
 
 class Renderer : public view::Renderer {
  public:
+    struct Config {
+        bool invert_colors = false;
+        float scaling_factor = 1.0f;
+    };
+
     Renderer(
+        Config config,
         std::shared_ptr<state::DocumentStorage> docs,
         std::shared_ptr<display::Display> display,
         std::shared_ptr<core::terminal::Terminal> terminal);
@@ -29,6 +37,7 @@ class Renderer : public view::Renderer {
  private:
     float calcFactor(media::pdf::PageSize page_size);
 
+    const Config config_;
     const uint32_t image_id_salt_;
     core::terminal::Dimensions term_dims_;
     std::shared_ptr<state::DocumentStorage> docs_;

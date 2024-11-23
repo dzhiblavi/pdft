@@ -10,10 +10,12 @@
 namespace pdft::view::app {
 
 Renderer::Renderer(
+    Config config,
     std::shared_ptr<state::DocumentStorage> docs,
     std::shared_ptr<display::Display> display,
     std::shared_ptr<core::terminal::Terminal> terminal)
-    : image_id_salt_(utils::random<uint32_t>(0))
+    : config_(std::move(config))
+    , image_id_salt_(utils::random<uint32_t>(0))
     , term_dims_(core::terminal::getTerminalDimensions())
     , docs_(std::move(docs))
     , display_(std::move(display))
@@ -46,7 +48,7 @@ asio::awaitable<void> Renderer::render(
         auto image = page.getImage({
             .scale_x = factor,
             .scale_y = factor,
-            .invert_colors = false,
+            .invert_colors = config_.invert_colors,
         });
 
         co_await display_->loadImage(id, *image, buffer);
@@ -103,7 +105,7 @@ float Renderer::calcFactor(media::pdf::PageSize page_size) {
     float fw = dw / pw;
     float fh = dh / ph;
 
-    return std::min(fw, fh);
+    return config_.scaling_factor * std::min(fw, fh);
 }
 
 }  // namespace pdft::view::app

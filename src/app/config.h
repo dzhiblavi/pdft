@@ -3,6 +3,7 @@
 #include "logging.h"
 
 #include "pdft/controller/app/controller.h"
+#include "pdft/view/app/renderer.h"
 
 #include <spdlog/common.h>
 
@@ -19,6 +20,7 @@ struct Config {
     SystemConfig system = {};
     LoggingConfig logging = {};
     pdft::controller::app::Controller::Config controller = {};
+    pdft::view::app::Renderer::Config renderer = {};
 };
 
 }  // namespace app
