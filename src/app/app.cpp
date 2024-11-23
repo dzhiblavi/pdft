@@ -43,6 +43,24 @@ namespace app {
 using namespace pdft;
 using namespace asio::experimental::awaitable_operators;
 
+namespace {
+
+void printAppInfo(const core::terminal::Dimensions& term_size) {
+    using namespace utils;
+    using magic_enum::enum_name;
+
+    log::info("PDFT {}", getFullVersionString());
+    log::info(
+        "Platform={}, ASAN={}, TSAN={}, UBSAN={}",
+        enum_name(getCurrentPlatform()),
+        enum_name(isBuiltWithASAN()),
+        enum_name(isBuiltWithTSAN()),
+        enum_name(isBuiltWithUBSAN()));
+    log::info("Display size is {}x{} cells", term_size.columns, term_size.rows);
+}
+
+}  // namespace
+
 Application::Application(asio::io_context& context, Config config)
     : context_(context)
     , config_(config) {
@@ -52,6 +70,7 @@ Application::Application(asio::io_context& context, Config config)
 void Application::setup() {
     app::setupSignalHandlers();
     app::setupLogging(config_.logging);
+    printAppInfo(term_size_);
 
     pdf_context_ = std::make_shared<media::pdf::Context>(media::pdf::Context::Builder().build());
     app::setupMupdfLogging(*pdf_context_);
@@ -117,29 +136,15 @@ void Application::loadPaths(const std::vector<std::string>& paths) {
 asio::awaitable<void> Application::runEventLoop() {
     // Prepare variables reused in the event loop
     auto buffer = core::io::OutBuffer();
-    auto term_size = core::terminal::getTerminalDimensions();
     auto screen = view::IRect{
         .x = 0,
         .y = 0,
-        .width = term_size.columns,
-        .height = term_size.rows,
+        .width = term_size_.columns,
+        .height = term_size_.rows,
     };
 
-    using namespace utils;
-    using magic_enum::enum_name;
-
-    log::info("PDFT {}", getFullVersionString());
-    log::info(
-        "Platform={}, ASAN={}, TSAN={}, UBSAN={}",
-        enum_name(getCurrentPlatform()),
-        enum_name(isBuiltWithASAN()),
-        enum_name(isBuiltWithTSAN()),
-        enum_name(isBuiltWithUBSAN()));
-
-    log::info("Display size is {}x{} cells", term_size.columns, term_size.rows);
-
     for (;;) {
-        log::info("========== NEW FRAME ===========");
+        log::debug("========== NEW FRAME ===========");
 
         auto tracer =
             core::trace::getGlobalPool().getTracer(core::trace::stackTraceLogger(), "display_one");
@@ -201,7 +206,7 @@ asio::awaitable<void> Application::cleanup() {
         fs_watcher_->stop();
     }
 
-    log::info("total stack tracer allocations: {}", core::trace::getGlobalPool().numAllocations());
+    log::debug("total stack tracer allocations: {}", core::trace::getGlobalPool().numAllocations());
 }
 
 }  // namespace app

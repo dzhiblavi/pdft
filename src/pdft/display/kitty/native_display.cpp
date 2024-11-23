@@ -12,7 +12,7 @@ asio::awaitable<void> NativeDisplay::displayImage(
     PDFT_VERIFY(isLoaded(id));
 
     const auto& [x, y, w, h] = rect;
-    log::info("display @ x={},y={},w={},h={}", x, y, w, h);
+    log::debug("display @ x={},y={},w={},h={}", x, y, w, h);
     PDFT_VERIFY(x >= 0 && y >= 0, "rect offset must not be negative: x={},y={}", x, y);
     PDFT_VERIFY(w >= 0 && h >= 0, "rect dimensions must not be negative: w={},h={}", w, h);
 
@@ -21,18 +21,18 @@ asio::awaitable<void> NativeDisplay::displayImage(
     }
 
     const auto& [rix, riy, riw, rih] = image_subarea;
-    log::info("display I rx={},ry={},rw={},rh={}", rix, riy, riw, rih);
+    log::debug("display I rx={},ry={},rw={},rh={}", rix, riy, riw, rih);
     PDFT_VERIFY(rix >= 0 && riy >= 0, "image offset must not be negative: x={},y={}", rix, riy);
     PDFT_VERIFY(riw > 0 && rih > 0, "image dimensions must be positive: w={},h={}", riw, rih);
 
     const auto& image_size = loaded_[id];
-    log::info("display IS wpx={},hpx={}", image_size.width_px, image_size.height_px);
+    log::debug("display IS wpx={},hpx={}", image_size.width_px, image_size.height_px);
 
     uint32_t iw_px = std::floor(image_size.width_px * riw);
     uint32_t ih_px = std::floor(image_size.height_px * rih);
     uint32_t ix_px = std::floor(iw_px * rix);
     uint32_t iy_px = std::floor(ih_px * riy);
-    log::info("display Ipx xpx={},ypx={},wpx={},hpx={}", ix_px, iy_px, iw_px, ih_px);
+    log::debug("display Ipx xpx={},ypx={},wpx={},hpx={}", ix_px, iy_px, iw_px, ih_px);
 
     // x, y, w, h (pixels) control the subrectangle of the image
     // c, r (columns and rows) control the rectangle at which the image will be displayed

@@ -85,7 +85,7 @@ uint32_t DocumentState::getPageCount() const {
 }
 
 void DocumentState::applyScrollOffset(uint32_t height, int32_t pages_per_height) {
-    log::info(
+    log::debug(
         "applyScrollOffset before: scroll_offset={}, page_index={}", scroll_offset_, page_index_);
 
     if (scroll_offset_ < 0) {
@@ -100,7 +100,7 @@ void DocumentState::applyScrollOffset(uint32_t height, int32_t pages_per_height)
         nextPage(pages_per_height * count);
     }
 
-    log::info(
+    log::debug(
         "applyScrollOffset after: scroll_offset={}, page_index={}", scroll_offset_, page_index_);
 }
 
@@ -179,7 +179,7 @@ asio::awaitable<void> DocumentState::renderOnePageContinuous(
     view::IRect rect, core::io::OutBuffer& buffer) {
     applyScrollOffset(rect.height, 1);
 
-    log::info("zoom is {}, pad fraction is {}", zoom_, std::fmin(0.47f, 0.30f / zoom_));
+    log::debug("zoom is {}, pad fraction is {}", zoom_, std::fmin(0.47f, 0.30f / zoom_));
 
     rect = view::horizontal(
                view::constraints::Fraction{std::fmin(0.47f, 0.30f / zoom_)},

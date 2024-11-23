@@ -17,7 +17,7 @@ asio::awaitable<void> Renderer::render(
     const auto& document = docs_->getDocument(doc_id);
     media::ImageId id = utils::cantorPair(doc_id, page_index + 1);
 
-    log::info("rendering a page: doc_id={}, page_index={}, image_id={}", doc_id, page_index, id);
+    log::debug("rendering a page: doc_id={}, page_index={}, image_id={}", doc_id, page_index, id);
 
     if (!display_->isLoaded(id)) {
         auto _ = trace.addChild("load_image");
@@ -25,7 +25,7 @@ asio::awaitable<void> Renderer::render(
         auto page = document.getPage(page_index);
         auto factor = calcFactor(page.getDefaultSize());
 
-        log::info(
+        log::debug(
             "loading page to display: index={}, doc_id={}, image_id={}, factor={}",
             page_index,
             doc_id,
@@ -51,7 +51,7 @@ asio::awaitable<void> Renderer::render(
         PDFT_VERIFY(image_ratio_.contains(id), "unknown image id={}", id);
 
         auto [x, y, w, h] = rect;
-        log::info("renderer @ x={},y={},w={},h={}", x, y, w, h);
+        log::debug("renderer @ x={},y={},w={},h={}", x, y, w, h);
 
         auto [irect, image] = fitPage(image_ratio_[id], rect, place);
         co_await display_->displayImage(id, irect, image, buffer);
@@ -78,7 +78,7 @@ void Renderer::render(
 }
 
 float Renderer::calcFactor(media::pdf::PageSize page_size) {
-    log::info(
+    log::debug(
         "calc factor for page {}x{}, term {}x{}",
         page_size.width_px,
         page_size.height_px,

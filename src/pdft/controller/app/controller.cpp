@@ -98,7 +98,7 @@ void Controller::bindKey(Command command, std::string_view keys, const Config& c
 }
 
 Action Controller::onKeyEvent(char key) {
-    log::info("controller: key={}", key);
+    log::debug("controller: key={}", key);
 
     switch (key_tree_.feed(key)) {
         using enum KeyTree::Result;
@@ -119,7 +119,7 @@ Action Controller::onKeyEvent(char key) {
 }
 
 Action Controller::onFilesystemEvent(const notify::Event& event) {
-    log::info("controller: fs event on path={}", event.path.c_str());
+    log::debug("controller: fs event on path={}", event.path.c_str());
 
     auto old_id = docs_->getIdByPath(event.path);
     reloadDocument(old_id, event.path);
@@ -127,13 +127,13 @@ Action Controller::onFilesystemEvent(const notify::Event& event) {
 }
 
 void Controller::reloadDocument(state::DocumentId old_id, std::filesystem::path path) {
-    log::info("controller: old_id={}", old_id);
+    log::debug("controller: old_id={}", old_id);
 
     docs_->removeDocument(old_id);
-    log::info("controller: removed document with id={}", old_id);
+    log::debug("controller: removed document with id={}", old_id);
 
     auto new_id = docs_->addDocument(media::pdf::Document::open(docs_->getContext(), path));
-    log::info("controller: added document with id={}", new_id);
+    log::debug("controller: added document with id={}", new_id);
 
     log::info(
         "controller: replaced document with path={} old_id={}, new_id={}",

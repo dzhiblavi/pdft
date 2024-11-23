@@ -97,18 +97,18 @@ class Notify : public notify::Notify {
 
  private:
     static void monitorRunLoop(Notify* self) {
-        core::log::info("start fswatch monitorRunLoop");
+        core::log::debug("start fswatch monitorRunLoop");
 
         while (!self->should_exit_.load(std::memory_order_acquire)) {
             fsw_start_monitor(self->handle_);
         }
 
-        core::log::info("end fswatch monitorRunLoop");
+        core::log::debug("end fswatch monitorRunLoop");
     }
 
     static void processEvents(const fsw_cevent* const events, unsigned count, void* context) {
         auto* self = static_cast<Notify*>(context);
-        core::log::info("received {} events", count);
+        core::log::trace("received {} events", count);
 
         for (unsigned i = 0; i < count; ++i) {
             if (events[i].flags_num > 0 &&
@@ -116,10 +116,10 @@ class Notify : public notify::Notify {
                 continue;
             }
 
-            core::log::info("received an event for path {}", events[i].path);
+            core::log::trace("received an event for path {}", events[i].path);
             for (unsigned j = 0; j < events[i].flags_num; ++j) {
                 auto* flag_name = fsw_get_event_flag_name(events[i].flags[j]);
-                core::log::info("flag #{}: {}", j, flag_name);
+                core::log::trace("flag #{}: {}", j, flag_name);
                 ::free(flag_name);
             }
 

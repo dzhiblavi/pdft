@@ -1,0 +1,62 @@
+system:
+  enable_filesystem_watching: true
+
+logging:
+  directory: ../../../../logs/
+  level: Trace
+
+controller:
+  rows_per_scroll: 15
+  zoom_multipler: 1.5
+
+  key_mappings:
+    - command: Quit
+      keys: q
+
+    - command: Reload
+      keys: r
+
+    - command: ScrollNext
+      keys: j
+
+    - command: ScrollPrev
+      keys: k
+
+    - command: NumNextPage
+      keys: j
+
+    - command: NumPrevPage
+      keys: k
+
+    - command: GoToFirstPage
+      keys: gg
+
+    - command: GoToLastPage
+      keys: G
+
+    - command: NumGoToPage
+      keys: G
+
+    - command: NextDocument
+      keys: l
+
+    - command: PrevDocument
+      keys: h
+
+    - command: NumNextDocument
+      keys: l
+
+    - command: NumPrevDocument
+      keys: h
+
+    - command: NextLayout
+      keys: s
+
+    - command: PrevLayout
+      keys: S
+
+    - command: ZoomIn
+      keys: =
+
+    - command: ZoomOut
+      keys: '-'

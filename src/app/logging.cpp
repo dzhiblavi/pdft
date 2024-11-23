@@ -84,7 +84,6 @@ void setupLogging(const LoggingConfig& config) {
     };
 
     core::log::loadConfig(log_config);
-    log::info("loggers have been successfully initialized");
 }
 
 void warningCallback(void*, const char* message) {
@@ -99,7 +98,7 @@ void setupMupdfLogging(const pdft::media::pdf::Context& context) {
     fz_set_warning_callback(context.native(), warningCallback, nullptr);
     fz_set_error_callback(context.native(), errorCallback, nullptr);
 
-    log::info("mupdf loggers have been successfully initialized");
+    log::debug("mupdf loggers have been successfully initialized");
 }
 
 }  // namespace app

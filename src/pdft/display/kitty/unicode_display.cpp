@@ -14,7 +14,7 @@ asio::awaitable<void> UnicodeDisplay::displayImage(
     PDFT_VERIFY(isLoaded(id));
 
     const auto& [x, y, w, h] = rect;
-    log::info("display @ x={},y={},w={},h={}", x, y, w, h);
+    log::debug("display @ x={},y={},w={},h={}", x, y, w, h);
     PDFT_VERIFY(x >= 0 && y >= 0, "rect offset must not be negative: x={},y={}", x, y);
     PDFT_VERIFY(w >= 0 && h >= 0, "rect dimensions must not be negative: w={},h={}", w, h);
 
@@ -23,19 +23,19 @@ asio::awaitable<void> UnicodeDisplay::displayImage(
     }
 
     const auto& [rix, riy, riw, rih] = image_subarea;
-    log::info("display I rx={},ry={},rw={},rh={}", rix, riy, riw, rih);
+    log::debug("display I rx={},ry={},rw={},rh={}", rix, riy, riw, rih);
     PDFT_VERIFY(rix >= 0 && riy >= 0, "image offset must not be negative: x={},y={}", rix, riy);
     PDFT_VERIFY(riw > 0 && rih > 0, "image dimensions must be positive: w={},h={}", riw, rih);
 
-    log::info("display I rx={},ry={},rw={},rh={}", rix, riy, riw, rih);
+    log::debug("display I rx={},ry={},rw={},rh={}", rix, riy, riw, rih);
 
     uint32_t image_cols = std::roundf(w / riw);
     uint32_t image_rows = std::roundf(h / rih);
-    log::info("display ISZ wc={},hc={}", image_cols, image_rows);
+    log::debug("display ISZ wc={},hc={}", image_cols, image_rows);
 
     uint32_t offset_cols = image_cols * rix;
     uint32_t offset_rows = image_rows * riy;
-    log::info("display IOF c={},r={}", offset_cols, offset_rows);
+    log::debug("display IOF c={},r={}", offset_cols, offset_rows);
 
     std::pair<std::string_view, std::string> control_data[] = {
         {"q", "2"},

@@ -35,7 +35,7 @@ std::unique_ptr<Image> Page::getImage(const ImageProperties& properties) {
     }
 
     PDFT_VERIFY(pix->w > 0 && pix->h > 0, "loaded an image with negative size");
-    log::info("loaded an image {}x{} pixels", pix->w, pix->h);
+    log::debug("loaded an image {}x{} pixels", pix->w, pix->h);
 
     if (pix == nullptr) {
         core::fail("fz_new_pixmap_from_page is null");

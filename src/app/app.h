@@ -44,6 +44,7 @@ class Application {
     std::shared_ptr<pdft::view::Renderer> renderer_;
 
     // State
+    pdft::core::terminal::Dimensions term_size_ = pdft::core::terminal::getTerminalDimensions();
     std::shared_ptr<pdft::state::DocumentStorage> document_storage_;
     std::shared_ptr<pdft::state::State> state_;
 
