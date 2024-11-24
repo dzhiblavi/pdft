@@ -1,6 +1,5 @@
 #pragma once
 
-#include "pdft/state/document_storage.h"
 #include "pdft/view/rect.h"
 #include "pdft/view/renderer.h"
 

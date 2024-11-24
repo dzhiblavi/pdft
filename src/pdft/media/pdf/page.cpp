@@ -13,7 +13,10 @@ extern "C" {
 
 namespace pdft::media::pdf {
 
-Page::Page(Page&& rhs) : context_(rhs.context_), page_(std::exchange(rhs.page_, nullptr)) {}
+Page::Page(Page&& rhs)
+    : page_index_(rhs.page_index_)
+    , context_(rhs.context_)
+    , page_(std::exchange(rhs.page_, nullptr)) {}
 
 Page::~Page() noexcept {
     fz_drop_page(context_.native(), page_);
@@ -65,6 +68,10 @@ PageSize Page::getDefaultSize() const {
         .width_px = rect.x1 - rect.x0,
         .height_px = rect.y1 - rect.y0,
     };
+}
+
+size_t Page::getPageIndex() const {
+    return page_index_;
 }
 
 }  // namespace pdft::media::pdf

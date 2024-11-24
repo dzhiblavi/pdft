@@ -16,7 +16,7 @@ class Document {
     Document(Document&& rhs);
     Document& operator=(Document&&) = delete;
 
-    int pageCount() const;
+    int getPageCount() const;
     Page getPage(int index) const;
     const std::filesystem::path& getPath() const;
 

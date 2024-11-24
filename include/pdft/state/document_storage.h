@@ -2,7 +2,6 @@
 
 #include "pdft/media/pdf/document.h"
 
-#include <cstdint>
 #include <unordered_map>
 
 namespace pdft::state {

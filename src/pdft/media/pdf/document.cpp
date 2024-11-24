@@ -20,7 +20,7 @@ Document::Document(Document&& rhs)
     , path_(std::move(rhs.path_))
     , document_(std::exchange(rhs.document_, nullptr)) {}
 
-int Document::pageCount() const {
+int Document::getPageCount() const {
     auto ctx = context_.native();
     int page_count = 0;
 
@@ -33,7 +33,7 @@ int Document::pageCount() const {
 }
 
 Page Document::getPage(int index) const {
-    assert(index >= 0 && index < pageCount());
+    PDFT_VERIFY(index >= 0 && index < getPageCount());
     auto ctx = context_.native();
     fz_page* page = nullptr;
 
@@ -46,7 +46,7 @@ Page Document::getPage(int index) const {
         core::fail("fz_load_page is null");
     }
 
-    return {context_, page};
+    return {static_cast<size_t>(index), context_, page};
 }
 
 const std::filesystem::path& Document::getPath() const {
