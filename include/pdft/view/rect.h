@@ -1,29 +1,38 @@
 #pragma once
 
+#include <concepts>
 #include <cstdint>
 
 namespace pdft::view {
 
-// A rectangle with integer dimensions
-struct IRect {
-    int32_t x;
-    int32_t y;
-    uint32_t width;
-    uint32_t height;
+template <typename T>
+requires std::integral<T> || std::floating_point<T>
+struct Rect {
+    T x;
+    T y;
+    T width;
+    T height;
 
-    bool operator==(const IRect&) const = default;
+    bool operator==(const Rect&) const = default;
 };
+
+// A rectangle with non-negative integer dimensions
+using IRect = Rect<uint32_t>;
 
 // A rectangle with float dimensions
-struct FRect {
-    float x;
-    float y;
-    float width;
-    float height;
+using FRect = Rect<float>;
 
-    bool operator==(const FRect&) const = default;
-};
+template <typename T>
+requires std::integral<T> || std::floating_point<T>
+Rect<T> offsetRect(const Rect<T>& rect, T x_offset, T y_offset) {
+    const auto& [x, y, w, h] = rect;
 
-IRect offsetRect(const IRect& rect, int32_t x_offset, int32_t y_offset);
+    return IRect{
+        .x = x + x_offset,
+        .y = y + y_offset,
+        .width = w,
+        .height = h,
+    };
+}
 
 }  // namespace pdft::view

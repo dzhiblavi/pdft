@@ -37,7 +37,6 @@ target_sources(
           ./utils/zlib.cpp
           ./utils/get_home_dir.cpp
           ./utils/random.cpp
-          ./view/rect.cpp
           ./view/layout.cpp
           ./view/app/fit_page.cpp
           ./view/app/fit_text.cpp
