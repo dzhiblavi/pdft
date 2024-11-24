@@ -2,7 +2,7 @@
 
 #include <string_view>
 
-namespace pdft::media {
+namespace pdft::display {
 
 using ImageId = uint32_t;
 
@@ -19,4 +19,4 @@ class Image {
     virtual std::string_view samples() const = 0;
 };
 
-}  // namespace pdft::media
+}  // namespace pdft::display

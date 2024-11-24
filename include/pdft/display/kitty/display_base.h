@@ -21,21 +21,21 @@ class DisplayBase : public display::Display {
         , console_(std::move(console)) {}
 
     asio::awaitable<void> loadImage(
-        media::ImageId id, const media::Image& image, core::io::OutBuffer& buffer) override;
+        ImageId id, const Image& image, core::io::OutBuffer& buffer) override;
 
     void clear(core::io::OutBuffer& buffer) override;
 
-    void unload(media::ImageId id, core::io::OutBuffer& buffer) override;
+    void unload(ImageId id, core::io::OutBuffer& buffer) override;
 
     void unloadAll(core::io::OutBuffer& buffer) override;
 
-    bool isLoaded(media::ImageId id) const override;
+    bool isLoaded(ImageId id) const override;
 
  protected:
     std::shared_ptr<core::terminal::Terminal> terminal_;
     std::shared_ptr<core::apc::APCExecutor> executor_;
     std::shared_ptr<core::io::Console> console_;
-    std::unordered_map<media::ImageId, media::ImageSize> loaded_;
+    std::unordered_map<ImageId, ImageSize> loaded_;
 };
 
 }  // namespace pdft::display::kitty

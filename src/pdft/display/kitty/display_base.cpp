@@ -5,12 +5,12 @@
 
 namespace pdft::display::kitty {
 
-bool DisplayBase::isLoaded(media::ImageId id) const {
+bool DisplayBase::isLoaded(ImageId id) const {
     return loaded_.contains(id);
 }
 
 asio::awaitable<void> DisplayBase::loadImage(
-    media::ImageId id, const media::Image& image, core::io::OutBuffer& buffer) {
+    ImageId id, const Image& image, core::io::OutBuffer& buffer) {
     log::debug("loading an image with id={} to the display", id);
     PDFT_VERIFY(!isLoaded(id), "image with id={} is already loaded", id);
 
@@ -57,7 +57,7 @@ void DisplayBase::clear(core::io::OutBuffer& buffer) {
         buffer);
 }
 
-void DisplayBase::unload(media::ImageId id, core::io::OutBuffer& buffer) {
+void DisplayBase::unload(ImageId id, core::io::OutBuffer& buffer) {
     log::debug("unloading an image with id={} from the display", id);
 
     auto it = loaded_.find(id);

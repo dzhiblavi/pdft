@@ -1,5 +1,6 @@
-#include "pdft/media/image.h"
 #include "pdft/media/pdf/context.h"
+
+#include "pdft/display/image.h"
 
 #include <memory>
 
@@ -26,7 +27,7 @@ class Page {
 
     ~Page() noexcept;
 
-    std::unique_ptr<Image> getImage(const ImageProperties& properties);
+    std::unique_ptr<display::Image> getImage(const ImageProperties& properties);
 
     PageSize getDefaultSize() const;
     size_t getPageIndex() const;

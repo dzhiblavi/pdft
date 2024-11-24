@@ -31,7 +31,7 @@ asio::awaitable<void> Renderer::render(
 
     const auto& [doc_id, page_index] = page;
     const auto& document = docs_->getDocument(doc_id);
-    media::ImageId id = image_id_salt_ + utils::cantorPair(doc_id, page_index + 1);
+    auto id = image_id_salt_ + utils::cantorPair(doc_id, page_index + 1);
 
     log::debug("rendering a page: doc_id={}, page_index={}, image_id={}", doc_id, page_index, id);
 

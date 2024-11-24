@@ -22,7 +22,7 @@ Page::~Page() noexcept {
     fz_drop_page(context_.native(), page_);
 }
 
-std::unique_ptr<Image> Page::getImage(const ImageProperties& properties) {
+std::unique_ptr<display::Image> Page::getImage(const ImageProperties& properties) {
     PDFT_VERIFY(properties.scale_x > 0.f, "scale factor should be positive");
     PDFT_VERIFY(properties.scale_y > 0.f, "scale factor should be positive");
 
@@ -52,7 +52,7 @@ std::unique_ptr<Image> Page::getImage(const ImageProperties& properties) {
         }
     }
 
-    return std::unique_ptr<Image>(new PixmapImage(context_, pix));
+    return std::unique_ptr<display::Image>(new PixmapImage(context_, pix));
 }
 
 PageSize Page::getDefaultSize() const {

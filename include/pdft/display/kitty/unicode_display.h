@@ -9,7 +9,7 @@ class UnicodeDisplay : public DisplayBase {
     using DisplayBase::DisplayBase;
 
     asio::awaitable<void> displayImage(
-        media::ImageId id,
+        ImageId id,
         const view::IRect& rect,
         const view::FRect& image_subarea,
         core::io::OutBuffer& buffer) override;
