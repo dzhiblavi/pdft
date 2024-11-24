@@ -36,7 +36,9 @@ asio::awaitable<void> Renderer::render(
     log::debug("rendering a page: doc_id={}, page_index={}, image_id={}", doc_id, page_index, id);
 
     if (auto it = loaded_.find(id); it != loaded_.end() && it->second.properties != properties) {
+        auto _ = trace.addChild("unload_image");
         log::debug("loaded image properties have changed, unloading id={}", id);
+
         display_->unload(id, buffer);
         loaded_.erase(it);
     }

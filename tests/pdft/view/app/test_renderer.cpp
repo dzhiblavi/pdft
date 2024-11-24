@@ -17,6 +17,8 @@ const core::terminal::Dimensions TermSize = {
 
 }  // namespace
 
+// TODO
+
 TEST_CASE("testRendererExample", "") {
     Renderer r(TermSize, {}, {}, {});
 }
