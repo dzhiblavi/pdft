@@ -35,6 +35,7 @@ add_test(./pdft/core/trace/test_stack_scope_tracer.cpp)
 add_test(./pdft/utils/test_intrusive_forward_list.cpp)
 
 add_test(./pdft/view/test_layout.cpp)
+add_test(./pdft/view/test_axis_fit.cpp)
 add_test(./pdft/view/app/test_fit_page.cpp)
 add_test(./pdft/view/app/test_fit_text.cpp)
 add_test(./pdft/view/app/test_renderer.cpp)

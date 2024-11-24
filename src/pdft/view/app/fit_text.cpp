@@ -74,7 +74,7 @@ cppcoro::generator<Line> fitText(
 
     for (auto line : lines(text, rect.width, overflow)) {
         co_yield Line{
-            .x = x + getOffset(max_width, line.size(), hor),
+            .x = x + getOffset<uint32_t>(max_width, line.size(), hor),
             .y = y + line_idx,
             .text = line,
         };

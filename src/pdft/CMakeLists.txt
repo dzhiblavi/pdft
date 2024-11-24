@@ -39,7 +39,6 @@ target_sources(
           ./utils/random.cpp
           ./view/rect.cpp
           ./view/layout.cpp
-          ./view/axis_fit.cpp
           ./view/app/fit_page.cpp
           ./view/app/fit_text.cpp
           ./view/app/renderer.cpp
