@@ -7,7 +7,7 @@
 #include "pdft/core/io/termctl.h"
 #include "pdft/core/terminal/terminal.h"
 #include "pdft/display/display.h"
-#include "pdft/media/mupdf/context.h"
+#include "pdft/notify/notify.h"
 #include "pdft/state/document_storage.h"
 #include "pdft/state/state.h"
 #include "pdft/view/renderer.h"

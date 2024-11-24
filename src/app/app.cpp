@@ -8,12 +8,12 @@
 #include "pdft/core/io/posix/console.h"
 #include "pdft/core/io/posix/termctl.h"
 #include "pdft/core/log/log.h"
-#include "pdft/core/notify/fsw/notify.h"
 #include "pdft/core/terminal/ansi/terminal.h"
 #include "pdft/core/trace/log.h"
 #include "pdft/core/trace/stack_scope_tracer.h"
 
 #include "pdft/controller/app/controller.h"
+#include "pdft/notify/fsw/notify.h"
 #include "pdft/view/app/renderer.h"
 
 #include "pdft/state/app/state.h"

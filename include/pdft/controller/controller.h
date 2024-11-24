@@ -1,6 +1,6 @@
 #pragma once
 
-#include "pdft/core/notify/notify.h"
+#include "pdft/notify/event.h"
 
 namespace pdft::controller {
 

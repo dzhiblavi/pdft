@@ -1,14 +1,12 @@
 #pragma once
 
+#include "pdft/notify/event.h"
+
 #include <filesystem>
 
 #include <asio/awaitable.hpp>
 
 namespace pdft::notify {
-
-struct Event {
-    std::filesystem::path path;
-};
 
 class Notify {
  public:

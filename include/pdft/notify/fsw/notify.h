@@ -1,8 +1,9 @@
 #pragma once
 
+#include "pdft/notify/notify.h"
+
 #include "pdft/core/assert.h"
 #include "pdft/core/log/log.h"
-#include "pdft/core/notify/notify.h"
 #include "pdft/utils/build_info.h"
 
 #include <asio/experimental/channel.hpp>
