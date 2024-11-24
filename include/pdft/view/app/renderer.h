@@ -21,7 +21,7 @@ class Renderer : public view::Renderer {
         core::io::OutBuffer& buffer,
         const IRect& rect,
         const PagePlacement& placement,
-        const ImageProperties& properties,
+        const display::ImageProperties& properties,
         const Page& page) override;
 
     void render(
@@ -35,7 +35,7 @@ class Renderer : public view::Renderer {
 
     struct LoadedImage {
         float cell_wh_ratio;
-        ImageProperties properties;
+        display::ImageProperties properties;
     };
 
     const uint32_t image_id_salt_;

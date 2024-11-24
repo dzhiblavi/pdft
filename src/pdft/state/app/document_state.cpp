@@ -105,7 +105,7 @@ void DocumentState::applyScrollOffset(uint32_t height, int32_t pages_per_height)
 }
 
 asio::awaitable<void> DocumentState::render(
-    view::IRect rect, const view::ImageProperties& properties, core::io::OutBuffer& buffer) {
+    view::IRect rect, const display::ImageProperties& properties, core::io::OutBuffer& buffer) {
     switch (view_mode_) {
         using enum ViewMode;
 
@@ -124,7 +124,7 @@ asio::awaitable<void> DocumentState::render(
 }
 
 asio::awaitable<void> DocumentState::renderOnePage(
-    view::IRect rect, const view::ImageProperties& properties, core::io::OutBuffer& buffer) {
+    view::IRect rect, const display::ImageProperties& properties, core::io::OutBuffer& buffer) {
     co_await renderer_->render(
         buffer,
         rect,
@@ -140,7 +140,7 @@ asio::awaitable<void> DocumentState::renderOnePage(
 }
 
 asio::awaitable<void> DocumentState::renderTwoPages(
-    view::IRect rect, const view::ImageProperties& properties, core::io::OutBuffer& buffer) {
+    view::IRect rect, const display::ImageProperties& properties, core::io::OutBuffer& buffer) {
     auto rects =
         view::horizontal(
             view::constraints::Fraction{0.15f / zoom_},
@@ -182,7 +182,7 @@ asio::awaitable<void> DocumentState::renderTwoPages(
 }
 
 asio::awaitable<void> DocumentState::renderOnePageContinuous(
-    view::IRect rect, const view::ImageProperties& properties, core::io::OutBuffer& buffer) {
+    view::IRect rect, const display::ImageProperties& properties, core::io::OutBuffer& buffer) {
     applyScrollOffset(rect.height, 1);
 
     log::debug("zoom is {}, pad fraction is {}", zoom_, std::fmin(0.47f, 0.30f / zoom_));
@@ -233,7 +233,7 @@ asio::awaitable<void> DocumentState::renderOnePageContinuous(
 }
 
 asio::awaitable<void> DocumentState::renderTwoPagesContinuous(
-    view::IRect rect, const view::ImageProperties& properties, core::io::OutBuffer& buffer) {
+    view::IRect rect, const display::ImageProperties& properties, core::io::OutBuffer& buffer) {
     applyScrollOffset(rect.height, 2);
 
     auto rects =

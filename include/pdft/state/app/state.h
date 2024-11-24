@@ -38,7 +38,7 @@ class State : public state::State {
     std::optional<size_t> idx_ = std::nullopt;
     std::vector<DocumentState> states_;
     std::string current_input_;
-    view::ImageProperties image_properties_;
+    display::ImageProperties image_properties_;
 };
 
 }  // namespace pdft::state::app

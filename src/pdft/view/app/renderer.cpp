@@ -24,7 +24,7 @@ asio::awaitable<void> Renderer::render(
     core::io::OutBuffer& buffer,
     const IRect& rect,
     const PagePlacement& place,
-    const ImageProperties& properties,
+    const display::ImageProperties& properties,
     const Page& page) {
     core::trace::StackScopeTracer trace =
         core::trace::getGlobalPool().getTracer(core::trace::stackTraceLogger(), "render_one");
