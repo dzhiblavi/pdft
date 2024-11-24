@@ -15,7 +15,7 @@ class Page {
  public:
     virtual ~Page() = default;
 
-    virtual std::unique_ptr<display::Image> getImage(
+    virtual std::shared_ptr<display::Image> getImage(
         const display::ImageProperties& properties) const = 0;
 
     virtual PageSize getDefaultSize() const = 0;

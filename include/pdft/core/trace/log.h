@@ -29,15 +29,13 @@ void logStackTrace(const StackScopeTracerBase& info, io::OutBuffer& out) {
             loc.file_name(),
             loc.line()));
 
-    info.children.forEach([&](const auto& child) {
-        logStackTrace<Duration>(child, out);
-    });
+    info.children.forEach([&](const auto& child) { logStackTrace<Duration>(child, out); });
 }
 
 }  // namespace detail
 
 template <typename Duration = std::chrono::milliseconds>
-inline auto stackTraceLogger(log::LoggerPtr logger = log::logger("trace")) {
+inline auto stackTraceLogger(log::LoggerPtr logger = log::global()) {
     return [logger](const StackScopeTracerBase& info) {
         io::OutBuffer out;
         detail::logStackTrace<Duration>(info, out);

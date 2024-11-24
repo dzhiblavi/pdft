@@ -1,5 +1,6 @@
 #include "pdft/core/log/log.h"
 #include "pdft/core/assert.h"
+#include "pdft/core/log/load.h"
 
 #include <spdlog/spdlog.h>
 
@@ -43,7 +44,23 @@ void setGlobalLogger(std::shared_ptr<spdlog::logger> logger) {
 namespace impl {
 
 LoggerPtr global() {
-    PDFT_VERIFY(GlobalLogger::instance().get(), "global logger is not configured");
+    if (!GlobalLogger::instance().get()) {
+        loadLogger(
+            "default",
+            {
+                .level = spdlog::level::trace,
+                .sinks =
+                    {
+                        StdoutSink{
+                            .cerr = true,
+                            .colors = true,
+                        },
+                    },
+            });
+
+        setGlobalLogger(logger("default"));
+    }
+
     return GlobalLogger::instance().get();
 }
 

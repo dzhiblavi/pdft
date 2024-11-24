@@ -9,7 +9,7 @@
 namespace pdft::core::trace {
 
 template <typename Duration = std::chrono::milliseconds>
-inline auto makeLoggingTracer(const char* label, log::LoggerPtr logger = log::logger("trace")) {
+inline auto makeLoggingTracer(const char* label, log::LoggerPtr logger = log::global()) {
     return utils::Overloaded{
         [=](DurationType duration) {
             auto dur = std::chrono::duration_cast<Duration>(duration);

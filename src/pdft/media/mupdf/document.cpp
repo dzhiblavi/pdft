@@ -32,7 +32,7 @@ size_t Document::getPageCount() const {
     return page_count;
 }
 
-std::unique_ptr<media::Page> Document::getPage(int index) const {
+std::shared_ptr<media::Page> Document::getPage(int index) const {
     PDFT_VERIFY(index >= 0 && index < static_cast<int>(getPageCount()));
     auto ctx = context_.native();
     fz_page* page = nullptr;
@@ -46,7 +46,7 @@ std::unique_ptr<media::Page> Document::getPage(int index) const {
         core::fail("fz_load_page is null");
     }
 
-    return std::unique_ptr<media::Page>(new Page(index, context_, page));
+    return std::shared_ptr<media::Page>(new Page(index, context_, page));
 }
 
 const std::filesystem::path& Document::getPath() const {

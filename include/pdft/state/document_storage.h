@@ -10,7 +10,7 @@ using DocumentId = uint32_t;
 
 class DocumentStorage {
  public:
-    DocumentId addDocument(std::unique_ptr<media::Document> document);
+    DocumentId addDocument(std::shared_ptr<media::Document> document);
 
     void removeDocument(DocumentId id);
 
@@ -19,7 +19,7 @@ class DocumentStorage {
     DocumentId getIdByPath(const std::filesystem::path& path) const;
 
  private:
-    std::unordered_map<DocumentId, std::unique_ptr<media::Document>> documents_;
+    std::unordered_map<DocumentId, std::shared_ptr<media::Document>> documents_;
     std::unordered_map<std::string, DocumentId> ids_by_path_;
 };
 

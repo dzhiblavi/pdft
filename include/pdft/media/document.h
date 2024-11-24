@@ -11,7 +11,7 @@ class Document {
     virtual ~Document() = default;
 
     virtual size_t getPageCount() const = 0;
-    virtual std::unique_ptr<Page> getPage(int index) const = 0;
+    virtual std::shared_ptr<Page> getPage(int index) const = 0;
     virtual const std::filesystem::path& getPath() const = 0;
 };
 

@@ -46,6 +46,8 @@ spdlog::sink_ptr loadSink(const SinkConfig& config) {
         });
 }
 
+}  // namespace
+
 void loadLogger(const std::string& name, const LoggerConfig& config) {
     std::vector<spdlog::sink_ptr> sinks;
     sinks.reserve(config.sinks.size());
@@ -61,7 +63,10 @@ void loadLogger(const std::string& name, const LoggerConfig& config) {
             case AsyncBlocking:
             case AsyncOverflow:
                 return std::make_shared<spdlog::async_logger>(
-                    name, sinks.begin(), sinks.end(), spdlog::thread_pool(),
+                    name,
+                    sinks.begin(),
+                    sinks.end(),
+                    spdlog::thread_pool(),
                     config.sync_mode == AsyncBlocking ? block : overrun_oldest);
         }
 
@@ -79,8 +84,6 @@ void loadLogger(const std::string& name, const LoggerConfig& config) {
 
     spdlog::register_logger(logger);
 }
-
-}  // namespace
 
 void loadConfig(const LogConfig& config) {
     spdlog::init_thread_pool(config.thread_pool.queue_size, config.thread_pool.num_threads);

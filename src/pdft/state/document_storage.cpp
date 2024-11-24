@@ -3,7 +3,7 @@
 
 namespace pdft::state {
 
-DocumentId DocumentStorage::addDocument(std::unique_ptr<media::Document> document) {
+DocumentId DocumentStorage::addDocument(std::shared_ptr<media::Document> document) {
     static DocumentId next_id = 0;
 
     auto id = next_id++;
