@@ -5,9 +5,9 @@
 #include <string_view>
 #include <vector>
 
-namespace pdft::core::apc {
+namespace pdft::display::kitty::apc {
 
-struct APC {
+struct Command {
     std::string_view command;
     std::string_view payload = "";
     std::span<std::pair<std::string_view, std::string>> control_data;
@@ -19,10 +19,10 @@ struct APC {
     bool compress = false;
 };
 
-struct APCResponse {
+struct Response {
     std::string command;
     std::string payload;
     std::vector<std::pair<std::string, std::string>> control_data;
 };
 
-}  // namespace pdft::core::apc
+}  // namespace pdft::display::kitty::apc

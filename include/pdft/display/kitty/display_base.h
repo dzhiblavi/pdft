@@ -1,9 +1,10 @@
 #pragma once
 
-#include "pdft/core/apc/apc_executor.h"
+#include "pdft/display/display.h"
+#include "pdft/display/kitty/apc/executor.h"
+
 #include "pdft/core/io/console.h"
 #include "pdft/core/terminal/terminal.h"
-#include "pdft/display/display.h"
 
 #include <memory>
 #include <unordered_map>
@@ -14,7 +15,7 @@ class DisplayBase : public display::Display {
  public:
     DisplayBase(
         std::shared_ptr<core::terminal::Terminal> terminal,
-        std::shared_ptr<core::apc::APCExecutor> executor,
+        std::shared_ptr<apc::Executor> executor,
         std::shared_ptr<core::io::Console> console)
         : terminal_(std::move(terminal))
         , executor_(std::move(executor))
@@ -33,7 +34,7 @@ class DisplayBase : public display::Display {
 
  protected:
     std::shared_ptr<core::terminal::Terminal> terminal_;
-    std::shared_ptr<core::apc::APCExecutor> executor_;
+    std::shared_ptr<apc::Executor> executor_;
     std::shared_ptr<core::io::Console> console_;
     std::unordered_map<ImageId, ImageSize> loaded_;
 };

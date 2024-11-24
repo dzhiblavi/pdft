@@ -1,12 +1,13 @@
-#include "pdft/core/apc/regular/apc_executor.h"
+#include "pdft/display/kitty/apc/tmux/executor.h"
+
 #include "tests/pdft/core/io/mock_console.h"
 #include "tests/pdft/run_coroutine.h"
 
-namespace pdft::core::apc::regular {
+namespace pdft::display::kitty::apc::tmux {
 
 TEST_CASE("testExecuteNoPayload", "") {
-    io::OutBuffer buffer;
-    auto executor = APCExecutor({}, nullptr);
+    core::io::OutBuffer buffer;
+    auto executor = Executor({}, nullptr);
 
     std::pair<std::string_view, std::string> control_data[] = {
         {"m", "1"},
@@ -21,12 +22,12 @@ TEST_CASE("testExecuteNoPayload", "") {
         },
         buffer);
 
-    CHECK(buffer.view() == "\033_Gm=1,a=p,C=1;\033\\");
+    CHECK(buffer.view() == "\033Ptmux;\033\033_Gm=1,a=p,C=1;\a\033\\");
 }
 
 TEST_CASE("testExecuteWithPayload", "") {
-    io::OutBuffer buffer;
-    auto executor = APCExecutor({}, nullptr);
+    core::io::OutBuffer buffer;
+    auto executor = Executor({}, nullptr);
 
     std::pair<std::string_view, std::string> control_data[] = {
         {"m", "1"},
@@ -42,7 +43,7 @@ TEST_CASE("testExecuteWithPayload", "") {
         },
         buffer);
 
-    CHECK(buffer.view() == "\033_Gm=1,a=p,C=1;hello\033\\");
+    CHECK(buffer.view() == "\033Ptmux;\033\033_Gm=1,a=p,C=1;hello\a\033\\");
 }
 
-}  // namespace pdft::core::apc::regular
+}  // namespace pdft::display::kitty::apc::tmux

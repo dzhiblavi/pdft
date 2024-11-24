@@ -1,6 +1,5 @@
 #include "app.h"
 #include "logging.h"
-#include "resolve_apc_executor.h"
 #include "resolve_display.h"
 #include "setup_signal_handlers.h"
 #include "version.h"
@@ -71,10 +70,9 @@ void Application::setup() {
     terminal_ = std::make_shared<core::terminal::ansi::Terminal>();
     console_ = std::make_shared<core::io::posix::Console>(
         context_, ::dup(STDIN_FILENO), ::dup(STDOUT_FILENO));
-    executor_ = resolveAPCExecutor(console_);
 
     document_storage_ = std::make_shared<state::DocumentStorage>();
-    image_display_ = resolveDisplay(terminal_, executor_, console_);
+    image_display_ = resolveDisplay(terminal_, console_);
     renderer_ = std::make_shared<view::app::Renderer>(
         term_size_, document_storage_, image_display_, terminal_);
     state_ = std::make_shared<state::app::State>(

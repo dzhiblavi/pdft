@@ -1,8 +1,8 @@
-#include "pdft/core/apc/parse_response.h"
+#include "pdft/display/kitty/apc/parse_response.h"
 
 #include <catch2/catch_test_macros.hpp>
 
-namespace pdft::core::apc {
+namespace pdft::display::kitty::apc {
 
 TEST_CASE("testParseResponseEmpty", "") {
     auto resp = parseResponse("");
@@ -95,4 +95,4 @@ TEST_CASE("testParseResponseInvalidControlDataNotAKeyValue", "") {
     CHECK(resp.error() == "malformed key-value control data item: AB");
 }
 
-}  // namespace pdft::core::apc
+}  // namespace pdft::display::kitty::apc

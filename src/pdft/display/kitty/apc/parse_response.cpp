@@ -1,8 +1,8 @@
-#include "pdft/core/apc/parse_response.h"
+#include "pdft/display/kitty/apc/parse_response.h"
 
 #include <format>
 
-namespace pdft::core::apc {
+namespace pdft::display::kitty::apc {
 
 namespace {
 
@@ -51,7 +51,7 @@ Result<ControlData> parseControlData(std::string_view control_data) {
 }  // namespace
 
 // \033_Ga=b,c=d;OK\033 and backslash
-Result<APCResponse> parseResponse(std::string_view response) {
+Result<Response> parseResponse(std::string_view response) {
     if (response.size() <= 4) {
         return std::unexpected("too short APC response to be valid");
     }
@@ -80,7 +80,7 @@ Result<APCResponse> parseResponse(std::string_view response) {
         response.substr(end_of_control_data + 1, response.size() - end_of_control_data - 3);
 
     return parseControlData(control_data_view).transform([&](auto control_data) {
-        return APCResponse{
+        return Response{
             .command = std::string(command_view),
             .payload = std::string(payload_view),
             .control_data = std::move(control_data),

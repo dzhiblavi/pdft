@@ -7,7 +7,6 @@ add_executable(
   ./logging.cpp
   ./setup_signal_handlers.cpp
   ./cli_args.cpp
-  ./resolve_apc_executor.cpp
   ./resolve_display.cpp
   ./version.cpp)
 

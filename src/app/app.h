@@ -2,7 +2,6 @@
 
 #include "config.h"
 #include "pdft/controller/controller.h"
-#include "pdft/core/apc/apc_executor.h"
 #include "pdft/core/io/console.h"
 #include "pdft/core/io/termctl.h"
 #include "pdft/core/terminal/terminal.h"
@@ -34,7 +33,6 @@ class Application {
 
     std::shared_ptr<pdft::core::io::TermControl> term_control_;
     std::shared_ptr<pdft::core::terminal::Terminal> terminal_;
-    std::shared_ptr<pdft::core::apc::APCExecutor> executor_;
     std::shared_ptr<pdft::core::io::Console> console_;
     std::shared_ptr<pdft::notify::Notify> fs_watcher_;
 

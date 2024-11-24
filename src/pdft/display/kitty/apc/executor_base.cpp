@@ -1,9 +1,10 @@
-#include "pdft/core/apc/apc_executor_base.h"
-#include "pdft/core/apc/parse_response.h"
+#include "pdft/display/kitty/apc/executor_base.h"
+#include "pdft/display/kitty/apc/parse_response.h"
+
 #include "pdft/utils/base64.h"
 #include "pdft/utils/zlib.h"
 
-namespace pdft::core::apc {
+namespace pdft::display::kitty::apc {
 
 namespace {
 
@@ -20,19 +21,19 @@ std::string_view nextChunk(std::string_view& data, size_t max_chunk_size) {
 }
 
 template <typename Arg>
-void writeControlData(io::OutBuffer& buffer, Arg&& value) {
+void writeControlData(core::io::OutBuffer& buffer, Arg&& value) {
     auto&& [k, v] = value;
     buffer << k << '=' << v;
 }
 
 template <typename Arg, typename... Args>
-void writeControlData(io::OutBuffer& buffer, Arg&& arg, Args&&... rest) {
+void writeControlData(core::io::OutBuffer& buffer, Arg&& arg, Args&&... rest) {
     writeControlData(buffer, std::forward<Arg>(arg));
     buffer << ',';
     writeControlData(buffer, std::forward<Args>(rest)...);
 }
 
-void writeControlData(const APC& apc, io::OutBuffer& buffer) {
+void writeControlData(const Command& apc, core::io::OutBuffer& buffer) {
     for (size_t i = 0; i < apc.control_data.size(); ++i) {
         auto&& [key, value] = apc.control_data[i];
         buffer << key << '=' << value;
@@ -43,7 +44,7 @@ void writeControlData(const APC& apc, io::OutBuffer& buffer) {
     }
 }
 
-std::string_view preparePayload(const APC& apc, std::string& encoded_payload) {
+std::string_view preparePayload(const Command& apc, std::string& encoded_payload) {
     std::string_view payload = apc.payload;
 
     if (apc.compress) {
@@ -61,7 +62,7 @@ std::string_view preparePayload(const APC& apc, std::string& encoded_payload) {
 
 }  // namespace
 
-void APCExecutorBase::execute(const APC& apc, io::OutBuffer& buffer) {
+void ExecutorBase::execute(const Command& apc, core::io::OutBuffer& buffer) {
     std::string encoded_payload;
     auto payload = preparePayload(apc, encoded_payload);
     auto first_chunk = nextChunk(payload, max_chunk_size_);
@@ -93,8 +94,8 @@ void APCExecutorBase::execute(const APC& apc, io::OutBuffer& buffer) {
     }
 }
 
-asio::awaitable<Result<APCResponse>> APCExecutorBase::executeWithResponse(
-    const APC& apc, io::OutBuffer& buffer) {
+asio::awaitable<Result<Response>> ExecutorBase::executeWithResponse(
+    const Command& apc, core::io::OutBuffer& buffer) {
     execute(std::move(apc), buffer);
 
     // Flush command and receive the response
@@ -115,4 +116,4 @@ asio::awaitable<Result<APCResponse>> APCExecutorBase::executeWithResponse(
     co_return parseResponse(in.view());
 }
 
-}  // namespace pdft::core::apc
+}  // namespace pdft::display::kitty::apc

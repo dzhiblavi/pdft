@@ -54,10 +54,10 @@ target_sources(
           ./core/io/posix/terminal.cpp
           ./core/terminal/terminal.cpp
           ./core/terminal/ansi/terminal.cpp
-          ./core/apc/parse_response.cpp
-          ./core/apc/apc_executor_base.cpp
-          ./core/apc/regular/apc_executor.cpp
-          ./core/apc/tmux/apc_executor.cpp
+          ./display/kitty/apc/parse_response.cpp
+          ./display/kitty/apc/executor_base.cpp
+          ./display/kitty/apc/regular/executor.cpp
+          ./display/kitty/apc/tmux/executor.cpp
           ./display/kitty/display_base.cpp
           ./display/kitty/unicode_display.cpp
           ./display/kitty/native_display.cpp

@@ -1,28 +1,28 @@
-#include "pdft/core/apc/apc_executor_base.h"
+#include "pdft/display/kitty/apc/executor_base.h"
 
 #include <catch2/catch_test_macros.hpp>
 
-namespace pdft::core::apc {
+namespace pdft::display::kitty::apc {
 
 namespace {
 
-struct TestExecutor : APCExecutorBase {
-    TestExecutor() : APCExecutorBase({.max_chunk_size_bytes = 4}, nullptr) {}
+struct TestExecutor : ExecutorBase {
+    TestExecutor() : ExecutorBase({.max_chunk_size_bytes = 4}, nullptr) {}
 
  private:
-    void writePrefix(io::OutBuffer& buffer) const override {
-        io::write(buffer, "P");
+    void writePrefix(core::io::OutBuffer& buffer) const override {
+        core::io::write(buffer, "P");
     }
 
-    void writeSuffix(io::OutBuffer& buffer) const override {
-        io::write(buffer, "S");
+    void writeSuffix(core::io::OutBuffer& buffer) const override {
+        core::io::write(buffer, "S");
     }
 };
 
 }  // namespace
 
 TEST_CASE("testExecuteNoControlDataNoPayload", "") {
-    io::OutBuffer buffer;
+    core::io::OutBuffer buffer;
     auto executor = TestExecutor();
 
     executor.execute(
@@ -36,7 +36,7 @@ TEST_CASE("testExecuteNoControlDataNoPayload", "") {
 }
 
 TEST_CASE("testExecuteWithControlDataNoPayload", "") {
-    io::OutBuffer buffer;
+    core::io::OutBuffer buffer;
     auto executor = TestExecutor();
 
     std::pair<std::string_view, std::string> control_data[] = {
@@ -55,7 +55,7 @@ TEST_CASE("testExecuteWithControlDataNoPayload", "") {
 }
 
 TEST_CASE("testExecuteNoControlDataWithPayloadOneChunk", "") {
-    io::OutBuffer buffer;
+    core::io::OutBuffer buffer;
     auto executor = TestExecutor();
 
     executor.execute(
@@ -70,7 +70,7 @@ TEST_CASE("testExecuteNoControlDataWithPayloadOneChunk", "") {
 }
 
 TEST_CASE("testExecuteWithControlDataWithPayloadOneChunk", "") {
-    io::OutBuffer buffer;
+    core::io::OutBuffer buffer;
     auto executor = TestExecutor();
 
     std::pair<std::string_view, std::string> control_data[] = {
@@ -90,7 +90,7 @@ TEST_CASE("testExecuteWithControlDataWithPayloadOneChunk", "") {
 }
 
 TEST_CASE("testExecuteWithControlDataWithPayloadMultipleChunks", "") {
-    io::OutBuffer buffer;
+    core::io::OutBuffer buffer;
     auto executor = TestExecutor();
 
     std::pair<std::string_view, std::string> control_data[] = {
@@ -110,7 +110,7 @@ TEST_CASE("testExecuteWithControlDataWithPayloadMultipleChunks", "") {
 }
 
 TEST_CASE("testExecuteBase64EncodeSingleChunk", "") {
-    io::OutBuffer buffer;
+    core::io::OutBuffer buffer;
     auto executor = TestExecutor();
 
     std::pair<std::string_view, std::string> control_data[] = {
@@ -131,7 +131,7 @@ TEST_CASE("testExecuteBase64EncodeSingleChunk", "") {
 }
 
 TEST_CASE("testExecuteBase64EncodeMultipleChunks", "") {
-    io::OutBuffer buffer;
+    core::io::OutBuffer buffer;
     auto executor = TestExecutor();
 
     std::pair<std::string_view, std::string> control_data[] = {
@@ -151,4 +151,4 @@ TEST_CASE("testExecuteBase64EncodeMultipleChunks", "") {
     CHECK(buffer.view() == "P_Ga=p,C=1,m=1;Ky09SP_Gm=1;YWJjSP_Gm=1;ZCUlSP_Gm=0;JQ==S");
 }
 
-}  // namespace pdft::core::apc
+}  // namespace pdft::display::kitty::apc
