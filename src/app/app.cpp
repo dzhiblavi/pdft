@@ -25,18 +25,10 @@
 #include "pdft/utils/build_info.h"
 #include "pdft/utils/visit.h"
 
-#include <asio/co_spawn.hpp>
-#include <asio/detached.hpp>
-#include <asio/io_context.hpp>
-#include <magic_enum.hpp>
-
-extern "C" {
-#include <mupdf/fitz/context.h>
-}
-
-#include <asio/awaitable.hpp>
 #include <asio/experimental/awaitable_operators.hpp>
-#include <asio/experimental/channel.hpp>
+#include <asio/io_context.hpp>
+
+#include <magic_enum.hpp>
 
 namespace app {
 
