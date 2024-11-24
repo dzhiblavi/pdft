@@ -89,9 +89,7 @@ void Renderer::render(
     const IRect& rect,
     const TextPlacement& placement,
     std::string_view text) {
-    auto lines = fitText(rect, placement, text);
-
-    for (auto line : lines) {
+    for (auto line : fitText(rect, placement, text)) {
         terminal_->moveCursor(
             core::terminal::CursorPosition{
                 .rows = line.y,
