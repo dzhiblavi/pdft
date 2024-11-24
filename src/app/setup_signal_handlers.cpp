@@ -2,6 +2,7 @@
 
 #include "pdft/core/assert.h"
 
+#include <csignal>
 #include <format>
 
 namespace app {
