@@ -12,6 +12,7 @@ namespace pdft::view::app {
 class Renderer : public view::Renderer {
  public:
     Renderer(
+        core::terminal::Dimensions term_size,
         std::shared_ptr<state::DocumentStorage> docs,
         std::shared_ptr<display::Display> display,
         std::shared_ptr<core::terminal::Terminal> terminal);

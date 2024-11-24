@@ -10,11 +10,12 @@
 namespace pdft::view::app {
 
 Renderer::Renderer(
+    core::terminal::Dimensions term_size,
     std::shared_ptr<state::DocumentStorage> docs,
     std::shared_ptr<display::Display> display,
     std::shared_ptr<core::terminal::Terminal> terminal)
     : image_id_salt_(utils::random<uint32_t>(0))
-    , term_dims_(core::terminal::getTerminalDimensions())
+    , term_dims_(term_size)
     , docs_(std::move(docs))
     , display_(std::move(display))
     , terminal_(std::move(terminal)) {}
