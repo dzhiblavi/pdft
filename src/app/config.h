@@ -19,6 +19,7 @@ struct Config {
     SystemConfig system = {};
     LoggingConfig logging = {};
     pdft::controller::app::Controller::Config controller = {};
+    pdft::display::ImageProperties image = {};
 };
 
 }  // namespace app

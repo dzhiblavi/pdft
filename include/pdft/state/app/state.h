@@ -9,9 +9,17 @@ namespace pdft::state::app {
 
 class State : public state::State {
  public:
-    State(std::shared_ptr<DocumentStorage> doc_storage, std::shared_ptr<view::Renderer> renderer)
+    struct Config {
+        display::ImageProperties image_properties = {};
+    };
+
+    State(
+        const Config& config,
+        std::shared_ptr<DocumentStorage> doc_storage,
+        std::shared_ptr<view::Renderer> renderer)
         : doc_storage_(std::move(doc_storage))
-        , renderer_(std::move(renderer)) {}
+        , renderer_(std::move(renderer))
+        , image_properties_(config.image_properties) {}
 
     asio::awaitable<void> render(view::IRect rect, core::io::OutBuffer& buffer) override;
 

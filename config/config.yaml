@@ -5,6 +5,10 @@ logging:
   directory: ../../../../logs/
   level: Trace
 
+image:
+  scaling_factor: 1.1
+  invert_colors: true
+
 controller:
   rows_per_scroll: 15
   zoom_multipler: 1.5
