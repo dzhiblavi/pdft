@@ -200,6 +200,7 @@ asio::awaitable<void> Application::cleanup() {
     {
         auto _ = cleanup.addChild("term_clear");
         terminal_->clear(buffer);
+        image_display_->unloadAll(buffer);
         co_await console_->write(buffer.view());
     }
 
