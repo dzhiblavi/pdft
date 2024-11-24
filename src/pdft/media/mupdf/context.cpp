@@ -1,4 +1,4 @@
-#include "pdft/media/pdf/context.h"
+#include "pdft/media/mupdf/context.h"
 #include "pdft/core/assert.h"
 
 extern "C" {
@@ -9,7 +9,7 @@ extern "C" {
 
 #include <utility>
 
-namespace pdft::media::pdf {
+namespace pdft::media::mupdf {
 
 Context::Builder& Context::Builder::setStorageSize(int size) {
     size_ = size;
@@ -41,4 +41,9 @@ void Context::registerDocumentHandlers() const {
     }
 }
 
-}  // namespace pdft::media::pdf
+Context& thisThreadContext() {
+    thread_local Context context = Context::Builder().build();
+    return context;
+}
+
+}  // namespace pdft::media::mupdf

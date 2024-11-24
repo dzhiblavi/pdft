@@ -1,4 +1,4 @@
-#include "pdft/media/pdf/pixmap_image.h"
+#include "pdft/media/mupdf/pixmap_image.h"
 #include "pdft/core/assert.h"
 
 extern "C" {
@@ -7,7 +7,7 @@ extern "C" {
 
 #include <utility>
 
-namespace pdft::media::pdf {
+namespace pdft::media::mupdf {
 
 PixmapImage::PixmapImage(PixmapImage&& rhs)
     : context_(rhs.context_)
@@ -49,4 +49,4 @@ std::string_view PixmapImage::samples() const {
     };
 }
 
-}  // namespace pdft::media::pdf
+}  // namespace pdft::media::mupdf

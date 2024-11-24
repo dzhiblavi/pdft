@@ -1,6 +1,6 @@
 #pragma once
 
-#include "pdft/media/pdf/context.h"
+#include "pdft/media/mupdf/context.h"
 #include "pdft/utils/get_home_dir.h"
 
 #include <spdlog/common.h>
@@ -24,6 +24,6 @@ struct LoggingConfig {
 
 void setupLogging(const LoggingConfig& config);
 
-void setupMupdfLogging(const pdft::media::pdf::Context& context);
+void setupMupdfLogging(const pdft::media::mupdf::Context& context);
 
 }  // namespace app

@@ -19,8 +19,8 @@
 #include "pdft/state/app/state.h"
 #include "pdft/state/document_storage.h"
 
-#include "pdft/media/pdf/context.h"
-#include "pdft/media/pdf/document.h"
+#include "pdft/media/mupdf/context.h"
+#include "pdft/media/mupdf/document.h"
 
 #include "pdft/utils/build_info.h"
 #include "pdft/utils/visit.h"
@@ -72,9 +72,8 @@ void Application::setup() {
     app::setupLogging(config_.logging);
     printAppInfo(term_size_);
 
-    pdf_context_ = std::make_shared<media::pdf::Context>(media::pdf::Context::Builder().build());
-    app::setupMupdfLogging(*pdf_context_);
-    pdf_context_->registerDocumentHandlers();
+    app::setupMupdfLogging(media::mupdf::thisThreadContext());
+    media::mupdf::thisThreadContext().registerDocumentHandlers();
 
     term_control_ = std::make_shared<core::io::posix::TermControl>();
     terminal_ = std::make_shared<core::terminal::ansi::Terminal>();
@@ -82,7 +81,7 @@ void Application::setup() {
         context_, ::dup(STDIN_FILENO), ::dup(STDOUT_FILENO));
     executor_ = resolveAPCExecutor(console_);
 
-    document_storage_ = std::make_shared<state::DocumentStorage>(pdf_context_);
+    document_storage_ = std::make_shared<state::DocumentStorage>();
     image_display_ = resolveDisplay(terminal_, executor_, console_);
     renderer_ = std::make_shared<view::app::Renderer>(
         term_size_, document_storage_, image_display_, terminal_);
@@ -122,8 +121,10 @@ void Application::loadPaths(const std::vector<std::string>& paths) {
 
         path = std::filesystem::absolute(path);
 
-        auto doc_id =
-            document_storage_->addDocument(media::pdf::Document::open(*pdf_context_, path));
+        auto document = media::mupdf::Document::open(media::mupdf::thisThreadContext(), path);
+        auto doc_id = document_storage_->addDocument(
+            std::unique_ptr<media::Document>(new media::mupdf::Document(std::move(document))));
+
         state_->addDocument(doc_id);
 
         if (config_.system.enable_filesystem_watching) {

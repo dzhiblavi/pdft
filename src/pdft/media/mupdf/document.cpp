@@ -1,15 +1,15 @@
-#include "pdft/media/pdf/document.h"
+#include "pdft/media/mupdf/document.h"
 #include "pdft/core/assert.h"
+#include "pdft/media/mupdf/page.h"
 
 extern "C" {
 #include <mupdf/fitz/archive.h>
 #include <mupdf/fitz/document.h>
 }
 
-#include <filesystem>
 #include <format>
 
-namespace pdft::media::pdf {
+namespace pdft::media::mupdf {
 
 Document::~Document() noexcept {
     fz_drop_document(context_.native(), document_);
@@ -20,7 +20,7 @@ Document::Document(Document&& rhs)
     , path_(std::move(rhs.path_))
     , document_(std::exchange(rhs.document_, nullptr)) {}
 
-int Document::getPageCount() const {
+size_t Document::getPageCount() const {
     auto ctx = context_.native();
     int page_count = 0;
 
@@ -32,8 +32,8 @@ int Document::getPageCount() const {
     return page_count;
 }
 
-Page Document::getPage(int index) const {
-    PDFT_VERIFY(index >= 0 && index < getPageCount());
+std::unique_ptr<media::Page> Document::getPage(int index) const {
+    PDFT_VERIFY(index >= 0 && index < static_cast<int>(getPageCount()));
     auto ctx = context_.native();
     fz_page* page = nullptr;
 
@@ -46,7 +46,7 @@ Page Document::getPage(int index) const {
         core::fail("fz_load_page is null");
     }
 
-    return {static_cast<size_t>(index), context_, page};
+    return std::unique_ptr<media::Page>(new Page(index, context_, page));
 }
 
 const std::filesystem::path& Document::getPath() const {
@@ -69,4 +69,4 @@ Document Document::open(Context& context, const std::filesystem::path& path) {
     return {context, path, doc};
 }
 
-}  // namespace pdft::media::pdf
+}  // namespace pdft::media::mupdf

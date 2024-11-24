@@ -7,7 +7,7 @@
 #include "pdft/core/io/termctl.h"
 #include "pdft/core/terminal/terminal.h"
 #include "pdft/display/display.h"
-#include "pdft/media/pdf/context.h"
+#include "pdft/media/mupdf/context.h"
 #include "pdft/state/document_storage.h"
 #include "pdft/state/state.h"
 #include "pdft/view/renderer.h"
@@ -32,7 +32,6 @@ class Application {
     asio::io_context& context_;
     Config config_;
 
-    std::shared_ptr<pdft::media::pdf::Context> pdf_context_;
     std::shared_ptr<pdft::core::io::TermControl> term_control_;
     std::shared_ptr<pdft::core::terminal::Terminal> terminal_;
     std::shared_ptr<pdft::core::apc::APCExecutor> executor_;

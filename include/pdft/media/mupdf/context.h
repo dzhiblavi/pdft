@@ -2,7 +2,7 @@
 
 struct fz_context;
 
-namespace pdft::media::pdf {
+namespace pdft::media::mupdf {
 
 class Context {
  public:
@@ -36,4 +36,6 @@ class Context {
     fz_context* context_ = nullptr;
 };
 
-}  // namespace pdft::media::pdf
+Context& thisThreadContext();
+
+}  // namespace pdft::media::mupdf

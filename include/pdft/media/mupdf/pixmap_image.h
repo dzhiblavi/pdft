@@ -1,18 +1,19 @@
 #pragma once
 
-#include "pdft/media/pdf/context.h"
+#include "pdft/media/mupdf/context.h"
 
 #include "pdft/display/image.h"
 
 struct fz_pixmap;
 
-namespace pdft::media::pdf {
+namespace pdft::media::mupdf {
 
 class PixmapImage : public display::Image {
  public:
     PixmapImage(PixmapImage&&);
     PixmapImage& operator=(PixmapImage&&) = delete;
-    ~PixmapImage() noexcept;
+
+    ~PixmapImage() noexcept override;
 
     display::ImageSize size() const override;
     std::string_view samples() const override;

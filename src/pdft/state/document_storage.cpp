@@ -3,11 +3,11 @@
 
 namespace pdft::state {
 
-DocumentId DocumentStorage::addDocument(media::pdf::Document document) {
+DocumentId DocumentStorage::addDocument(std::unique_ptr<media::Document> document) {
     static DocumentId next_id = 0;
 
     auto id = next_id++;
-    ids_by_path_.emplace(document.getPath(), id);
+    ids_by_path_.emplace(document->getPath(), id);
     documents_.emplace(id, std::move(document));
     return id;
 }
@@ -15,14 +15,14 @@ DocumentId DocumentStorage::addDocument(media::pdf::Document document) {
 void DocumentStorage::removeDocument(DocumentId id) {
     auto it = documents_.find(id);
     PDFT_VERIFY(it != documents_.end(), "trying to delete an unknown document with id={}", id);
-    ids_by_path_.erase(it->second.getPath());
+    ids_by_path_.erase(it->second->getPath());
     documents_.erase(it);
 }
 
-const media::pdf::Document& DocumentStorage::getDocument(DocumentId id) const {
+const media::Document& DocumentStorage::getDocument(DocumentId id) const {
     auto it = documents_.find(id);
     PDFT_VERIFY(it != documents_.end(), "trying to get an unknown document with id={}", id);
-    return it->second;
+    return *it->second;
 }
 
 DocumentId DocumentStorage::getIdByPath(const std::filesystem::path& path) const {
@@ -30,10 +30,6 @@ DocumentId DocumentStorage::getIdByPath(const std::filesystem::path& path) const
     PDFT_VERIFY(
         it != ids_by_path_.end(), "no document with exists with this path={}", path.c_str());
     return it->second;
-}
-
-media::pdf::Context& DocumentStorage::getContext() const {
-    return *context_;
 }
 
 }  // namespace pdft::state

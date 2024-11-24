@@ -31,7 +31,7 @@ class Renderer : public view::Renderer {
         std::string_view text) override;
 
  private:
-    float calcFactor(media::pdf::PageSize page_size, float scaling_factor);
+    float calcFactor(media::PageSize page_size, float scaling_factor);
 
     struct LoadedImage {
         float cell_wh_ratio;

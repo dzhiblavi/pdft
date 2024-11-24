@@ -61,7 +61,7 @@ target_sources(
           ./display/kitty/display_base.cpp
           ./display/kitty/unicode_display.cpp
           ./display/kitty/native_display.cpp
-          ./media/pdf/context.cpp
-          ./media/pdf/document.cpp
-          ./media/pdf/page.cpp
-          ./media/pdf/pixmap_image.cpp)
+          ./media/mupdf/context.cpp
+          ./media/mupdf/document.cpp
+          ./media/mupdf/page.cpp
+          ./media/mupdf/pixmap_image.cpp)

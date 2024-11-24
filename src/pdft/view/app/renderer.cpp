@@ -47,7 +47,7 @@ asio::awaitable<void> Renderer::render(
         auto _ = trace.addChild("load_image");
 
         auto page = document.getPage(page_index);
-        auto factor = calcFactor(page.getDefaultSize(), properties.scaling_factor);
+        auto factor = calcFactor(page->getDefaultSize(), properties.scaling_factor);
 
         log::debug(
             "loading page to display: index={}, doc_id={}, image_id={}, factor={}",
@@ -56,9 +56,8 @@ asio::awaitable<void> Renderer::render(
             id,
             factor);
 
-        auto image = page.getImage({
-            .scale_x = factor,
-            .scale_y = factor,
+        auto image = page->getImage({
+            .scaling_factor = factor,
             .invert_colors = properties.invert_colors,
         });
 
@@ -104,7 +103,7 @@ void Renderer::render(
     }
 }
 
-float Renderer::calcFactor(media::pdf::PageSize page_size, float scaling_factor) {
+float Renderer::calcFactor(media::PageSize page_size, float scaling_factor) {
     float dw = term_dims_.width_px;
     float dh = term_dims_.height_px;
     auto [pw, ph] = page_size;

@@ -1,24 +1,22 @@
 #pragma once
 
-#include "pdft/media/pdf/context.h"
-#include "pdft/media/pdf/page.h"
-
-#include <filesystem>
+#include "pdft/media/document.h"
+#include "pdft/media/mupdf/context.h"
 
 struct fz_document;
 
-namespace pdft::media::pdf {
+namespace pdft::media::mupdf {
 
-class Document {
+class Document : public media::Document {
  public:
-    ~Document() noexcept;
-
     Document(Document&& rhs);
     Document& operator=(Document&&) = delete;
 
-    int getPageCount() const;
-    Page getPage(int index) const;
-    const std::filesystem::path& getPath() const;
+    ~Document() noexcept override;
+
+    size_t getPageCount() const override;
+    std::unique_ptr<media::Page> getPage(int index) const override;
+    const std::filesystem::path& getPath() const override;
 
     static Document open(Context& context, const std::filesystem::path& path);
 
@@ -33,4 +31,4 @@ class Document {
     fz_document* document_ = nullptr;
 };
 
-}  // namespace pdft::media::pdf
+}  // namespace pdft::media::mupdf

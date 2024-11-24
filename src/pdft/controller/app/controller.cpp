@@ -1,6 +1,7 @@
 #include "pdft/controller/app/controller.h"
 
 #include "pdft/core/log/log.h"
+#include "pdft/media/mupdf/document.h"
 
 namespace pdft::controller::app {
 
@@ -144,7 +145,10 @@ void Controller::reloadDocument(state::DocumentId old_id, std::filesystem::path 
     docs_->removeDocument(old_id);
     log::debug("controller: removed document with id={}", old_id);
 
-    auto new_id = docs_->addDocument(media::pdf::Document::open(docs_->getContext(), path));
+    auto document = media::mupdf::Document::open(media::mupdf::thisThreadContext(), path);
+    auto new_id = docs_->addDocument(
+        std::unique_ptr<media::Document>(new media::mupdf::Document(std::move(document))));
+
     log::debug("controller: added document with id={}", new_id);
 
     log::info(

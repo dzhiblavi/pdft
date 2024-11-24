@@ -1,7 +1,8 @@
-#include "pdft/media/pdf/page.h"
+#include "pdft/media/mupdf/page.h"
+#include "pdft/media/mupdf/pixmap_image.h"
+
 #include "pdft/core/assert.h"
 #include "pdft/core/log/log.h"
-#include "pdft/media/pdf/pixmap_image.h"
 
 extern "C" {
 #include <mupdf/fitz/archive.h>
@@ -11,7 +12,7 @@ extern "C" {
 
 #include <utility>
 
-namespace pdft::media::pdf {
+namespace pdft::media::mupdf {
 
 Page::Page(Page&& rhs)
     : page_index_(rhs.page_index_)
@@ -22,15 +23,14 @@ Page::~Page() noexcept {
     fz_drop_page(context_.native(), page_);
 }
 
-std::unique_ptr<display::Image> Page::getImage(const ImageProperties& properties) {
-    PDFT_VERIFY(properties.scale_x > 0.f, "scale factor should be positive");
-    PDFT_VERIFY(properties.scale_y > 0.f, "scale factor should be positive");
+std::unique_ptr<display::Image> Page::getImage(const display::ImageProperties& properties) const {
+    PDFT_VERIFY(properties.scaling_factor > 0.f, "scale factor should be positive");
 
     auto ctx = context_.native();
     fz_pixmap* pix = nullptr;
 
-    fz_matrix ctm = fz_scale(properties.scale_x, properties.scale_y);
-    ctm = fz_pre_rotate(ctm, properties.rotation_degrees);
+    fz_matrix ctm = fz_scale(properties.scaling_factor, properties.scaling_factor);
+    ctm = fz_pre_rotate(ctm, 0.f);
 
     fz_try(ctx) pix = fz_new_pixmap_from_page(ctx, page_, ctm, fz_device_rgb(ctx), /* alpha= */ 0);
     fz_catch(ctx) {
@@ -74,4 +74,4 @@ size_t Page::getPageIndex() const {
     return page_index_;
 }
 
-}  // namespace pdft::media::pdf
+}  // namespace pdft::media::mupdf
