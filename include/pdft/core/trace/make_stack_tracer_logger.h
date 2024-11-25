@@ -3,6 +3,7 @@
 #include "pdft/core/io/buffer.h"
 #include "pdft/core/log/log.h"
 #include "pdft/core/trace/detail/duration_suffix.h"
+#include "pdft/core/trace/logger.h"
 #include "pdft/core/trace/stack_scope_tracer.h"
 
 namespace pdft::core::trace {
@@ -35,7 +36,7 @@ void logStackTrace(const StackScopeTracerBase& info, io::OutBuffer& out) {
 }  // namespace detail
 
 template <typename Duration = std::chrono::milliseconds>
-inline auto stackTraceLogger(log::LoggerPtr logger = log::global()) {
+auto makeStackTraceLogger(log::LoggerPtr logger = trace::logger()) {
     return [logger](const StackScopeTracerBase& info) {
         io::OutBuffer out;
         detail::logStackTrace<Duration>(info, out);

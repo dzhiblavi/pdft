@@ -6,7 +6,7 @@
 #include "pdft/core/io/posix/console.h"
 #include "pdft/core/io/posix/termctl.h"
 #include "pdft/core/log/log.h"
-#include "pdft/core/trace/log.h"
+#include "pdft/core/trace/make_stack_tracer_logger.h"
 #include "pdft/core/trace/stack_scope_tracer.h"
 #include "pdft/tui/terminal/ansi/terminal.h"
 
@@ -155,8 +155,8 @@ asio::awaitable<void> Application::runEventLoop() {
             .buffer = buffer,
         };
 
-        auto tracer =
-            core::trace::getGlobalPool().getTracer(core::trace::stackTraceLogger(), "display_one");
+        auto tracer = core::trace::getGlobalPool().getTracer(
+            core::trace::makeStackTraceLogger(), "display_one");
 
         core::io::clear(buffer);
         terminal_->clear(buffer);
@@ -204,7 +204,7 @@ asio::awaitable<void> Application::runEventLoop() {
 
 asio::awaitable<void> Application::cleanup() {
     auto cleanup = core::trace::getGlobalPool().getTracer(
-        core::trace::stackTraceLogger<std::chrono::microseconds>(), "cleanup");
+        core::trace::makeStackTraceLogger<std::chrono::microseconds>(), "cleanup");
 
     core::io::OutBuffer buffer;
     {

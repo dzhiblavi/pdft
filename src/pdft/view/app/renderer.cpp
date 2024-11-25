@@ -1,6 +1,6 @@
 #include "pdft/view/app/renderer.h"
 
-#include "pdft/core/trace/log.h"
+#include "pdft/core/trace/make_stack_tracer_logger.h"
 #include "pdft/core/trace/stack_scope_tracer.h"
 #include "pdft/utils/cantor_pair.h"
 #include "pdft/utils/random.h"
@@ -23,7 +23,7 @@ asio::awaitable<void> Renderer::render(
     const Page& page,
     tui::Context& ctx) {
     core::trace::StackScopeTracer trace =
-        core::trace::getGlobalPool().getTracer(core::trace::stackTraceLogger(), "render_one");
+        core::trace::getGlobalPool().getTracer(core::trace::makeStackTraceLogger(), "render_one");
 
     const auto& [doc_id, page_index] = page;
     const auto& document = docs_->getDocument(doc_id);
