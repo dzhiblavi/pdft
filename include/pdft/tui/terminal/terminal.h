@@ -15,7 +15,7 @@ struct Dimensions {
     uint32_t cell_height_px;
     uint32_t cell_width_px;
 
-    layout::IRect rect() {
+    layout::IRect rect() const {
         return {
             .width = columns,
             .height = rows,
