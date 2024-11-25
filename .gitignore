@@ -49,3 +49,5 @@ bazel-*
 # Test assets
 assets/
 logs/
+
+include/pdft/tui
