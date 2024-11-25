@@ -4,11 +4,11 @@
 #include "pdft/controller/controller.h"
 #include "pdft/core/io/console.h"
 #include "pdft/core/io/termctl.h"
-#include "pdft/core/terminal/terminal.h"
-#include "pdft/display/display.h"
 #include "pdft/notify/notify.h"
 #include "pdft/state/document_storage.h"
 #include "pdft/state/state.h"
+#include "pdft/tui/display/display.h"
+#include "pdft/tui/terminal/terminal.h"
 #include "pdft/view/renderer.h"
 
 #include <asio/awaitable.hpp>
@@ -32,16 +32,16 @@ class Application {
     Config config_;
 
     std::shared_ptr<pdft::core::io::TermControl> term_control_;
-    std::shared_ptr<pdft::core::terminal::Terminal> terminal_;
+    std::shared_ptr<pdft::tui::terminal::Terminal> terminal_;
     std::shared_ptr<pdft::core::io::Console> console_;
     std::shared_ptr<pdft::notify::Notify> fs_watcher_;
 
     // View
-    std::shared_ptr<pdft::display::Display> image_display_;
+    std::shared_ptr<pdft::tui::display::Display> image_display_;
     std::shared_ptr<pdft::view::Renderer> renderer_;
 
     // State
-    pdft::core::terminal::Dimensions term_size_ = pdft::core::terminal::getTerminalDimensions();
+    pdft::tui::terminal::Dimensions term_size_ = pdft::tui::terminal::getTerminalDimensions();
     std::shared_ptr<pdft::state::DocumentStorage> document_storage_;
     std::shared_ptr<pdft::state::State> state_;
 

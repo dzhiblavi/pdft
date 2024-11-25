@@ -1,6 +1,6 @@
 #pragma once
 
-#include "pdft/display/image.h"
+#include "pdft/image/image.h"
 
 #include <memory>
 
@@ -15,8 +15,8 @@ class Page {
  public:
     virtual ~Page() = default;
 
-    virtual std::shared_ptr<display::Image> getImage(
-        const display::ImageProperties& properties) const = 0;
+    virtual std::shared_ptr<image::Image> getImage(
+        const image::ImageProperties& properties) const = 0;
 
     virtual PageSize getDefaultSize() const = 0;
     virtual size_t getPageIndex() const = 0;

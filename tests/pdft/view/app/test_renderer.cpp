@@ -1,10 +1,10 @@
 #include "pdft/view/app/renderer.h"
 
-#include "tests/pdft/display/mock_display.h"
-#include "tests/pdft/display/mock_image.h"
+#include "tests/pdft/image/mock_image.h"
 #include "tests/pdft/media/document.h"
 #include "tests/pdft/media/page.h"
 #include "tests/pdft/run_coroutine.h"
+#include "tests/pdft/tui/display/mock_display.h"
 
 #include <catch2/catch_test_macros.hpp>
 
@@ -21,7 +21,7 @@ const core::terminal::Dimensions TermSize = {
     .cell_width_px = 1920 / 200,
 };
 
-const IRect Rect = {
+const tui::layout::IRect Rect = {
     .x = 10,
     .y = 20,
     .width = 30,
@@ -44,8 +44,9 @@ struct TestRenderer {
     std::shared_ptr<media::mock::Document> doc = std::make_shared<media::mock::Document>();
     std::shared_ptr<media::mock::Page> page = std::make_shared<media::mock::Page>();
     std::shared_ptr<state::DocumentStorage> docs = std::make_shared<state::DocumentStorage>();
-    std::shared_ptr<display::mock::Display> display = std::make_shared<display::mock::Display>();
-    std::shared_ptr<display::mock::Image> image = std::make_shared<display::mock::Image>();
+    std::shared_ptr<tui::display::mock::Display> display =
+        std::make_shared<tui::display::mock::Display>();
+    std::shared_ptr<image::mock::Image> image = std::make_shared<image::mock::Image>();
     state::DocumentId doc_id;
     core::io::OutBuffer buffer;
     Renderer renderer = Renderer(TermSize, docs, display, {});

@@ -31,7 +31,7 @@ PixmapImage::~PixmapImage() noexcept {
     fz_drop_pixmap(context_.native(), pixmap_);
 }
 
-display::ImageSize PixmapImage::size() const {
+image::ImageSize PixmapImage::size() const {
     PDFT_VERIFY(pixmap_ != nullptr, "invalid pixmap image");
 
     return {

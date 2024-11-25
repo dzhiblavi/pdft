@@ -37,9 +37,7 @@ target_sources(
           ./utils/zlib.cpp
           ./utils/get_home_dir.cpp
           ./utils/random.cpp
-          ./view/layout.cpp
-          ./view/app/fit_page.cpp
-          ./view/app/fit_text.cpp
+          # ./view/layout.cpp ./view/app/fit_page.cpp ./view/app/fit_text.cpp
           ./view/app/renderer.cpp
           ./state/app/state.cpp
           ./state/app/document_state.cpp
@@ -52,16 +50,18 @@ target_sources(
           ./core/trace/stack_scope_tracer.cpp
           ./core/io/posix/console.cpp
           ./core/io/posix/terminal.cpp
-          ./core/terminal/terminal.cpp
-          ./core/terminal/ansi/terminal.cpp
-          ./display/kitty/apc/parse_response.cpp
-          ./display/kitty/apc/executor_base.cpp
-          ./display/kitty/apc/regular/executor.cpp
-          ./display/kitty/apc/tmux/executor.cpp
-          ./display/kitty/display_base.cpp
-          ./display/kitty/unicode_display.cpp
-          ./display/kitty/native_display.cpp
           ./media/mupdf/context.cpp
           ./media/mupdf/document.cpp
           ./media/mupdf/page.cpp
-          ./media/mupdf/pixmap_image.cpp)
+          ./media/mupdf/pixmap_image.cpp
+          ./tui/layout/layout.cpp
+          ./tui/image/fit_image.cpp
+          ./tui/display/kitty/apc/parse_response.cpp
+          ./tui/display/kitty/apc/executor_base.cpp
+          ./tui/display/kitty/apc/regular/executor.cpp
+          ./tui/display/kitty/apc/tmux/executor.cpp
+          ./tui/display/kitty/display_base.cpp
+          ./tui/display/kitty/unicode_display.cpp
+          ./tui/display/kitty/native_display.cpp
+          ./tui/terminal/terminal.cpp
+          ./tui/terminal/ansi/terminal.cpp)

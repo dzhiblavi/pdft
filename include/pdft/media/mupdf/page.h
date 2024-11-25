@@ -2,7 +2,7 @@
 
 #include "pdft/media/mupdf/context.h"
 
-#include "pdft/display/image.h"
+#include "pdft/image/image.h"
 #include "pdft/media/page.h"
 
 struct fz_page;
@@ -16,8 +16,7 @@ class Page : public media::Page {
 
     ~Page() noexcept override;
 
-    std::shared_ptr<display::Image> getImage(
-        const display::ImageProperties& properties) const override;
+    std::shared_ptr<image::Image> getImage(const image::ImageProperties& properties) const override;
 
     PageSize getDefaultSize() const override;
     size_t getPageIndex() const override;

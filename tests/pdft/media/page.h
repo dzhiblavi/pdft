@@ -9,9 +9,9 @@ namespace pdft::media::mock {
 class Page : public media::Page {
  public:
     MOCK_METHOD(
-        std::shared_ptr<display::Image>,
+        std::shared_ptr<image::Image>,
         getImage,
-        (const display::ImageProperties& properties),
+        (const image::ImageProperties& properties),
         (const, override));
 
     MOCK_METHOD(PageSize, getDefaultSize, (), (const, override));

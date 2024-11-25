@@ -1,45 +1,36 @@
 #include "pdft/state/app/state.h"
 #include "pdft/core/assert.h"
-#include "pdft/view/layout.h"
+#include "pdft/tui/layout/layout.h"
+#include "pdft/tui/text/line.h"
 
 #include <algorithm>
 #include <format>
 
 namespace pdft::state::app {
 
-asio::awaitable<void> State::render(view::IRect rect, core::io::OutBuffer& buffer) {
-    namespace constr = view::constraints;
+asio::awaitable<void> State::render(tui::layout::IRect rect, tui::ContextRef ctx) {
+    namespace constr = tui::layout::constraints;
 
-    auto rects = view::vertical(constr::Length(1), constr::Fill(1), constr::Length(1)).split(rect);
-    auto info_rects = view::horizontal(constr::Fill(1), constr::Fill(1)).split(rects[2]);
+    auto rects =
+        tui::layout::vertical(constr::Length(1), constr::Fill(1), constr::Length(1)).split(rect);
+    auto info_rects = tui::layout::horizontal(constr::Fill(1), constr::Fill(1)).split(rects[2]);
 
-    renderer_->render(
-        buffer,
+    tui::text::render(
+        tui::text::Line::raw(current_input_).setAlignment(tui::layout::Alignment::Min),
         info_rects[0],
-        view::TextPlacement{
-            .hor = view::AxisFit::Min,
-            .vert = view::AxisFit::Center,
-            .overflow = view::TextPlacement::OverflowMode::Truncate,
-        },
-        current_input_);
+        ctx);
 
     if (auto state = getState()) {
-        co_await state->render(rects[1], image_properties_, buffer);
+        co_await state->render(rects[1], image_properties_, ctx);
 
-        renderer_->render(
-            buffer,
-            info_rects[1],
-            view::TextPlacement{
-                .hor = view::AxisFit::Max,
-                .vert = view::AxisFit::Center,
-                .overflow = view::TextPlacement::OverflowMode::Truncate,
-            },
-            std::format(
-                "document {}: {}/{}",
-                state->getDocumentId(),
-                state->getPageIndex() + 1,
-                state->getPageCount())
-                .c_str());
+        auto info = std::format(
+            "document {}: {}/{}",
+            state->getDocumentId(),
+            state->getPageIndex() + 1,
+            state->getPageCount());
+
+        auto text = tui::text::Line::raw(info).setAlignment(tui::layout::Alignment::Max);
+        tui::text::render(text, info_rects[1], ctx);
     }
 }
 

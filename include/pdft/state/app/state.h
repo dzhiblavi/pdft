@@ -10,7 +10,7 @@ namespace pdft::state::app {
 class State : public state::State {
  public:
     struct Config {
-        display::ImageProperties image_properties = {};
+        image::ImageProperties image_properties = {};
     };
 
     State(
@@ -21,7 +21,7 @@ class State : public state::State {
         , renderer_(std::move(renderer))
         , image_properties_(config.image_properties) {}
 
-    asio::awaitable<void> render(view::IRect rect, core::io::OutBuffer& buffer) override;
+    asio::awaitable<void> render(tui::layout::IRect rect, tui::ContextRef ctx) override;
 
     void onInput(char key) override;
     void resetInput() override;
@@ -46,7 +46,7 @@ class State : public state::State {
     std::optional<size_t> idx_ = std::nullopt;
     std::vector<DocumentState> states_;
     std::string current_input_;
-    display::ImageProperties image_properties_;
+    image::ImageProperties image_properties_;
 };
 
 }  // namespace pdft::state::app

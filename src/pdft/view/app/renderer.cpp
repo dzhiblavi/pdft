@@ -4,28 +4,27 @@
 #include "pdft/core/trace/stack_scope_tracer.h"
 #include "pdft/utils/cantor_pair.h"
 #include "pdft/utils/random.h"
-#include "pdft/view/app/fit_page.h"
-#include "pdft/view/app/fit_text.h"
+
+#include "pdft/tui/image/fit_image.h"
+#include "pdft/tui/image/image.h"
 
 namespace pdft::view::app {
 
 Renderer::Renderer(
-    core::terminal::Dimensions term_size,
+    tui::terminal::Dimensions term_size,
     std::shared_ptr<state::DocumentStorage> docs,
-    std::shared_ptr<display::Display> display,
-    std::shared_ptr<core::terminal::Terminal> terminal)
+    std::shared_ptr<tui::display::Display> display)
     : image_id_salt_(utils::random<uint32_t>(0))
     , term_dims_(term_size)
     , docs_(std::move(docs))
-    , display_(std::move(display))
-    , terminal_(std::move(terminal)) {}
+    , display_(std::move(display)) {}
 
 asio::awaitable<void> Renderer::render(
-    core::io::OutBuffer& buffer,
-    const IRect& rect,
-    const PagePlacement& place,
-    const display::ImageProperties& properties,
-    const Page& page) {
+    const tui::layout::IRect& rect,
+    const tui::image::Placement& place,
+    const image::ImageProperties& properties,
+    const Page& page,
+    tui::ContextRef ctx) {
     core::trace::StackScopeTracer trace =
         core::trace::getGlobalPool().getTracer(core::trace::stackTraceLogger(), "render_one");
 
@@ -39,7 +38,7 @@ asio::awaitable<void> Renderer::render(
         auto _ = trace.addChild("unload_image");
         log::debug("loaded image properties have changed, unloading id={}", id);
 
-        display_->unload(id, buffer);
+        display_->unload(id, ctx.buffer);
         loaded_.erase(it);
     }
 
@@ -61,7 +60,7 @@ asio::awaitable<void> Renderer::render(
             .invert_colors = properties.invert_colors,
         });
 
-        co_await display_->loadImage(id, *image, buffer);
+        co_await display_->loadImage(id, *image, ctx.buffer);
 
         auto size = image->size();
         float image_cols = float(size.width_px) / term_dims_.cell_width_px;
@@ -80,25 +79,9 @@ asio::awaitable<void> Renderer::render(
     auto [x, y, w, h] = rect;
     log::debug("renderer @ x={},y={},w={},h={}", x, y, w, h);
 
-    auto [irect, image] = fitPage(loaded_[id].cell_wh_ratio, rect, place);
-    co_await display_->displayImage(id, irect, image, buffer);
-}
-
-void Renderer::render(
-    core::io::OutBuffer& buffer,
-    const IRect& rect,
-    const TextPlacement& placement,
-    std::string_view text) {
-    for (auto line : fitText(rect, placement, text)) {
-        terminal_->moveCursor(
-            core::terminal::CursorPosition{
-                .rows = line.y,
-                .columns = line.x,
-            },
-            buffer);
-
-        core::io::write(buffer, line.text);
-    }
+    auto [irect, subarea] = tui::image::fitImage(loaded_[id].cell_wh_ratio, rect, place);
+    auto image = tui::image::Image::make(id, subarea);
+    co_await tui::image::render(image, irect, *display_, ctx);
 }
 
 float Renderer::calcFactor(media::PageSize page_size, float scaling_factor) {

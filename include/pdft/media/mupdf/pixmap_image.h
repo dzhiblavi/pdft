@@ -2,20 +2,20 @@
 
 #include "pdft/media/mupdf/context.h"
 
-#include "pdft/display/image.h"
+#include "pdft/image/image.h"
 
 struct fz_pixmap;
 
 namespace pdft::media::mupdf {
 
-class PixmapImage : public display::Image {
+class PixmapImage : public image::Image {
  public:
     PixmapImage(PixmapImage&&);
     PixmapImage& operator=(PixmapImage&&) = delete;
 
     ~PixmapImage() noexcept override;
 
-    display::ImageSize size() const override;
+    image::ImageSize size() const override;
     std::string_view samples() const override;
 
  private:

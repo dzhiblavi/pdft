@@ -7,9 +7,9 @@
 #include "pdft/core/io/posix/console.h"
 #include "pdft/core/io/posix/termctl.h"
 #include "pdft/core/log/log.h"
-#include "pdft/core/terminal/ansi/terminal.h"
 #include "pdft/core/trace/log.h"
 #include "pdft/core/trace/stack_scope_tracer.h"
+#include "pdft/tui/terminal/ansi/terminal.h"
 
 #include "pdft/controller/app/controller.h"
 #include "pdft/notify/fsw/notify.h"
@@ -36,7 +36,7 @@ using namespace asio::experimental::awaitable_operators;
 
 namespace {
 
-void printAppInfo(const core::terminal::Dimensions& term_size) {
+void printAppInfo(const tui::terminal::Dimensions& term_size) {
     using namespace utils;
     using magic_enum::enum_name;
 
@@ -67,14 +67,14 @@ void Application::setup() {
     media::mupdf::thisThreadContext().registerDocumentHandlers();
 
     term_control_ = std::make_shared<core::io::posix::TermControl>();
-    terminal_ = std::make_shared<core::terminal::ansi::Terminal>();
+    terminal_ = std::make_shared<tui::terminal::ansi::Terminal>();
     console_ = std::make_shared<core::io::posix::Console>(
         context_, ::dup(STDIN_FILENO), ::dup(STDOUT_FILENO));
 
     document_storage_ = std::make_shared<state::DocumentStorage>();
-    image_display_ = resolveDisplay(terminal_, console_);
-    renderer_ = std::make_shared<view::app::Renderer>(
-        term_size_, document_storage_, image_display_, terminal_);
+    image_display_ = resolveDisplay(console_);
+    renderer_ =
+        std::make_shared<view::app::Renderer>(term_size_, document_storage_, image_display_);
     state_ = std::make_shared<state::app::State>(
         state::app::State::Config{.image_properties = config_.image}, document_storage_, renderer_);
     controller_ = std::make_shared<controller::app::Controller>(
@@ -129,11 +129,15 @@ void Application::loadPaths(const std::vector<std::string>& paths) {
 asio::awaitable<void> Application::runEventLoop() {
     // Prepare variables reused in the event loop
     auto buffer = core::io::OutBuffer();
-    auto screen = view::IRect{
+    auto screen = tui::layout::IRect{
         .x = 0,
         .y = 0,
         .width = term_size_.columns,
         .height = term_size_.rows,
+    };
+    auto ctx = tui::ContextRef{
+        .terminal = *terminal_,
+        .buffer = buffer,
     };
 
     for (;;) {
@@ -148,7 +152,7 @@ asio::awaitable<void> Application::runEventLoop() {
 
         {
             auto _ = tracer.addChild("render");
-            co_await state_->render(screen, buffer);
+            co_await state_->render(screen, ctx);
         }
 
         {

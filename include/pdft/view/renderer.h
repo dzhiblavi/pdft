@@ -1,9 +1,9 @@
 #pragma once
 
-#include "pdft/core/io/buffer.h"
 #include "pdft/state/document_storage.h"
-#include "pdft/view/placement.h"
-#include "pdft/view/rect.h"
+#include "pdft/tui/context.h"
+#include "pdft/tui/image/fit_image.h"
+#include "pdft/tui/layout/rect.h"
 
 #include <asio/awaitable.hpp>
 
@@ -19,17 +19,11 @@ class Renderer {
     virtual ~Renderer() = default;
 
     virtual asio::awaitable<void> render(
-        core::io::OutBuffer& buffer,
-        const IRect& rect,
-        const PagePlacement& placement,
-        const display::ImageProperties& properties,
-        const Page& page) = 0;
-
-    virtual void render(
-        core::io::OutBuffer& buffer,
-        const IRect& rect,
-        const TextPlacement& placement,
-        std::string_view text) = 0;
+        const tui::layout::IRect& rect,
+        const tui::image::Placement& placement,
+        const image::ImageProperties& properties,
+        const Page& page,
+        tui::ContextRef ctx) = 0;
 };
 
 }  // namespace pdft::view

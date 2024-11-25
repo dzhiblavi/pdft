@@ -1,8 +1,8 @@
 #pragma once
 
-#include "pdft/core/io/buffer.h"
 #include "pdft/state/document_storage.h"
-#include "pdft/view/rect.h"
+#include "pdft/tui/context.h"
+#include "pdft/tui/layout/rect.h"
 
 #include <asio/awaitable.hpp>
 
@@ -12,7 +12,7 @@ class State {
  public:
     virtual ~State() = default;
 
-    virtual asio::awaitable<void> render(view::IRect rect, core::io::OutBuffer& buffer) = 0;
+    virtual asio::awaitable<void> render(tui::layout::IRect rect, tui::ContextRef ctx) = 0;
 
     virtual void onInput(char key) = 0;
     virtual void resetInput() = 0;

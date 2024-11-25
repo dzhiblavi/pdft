@@ -3,6 +3,7 @@
 #include "logging.h"
 
 #include "pdft/controller/app/controller.h"
+#include "pdft/image/image.h"
 
 #include <spdlog/common.h>
 
@@ -19,7 +20,7 @@ struct Config {
     SystemConfig system = {};
     LoggingConfig logging = {};
     pdft::controller::app::Controller::Config controller = {};
-    pdft::display::ImageProperties image = {};
+    pdft::image::ImageProperties image = {};
 };
 
 }  // namespace app
