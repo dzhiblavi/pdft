@@ -35,12 +35,12 @@ struct Line {
         });
     }
 
-    static Line raw(std::string_view content) {
-        return Line().setSpans({Span::raw(content)});
+    static Line raw(std::string content) {
+        return Line().setSpans({Span::raw(std::move(content))});
     }
 
-    static Line styled(std::string_view content, style::Patch patch) {
-        return raw(content).setStyle(patch);
+    static Line styled(std::string content, style::Patch patch) {
+        return raw(std::move(content)).setStyle(patch);
     }
 
     static Line from(std::vector<Span> spans) {

@@ -30,16 +30,16 @@ struct Text {
         return std::ranges::max(lines, {}, &Line::getWidth).getWidth();
     }
 
-    static Text raw(std::string_view content) {
+    static Text raw(std::string content) {
         Text text;
         for (auto line : splitLines(content)) {
-            text.lines.push_back(Line::raw(line));
+            text.lines.push_back(Line::raw(std::string(line)));
         }
         return text;
     }
 
-    static Text styled(std::string_view content, style::Patch patch) {
-        return raw(content).setStyle(patch);
+    static Text styled(std::string content, style::Patch patch) {
+        return raw(std::move(content)).setStyle(patch);
     }
 
     static Text from(std::vector<Line> lines) {

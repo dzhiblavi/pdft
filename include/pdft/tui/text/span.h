@@ -7,16 +7,16 @@
 
 #include <cppcoro/generator.hpp>
 
-#include <string_view>
+#include <string>
 
 namespace pdft::tui::text {
 
 struct Span {
-    std::string_view content;
+    std::string content;
     style::Patch patch;
 
-    Span& setContent(std::string_view content) {
-        this->content = content;
+    Span& setContent(std::string content) {
+        this->content = std::move(content);
         return *this;
     }
 
@@ -29,12 +29,12 @@ struct Span {
         return content.size();
     }
 
-    static Span raw(std::string_view content) {
-        return Span().setContent(content);
+    static Span raw(std::string content) {
+        return Span().setContent(std::string(content));
     }
 
-    static Span styled(std::string_view content, style::Patch patch) {
-        return Span().setContent(content).setStyle(patch);
+    static Span styled(std::string content, style::Patch patch) {
+        return Span().setContent(std::string(content)).setStyle(patch);
     }
 
  private:

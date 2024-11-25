@@ -2,6 +2,7 @@
 #include "pdft/core/assert.h"
 #include "pdft/tui/layout/layout.h"
 #include "pdft/tui/text/line.h"
+#include "pdft/tui/text/text.h"
 
 #include <algorithm>
 #include <format>
@@ -14,6 +15,8 @@ asio::awaitable<void> State::render(tui::layout::IRect rect, tui::Context& ctx) 
     auto rects =
         tui::layout::vertical(constr::Length(1), constr::Fill(1), constr::Length(1)).split(rect);
     auto info_rects = tui::layout::horizontal(constr::Fill(1), constr::Fill(1)).split(rects[2]);
+
+    rects = tui::layout::horizontal(constr::Fill(1), constr::Fill(20)).split(rects[1]);
 
     tui::text::render(
         tui::text::Line::raw(current_input_).setAlignment(tui::layout::Alignment::Min),
@@ -32,6 +35,20 @@ asio::awaitable<void> State::render(tui::layout::IRect rect, tui::Context& ctx) 
         auto text = tui::text::Line::raw(info).setAlignment(tui::layout::Alignment::Max);
         tui::text::render(text, info_rects[1], ctx);
     }
+
+    std::vector<tui::text::Line> lines;
+
+    for (size_t i = 0; i < states_.size(); ++i) {
+        const auto& state = states_[i];
+        bool is_current = i == *idx_;
+        auto doc_id = state.getDocumentId();
+        const auto& path = doc_storage_->getDocument(doc_id).getPath();
+
+        auto line = std::format("{}{}", is_current ? "* " : "", path.filename().c_str());
+        lines.push_back(tui::text::Line::raw(std::move(line)));
+    }
+
+    tui::text::render(tui::text::Text::from(std::move(lines)), rects[0], ctx);
 }
 
 void State::onInput(char key) {
