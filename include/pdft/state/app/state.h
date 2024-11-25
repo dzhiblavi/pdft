@@ -21,7 +21,7 @@ class State : public state::State {
         , renderer_(std::move(renderer))
         , image_properties_(config.image_properties) {}
 
-    asio::awaitable<void> render(tui::layout::IRect rect, tui::ContextRef ctx) override;
+    asio::awaitable<void> render(tui::layout::IRect rect, tui::Context& ctx) override;
 
     void onInput(char key) override;
     void resetInput() override;

@@ -15,10 +15,10 @@ class ExecutorBase : public Executor {
         : max_chunk_size_(config.max_chunk_size_bytes)
         , console_(std::move(console)) {}
 
-    void execute(const Command& apc, core::io::OutBuffer& buffer) override;
+    void execute(const Command& cmd, core::io::OutBuffer& buffer) override;
 
     asio::awaitable<Result<Response>> executeWithResponse(
-        const Command& apc, core::io::OutBuffer& buffer) override;
+        const Command& cmd, core::io::OutBuffer& buffer) override;
 
  protected:
     virtual void writePrefix(core::io::OutBuffer& buffer) const = 0;

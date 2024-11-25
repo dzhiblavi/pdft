@@ -10,7 +10,7 @@ asio::awaitable<void> UnicodeDisplay::displayImage(
     image::ImageId id,
     const layout::IRect& rect,
     const layout::FRect& image_subarea,
-    ContextRef ctx) {
+    Context& ctx) {
     PDFT_VERIFY(isLoaded(id));
 
     const auto& [x, y, w, h] = rect;

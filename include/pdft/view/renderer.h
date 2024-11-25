@@ -23,7 +23,7 @@ class Renderer {
         const tui::image::Placement& placement,
         const image::ImageProperties& properties,
         const Page& page,
-        tui::ContextRef ctx) = 0;
+        tui::Context& ctx) = 0;
 };
 
 }  // namespace pdft::view

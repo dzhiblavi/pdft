@@ -41,7 +41,7 @@ struct Span {
     Span() = default;
 };
 
-inline void render(const Span& span, const layout::IRect& rect, ContextRef ctx) {
+inline void render(const Span& span, const layout::IRect& rect, Context& ctx) {
     ctx.terminal.patchStyle(span.patch, ctx.buffer);
     ctx.terminal.moveCursor(
         {

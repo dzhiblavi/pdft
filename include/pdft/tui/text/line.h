@@ -51,7 +51,7 @@ struct Line {
     Line() = default;
 };
 
-inline void render(const Line& line, layout::IRect rect, ContextRef ctx) {
+inline void render(const Line& line, layout::IRect rect, Context& ctx) {
     ctx.terminal.patchStyle(line.patch, ctx.buffer);
     layout::IRect span_rect = rect;
     size_t width = 0;

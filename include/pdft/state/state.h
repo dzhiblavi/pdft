@@ -12,7 +12,7 @@ class State {
  public:
     virtual ~State() = default;
 
-    virtual asio::awaitable<void> render(tui::layout::IRect rect, tui::ContextRef ctx) = 0;
+    virtual asio::awaitable<void> render(tui::layout::IRect rect, tui::Context& ctx) = 0;
 
     virtual void onInput(char key) = 0;
     virtual void resetInput() = 0;

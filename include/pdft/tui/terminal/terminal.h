@@ -1,6 +1,7 @@
 #pragma once
 
 #include "pdft/core/io/buffer.h"
+#include "pdft/tui/layout/rect.h"
 #include "pdft/tui/style/style.h"
 #include "pdft/tui/terminal/cursor_position.h"
 
@@ -13,17 +14,24 @@ struct Dimensions {
     uint32_t width_px;
     uint32_t cell_height_px;
     uint32_t cell_width_px;
+
+    layout::IRect rect() {
+        return {
+            .width = columns,
+            .height = rows,
+        };
+    }
 };
 
 class Terminal {
  public:
     virtual ~Terminal() = default;
 
+    Dimensions getDimensions() const;
+
     virtual void clear(core::io::OutBuffer& buffer) = 0;
     virtual void moveCursor(CursorPosition position, core::io::OutBuffer& buffer) = 0;
     virtual void patchStyle(style::Patch patch, core::io::OutBuffer& buffer) = 0;
 };
-
-Dimensions getTerminalDimensions();
 
 }  // namespace pdft::tui::terminal

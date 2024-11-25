@@ -5,7 +5,6 @@ add_executable(
   ./main.cpp
   ./app.cpp
   ./logging.cpp
-  ./setup_signal_handlers.cpp
   ./cli_args.cpp
   ./resolve_display.cpp
   ./version.cpp)

@@ -12,7 +12,7 @@ class NativeDisplay : public DisplayBase {
         image::ImageId id,
         const layout::IRect& rect,
         const layout::FRect& image_subarea,
-        ContextRef ctx) override;
+        Context& ctx) override;
 };
 
 }  // namespace pdft::tui::display::kitty

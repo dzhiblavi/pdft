@@ -13,7 +13,7 @@ class DocumentState {
         , renderer_(std::move(renderer)) {}
 
     asio::awaitable<void> render(
-        tui::layout::IRect rect, const image::ImageProperties& properties, tui::ContextRef ctx);
+        tui::layout::IRect rect, const image::ImageProperties& properties, tui::Context& ctx);
 
     void scrollNext(int32_t delta);
     void nextPage(int32_t delta);
@@ -37,13 +37,13 @@ class DocumentState {
 
     void applyScrollOffset(uint32_t height, int32_t pages_per_height);
     asio::awaitable<void> renderOnePage(
-        tui::layout::IRect rect, const image::ImageProperties& properties, tui::ContextRef ctx);
+        tui::layout::IRect rect, const image::ImageProperties& properties, tui::Context& ctx);
     asio::awaitable<void> renderTwoPages(
-        tui::layout::IRect rect, const image::ImageProperties& properties, tui::ContextRef ctx);
+        tui::layout::IRect rect, const image::ImageProperties& properties, tui::Context& ctx);
     asio::awaitable<void> renderOnePageContinuous(
-        tui::layout::IRect rect, const image::ImageProperties& properties, tui::ContextRef ctx);
+        tui::layout::IRect rect, const image::ImageProperties& properties, tui::Context& ctx);
     asio::awaitable<void> renderTwoPagesContinuous(
-        tui::layout::IRect rect, const image::ImageProperties& properties, tui::ContextRef ctx);
+        tui::layout::IRect rect, const image::ImageProperties& properties, tui::Context& ctx);
 
     DocumentId document_id_;
     uint32_t page_count_;

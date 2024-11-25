@@ -15,7 +15,7 @@ class Executor {
     virtual void execute(const Command& cmd, core::io::OutBuffer& buffer) = 0;
 
     virtual asio::awaitable<Result<Response>> executeWithResponse(
-        const Command& apc, core::io::OutBuffer& buffer) = 0;
+        const Command& cmd, core::io::OutBuffer& buffer) = 0;
 };
 
 }  // namespace pdft::tui::display::kitty::apc

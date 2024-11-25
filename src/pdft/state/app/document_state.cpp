@@ -105,7 +105,7 @@ void DocumentState::applyScrollOffset(uint32_t height, int32_t pages_per_height)
 }
 
 asio::awaitable<void> DocumentState::render(
-    tui::layout::IRect rect, const image::ImageProperties& properties, tui::ContextRef ctx) {
+    tui::layout::IRect rect, const image::ImageProperties& properties, tui::Context& ctx) {
     switch (view_mode_) {
         using enum ViewMode;
 
@@ -124,7 +124,7 @@ asio::awaitable<void> DocumentState::render(
 }
 
 asio::awaitable<void> DocumentState::renderOnePage(
-    tui::layout::IRect rect, const image::ImageProperties& properties, tui::ContextRef ctx) {
+    tui::layout::IRect rect, const image::ImageProperties& properties, tui::Context& ctx) {
     co_await renderer_->render(
         rect,
         {
@@ -140,7 +140,7 @@ asio::awaitable<void> DocumentState::renderOnePage(
 }
 
 asio::awaitable<void> DocumentState::renderTwoPages(
-    tui::layout::IRect rect, const image::ImageProperties& properties, tui::ContextRef ctx) {
+    tui::layout::IRect rect, const image::ImageProperties& properties, tui::Context& ctx) {
     using namespace tui::layout;
     auto rects =
         horizontal(
@@ -183,7 +183,7 @@ asio::awaitable<void> DocumentState::renderTwoPages(
 }
 
 asio::awaitable<void> DocumentState::renderOnePageContinuous(
-    tui::layout::IRect rect, const image::ImageProperties& properties, tui::ContextRef ctx) {
+    tui::layout::IRect rect, const image::ImageProperties& properties, tui::Context& ctx) {
     using namespace tui::layout;
     applyScrollOffset(rect.height, 1);
 
@@ -233,7 +233,7 @@ asio::awaitable<void> DocumentState::renderOnePageContinuous(
 }
 
 asio::awaitable<void> DocumentState::renderTwoPagesContinuous(
-    tui::layout::IRect rect, const image::ImageProperties& properties, tui::ContextRef ctx) {
+    tui::layout::IRect rect, const image::ImageProperties& properties, tui::Context& ctx) {
     using namespace tui::layout;
 
     applyScrollOffset(rect.height, 2);

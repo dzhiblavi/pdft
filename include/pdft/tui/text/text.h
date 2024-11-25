@@ -50,7 +50,7 @@ struct Text {
     Text() = default;
 };
 
-inline void render(const Text& text, const layout::IRect& rect, ContextRef ctx) {
+inline void render(const Text& text, const layout::IRect& rect, Context& ctx) {
     ctx.terminal.patchStyle(text.patch, ctx.buffer);
     layout::IRect line_rect = rect;
 

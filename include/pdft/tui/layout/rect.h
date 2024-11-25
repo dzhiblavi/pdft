@@ -8,10 +8,10 @@ namespace pdft::tui::layout {
 template <typename T>
 requires std::integral<T> || std::floating_point<T>
 struct Rect {
-    T x;
-    T y;
-    T width;
-    T height;
+    T x = 0;
+    T y = 0;
+    T width = 0;
+    T height = 0;
 
     bool operator==(const Rect&) const = default;
 };

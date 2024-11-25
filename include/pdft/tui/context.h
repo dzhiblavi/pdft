@@ -5,8 +5,9 @@
 
 namespace pdft::tui {
 
-struct ContextRef {
+struct Context {
     terminal::Terminal& terminal;
+    terminal::Dimensions screen_size;
     core::io::OutBuffer& buffer;
 };
 

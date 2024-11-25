@@ -8,7 +8,7 @@
 
 namespace pdft::tui::terminal {
 
-Dimensions getTerminalDimensions() {
+Dimensions Terminal::getDimensions() const {
     winsize sz;
 
     if (ioctl(STDIN_FILENO, TIOCGWINSZ, &sz) != 0) {
@@ -29,4 +29,4 @@ Dimensions getTerminalDimensions() {
     };
 }
 
-}  // namespace pdft::core::terminal
+}  // namespace pdft::tui::terminal

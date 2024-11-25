@@ -8,7 +8,7 @@
 
 namespace pdft::state::app {
 
-asio::awaitable<void> State::render(tui::layout::IRect rect, tui::ContextRef ctx) {
+asio::awaitable<void> State::render(tui::layout::IRect rect, tui::Context& ctx) {
     namespace constr = tui::layout::constraints;
 
     auto rects =

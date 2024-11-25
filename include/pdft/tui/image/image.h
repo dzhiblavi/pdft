@@ -38,7 +38,7 @@ struct Image {
 };
 
 inline asio::awaitable<void> render(
-    const Image& image, const layout::IRect& rect, display::Display& display, ContextRef ctx) {
+    const Image& image, const layout::IRect& rect, display::Display& display, Context& ctx) {
     PDFT_VERIFY(display.isLoaded(image.id));
     co_await display.displayImage(image.id, rect, image.subarea, ctx);
 }

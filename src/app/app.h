@@ -12,6 +12,7 @@
 #include "pdft/view/renderer.h"
 
 #include <asio/awaitable.hpp>
+#include <asio/signal_set.hpp>
 
 namespace app {
 
@@ -41,12 +42,13 @@ class Application {
     std::shared_ptr<pdft::view::Renderer> renderer_;
 
     // State
-    pdft::tui::terminal::Dimensions term_size_ = pdft::tui::terminal::getTerminalDimensions();
     std::shared_ptr<pdft::state::DocumentStorage> document_storage_;
     std::shared_ptr<pdft::state::State> state_;
 
     // Controller
     std::shared_ptr<pdft::controller::Controller> controller_;
+
+    asio::signal_set signals_;
 };
 
 }  // namespace app

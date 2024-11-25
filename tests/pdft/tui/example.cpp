@@ -34,7 +34,8 @@ TEST_CASE("tuiSpanExample", "") {
         .height = 1,
     };
 
-    text::render(span, rect, {terminal, buffer});
+    auto ctx = Context{terminal, {}, buffer};
+    text::render(span, rect, ctx);
 
     std::cout << buffer.view() << std::endl;
 }
@@ -68,7 +69,8 @@ TEST_CASE("tuiLineExample", "") {
         .height = 1,
     };
 
-    text::render(line, rect, {terminal, buffer});
+    auto ctx = Context{terminal, {}, buffer};
+    text::render(line, rect, ctx);
 
     std::cout << buffer.view() << std::endl;
 }
@@ -90,7 +92,8 @@ TEST_CASE("tuiTextRawExample", "") {
         .height = 3,
     };
 
-    text::render(text, rect, {terminal, buffer});
+    auto ctx = Context{terminal, {}, buffer};
+    text::render(text, rect, ctx);
 
     std::cout << buffer.view() << std::endl;
 }
@@ -130,7 +133,8 @@ TEST_CASE("tuiImageExample", "") {
             .height = 30,
         };
 
-        co_await render(image, rect, display, {*terminal, buffer});
+        auto ctx = Context{*terminal, {}, buffer};
+        co_await render(image, rect, display, ctx);
 
         std::cout << buffer.view() << std::flush;
     });

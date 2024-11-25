@@ -12,7 +12,6 @@ namespace pdft::view::app {
 class Renderer : public view::Renderer {
  public:
     Renderer(
-        tui::terminal::Dimensions term_size,
         std::shared_ptr<state::DocumentStorage> docs,
         std::shared_ptr<tui::display::Display> display);
 
@@ -21,18 +20,22 @@ class Renderer : public view::Renderer {
         const tui::image::Placement& placement,
         const image::ImageProperties& properties,
         const Page& page,
-        tui::ContextRef ctx) override;
+        tui::Context& ctx) override;
 
  private:
-    float calcFactor(media::PageSize page_size, float scaling_factor);
+    float calcFactor(
+        media::PageSize page_size,
+        float scaling_factor,
+        const tui::terminal::Dimensions& screen_size);
 
     struct LoadedImage {
+        media::PageSize page_size;
+        bool inverted_colors;
+        float factor;
         float cell_wh_ratio;
-        image::ImageProperties properties;
     };
 
     const uint32_t image_id_salt_;
-    tui::terminal::Dimensions term_dims_;
     std::shared_ptr<state::DocumentStorage> docs_;
     std::shared_ptr<tui::display::Display> display_;
     std::shared_ptr<tui::terminal::Terminal> terminal_;

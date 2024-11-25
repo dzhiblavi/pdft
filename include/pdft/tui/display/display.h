@@ -20,7 +20,7 @@ class Display {
         image::ImageId id,
         const layout::IRect& rect,
         const layout::FRect& image_subarea,
-        ContextRef ctx) = 0;
+        Context& ctx) = 0;
 
     virtual void clear(core::io::OutBuffer& buffer) = 0;
 

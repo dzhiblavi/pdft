@@ -1,7 +1,6 @@
 #include "app.h"
 #include "logging.h"
 #include "resolve_display.h"
-#include "setup_signal_handlers.h"
 #include "version.h"
 
 #include "pdft/core/io/posix/console.h"
@@ -36,7 +35,7 @@ using namespace asio::experimental::awaitable_operators;
 
 namespace {
 
-void printAppInfo(const tui::terminal::Dimensions& term_size) {
+void printAppInfo() {
     using namespace utils;
     using magic_enum::enum_name;
 
@@ -47,21 +46,40 @@ void printAppInfo(const tui::terminal::Dimensions& term_size) {
         enum_name(isBuiltWithASAN()),
         enum_name(isBuiltWithTSAN()),
         enum_name(isBuiltWithUBSAN()));
-    log::info("Display size is {}x{} cells", term_size.columns, term_size.rows);
+}
+
+controller::Action handleSignal(int signal) {
+    switch (signal) {
+        using enum controller::Action;
+
+        case SIGWINCH:
+            log::info("received SIGWINCH: terminal resized, redrawing");
+            return Redraw;
+
+        case SIGINT:
+            log::info("received SIGINT: exiting");
+            return Quit;
+
+        case SIGSEGV:
+            pdft::core::fail("received SIGSEGV");
+
+        default:
+            pdft::core::fail(std::format("received unknown signal ({})", signal).c_str());
+    }
 }
 
 }  // namespace
 
 Application::Application(asio::io_context& context, Config config)
     : context_(context)
-    , config_(config) {
+    , config_(config)
+    , signals_(context, SIGWINCH, SIGINT, SIGSEGV) {
     setup();
 }
 
 void Application::setup() {
-    app::setupSignalHandlers();
     app::setupLogging(config_.logging);
-    printAppInfo(term_size_);
+    printAppInfo();
 
     app::setupMupdfLogging(media::mupdf::thisThreadContext());
     media::mupdf::thisThreadContext().registerDocumentHandlers();
@@ -73,8 +91,7 @@ void Application::setup() {
 
     document_storage_ = std::make_shared<state::DocumentStorage>();
     image_display_ = resolveDisplay(console_);
-    renderer_ =
-        std::make_shared<view::app::Renderer>(term_size_, document_storage_, image_display_);
+    renderer_ = std::make_shared<view::app::Renderer>(document_storage_, image_display_);
     state_ = std::make_shared<state::app::State>(
         state::app::State::Config{.image_properties = config_.image}, document_storage_, renderer_);
     controller_ = std::make_shared<controller::app::Controller>(
@@ -127,21 +144,16 @@ void Application::loadPaths(const std::vector<std::string>& paths) {
 }
 
 asio::awaitable<void> Application::runEventLoop() {
-    // Prepare variables reused in the event loop
-    auto buffer = core::io::OutBuffer();
-    auto screen = tui::layout::IRect{
-        .x = 0,
-        .y = 0,
-        .width = term_size_.columns,
-        .height = term_size_.rows,
-    };
-    auto ctx = tui::ContextRef{
-        .terminal = *terminal_,
-        .buffer = buffer,
-    };
+    core::io::OutBuffer buffer;
 
     for (;;) {
         log::debug("========== NEW FRAME ===========");
+
+        auto ctx = tui::Context{
+            .terminal = *terminal_,
+            .screen_size = terminal_->getDimensions(),
+            .buffer = buffer,
+        };
 
         auto tracer =
             core::trace::getGlobalPool().getTracer(core::trace::stackTraceLogger(), "display_one");
@@ -152,7 +164,7 @@ asio::awaitable<void> Application::runEventLoop() {
 
         {
             auto _ = tracer.addChild("render");
-            co_await state_->render(screen, ctx);
+            co_await state_->render(ctx.screen_size.rect(), ctx);
         }
 
         {
@@ -162,14 +174,17 @@ asio::awaitable<void> Application::runEventLoop() {
 
         bool quit = co_await [&]() -> asio::awaitable<bool> {
             for (;;) {
-                auto event = co_await (console_->read(1) || fs_watcher_->nextEvent());
+                using enum controller::Action;
+
+                auto event = co_await (
+                    console_->read(1) || fs_watcher_->nextEvent() ||
+                    signals_.async_wait(asio::use_awaitable));
 
                 auto action = utils::visit(
                     event,
                     [&](std::string event) { return controller_->onKeyEvent(event[0]); },
-                    [&](notify::Event event) { return controller_->onFilesystemEvent(event); });
-
-                using enum controller::Action;
+                    [&](notify::Event event) { return controller_->onFilesystemEvent(event); },
+                    [&](int signal) { return handleSignal(signal); });
 
                 if (action == Quit) {
                     co_return true;

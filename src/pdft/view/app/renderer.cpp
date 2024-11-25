@@ -11,11 +11,8 @@
 namespace pdft::view::app {
 
 Renderer::Renderer(
-    tui::terminal::Dimensions term_size,
-    std::shared_ptr<state::DocumentStorage> docs,
-    std::shared_ptr<tui::display::Display> display)
+    std::shared_ptr<state::DocumentStorage> docs, std::shared_ptr<tui::display::Display> display)
     : image_id_salt_(utils::random<uint32_t>(0))
-    , term_dims_(term_size)
     , docs_(std::move(docs))
     , display_(std::move(display)) {}
 
@@ -24,7 +21,7 @@ asio::awaitable<void> Renderer::render(
     const tui::image::Placement& place,
     const image::ImageProperties& properties,
     const Page& page,
-    tui::ContextRef ctx) {
+    tui::Context& ctx) {
     core::trace::StackScopeTracer trace =
         core::trace::getGlobalPool().getTracer(core::trace::stackTraceLogger(), "render_one");
 
@@ -34,19 +31,35 @@ asio::awaitable<void> Renderer::render(
 
     log::debug("rendering a page: doc_id={}, page_index={}, image_id={}", doc_id, page_index, id);
 
-    if (auto it = loaded_.find(id); it != loaded_.end() && it->second.properties != properties) {
-        auto _ = trace.addChild("unload_image");
-        log::debug("loaded image properties have changed, unloading id={}", id);
+    if (auto it = loaded_.find(id); it != loaded_.end()) {
+        auto&& info = it->second;
 
-        display_->unload(id, ctx.buffer);
-        loaded_.erase(it);
+        bool should_reload = false;
+        auto factor = calcFactor(info.page_size, properties.scaling_factor, ctx.screen_size);
+
+        if (factor != info.factor) {
+            log::debug("loaded image scaling factor has changed, unloading id={}", id);
+            should_reload = true;
+        }
+
+        if (properties.invert_colors != info.inverted_colors) {
+            log::debug("loaded image color inversion has changed, unloading id={}", id);
+            should_reload = true;
+        }
+
+        if (should_reload) {
+            auto _ = trace.addChild("unload_image");
+            display_->unload(id, ctx.buffer);
+            loaded_.erase(it);
+        }
     }
 
     if (!loaded_.contains(id)) {
         auto _ = trace.addChild("load_image");
 
         auto page = document.getPage(page_index);
-        auto factor = calcFactor(page->getDefaultSize(), properties.scaling_factor);
+        auto page_size = page->getDefaultSize();
+        auto factor = calcFactor(page_size, properties.scaling_factor, ctx.screen_size);
 
         log::debug(
             "loading page to display: index={}, doc_id={}, image_id={}, factor={}",
@@ -62,13 +75,15 @@ asio::awaitable<void> Renderer::render(
 
         co_await display_->loadImage(id, *image, ctx.buffer);
 
-        auto size = image->size();
-        float image_cols = float(size.width_px) / term_dims_.cell_width_px;
-        float image_rows = float(size.height_px) / term_dims_.cell_height_px;
+        auto image_size = image->size();
+        float image_cols = float(image_size.width_px) / ctx.screen_size.cell_width_px;
+        float image_rows = float(image_size.height_px) / ctx.screen_size.cell_height_px;
 
         loaded_[id] = LoadedImage{
+            .page_size = page_size,
+            .inverted_colors = properties.invert_colors,
+            .factor = factor,
             .cell_wh_ratio = image_cols / image_rows,
-            .properties = properties,
         };
     }
 
@@ -84,9 +99,10 @@ asio::awaitable<void> Renderer::render(
     co_await tui::image::render(image, irect, *display_, ctx);
 }
 
-float Renderer::calcFactor(media::PageSize page_size, float scaling_factor) {
-    float dw = term_dims_.width_px;
-    float dh = term_dims_.height_px;
+float Renderer::calcFactor(
+    media::PageSize page_size, float scaling_factor, const tui::terminal::Dimensions& screen_size) {
+    float dw = screen_size.width_px;
+    float dh = screen_size.height_px;
     auto [pw, ph] = page_size;
 
     float fw = dw / pw;
@@ -97,8 +113,8 @@ float Renderer::calcFactor(media::PageSize page_size, float scaling_factor) {
         "calc factor for page {}x{}, term {}x{}, factor={}, scale_by={}",
         page_size.width_px,
         page_size.height_px,
-        term_dims_.width_px,
-        term_dims_.height_px,
+        screen_size.width_px,
+        screen_size.height_px,
         f,
         scaling_factor);
 
