@@ -27,6 +27,8 @@ class Application {
     asio::awaitable<void> prepareTerminal();
     void loadPaths(const std::vector<std::string>& paths);
     asio::awaitable<void> runEventLoop();
+    asio::awaitable<void> render(pdft::core::io::OutBuffer& buffer);
+    asio::awaitable<bool> waitForNextRender();
     asio::awaitable<void> cleanup();
 
     asio::io_context& context_;

@@ -147,57 +147,61 @@ asio::awaitable<void> Application::runEventLoop() {
     core::io::OutBuffer buffer;
 
     for (;;) {
-        log::debug("========== NEW FRAME ===========");
+        co_await render(buffer);
 
-        auto ctx = tui::Context{
-            .terminal = *terminal_,
-            .screen_size = terminal_->getDimensions(),
-            .buffer = buffer,
-        };
+        bool should_quit = co_await waitForNextRender();
 
-        auto tracer = core::trace::getGlobalPool().getTracer(
-            core::trace::makeStackTraceLogger(), "display_one");
-
-        core::io::clear(buffer);
-        terminal_->clear(buffer);
-        image_display_->clear(buffer);
-
-        {
-            auto _ = tracer.addChild("render");
-            co_await state_->render(ctx.screen_size.rect(), ctx);
-        }
-
-        {
-            auto _ = tracer.addChild("flush");
-            co_await console_->write(buffer.view());
-        }
-
-        bool quit = co_await [&]() -> asio::awaitable<bool> {
-            for (;;) {
-                using enum controller::Action;
-
-                auto event = co_await (
-                    console_->read(1) || fs_watcher_->nextEvent() ||
-                    signals_.async_wait(asio::use_awaitable));
-
-                auto action = utils::visit(
-                    event,
-                    [&](std::string event) { return controller_->onKeyEvent(event[0]); },
-                    [&](notify::Event event) { return controller_->onFilesystemEvent(event); },
-                    [&](int signal) { return handleSignal(signal); });
-
-                if (action == Quit) {
-                    co_return true;
-                }
-
-                if (action == Redraw) {
-                    co_return false;
-                }
-            }
-        }();
-
-        if (quit) {
+        if (should_quit) {
             break;
+        }
+    }
+}
+
+asio::awaitable<void> Application::render(core::io::OutBuffer& buffer) {
+    log::debug("========== NEW FRAME ===========");
+
+    auto ctx = tui::Context{
+        .terminal = *terminal_,
+        .screen_size = terminal_->getDimensions(),
+        .buffer = buffer,
+    };
+
+    auto tracer =
+        core::trace::getGlobalPool().getTracer(core::trace::makeStackTraceLogger(), "display_one");
+
+    core::io::clear(buffer);
+    terminal_->clear(buffer);
+    image_display_->clear(buffer);
+
+    {
+        auto _ = tracer.addChild("render");
+        co_await state_->render(ctx.screen_size.rect(), ctx);
+    }
+
+    auto _ = tracer.addChild("flush");
+    co_await console_->write(buffer.view());
+}
+
+asio::awaitable<bool> Application::waitForNextRender() {
+    for (;;) {
+        using enum controller::Action;
+
+        auto event = co_await (
+            console_->read(1) || fs_watcher_->nextEvent() ||
+            signals_.async_wait(asio::use_awaitable));
+
+        auto action = utils::visit(
+            event,
+            [&](std::string event) { return controller_->onKeyEvent(event[0]); },
+            [&](notify::Event event) { return controller_->onFilesystemEvent(event); },
+            [&](int signal) { return handleSignal(signal); });
+
+        if (action == Quit) {
+            co_return true;
+        }
+
+        if (action == Redraw) {
+            co_return false;
         }
     }
 }
