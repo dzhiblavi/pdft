@@ -13,7 +13,10 @@ namespace app {
 
 asio::awaitable<void> main(
     asio::io_context& context, Config config, const std::vector<std::string>& paths) {
-    co_await Application(context, std::move(config)).run(paths);
+    setupLogging(config.logging);
+    auto app = Application(context, std::move(config));
+    app.setLogger(pdft::core::log::global());
+    co_await app.run(paths);
 }
 
 }  // namespace app

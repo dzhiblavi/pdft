@@ -4,6 +4,7 @@
 #include "pdft/controller/controller.h"
 #include "pdft/core/io/console.h"
 #include "pdft/core/io/termctl.h"
+#include "pdft/core/log/with_logger.h"
 #include "pdft/notify/notify.h"
 #include "pdft/state/document_storage.h"
 #include "pdft/state/state.h"
@@ -16,13 +17,14 @@
 
 namespace app {
 
-class Application {
+class Application : public pdft::core::log::WithLogger {
  public:
     Application(asio::io_context& context, Config config);
 
     asio::awaitable<void> run(const std::vector<std::string>& paths);
 
  private:
+    void printAppInfo() const;
     void setup();
     asio::awaitable<void> prepareTerminal();
     void loadPaths(const std::vector<std::string>& paths);

@@ -10,83 +10,104 @@ namespace pdft::core::log::impl {
 
 using LoggerPtr = std::shared_ptr<spdlog::logger>;
 
-using Level = spdlog::level::level_enum;
-
 LoggerPtr global();
 
-template <typename... Args>
+using Level = spdlog::level::level_enum;
+
+template <typename T>
+concept WithLogger = requires(const T& t) {
+    { t.getLogger() } -> std::same_as<LoggerPtr>;
+};
+
+template <typename T>
+concept AsLogger =
+    std::same_as<T, LoggerPtr> || WithLogger<T> || WithLogger<std::remove_pointer_t<T>>;
+
+LoggerPtr getLogger(const WithLogger auto& x) {
+    return x.getLogger();
+}
+
+LoggerPtr getLogger(const WithLogger auto* x) {
+    return x->getLogger();
+}
+
+inline LoggerPtr getLogger(LoggerPtr logger) {
+    return logger;
+}
+
+template <AsLogger Logger, typename... Args>
 struct log {
-    log(LoggerPtr logger,
+    log(const Logger& logger,
         Level level,
-        std::format_string<Args...> fmt,
-        Args&&... args,
+        std::format_string<const Args&...> fmt,
+        const Args&... args,
         const std::source_location loc = std::source_location::current()) {
         auto spdlog_loc = spdlog::source_loc(loc.file_name(), loc.line(), loc.function_name());
-        logger->log(spdlog_loc, level, std::format(fmt, std::forward<Args>(args)...));
+        getLogger(logger)->log(spdlog_loc, level, std::format(fmt, args...));
     }
 
-    log(LoggerPtr logger,
+    log(const Logger& logger,
         Level level,
-        Args&&... args,
+        const Args&... args,
         const std::source_location loc = std::source_location::current()) {
         auto spdlog_loc = spdlog::source_loc(loc.file_name(), loc.line(), loc.function_name());
-        logger->log(spdlog_loc, level, std::forward<Args>(args)...);
+        getLogger(logger)->log(spdlog_loc, level, args...);
     }
 };
 
-template <typename... Args>
-log(LoggerPtr, Level, std::format_string<Args...>, Args&&...) -> log<Args...>;
+template <AsLogger Logger, typename... Args>
+log(const Logger&, Level, std::format_string<const Args&...>, const Args&...)
+    -> log<Logger, Args...>;
 
-template <typename Msg>
-log(LoggerPtr, Level, Msg&&) -> log<Msg>;
+template <AsLogger Logger, typename Msg>
+log(const Logger&, Level, const Msg&) -> log<Logger, Msg>;
 
-#define PDFT_DEFINE_LOG_FOR_LEVEL(level)                                                          \
-    template <typename... Args>                                                                   \
-    struct level {                                                                                \
-        level(                                                                                    \
-            LoggerPtr logger,                                                                     \
-            std::format_string<Args...> fmt,                                                      \
-            Args&&... args,                                                                       \
-            const std::source_location loc = std::source_location::current()) {                   \
-            auto spdlog_loc =                                                                     \
-                spdlog::source_loc(loc.file_name(), loc.line(), loc.function_name());             \
-            logger->log(spdlog_loc, Level::level, std::format(fmt, std::forward<Args>(args)...)); \
-        }                                                                                         \
-                                                                                                  \
-        level(                                                                                    \
-            LoggerPtr logger,                                                                     \
-            Args&&... args,                                                                       \
-            const std::source_location loc = std::source_location::current()) {                   \
-            auto spdlog_loc =                                                                     \
-                spdlog::source_loc(loc.file_name(), loc.line(), loc.function_name());             \
-            logger->log(spdlog_loc, Level::level, std::forward<Args>(args)...);                   \
-        }                                                                                         \
-                                                                                                  \
-        level(                                                                                    \
-            std::format_string<Args...> fmt,                                                      \
-            Args&&... args,                                                                       \
-            const std::source_location loc = std::source_location::current()) {                   \
-            auto spdlog_loc =                                                                     \
-                spdlog::source_loc(loc.file_name(), loc.line(), loc.function_name());             \
-            global()->log(                                                                        \
-                spdlog_loc, Level::level, std::format(fmt, std::forward<Args>(args)...));         \
-        }                                                                                         \
-                                                                                                  \
-        level(Args&&... args, const std::source_location loc = std::source_location::current()) { \
-            auto spdlog_loc =                                                                     \
-                spdlog::source_loc(loc.file_name(), loc.line(), loc.function_name());             \
-            global()->log(spdlog_loc, Level::level, std::forward<Args>(args)...);                 \
-        }                                                                                         \
-    };                                                                                            \
-                                                                                                  \
-    template <typename... Args>                                                                   \
-    level(std::format_string<Args...>, Args&&...) -> level<Args...>;                              \
-    template <typename Msg>                                                                       \
-    level(Msg&&) -> level<Msg>;                                                                   \
-    template <typename... Args>                                                                   \
-    level(LoggerPtr, std::format_string<Args...>, Args&&...) -> level<Args...>;                   \
-    template <typename Msg>                                                                       \
-    level(LoggerPtr, Msg&&)->level<Msg>
+#define PDFT_DEFINE_LOG_FOR_LEVEL(level)                                                    \
+    template <AsLogger Logger, typename... Args>                                            \
+    struct level {                                                                          \
+        level(                                                                              \
+            const Logger& logger,                                                           \
+            std::format_string<const Args&...> fmt,                                         \
+            const Args&... args,                                                            \
+            const std::source_location loc = std::source_location::current()) {             \
+            auto spdlog_loc =                                                               \
+                spdlog::source_loc(loc.file_name(), loc.line(), loc.function_name());       \
+            getLogger(logger)->log(spdlog_loc, Level::level, std::format(fmt, args...));    \
+        }                                                                                   \
+        level(                                                                              \
+            const Logger& logger,                                                           \
+            const Args&... args,                                                            \
+            const std::source_location loc = std::source_location::current()) {             \
+            auto spdlog_loc =                                                               \
+                spdlog::source_loc(loc.file_name(), loc.line(), loc.function_name());       \
+            getLogger(logger)->log(spdlog_loc, Level::level, args...);                      \
+        }                                                                                   \
+        level(                                                                              \
+            std::format_string<const Args&...> fmt,                                         \
+            const Args&... args,                                                            \
+            const std::source_location loc = std::source_location::current()) {             \
+            auto spdlog_loc =                                                               \
+                spdlog::source_loc(loc.file_name(), loc.line(), loc.function_name());       \
+            global()->log(spdlog_loc, Level::level, std::format(fmt, args...));             \
+        }                                                                                   \
+        level(                                                                              \
+            const Args&... args,                                                            \
+            const std::source_location loc = std::source_location::current()) {             \
+            auto spdlog_loc =                                                               \
+                spdlog::source_loc(loc.file_name(), loc.line(), loc.function_name());       \
+            global()->log(spdlog_loc, Level::level, args...);                               \
+        }                                                                                   \
+    };                                                                                      \
+                                                                                            \
+    template <typename... Args>                                                             \
+    level(std::format_string<const Args&...>, const Args&...) -> level<LoggerPtr, Args...>; \
+    template <typename Msg>                                                                 \
+    level(const Msg&) -> level<LoggerPtr, Msg>;                                             \
+    template <AsLogger Logger, typename... Args>                                            \
+    level(const Logger&, std::format_string<const Args&...>, const Args&...)                \
+        -> level<Logger, Args...>;                                                          \
+    template <AsLogger Logger, typename Msg>                                                \
+    level(const Logger&, const Msg&)->level<Logger, Msg>
 
 PDFT_DEFINE_LOG_FOR_LEVEL(trace);
 PDFT_DEFINE_LOG_FOR_LEVEL(debug);

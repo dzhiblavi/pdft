@@ -35,19 +35,6 @@ using namespace asio::experimental::awaitable_operators;
 
 namespace {
 
-void printAppInfo() {
-    using namespace utils;
-    using magic_enum::enum_name;
-
-    log::info("PDFT {}", getFullVersionString());
-    log::info(
-        "Platform={}, ASAN={}, TSAN={}, UBSAN={}",
-        enum_name(getCurrentPlatform()),
-        enum_name(isBuiltWithASAN()),
-        enum_name(isBuiltWithTSAN()),
-        enum_name(isBuiltWithUBSAN()));
-}
-
 controller::Action handleSignal(int signal) {
     switch (signal) {
         using enum controller::Action;
@@ -78,9 +65,6 @@ Application::Application(asio::io_context& context, Config config)
 }
 
 void Application::setup() {
-    app::setupLogging(config_.logging);
-    printAppInfo();
-
     app::setupMupdfLogging(media::mupdf::thisThreadContext());
     media::mupdf::thisThreadContext().registerDocumentHandlers();
 
@@ -103,7 +87,23 @@ void Application::setup() {
     }
 }
 
+void Application::printAppInfo() const {
+    using namespace utils;
+    using magic_enum::enum_name;
+
+    log::info(this, "PDFT {}", getFullVersionString());
+
+    log::info(
+        this,
+        "Platform={}, ASAN={}, TSAN={}, UBSAN={}",
+        enum_name(getCurrentPlatform()),
+        enum_name(isBuiltWithASAN()),
+        enum_name(isBuiltWithTSAN()),
+        enum_name(isBuiltWithUBSAN()));
+}
+
 asio::awaitable<void> Application::run(const std::vector<std::string>& paths) {
+    printAppInfo();
     co_await prepareTerminal();
     loadPaths(paths);
     co_await runEventLoop();
@@ -158,7 +158,7 @@ asio::awaitable<void> Application::runEventLoop() {
 }
 
 asio::awaitable<void> Application::render(core::io::OutBuffer& buffer) {
-    log::debug("========== NEW FRAME ===========");
+    log::debug(this, "========== NEW FRAME ===========");
 
     auto tracer =
         core::trace::getGlobalPool().getTracer(core::trace::makeStackTraceLogger(), "display_one");
@@ -232,7 +232,8 @@ asio::awaitable<void> Application::cleanup() {
         fs_watcher_->stop();
     }
 
-    log::debug("total stack tracer allocations: {}", core::trace::getGlobalPool().numAllocations());
+    log::debug(
+        this, "total stack tracer allocations: {}", core::trace::getGlobalPool().numAllocations());
 }
 
 }  // namespace app

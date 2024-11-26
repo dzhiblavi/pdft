@@ -15,16 +15,16 @@ class GlobalLogger {
         return instance;
     }
 
-    std::shared_ptr<spdlog::logger> get() {
+    LoggerPtr get() {
         return logger;
     }
 
-    void set(std::shared_ptr<spdlog::logger> instance) {
+    void set(LoggerPtr instance) {
         logger = std::move(instance);
     }
 
  private:
-    std::shared_ptr<spdlog::logger> logger;
+    LoggerPtr logger;
 };
 
 }  // namespace
@@ -44,23 +44,6 @@ void setGlobalLogger(std::shared_ptr<spdlog::logger> logger) {
 namespace impl {
 
 LoggerPtr global() {
-    if (!GlobalLogger::instance().get()) {
-        loadLogger(
-            "default",
-            {
-                .level = spdlog::level::trace,
-                .sinks =
-                    {
-                        StdoutSink{
-                            .cerr = true,
-                            .colors = true,
-                        },
-                    },
-            });
-
-        setGlobalLogger(logger("default"));
-    }
-
     return GlobalLogger::instance().get();
 }
 
