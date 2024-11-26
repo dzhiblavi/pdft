@@ -3,7 +3,7 @@
 #include <concepts>
 #include <cstdint>
 
-namespace pdft::tui::layout {
+namespace pdft::tui {
 
 template <typename T>
 requires std::integral<T> || std::floating_point<T>
@@ -14,6 +14,10 @@ struct Rect {
     T height = 0;
 
     bool operator==(const Rect&) const = default;
+
+    bool isEmpty() const {
+        return width == 0 || height == 0;
+    }
 };
 
 // A rectangle with non-negative integer dimensions
@@ -35,4 +39,4 @@ Rect<T> offsetRect(const Rect<T>& rect, T x_offset, T y_offset) {
     };
 }
 
-}  // namespace pdft::tui::layout
+}  // namespace pdft::tui

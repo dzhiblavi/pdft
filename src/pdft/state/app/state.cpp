@@ -1,54 +1,37 @@
 #include "pdft/state/app/state.h"
 #include "pdft/core/assert.h"
-#include "pdft/tui/layout/layout.h"
-#include "pdft/tui/text/line.h"
-#include "pdft/tui/text/text.h"
 
 #include <algorithm>
 #include <format>
 
 namespace pdft::state::app {
 
-asio::awaitable<void> State::render(tui::layout::IRect rect, tui::Context& ctx) {
-    namespace constr = tui::layout::constraints;
-
-    auto rects =
-        tui::layout::vertical(constr::Length(1), constr::Fill(1), constr::Length(1)).split(rect);
-    auto info_rects = tui::layout::horizontal(constr::Fill(1), constr::Fill(1)).split(rects[2]);
-
-    rects = tui::layout::horizontal(constr::Fill(1), constr::Fill(20)).split(rects[1]);
-
-    tui::text::render(
-        tui::text::Line::raw(current_input_).setAlignment(tui::layout::Alignment::Min),
-        info_rects[0],
-        ctx);
-
-    if (auto state = getState()) {
-        co_await state->render(rects[1], image_properties_, ctx);
-
-        auto info = std::format(
-            "document {}: {}/{}",
-            state->getDocumentId(),
-            state->getPageIndex() + 1,
-            state->getPageCount());
-
-        auto text = tui::text::Line::raw(info).setAlignment(tui::layout::Alignment::Max);
-        tui::text::render(text, info_rects[1], ctx);
-    }
-
-    std::vector<tui::text::Line> lines;
-
+tui::Element State::render(tui::Context& ctx) {
+    std::vector<tui::Element> elements;
     for (size_t i = 0; i < states_.size(); ++i) {
         const auto& state = states_[i];
         bool is_current = i == *idx_;
         auto doc_id = state.getDocumentId();
         const auto& path = doc_storage_->getDocument(doc_id).getPath();
-
         auto line = std::format("{}{}", is_current ? "* " : "", path.filename().c_str());
-        lines.push_back(tui::text::Line::raw(std::move(line)));
+        elements.push_back(ftxui::text(std::move(line)));
     }
+    auto sidebar = ftxui::vbox(std::move(elements));
 
-    tui::text::render(tui::text::Text::from(std::move(lines)), rects[0], ctx);
+    auto doc = [&] {
+        if (auto state = getState()) {
+            return state->render(image_properties_, ctx);
+        }
+
+        return tui::emptyElement();
+    }();
+
+    auto dom = tui::hbox({
+        sidebar | tui::border | tui::size(tui::WIDTH, tui::EQUAL, 20),
+        doc | tui::flex | tui::borderLight,
+    });
+
+    return dom;
 }
 
 void State::onInput(char key) {

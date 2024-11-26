@@ -1,4 +1,4 @@
-#include "pdft/tui/layout/alignment.h"
+#include "pdft/tui/alignment.h"
 
 #include <catch2/catch_all.hpp>
 

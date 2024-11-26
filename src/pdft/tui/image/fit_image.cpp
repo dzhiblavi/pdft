@@ -2,29 +2,30 @@
 
 namespace pdft::tui::image {
 
+namespace {
+
 struct Fitter {
-    float wh_ratio;
-    const layout::IRect& rect;
+    float image_wh_ratio;
+    const IRect& rect;
     const Placement& place;
     bool image_ratio_is_greater;
 
     // The result
-    layout::IRect pos;
-    layout::FRect image;
+    IRect pos;
 
-    Fitter(float wh_ratio, const layout::IRect& rect, const Placement& place)
-        : wh_ratio(wh_ratio)
+    Fitter(float image_wh_ratio, const IRect& rect, const Placement& place)
+        : image_wh_ratio(image_wh_ratio)
         , rect(rect)
         , place(place) {
-        image_ratio_is_greater = wh_ratio * rect.height > rect.width;
+        image_ratio_is_greater = image_wh_ratio > float(rect.width) / rect.height;
     }
 
     float adjustedHeight() {
-        return rect.width / wh_ratio;
+        return rect.width / image_wh_ratio;
     }
 
     float adjustedWidth() {
-        return rect.height * wh_ratio;
+        return rect.height * image_wh_ratio;
     }
 
     uint32_t adjustedHeightRounded() {
@@ -36,10 +37,6 @@ struct Fitter {
     }
 
     void fitInside() {
-        // Display the full image with no offset
-        image.x = image.y = 0.f;
-        image.width = image.height = 1.f;
-
         uint32_t in_img_cols;
         uint32_t in_img_rows;
 
@@ -61,50 +58,16 @@ struct Fitter {
         pos.height = in_img_rows;
     }
 
-    void fitCropAndFill() {
-        pos = rect;
-
-        if (image_ratio_is_greater) {
-            float img_width = adjustedWidth();
-
-            image = {
-                .x = getOffset(img_width, float(rect.width), place.hor) / img_width,
-                .y = 0.f,  // no vertical offset
-                .width = rect.width / img_width,
-                .height = 1.f,  // full height
-            };
-        } else {
-            float img_height = adjustedHeight();
-
-            image = {
-                .x = 0.f,  // no horizontal offset
-                .y = getOffset(img_height, float(rect.height), place.vert) / img_height,
-                .width = 1.f,  // full width
-                .height = rect.height / img_height,
-            };
-        }
-    }
-
-    std::tuple<layout::IRect, layout::FRect> fit() {
-        switch (place.fit) {
-            using enum Placement::FitMode;
-
-            case FitInside:
-                fitInside();
-                break;
-
-            case CropAndFill:
-                fitCropAndFill();
-                break;
-        }
-
-        return std::make_tuple(pos, image);
+    IRect fit() {
+        fitInside();
+        return pos;
     }
 };
 
-std::tuple<layout::IRect, layout::FRect> fitImage(
-    float wh_ratio, const layout::IRect& rect, const Placement& place) {
-    return Fitter(wh_ratio, rect, place).fit();
+}  // namespace
+
+IRect fitImage(float image_wh_cell_ratio, const IRect& rect, const Placement& place) {
+    return Fitter(image_wh_cell_ratio, rect, place).fit();
 }
 
 }  // namespace pdft::tui::image

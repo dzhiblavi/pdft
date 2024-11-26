@@ -2,9 +2,7 @@
 
 #include "pdft/state/document_storage.h"
 #include "pdft/tui/context.h"
-#include "pdft/tui/layout/rect.h"
-
-#include <asio/awaitable.hpp>
+#include "pdft/tui/elements.h"
 
 namespace pdft::state {
 
@@ -12,7 +10,7 @@ class State {
  public:
     virtual ~State() = default;
 
-    virtual asio::awaitable<void> render(tui::layout::IRect rect, tui::Context& ctx) = 0;
+    virtual tui::Element render(tui::Context& ctx) = 0;
 
     virtual void onInput(char key) = 0;
     virtual void resetInput() = 0;

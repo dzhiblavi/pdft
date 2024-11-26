@@ -8,11 +8,8 @@ class NativeDisplay : public DisplayBase {
  public:
     using DisplayBase::DisplayBase;
 
-    asio::awaitable<void> displayImage(
-        image::ImageId id,
-        const layout::IRect& rect,
-        const layout::FRect& image_subarea,
-        Context& ctx) override;
+    void displayImage(
+        image::ImageId id, const IRect& rect, const FRect& image_subarea, Context& ctx) override;
 };
 
 }  // namespace pdft::tui::display::kitty

@@ -4,10 +4,10 @@
 
 namespace pdft::tui::display::kitty {
 
-asio::awaitable<void> NativeDisplay::displayImage(
+void NativeDisplay::displayImage(
     image::ImageId id,
-    const layout::IRect& rect,
-    const layout::FRect& image_subarea,
+    const IRect& rect,
+    const FRect& image_subarea,
     Context& ctx) {
     PDFT_VERIFY(isLoaded(id));
 
@@ -17,7 +17,7 @@ asio::awaitable<void> NativeDisplay::displayImage(
     PDFT_VERIFY(w >= 0 && h >= 0, "rect dimensions must not be negative: w={},h={}", w, h);
 
     if (w == 0 || h == 0) {
-        co_return;
+        return;
     }
 
     const auto& [rix, riy, riw, rih] = image_subarea;
@@ -50,7 +50,7 @@ asio::awaitable<void> NativeDisplay::displayImage(
     };
 
     // Position cursor to the top left corner
-    ctx.terminal.moveCursor(
+    ctx.terminal.setCursorPosition(
         tui::terminal::CursorPosition{
             .rows = static_cast<uint32_t>(y),
             .columns = static_cast<uint32_t>(x),
@@ -66,4 +66,4 @@ asio::awaitable<void> NativeDisplay::displayImage(
         ctx.buffer);
 }
 
-}  // namespace pdft::display::kitty
+}  // namespace pdft::tui::display::kitty

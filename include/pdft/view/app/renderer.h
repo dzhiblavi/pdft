@@ -15,8 +15,9 @@ class Renderer : public view::Renderer {
         std::shared_ptr<state::DocumentStorage> docs,
         std::shared_ptr<tui::display::Display> display);
 
-    asio::awaitable<void> render(
-        const tui::layout::IRect& rect,
+    void render(
+        const tui::IRect& rect,
+        const tui::FRect& subarea,
         const tui::image::Placement& placement,
         const image::ImageProperties& properties,
         const Page& page,
@@ -32,7 +33,8 @@ class Renderer : public view::Renderer {
         media::PageSize page_size;
         bool inverted_colors;
         float factor;
-        float cell_wh_ratio;
+        float image_rows;
+        float image_cols;
     };
 
     const uint32_t image_id_salt_;

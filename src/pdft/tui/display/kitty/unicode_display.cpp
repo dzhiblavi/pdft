@@ -6,10 +6,10 @@
 
 namespace pdft::tui::display::kitty {
 
-asio::awaitable<void> UnicodeDisplay::displayImage(
+void UnicodeDisplay::displayImage(
     image::ImageId id,
-    const layout::IRect& rect,
-    const layout::FRect& image_subarea,
+    const IRect& rect,
+    const FRect& image_subarea,
     Context& ctx) {
     PDFT_VERIFY(isLoaded(id));
 
@@ -19,7 +19,7 @@ asio::awaitable<void> UnicodeDisplay::displayImage(
     PDFT_VERIFY(w >= 0 && h >= 0, "rect dimensions must not be negative: w={},h={}", w, h);
 
     if (w == 0 || h == 0) {
-        co_return;
+        return;
     }
 
     const auto& [rix, riy, riw, rih] = image_subarea;
@@ -70,7 +70,7 @@ asio::awaitable<void> UnicodeDisplay::displayImage(
         "m");
 
     for (uint32_t row = 0; row < h; ++row) {
-        ctx.terminal.moveCursor(
+        ctx.terminal.setCursorPosition(
             tui::terminal::CursorPosition{
                 .rows = y + row,
                 .columns = static_cast<uint32_t>(x),

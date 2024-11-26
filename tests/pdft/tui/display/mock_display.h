@@ -18,8 +18,8 @@ class Display : public display::Display {
         asio::awaitable<void>,
         displayImage,
         (image::ImageId id,
-         const tui::layout::IRect& rect,
-         const tui::layout::FRect& image_subarea,
+         const tui::IRect& rect,
+         const tui::FRect& image_subarea,
          core::io::OutBuffer& buffer),
         (override));
 

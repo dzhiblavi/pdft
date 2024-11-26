@@ -29,7 +29,10 @@ target_link_libraries(
          libmupdf_ext
          libfswatch
          magic_enum::magic_enum
-         cppcoro::cppcoro)
+         cppcoro::cppcoro
+         ftxui::screen
+         ftxui::dom
+         ftxui::component)
 
 target_sources(
   pdft
@@ -37,7 +40,6 @@ target_sources(
           ./utils/zlib.cpp
           ./utils/get_home_dir.cpp
           ./utils/random.cpp
-          # ./view/layout.cpp ./view/app/fit_page.cpp ./view/app/fit_text.cpp
           ./view/app/renderer.cpp
           ./state/app/state.cpp
           ./state/app/document_state.cpp
@@ -54,7 +56,6 @@ target_sources(
           ./media/mupdf/document.cpp
           ./media/mupdf/page.cpp
           ./media/mupdf/pixmap_image.cpp
-          ./tui/layout/layout.cpp
           ./tui/image/fit_image.cpp
           ./tui/display/kitty/apc/parse_response.cpp
           ./tui/display/kitty/apc/executor_base.cpp

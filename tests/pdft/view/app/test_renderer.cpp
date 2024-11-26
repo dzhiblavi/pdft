@@ -21,7 +21,7 @@ const core::terminal::Dimensions TermSize = {
     .cell_width_px = 1920 / 200,
 };
 
-const tui::layout::IRect Rect = {
+const tui::IRect Rect = {
     .x = 10,
     .y = 20,
     .width = 30,

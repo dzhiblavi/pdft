@@ -1,6 +1,5 @@
 #include "pdft/state/app/document_state.h"
 #include "pdft/core/log/log.h"
-#include "pdft/tui/layout/layout.h"
 
 #include <magic_enum.hpp>
 
@@ -104,222 +103,272 @@ void DocumentState::applyScrollOffset(uint32_t height, int32_t pages_per_height)
         "applyScrollOffset after: scroll_offset={}, page_index={}", scroll_offset_, page_index_);
 }
 
-asio::awaitable<void> DocumentState::render(
-    tui::layout::IRect rect, const image::ImageProperties& properties, tui::Context& ctx) {
+tui::Element DocumentState::render(const image::ImageProperties& properties, tui::Context& ctx) {
     switch (view_mode_) {
         using enum ViewMode;
 
         case OnePage:
-            co_return co_await renderOnePage(rect, properties, ctx);
+            return renderOnePage(properties, ctx);
 
         case TwoPages:
-            co_return co_await renderTwoPages(rect, properties, ctx);
+            return renderTwoPages(properties, ctx);
 
         case OnePageContinuous:
-            co_return co_await renderOnePageContinuous(rect, properties, ctx);
+            return renderOnePageContinuous(properties, ctx);
 
         case TwoPagesContinuous:
-            co_return co_await renderTwoPagesContinuous(rect, properties, ctx);
+            return renderTwoPagesContinuous(properties, ctx);
     }
 }
 
-asio::awaitable<void> DocumentState::renderOnePage(
-    tui::layout::IRect rect, const image::ImageProperties& properties, tui::Context& ctx) {
-    co_await renderer_->render(
-        rect,
-        {
-            .hor = tui::layout::Alignment::Center,
-            .vert = tui::layout::Alignment::Center,
-        },
-        properties,
-        {
-            .document_id = document_id_,
-            .page_index = page_index_,
-        },
-        ctx);
+tui::Element DocumentState::renderOnePage(
+    const image::ImageProperties& properties, tui::Context& ctx) {
+    auto render = [&](tui::IRect rect) {
+        renderer_->render(
+            rect,
+            {
+                .hor = tui::Alignment::Center,
+                .vert = tui::Alignment::Center,
+            },
+            properties,
+            {
+                .document_id = document_id_,
+                .page_index = page_index_,
+            },
+            ctx);
+    };
+
+    return tui::withSize(render);
 }
 
-asio::awaitable<void> DocumentState::renderTwoPages(
-    tui::layout::IRect rect, const image::ImageProperties& properties, tui::Context& ctx) {
-    using namespace tui::layout;
-    auto rects =
-        horizontal(
-            constraints::Fraction{0.15f / zoom_},
-            constraints::Fill{1},
-            constraints::Length{1},
-            constraints::Fill{1},
-            constraints::Fraction{0.15f / zoom_})
-            .split(rect);
+tui::Element DocumentState::renderTwoPages(
+    const image::ImageProperties& properties, tui::Context& ctx) {
+    auto render_left = [&](tui::IRect rect) {
+        renderer_->render(
+            rect,
+            {
+                .hor = tui::Alignment::Max,
+                .vert = tui::Alignment::Center,
+            },
+            properties,
+            {
+                .document_id = document_id_,
+                .page_index = page_index_,
+            },
+            ctx);
+    };
 
-    co_await renderer_->render(
-        rects[1],
-        {
-            .hor = tui::layout::Alignment::Max,
-            .vert = tui::layout::Alignment::Center,
-        },
-        properties,
-        {
-            .document_id = document_id_,
-            .page_index = page_index_,
-        },
-        ctx);
+    auto render_right = [&](tui::IRect rect) {
+        if (page_index_ + 1 >= page_count_) {
+            return;
+        }
 
-    if (page_index_ + 1 >= page_count_) {
-        co_return;
-    }
+        renderer_->render(
+            rect,
+            {
+                .hor = tui::Alignment::Min,
+                .vert = tui::Alignment::Center,
+            },
+            properties,
+            {
+                .document_id = document_id_,
+                .page_index = page_index_ + 1,
+            },
+            ctx);
+    };
 
-    co_await renderer_->render(
-        rects[3],
-        {
-            .hor = tui::layout::Alignment::Min,
-            .vert = tui::layout::Alignment::Center,
-        },
-        properties,
-        {
-            .document_id = document_id_,
-            .page_index = page_index_ + 1,
-        },
-        ctx);
+    return tui::hbox({
+        tui::withSize(render_left) | tui::flex,
+        tui::withSize(render_right) | tui::flex,
+    });
 }
 
-asio::awaitable<void> DocumentState::renderOnePageContinuous(
-    tui::layout::IRect rect, const image::ImageProperties& properties, tui::Context& ctx) {
-    using namespace tui::layout;
-    applyScrollOffset(rect.height, 1);
+tui::Element DocumentState::renderOnePageContinuous(
+    const image::ImageProperties& properties, tui::Context& ctx) {
+    applyScrollOffset(100, 1);
 
-    log::debug("zoom is {}, pad fraction is {}", zoom_, std::fmin(0.47f, 0.30f / zoom_));
+    auto render_top = [&](tui::IRect rect) {
+        float this_ratio = float(rect.height) / rect_.height;
 
-    rect = horizontal(
-               constraints::Fraction{std::fmin(0.47f, 0.30f / zoom_)},
-               constraints::Fill{1},
-               constraints::Fraction{std::fmin(0.47f, 0.30f / zoom_)})
-               .split(rect)[1];
+        renderer_->render(
+            rect,
+            {
+                .x = 0.f,
+                .y = 1.f - this_ratio,
+                .width = 1.f,
+                .height = this_ratio,
+            },
+            {
+                .hor = tui::Alignment::Center,
+                .vert = tui::Alignment::Max,
+            },
+            properties,
+            {
+                .document_id = document_id_,
+                .page_index = page_index_,
+            },
+            ctx);
+    };
 
-    auto top_height = rect.height - scroll_offset_;
+    auto render_bottom = [&](tui::IRect rect) {
+        if (page_index_ + 1 >= page_count_) {
+            return;
+        }
 
-    auto page_rects = vertical(constraints::Length(top_height), constraints::Fill(1)).split(rect);
+        float this_ratio = float(rect.height) / rect_.height;
 
-    co_await renderer_->render(
-        page_rects[0],
-        {
-            .hor = tui::layout::Alignment::Center,
-            .vert = tui::layout::Alignment::Max,
-            .fit = tui::image::Placement::FitMode::CropAndFill,
-        },
-        properties,
-        {
-            .document_id = document_id_,
-            .page_index = page_index_,
-        },
-        ctx);
+        renderer_->render(
+            rect,
+            {
+                .x = 0.f,
+                .y = 0.f,
+                .width = 1.f,
+                .height = this_ratio,
+            },
+            {
+                .hor = tui::Alignment::Center,
+                .vert = tui::Alignment::Min,
+            },
+            properties,
+            {
+                .document_id = document_id_,
+                .page_index = page_index_ + 1,
+            },
+            ctx);
+    };
 
-    if (page_index_ + 1 >= page_count_) {
-        co_return;
-    }
-
-    co_await renderer_->render(
-        page_rects[1],
-        {
-            .hor = tui::layout::Alignment::Center,
-            .vert = tui::layout::Alignment::Min,
-            .fit = tui::image::Placement::FitMode::CropAndFill,
-        },
-        properties,
-        {
-            .document_id = document_id_,
-            .page_index = page_index_ + 1,
-        },
-        ctx);
+    return tui::vbox({
+               tui::withSize(render_top) | tui::flex |
+                   tui::size(tui::HEIGHT, tui::EQUAL, 100 - scroll_offset_),
+               tui::withSize(render_bottom) | tui::flex |
+                   tui::size(tui::HEIGHT, tui::EQUAL, scroll_offset_),
+           }) |
+           tui::reflect(rect_);
 }
 
-asio::awaitable<void> DocumentState::renderTwoPagesContinuous(
-    tui::layout::IRect rect, const image::ImageProperties& properties, tui::Context& ctx) {
-    using namespace tui::layout;
+tui::Element DocumentState::renderTwoPagesContinuous(
+    const image::ImageProperties& properties, tui::Context& ctx) {
+    applyScrollOffset(100, 2);
 
-    applyScrollOffset(rect.height, 2);
+    auto render_top_left = [&](tui::IRect rect) {
+        float this_ratio = float(rect.height) / rect_.height;
 
-    auto rects =
-        horizontal(
-            constraints::Fraction{std::fmin(0.47f, 0.1f / zoom_)},
-            constraints::Fill{1},  // rects[1]
-            constraints::Fill{1},  // rects[2]
-            constraints::Fraction{std::fmin(0.47f, 0.10f / zoom_)})
-            .split(rect);
+        renderer_->render(
+            rect,
+            {
+                .x = 0.f,
+                .y = 1.f - this_ratio,
+                .width = 1.f,
+                .height = this_ratio,
+            },
+            {
+                .hor = tui::Alignment::Max,
+                .vert = tui::Alignment::Max,
+            },
+            properties,
+            {
+                .document_id = document_id_,
+                .page_index = page_index_,
+            },
+            ctx);
+    };
 
-    uint32_t top_height = rect.height - scroll_offset_;
+    auto render_top_right = [&](tui::IRect rect) {
+        if (page_index_ + 1 >= page_count_) {
+            return;
+        }
 
-    auto left_rects =
-        vertical(constraints::Length(top_height), constraints::Fill(1)).split(rects[1]);
-    auto right_rects =
-        vertical(constraints::Length(top_height), constraints::Fill(1)).split(rects[2]);
+        float this_ratio = float(rect.height) / rect_.height;
 
-    co_await renderer_->render(
-        left_rects[0],
-        {
-            .hor = tui::layout::Alignment::Max,
-            .vert = tui::layout::Alignment::Max,
-            .fit = tui::image::Placement::FitMode::CropAndFill,
-        },
-        properties,
-        {
-            .document_id = document_id_,
-            .page_index = page_index_,
-        },
-        ctx);
+        renderer_->render(
+            rect,
+            {
+                .x = 0.f,
+                .y = 1.f - this_ratio,
+                .width = 1.f,
+                .height = this_ratio,
+            },
+            {
+                .hor = tui::Alignment::Min,
+                .vert = tui::Alignment::Max,
+            },
+            properties,
+            {
+                .document_id = document_id_,
+                .page_index = page_index_ + 1,
+            },
+            ctx);
+    };
 
-    if (page_index_ + 1 >= page_count_) {
-        co_return;
-    }
+    auto render_bottom_left = [&](tui::IRect rect) {
+        if (page_index_ + 2 >= page_count_) {
+            return;
+        }
 
-    co_await renderer_->render(
-        right_rects[0],
-        {
-            .hor = tui::layout::Alignment::Min,
-            .vert = tui::layout::Alignment::Max,
-            .fit = tui::image::Placement::FitMode::CropAndFill,
-        },
-        properties,
-        {
-            .document_id = document_id_,
-            .page_index = page_index_ + 1,
-        },
-        ctx);
+        float this_ratio = float(rect.height) / rect_.height;
 
-    if (page_index_ + 2 >= page_count_) {
-        co_return;
-    }
+        renderer_->render(
+            rect,
+            {
+                .x = 0.f,
+                .y = 0.f,
+                .width = 1.f,
+                .height = this_ratio,
+            },
+            {
+                .hor = tui::Alignment::Max,
+                .vert = tui::Alignment::Min,
+            },
+            properties,
+            {
+                .document_id = document_id_,
+                .page_index = page_index_ + 2,
+            },
+            ctx);
+    };
 
-    co_await renderer_->render(
-        left_rects[1],
-        {
-            .hor = tui::layout::Alignment::Max,
-            .vert = tui::layout::Alignment::Min,
-            .fit = tui::image::Placement::FitMode::CropAndFill,
-        },
-        properties,
-        {
-            .document_id = document_id_,
-            .page_index = page_index_ + 2,
-        },
-        ctx);
+    auto render_bottom_right = [&](tui::IRect rect) {
+        if (page_index_ + 3 >= page_count_) {
+            return;
+        }
 
-    if (page_index_ + 3 >= page_count_) {
-        co_return;
-    }
+        float this_ratio = float(rect.height) / rect_.height;
 
-    co_await renderer_->render(
-        right_rects[1],
-        {
-            .hor = tui::layout::Alignment::Min,
-            .vert = tui::layout::Alignment::Min,
-            .fit = tui::image::Placement::FitMode::CropAndFill,
-        },
-        properties,
-        {
-            .document_id = document_id_,
-            .page_index = page_index_ + 3,
-        },
-        ctx);
+        renderer_->render(
+            rect,
+            {
+                .x = 0.f,
+                .y = 0.f,
+                .width = 1.f,
+                .height = this_ratio,
+            },
+            {
+                .hor = tui::Alignment::Min,
+                .vert = tui::Alignment::Min,
+            },
+            properties,
+            {
+                .document_id = document_id_,
+                .page_index = page_index_ + 3,
+            },
+            ctx);
+    };
+
+    return tui::vbox({
+               tui::hbox({
+                   tui::withSize(render_top_left) | tui::flex |
+                       tui::size(tui::HEIGHT, tui::EQUAL, 100 - scroll_offset_),
+                   tui::withSize(render_top_right) | tui::flex |
+                       tui::size(tui::HEIGHT, tui::EQUAL, 100 - scroll_offset_),
+               }) | tui::flex,
+               tui::hbox({
+                   tui::withSize(render_bottom_left) | tui::flex |
+                       tui::size(tui::HEIGHT, tui::EQUAL, scroll_offset_),
+                   tui::withSize(render_bottom_right) | tui::flex |
+                       tui::size(tui::HEIGHT, tui::EQUAL, scroll_offset_),
+               }) | tui::flex,
+           }) |
+           tui::reflect(rect_);
 }
 
 }  // namespace pdft::state::app

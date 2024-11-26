@@ -13,7 +13,7 @@ using enum TextPlacement::OverflowMode;
 
 namespace {
 
-tui::layout::IRect makeRect(uint32_t num_lines) {
+tui::IRect makeRect(uint32_t num_lines) {
     return {
         .x = 1,
         .y = 2,
@@ -28,7 +28,7 @@ void dump(const Line& line) {
 }
 
 void check(
-    const tui::layout::IRect& rect,
+    const tui::IRect& rect,
     const TextPlacement& placement,
     std::string_view text,
     const std::vector<Line>& expected_lines) {

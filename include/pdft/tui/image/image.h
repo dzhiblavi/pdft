@@ -3,15 +3,15 @@
 #include "pdft/core/assert.h"
 #include "pdft/tui/context.h"
 #include "pdft/tui/display/display.h"
-#include "pdft/tui/layout/rect.h"
+#include "pdft/tui/rect.h"
 
 namespace pdft::tui::image {
 
 struct Image {
     uint32_t id;
-    layout::FRect subarea;
+    FRect subarea;
 
-    Image& setSubarea(layout::FRect subarea) {
+    Image& setSubarea(FRect subarea) {
         this->subarea = subarea;
         return *this;
     }
@@ -27,7 +27,7 @@ struct Image {
         });
     }
 
-    static Image make(uint32_t id, layout::FRect subarea) {
+    static Image make(uint32_t id, FRect subarea) {
         Image image;
         image.id = id;
         return image.setSubarea(subarea);
@@ -37,10 +37,9 @@ struct Image {
     Image() = default;
 };
 
-inline asio::awaitable<void> render(
-    const Image& image, const layout::IRect& rect, display::Display& display, Context& ctx) {
+inline void render(const Image& image, const IRect& rect, display::Display& display, Context& ctx) {
     PDFT_VERIFY(display.isLoaded(image.id));
-    co_await display.displayImage(image.id, rect, image.subarea, ctx);
+    display.displayImage(image.id, rect, image.subarea, ctx);
 }
 
 }  // namespace pdft::tui::image

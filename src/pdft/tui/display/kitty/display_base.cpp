@@ -9,7 +9,7 @@ bool DisplayBase::isLoaded(image::ImageId id) const {
     return loaded_.contains(id);
 }
 
-asio::awaitable<void> DisplayBase::loadImage(
+void DisplayBase::loadImage(
     image::ImageId id, const image::Image& image, core::io::OutBuffer& buffer) {
     log::debug("loading an image with id={} to the display", id);
     PDFT_VERIFY(!isLoaded(id), "image with id={} is already loaded", id);
@@ -36,8 +36,6 @@ asio::awaitable<void> DisplayBase::loadImage(
             .compress = true,
         },
         buffer);
-
-    co_return;
 }
 
 void DisplayBase::clear(core::io::OutBuffer& buffer) {
@@ -99,4 +97,4 @@ void DisplayBase::unloadAll(core::io::OutBuffer& buffer) {
         buffer);
 }
 
-}  // namespace pdft::display::kitty
+}  // namespace pdft::tui::display::kitty

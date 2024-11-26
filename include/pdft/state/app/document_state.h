@@ -1,6 +1,7 @@
 #pragma once
 
 #include "pdft/tui/context.h"
+#include "pdft/tui/elements.h"
 #include "pdft/view/renderer.h"
 
 namespace pdft::state::app {
@@ -12,8 +13,7 @@ class DocumentState {
         , page_count_(page_count)
         , renderer_(std::move(renderer)) {}
 
-    asio::awaitable<void> render(
-        tui::layout::IRect rect, const image::ImageProperties& properties, tui::Context& ctx);
+    tui::Element render(const image::ImageProperties& properties, tui::Context& ctx);
 
     void scrollNext(int32_t delta);
     void nextPage(int32_t delta);
@@ -36,14 +36,12 @@ class DocumentState {
     };
 
     void applyScrollOffset(uint32_t height, int32_t pages_per_height);
-    asio::awaitable<void> renderOnePage(
-        tui::layout::IRect rect, const image::ImageProperties& properties, tui::Context& ctx);
-    asio::awaitable<void> renderTwoPages(
-        tui::layout::IRect rect, const image::ImageProperties& properties, tui::Context& ctx);
-    asio::awaitable<void> renderOnePageContinuous(
-        tui::layout::IRect rect, const image::ImageProperties& properties, tui::Context& ctx);
-    asio::awaitable<void> renderTwoPagesContinuous(
-        tui::layout::IRect rect, const image::ImageProperties& properties, tui::Context& ctx);
+    tui::Element renderOnePage(const image::ImageProperties& properties, tui::Context& ctx);
+    tui::Element renderTwoPages(const image::ImageProperties& properties, tui::Context& ctx);
+    tui::Element renderOnePageContinuous(
+        const image::ImageProperties& properties, tui::Context& ctx);
+    tui::Element renderTwoPagesContinuous(
+        const image::ImageProperties& properties, tui::Context& ctx);
 
     DocumentId document_id_;
     uint32_t page_count_;
@@ -52,6 +50,7 @@ class DocumentState {
     int32_t scroll_offset_ = 0;
     float zoom_ = 1.0f;
     ViewMode view_mode_ = ViewMode::OnePage;
+    tui::IRect rect_;
 };
 
 }  // namespace pdft::state::app

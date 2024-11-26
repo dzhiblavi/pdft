@@ -25,16 +25,10 @@ add_test(./pdft/core/io/posix/test_console.cpp)
 add_test(./pdft/core/trace/test_scope_tracer.cpp)
 add_test(./pdft/core/trace/test_stack_scope_tracer.cpp)
 
-# add_test(./pdft/view/app/test_fit_page.cpp)
-# add_test(./pdft/view/app/test_fit_text.cpp)
-# add_test(./pdft/view/app/test_renderer.cpp)
-
 add_test(./pdft/controller/test_keytree.cpp)
 
-add_test(./pdft/tui/example.cpp)
+add_test(./pdft/tui/test_alignment.cpp)
 add_test(./pdft/tui/image/test_fit_image.cpp)
-add_test(./pdft/tui/layout/test_layout.cpp)
-add_test(./pdft/tui/layout/test_alignment.cpp)
 add_test(./pdft/tui/terminal/ansi/test_terminal.cpp)
 add_test(./pdft/tui/display/kitty/apc/test_parse_response.cpp)
 add_test(./pdft/tui/display/kitty/apc/test_executor_base.cpp)

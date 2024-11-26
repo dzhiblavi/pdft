@@ -16,7 +16,7 @@ class DisplayBase : public display::Display {
         : executor_(std::move(executor))
         , console_(std::move(console)) {}
 
-    asio::awaitable<void> loadImage(
+    void loadImage(
         image::ImageId id, const image::Image& image, core::io::OutBuffer& buffer) override;
 
     void clear(core::io::OutBuffer& buffer) override;

@@ -170,15 +170,17 @@ asio::awaitable<void> Application::render(core::io::OutBuffer& buffer) {
         core::trace::getGlobalPool().getTracer(core::trace::makeStackTraceLogger(), "display_one");
 
     core::io::clear(buffer);
-    terminal_->clear(buffer);
     image_display_->clear(buffer);
 
     {
         auto _ = tracer.addChild("render");
-        co_await state_->render(ctx.screen_size.rect(), ctx);
+        auto dom = state_->render(ctx);
+        auto screen = ftxui::Screen::Create(ftxui::Dimension::Full());
+        ftxui::Render(screen, dom);
+        co_await console_->write(screen.ToString());
     }
 
-    auto _ = tracer.addChild("flush");
+    auto _ = tracer.addChild("flush_display");
     co_await console_->write(buffer.view());
 }
 

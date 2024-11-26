@@ -2,7 +2,7 @@
 
 #include "pdft/core/assert.h"
 
-namespace pdft::tui::layout {
+namespace pdft::tui {
 
 enum class Alignment {
     Center,
@@ -30,4 +30,4 @@ T getOffset(T outer, T inner, Alignment strategy) {
     }
 }
 
-}  // namespace pdft::tui::layout
+}  // namespace pdft::tui

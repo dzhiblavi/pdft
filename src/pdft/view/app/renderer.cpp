@@ -16,8 +16,9 @@ Renderer::Renderer(
     , docs_(std::move(docs))
     , display_(std::move(display)) {}
 
-asio::awaitable<void> Renderer::render(
-    const tui::layout::IRect& rect,
+void Renderer::render(
+    const tui::IRect& rect,
+    const tui::FRect& subarea,
     const tui::image::Placement& place,
     const image::ImageProperties& properties,
     const Page& page,
@@ -73,7 +74,7 @@ asio::awaitable<void> Renderer::render(
             .invert_colors = properties.invert_colors,
         });
 
-        co_await display_->loadImage(id, *image, ctx.buffer);
+        display_->loadImage(id, *image, ctx.buffer);
 
         auto image_size = image->size();
         float image_cols = float(image_size.width_px) / ctx.screen_size.cell_width_px;
@@ -83,7 +84,8 @@ asio::awaitable<void> Renderer::render(
             .page_size = page_size,
             .inverted_colors = properties.invert_colors,
             .factor = factor,
-            .cell_wh_ratio = image_cols / image_rows,
+            .image_rows = image_rows,
+            .image_cols = image_cols,
         };
     }
 
@@ -91,12 +93,21 @@ asio::awaitable<void> Renderer::render(
     PDFT_VERIFY(loaded_.contains(id));
     PDFT_VERIFY(display_->isLoaded(id));
 
-    auto [x, y, w, h] = rect;
-    log::debug("renderer @ x={},y={},w={},h={}", x, y, w, h);
-
-    auto [irect, subarea] = tui::image::fitImage(loaded_[id].cell_wh_ratio, rect, place);
+    const auto& props = loaded_[id];
+    float sub_rows = props.image_rows * subarea.height;
+    float sub_cols = props.image_cols * subarea.width;
+    auto irect = tui::image::fitImage(sub_cols / sub_rows, rect, place);
     auto image = tui::image::Image::make(id, subarea);
-    co_await tui::image::render(image, irect, *display_, ctx);
+
+    {
+        auto [x, y, w, h] = rect;
+        log::debug("renderer @ x={},y={},w={},h={}", x, y, w, h);
+
+        auto [ix, iy, iw, ih] = irect;
+        log::debug("renderer I ix={},iy={},iw={},ih={}", ix, iy, iw, ih);
+    }
+
+    tui::image::render(image, irect, *display_, ctx);
 }
 
 float Renderer::calcFactor(

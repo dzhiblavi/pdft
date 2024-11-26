@@ -7,11 +7,9 @@ namespace pdft::tui::terminal::ansi {
 class Terminal : public terminal::Terminal {
  public:
     void clear(core::io::OutBuffer& buffer) override;
-    void moveCursor(CursorPosition position, core::io::OutBuffer& buffer) override;
-    void patchStyle(style::Patch patch, core::io::OutBuffer& buffer) override;
-
- private:
-    style::Style current_style_;
+    void setCursorPosition(CursorPosition position, core::io::OutBuffer& buffer) override;
+    void moveCursorHorizontally(int32_t shift, core::io::OutBuffer& buffer) override;
+    void moveCursorVertically(int32_t shift, core::io::OutBuffer& buffer) override;
 };
 
 }  // namespace pdft::tui::terminal::ansi

@@ -5,11 +5,11 @@
 
 namespace pdft::tui::terminal::ansi {
 
-TEST_CASE("testMoveCursor", "") {
+TEST_CASE("testsetCursorPosition", "") {
     core::io::OutBuffer buffer;
     auto terminal = Terminal();
 
-    terminal.moveCursor(CursorPosition{10, 20}, buffer);
+    terminal.setCursorPosition(CursorPosition{10, 20}, buffer);
     CHECK(buffer.view() == "\x1b[11;21H");
 }
 
