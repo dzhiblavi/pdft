@@ -35,12 +35,10 @@ tui::Element State::render(tui::Context& ctx) {
         return tui::emptyElement();
     }();
 
-    auto dom = tui::hbox({
+    return tui::hbox({
         getSidebar(),
         doc | tui::flex | tui::borderLight,
     });
-
-    return dom;
 }
 
 void State::onInput(char key) {
