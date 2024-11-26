@@ -6,6 +6,13 @@
 
 namespace pdft::state {
 
+enum class ViewMode {
+    OnePage = 0,
+    TwoPages = 1,
+    OnePageContinuous = 2,
+    TwoPagesContinuous = 3,
+};
+
 class State {
  public:
     virtual ~State() = default;
@@ -23,7 +30,6 @@ class State {
     virtual void setPageIndex(uint32_t index) = 0;
     virtual void nextDocument(int delta) = 0;
     virtual void nextLayout(int delta) = 0;
-    virtual void updateZoom(float coeff) = 0;
     virtual void invertColors() = 0;
     virtual void updateScalingFactor(float coeff) = 0;
     virtual void toggleSidebar() = 0;

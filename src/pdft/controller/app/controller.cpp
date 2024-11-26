@@ -88,14 +88,6 @@ void Controller::bindKey(Command command, std::string_view keys, const Config& c
             key_tree_.bind(keys, [this] { state_->nextLayout(-1); });
             break;
 
-        case ZoomIn:
-            key_tree_.bind(keys, [&] { state_->updateZoom(config.zoom_multiplier); });
-            break;
-
-        case ZoomOut:
-            key_tree_.bind(keys, [&] { state_->updateZoom(1.f / config.zoom_multiplier); });
-            break;
-
         case InvertColors:
             key_tree_.bind(keys, [this] { state_->invertColors(); });
             break;

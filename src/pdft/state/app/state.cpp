@@ -106,12 +106,6 @@ void State::nextLayout(int delta) {
     }
 }
 
-void State::updateZoom(float coeff) {
-    if (auto state = getState()) {
-        state->updateZoom(coeff);
-    }
-}
-
 DocumentState* State::getState() {
     if (idx_) {
         return &states_[*idx_];

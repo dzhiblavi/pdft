@@ -1,5 +1,6 @@
 #pragma once
 
+#include "pdft/state/state.h"
 #include "pdft/tui/context.h"
 #include "pdft/tui/elements.h"
 #include "pdft/view/renderer.h"
@@ -19,7 +20,6 @@ class DocumentState {
     void nextPage(int32_t delta);
     void setPageIndex(uint32_t index);
     void nextLayout(int32_t delta);
-    void updateZoom(float coeff);
 
     DocumentId getDocumentId() const;
     void setDocument(DocumentId id, uint32_t page_count);
@@ -28,13 +28,6 @@ class DocumentState {
     uint32_t getPageCount() const;
 
  private:
-    enum class ViewMode {
-        OnePage = 0,
-        TwoPages = 1,
-        OnePageContinuous = 2,
-        TwoPagesContinuous = 3,
-    };
-
     void applyScrollOffset(uint32_t height, int32_t pages_per_height);
     tui::Element renderOnePage(const image::ImageProperties& properties, tui::Context& ctx);
     tui::Element renderTwoPages(const image::ImageProperties& properties, tui::Context& ctx);
@@ -48,7 +41,6 @@ class DocumentState {
     std::shared_ptr<view::Renderer> renderer_;
     uint32_t page_index_ = 0;
     int32_t scroll_offset_ = 0;
-    float zoom_ = 1.0f;
     ViewMode view_mode_ = ViewMode::OnePage;
     tui::IRect rect_;
 };

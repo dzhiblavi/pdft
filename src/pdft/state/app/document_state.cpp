@@ -55,12 +55,6 @@ void DocumentState::nextLayout(int32_t delta) {
     view_mode_ = static_cast<ViewMode>(new_layout_index);
 }
 
-void DocumentState::updateZoom(float coeff) {
-    constexpr float MinZoom = 0.001f;
-    constexpr float MaxZoom = 200.0f;
-    zoom_ = std::fmin(MaxZoom, std::fmax(MinZoom, zoom_ * coeff));
-}
-
 DocumentId DocumentState::getDocumentId() const {
     return document_id_;
 }

@@ -30,9 +30,9 @@ target_link_libraries(
          libfswatch
          magic_enum::magic_enum
          cppcoro::cppcoro
+         reflectcpp
          ftxui::screen
-         ftxui::dom
-         ftxui::component)
+         ftxui::dom)
 
 target_sources(
   pdft

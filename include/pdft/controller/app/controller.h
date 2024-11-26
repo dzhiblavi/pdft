@@ -28,8 +28,6 @@ class Controller : public controller::Controller {
         NumPrevDocument,
         NextLayout,
         PrevLayout,
-        ZoomIn,
-        ZoomOut,
         InvertColors,
         IncreaseScalingFactor,
         DecreaseScalingFactor,
@@ -44,7 +42,6 @@ class Controller : public controller::Controller {
     struct Config {
         std::vector<KeyMapping> key_mappings;
         int32_t rows_per_scroll = 10;
-        float zoom_multiplier = 1.1f;
     };
 
     Controller(

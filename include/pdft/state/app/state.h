@@ -32,7 +32,6 @@ class State : public state::State {
     void setPageIndex(uint32_t index) override;
     void nextDocument(int delta) override;
     void nextLayout(int delta) override;
-    void updateZoom(float coeff) override;
     void invertColors() override;
     void updateScalingFactor(float coeff) override;
     void toggleSidebar() override;
