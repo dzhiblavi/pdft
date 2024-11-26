@@ -23,8 +23,7 @@ void Renderer::render(
     const image::ImageProperties& properties,
     const Page& page,
     tui::Context& ctx) {
-    core::trace::StackScopeTracer trace =
-        core::trace::getGlobalPool().getTracer(core::trace::makeStackTraceLogger(), "render_one");
+    auto _ = ctx.push("render_one");
 
     const auto& [doc_id, page_index] = page;
     const auto& document = docs_->getDocument(doc_id);
@@ -49,14 +48,14 @@ void Renderer::render(
         }
 
         if (should_reload) {
-            auto _ = trace.addChild("unload_image");
+            auto _ = ctx.push("unload_image");
             display_->unload(id, ctx.buffer);
             loaded_.erase(it);
         }
     }
 
     if (!loaded_.contains(id)) {
-        auto _ = trace.addChild("load_image");
+        auto _ = ctx.push("load_image");
 
         auto page = document.getPage(page_index);
         auto page_size = page->getDefaultSize();
@@ -89,7 +88,7 @@ void Renderer::render(
         };
     }
 
-    auto _ = trace.addChild("display_image");
+    auto _2 = ctx.push("display_image");
     PDFT_VERIFY(loaded_.contains(id));
     PDFT_VERIFY(display_->isLoaded(id));
 

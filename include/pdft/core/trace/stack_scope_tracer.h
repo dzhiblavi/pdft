@@ -9,12 +9,8 @@ namespace pdft::core::trace {
 
 class StackScopeTracerPool;
 
-struct Noop {
-    void operator()(auto&&...) {}
-};
-
 struct StackScopeTracerBase : utils::IntrusiveForwardListItem<StackScopeTracerBase> {
-    void onExit();
+    void finalize();
     void release();
     void addChild(StackScopeTracerBase* child);
 
@@ -33,51 +29,52 @@ struct StackScopeTracerBase : utils::IntrusiveForwardListItem<StackScopeTracerBa
     StackScopeTracerPool* pool = nullptr;
 };
 
-template <typename Callback>
-class StackScopeTracer {
+class StackScopeTracerOwner;
+
+class StackScopeTraceHandle {
  public:
-    ~StackScopeTracer() {
-        manualExit();
-    }
+    StackScopeTraceHandle() = default;
+    StackScopeTraceHandle(const StackScopeTracerOwner& owner);
+    StackScopeTraceHandle(const StackScopeTraceHandle&) = default;
+    StackScopeTraceHandle& operator=(const StackScopeTraceHandle&) = default;
 
-    StackScopeTracer(StackScopeTracer&& rhs)
-        : base_(std::exchange(rhs.base_, nullptr))
-        , callback_(std::move(rhs.callback_)) {}
+    StackScopeTracerOwner addChild(
+        const char* label = "", std::source_location loc = std::source_location::current());
 
-    StackScopeTracer& operator=(StackScopeTracer&&) = delete;
-    StackScopeTracer(const StackScopeTracer&) = delete;
-    StackScopeTracer& operator=(const StackScopeTracer&) = delete;
-
-    template <typename ChildCallback>
-    StackScopeTracer<ChildCallback> addChild(
-        ChildCallback&& callback,
-        const char* label = "",
-        std::source_location loc = std::source_location::current());
-
-    StackScopeTracer<Noop> addChild(
-        const char* label = "", std::source_location loc = std::source_location::current()) {
-        return addChild(Noop(), label, loc);
-    }
-
-    void manualExit() {
-        if (base_ == nullptr) {
-            return;
-        }
-
-        base_->onExit();
-        std::invoke(std::move(callback_), *base_);
-        base_->release();
-        base_ = nullptr;
-    }
+    bool isValid() const;
 
  private:
-    StackScopeTracer(StackScopeTracerBase* base, Callback callback)
-        : base_(base)
-        , callback_(std::move(callback)) {}
+    explicit StackScopeTraceHandle(StackScopeTracerBase* base) : base_(base) {}
+
+    StackScopeTracerBase* base_ = nullptr;
+
+    friend class StackScopeTracerOwner;
+};
+
+class StackScopeTracerOwner {
+ public:
+    ~StackScopeTracerOwner();
+    StackScopeTracerOwner(StackScopeTracerOwner&& rhs);
+
+    StackScopeTracerOwner& operator=(StackScopeTracerOwner&&) = delete;
+    StackScopeTracerOwner(const StackScopeTracerOwner&) = delete;
+    StackScopeTracerOwner& operator=(const StackScopeTracerOwner&) = delete;
+
+    StackScopeTracerOwner addChild(
+        const char* label = "", std::source_location loc = std::source_location::current());
+
+    const StackScopeTracerBase& getInfo() const;
+
+    void finalize();
+
+ private:
+    explicit StackScopeTracerOwner(StackScopeTracerBase* base) : base_(base) {}
+
+    void release();
 
     StackScopeTracerBase* base_;
-    [[no_unique_address]] Callback callback_;
 
+    friend class StackScopeTraceHandle;
     friend class StackScopeTracerPool;
 
     template <typename C>
@@ -88,47 +85,12 @@ class StackScopeTracerPool {
  public:
     StackScopeTracerPool() = default;
 
-    ~StackScopeTracerPool() {
-        size_t total_freed = 0;
+    ~StackScopeTracerPool();
 
-        free_list_.forEach([&](auto& item) {
-            ++total_freed;
-            delete &item;
-        });
+    StackScopeTracerOwner getTracer(
+        const char* label = "", std::source_location loc = std::source_location::current());
 
-        PDFT_VERIFY(total_freed == numAllocations());
-    }
-
-    template <typename Callback>
-    StackScopeTracer<Callback> getTracer(
-        Callback&& callback,
-        const char* label = "",
-        std::source_location loc = std::source_location::current()) {
-        auto* base = getTracerBase();
-
-        base->started_at = ClockType::now();
-        base->duration = {};
-        base->loc = loc;
-        base->label = label;
-
-        base->depth = 0;
-        base->parent = nullptr;
-        base->children.clear();
-
-        base->refcount = 1;
-        base->pool = this;
-
-        return {base, std::forward<Callback>(callback)};
-    }
-
-    StackScopeTracer<Noop> getTracer(
-        const char* label = "", std::source_location loc = std::source_location::current()) {
-        return getTracer(Noop(), label, loc);
-    }
-
-    size_t numAllocations() const {
-        return num_allocations_;
-    }
+    size_t numAllocations() const;
 
  private:
     StackScopeTracerBase* getTracerBase();
@@ -136,22 +98,12 @@ class StackScopeTracerPool {
 
     utils::IntrusiveForwardList<StackScopeTracerBase> free_list_;
 
+    friend class StackScopeTraceHandle;
     friend struct StackScopeTracerBase;
 
     size_t num_allocations_ = 0;
 };
 
 StackScopeTracerPool& getGlobalPool();
-
-template <typename Callback>
-template <typename ChildCallback>
-StackScopeTracer<ChildCallback> StackScopeTracer<Callback>::addChild(
-    ChildCallback&& callback, const char* label, std::source_location loc) {
-    auto c = base_->pool->getTracer(std::forward<ChildCallback>(callback), label, loc);
-    c.base_->depth = base_->depth + 1;
-    c.base_->parent = base_;
-    base_->addChild(c.base_);
-    return c;
-}
 
 }  // namespace pdft::core::trace

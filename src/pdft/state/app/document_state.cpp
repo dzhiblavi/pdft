@@ -98,6 +98,8 @@ void DocumentState::applyScrollOffset(uint32_t height, int32_t pages_per_height)
 }
 
 tui::Element DocumentState::render(const image::ImageProperties& properties, tui::Context& ctx) {
+    auto _ = ctx.push("render");
+
     switch (view_mode_) {
         using enum ViewMode;
 
@@ -118,6 +120,8 @@ tui::Element DocumentState::render(const image::ImageProperties& properties, tui
 tui::Element DocumentState::renderOnePage(
     const image::ImageProperties& properties, tui::Context& ctx) {
     auto render = [&](tui::IRect rect) {
+        auto _ = ctx.push("only_page");
+
         renderer_->render(
             rect,
             {
@@ -138,6 +142,8 @@ tui::Element DocumentState::renderOnePage(
 tui::Element DocumentState::renderTwoPages(
     const image::ImageProperties& properties, tui::Context& ctx) {
     auto render_left = [&](tui::IRect rect) {
+        auto _ = ctx.push("left_page");
+
         renderer_->render(
             rect,
             {
@@ -156,6 +162,8 @@ tui::Element DocumentState::renderTwoPages(
         if (page_index_ + 1 >= page_count_) {
             return;
         }
+
+        auto _ = ctx.push("right_page");
 
         renderer_->render(
             rect,
@@ -182,6 +190,7 @@ tui::Element DocumentState::renderOnePageContinuous(
     applyScrollOffset(100, 1);
 
     auto render_top = [&](tui::IRect rect) {
+        auto _ = ctx.push("top_page");
         float this_ratio = float(rect.height) / rect_.height;
 
         renderer_->render(
@@ -208,7 +217,7 @@ tui::Element DocumentState::renderOnePageContinuous(
         if (page_index_ + 1 >= page_count_) {
             return;
         }
-
+        auto _ = ctx.push("bottom_page");
         float this_ratio = float(rect.height) / rect_.height;
 
         renderer_->render(
@@ -245,6 +254,7 @@ tui::Element DocumentState::renderTwoPagesContinuous(
     applyScrollOffset(100, 2);
 
     auto render_top_left = [&](tui::IRect rect) {
+        auto _ = ctx.push("top_left_page");
         float this_ratio = float(rect.height) / rect_.height;
 
         renderer_->render(
@@ -272,6 +282,7 @@ tui::Element DocumentState::renderTwoPagesContinuous(
             return;
         }
 
+        auto _ = ctx.push("top_right_page");
         float this_ratio = float(rect.height) / rect_.height;
 
         renderer_->render(
@@ -299,6 +310,7 @@ tui::Element DocumentState::renderTwoPagesContinuous(
             return;
         }
 
+        auto _ = ctx.push("bottom_left_page");
         float this_ratio = float(rect.height) / rect_.height;
 
         renderer_->render(
@@ -326,6 +338,7 @@ tui::Element DocumentState::renderTwoPagesContinuous(
             return;
         }
 
+        auto _ = ctx.push("bottom_right_page");
         float this_ratio = float(rect.height) / rect_.height;
 
         renderer_->render(

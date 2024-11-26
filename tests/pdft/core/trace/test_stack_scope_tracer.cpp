@@ -4,44 +4,27 @@
 
 namespace pdft::core::trace {
 
-TEST_CASE("testStackScopeTracerCallsCallback", "") {
+TEST_CASE("testStackScopeTracerOneAllocation", "") {
     StackScopeTracerPool pool;
-    bool called = false;
 
-    {
-        auto _ = pool.getTracer([&](auto...) {
-            called = true;
-        });
-    }
-
-    CHECK(called);
+    auto t = pool.getTracer();
+    t.finalize();
     CHECK(pool.numAllocations() == 1);
 }
 
 TEST_CASE("testStackScopeTracerChildCallsCallback", "") {
     StackScopeTracerPool pool;
-    bool called = false;
-    bool child_called = false;
 
     {
-        auto t = pool.getTracer([&](auto...) {
-            called = true;
-        });
-
+        auto t = pool.getTracer();
         CHECK(pool.numAllocations() == 1);
 
-        {
-            auto _ = t.addChild([&](auto&&...) {
-                child_called = true;
-            });
-        }
+        { auto c = t.addChild(); }
 
         CHECK(pool.numAllocations() == 2);
-        CHECK(child_called);
-        CHECK(!called);
+        CHECK(t.getInfo().children.size() == 1);
     }
 
-    CHECK(called);
     CHECK(pool.numAllocations() == 2);
 }
 

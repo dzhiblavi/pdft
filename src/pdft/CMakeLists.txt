@@ -47,6 +47,7 @@ target_sources(
           ./controller/keytree.cpp
           ./controller/app/controller.cpp
           ./core/assert.cpp
+          ./core/context.cpp
           ./core/log/load.cpp
           ./core/log/log.cpp
           ./core/trace/stack_scope_tracer.cpp

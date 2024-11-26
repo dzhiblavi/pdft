@@ -61,7 +61,7 @@ class IntrusiveForwardList {
     }
 
     template <typename F>
-    void forEach(F func) {
+    void forEachReversed(F func) {
         T* curr = head_;
 
         while (curr != nullptr) {
@@ -72,13 +72,45 @@ class IntrusiveForwardList {
     }
 
     template <typename F>
-    void forEach(F func) const {
+    void forEach(F func) {
+        if (size() == 0) {
+            return;
+        }
+
+        std::vector<T*> values;
+        values.resize(size());
+        size_t index = size() - 1;
+        forEachReversed([&](T& item) { values[index--] = &item; });
+
+        for (auto* item : values) {
+            std::invoke(func, *item);
+        }
+    }
+
+    template <typename F>
+    void forEachReversed(F func) const {
         const T* curr = head_;
 
         while (curr != nullptr) {
             auto next = curr->next_;
             std::invoke(func, *curr);
             curr = next;
+        }
+    }
+
+    template <typename F>
+    void forEach(F func) const {
+        if (size() == 0) {
+            return;
+        }
+
+        std::vector<const T*> values;
+        values.resize(size());
+        size_t index = size() - 1;
+        forEachReversed([&](const T& item) { values[index--] = &item; });
+
+        for (auto* item : values) {
+            std::invoke(func, *item);
         }
     }
 

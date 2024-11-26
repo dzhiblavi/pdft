@@ -6,10 +6,12 @@
 
 namespace pdft::state::app {
 
-tui::Element State::getSidebar() {
+tui::Element State::getSidebar(tui::Context& ctx) {
     if (!show_sidebar_) {
         return tui::emptyElement();
     }
+
+    auto _ = ctx.push("render_sidebar");
 
     std::vector<tui::Element> elements;
     for (size_t i = 0; i < states_.size(); ++i) {
@@ -27,8 +29,12 @@ tui::Element State::getSidebar() {
 }
 
 tui::Element State::render(tui::Context& ctx) {
+    auto _ = ctx.push("state");
+
     auto doc = [&] {
         if (auto state = getState()) {
+            auto _ = ctx.push("render_doc");
+
             auto path = doc_storage_->getDocument(state->getDocumentId()).getPath().filename();
             auto page_str = std::format("{}/{}", state->getPageIndex() + 1, state->getPageCount());
             return tui::window(
@@ -40,7 +46,7 @@ tui::Element State::render(tui::Context& ctx) {
     }();
 
     return tui::hbox({
-        getSidebar(),
+        getSidebar(ctx),
         doc | tui::flex,
     });
 }

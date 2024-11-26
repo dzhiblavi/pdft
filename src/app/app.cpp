@@ -156,21 +156,17 @@ asio::awaitable<void> Application::runEventLoop() {
 asio::awaitable<void> Application::render(core::io::OutBuffer& buffer) {
     log::debug(this, "========== NEW FRAME ===========");
 
-    auto tracer =
-        core::trace::getGlobalPool().getTracer(core::trace::makeStackTraceLogger(), "display_one");
+    auto tracer = core::trace::getGlobalPool().getTracer("display_one");
     auto screen = ftxui::Screen::Create(ftxui::Dimension::Full());
-    auto ctx = tui::Context{
-        .terminal = *terminal_,
-        .screen_size = terminal_->getDimensions(),
-        .buffer = buffer,
-    };
+    auto ctx = tui::Context(*terminal_, buffer);
+    ctx.setTracer(tracer);
 
     {
-        auto _ = tracer.addChild("render");
+        auto _ = ctx.push("render");
         tui::Render(screen, state_->render(ctx));
     }
     {
-        auto _ = tracer.addChild("clear_screen_flush");
+        auto _ = ctx.push("clear_screen_flush");
         core::io::OutBuffer clear_buf;
         core::io::clear(clear_buf);
         terminal_->clear(clear_buf);
@@ -178,13 +174,16 @@ asio::awaitable<void> Application::render(core::io::OutBuffer& buffer) {
         co_await console_->write(clear_buf.view());
     }
     {
-        auto _ = tracer.addChild("flush_tui");
+        auto _ = ctx.push("flush_tui");
         co_await console_->write(screen.ToString());
     }
     {
-        auto _ = tracer.addChild("flush_images");
+        auto _ = ctx.push("flush_images");
         co_await console_->write(buffer);
     }
+
+    tracer.finalize();
+    core::trace::logStackTrace(tracer.getInfo());
 }
 
 asio::awaitable<bool> Application::waitForNextRender() {
@@ -212,8 +211,7 @@ asio::awaitable<bool> Application::waitForNextRender() {
 }
 
 asio::awaitable<void> Application::cleanup() {
-    auto cleanup = core::trace::getGlobalPool().getTracer(
-        core::trace::makeStackTraceLogger<std::chrono::microseconds>(), "cleanup");
+    auto cleanup = core::trace::getGlobalPool().getTracer("cleanup");
 
     core::io::OutBuffer buffer;
     {
@@ -230,6 +228,9 @@ asio::awaitable<void> Application::cleanup() {
 
     log::debug(
         this, "total stack tracer allocations: {}", core::trace::getGlobalPool().numAllocations());
+
+    cleanup.finalize();
+    core::trace::logStackTrace<std::chrono::microseconds>(cleanup.getInfo());
 }
 
 }  // namespace app

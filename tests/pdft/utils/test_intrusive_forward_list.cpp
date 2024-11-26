@@ -73,10 +73,7 @@ TEST_CASE("testIntrusiveForwardListPushMany", "") {
     CHECK(!list.isEmpty());
 
     int count = 0;
-    list.forEach([&](auto& value) {
-        ++count;
-        CHECK(value.value == 10 - count);
-    });
+    list.forEach([&](auto& value) { CHECK(value.value == count++); });
     CHECK(count == 10);
 }
 

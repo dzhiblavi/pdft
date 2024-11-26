@@ -40,7 +40,7 @@ class State : public state::State {
 
  private:
     DocumentState* getState();
-    tui::Element getSidebar();
+    tui::Element getSidebar(tui::Context& ctx);
 
     std::shared_ptr<DocumentStorage> doc_storage_;
     std::shared_ptr<view::Renderer> renderer_;

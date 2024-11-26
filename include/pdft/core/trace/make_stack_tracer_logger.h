@@ -5,6 +5,7 @@
 #include "pdft/core/trace/detail/duration_suffix.h"
 #include "pdft/core/trace/logger.h"
 #include "pdft/core/trace/stack_scope_tracer.h"
+#include <filesystem>
 
 namespace pdft::core::trace {
 
@@ -16,7 +17,7 @@ void logStackTrace(const StackScopeTracerBase& info, io::OutBuffer& out) {
 
     core::io::write(out, '\n');
     for (int d = info.depth; d > 0; d--) {
-        core::io::write(out, '\t');
+        core::io::write(out, "  ");
     }
 
     auto dur = std::chrono::duration_cast<Duration>(info.duration);
@@ -27,7 +28,7 @@ void logStackTrace(const StackScopeTracerBase& info, io::OutBuffer& out) {
             info.label,
             dur.count(),
             durationSuffix<Duration>,
-            loc.file_name(),
+            std::filesystem::path(loc.file_name()).filename().c_str(),
             loc.line()));
 
     info.children.forEach([&](const auto& child) { logStackTrace<Duration>(child, out); });
@@ -36,12 +37,10 @@ void logStackTrace(const StackScopeTracerBase& info, io::OutBuffer& out) {
 }  // namespace detail
 
 template <typename Duration = std::chrono::milliseconds>
-auto makeStackTraceLogger(log::LoggerPtr logger = trace::logger()) {
-    return [logger](const StackScopeTracerBase& info) {
-        io::OutBuffer out;
-        detail::logStackTrace<Duration>(info, out);
-        logger->trace(out.view());
-    };
+auto logStackTrace(const StackScopeTracerBase& info, log::LoggerPtr logger = trace::logger()) {
+    io::OutBuffer out;
+    detail::logStackTrace<Duration>(info, out);
+    logger->trace(out.view());
 }
 
 }  // namespace pdft::core::trace
