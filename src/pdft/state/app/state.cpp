@@ -30,7 +30,10 @@ tui::Element State::render(tui::Context& ctx) {
     auto doc = [&] {
         if (auto state = getState()) {
             auto path = doc_storage_->getDocument(state->getDocumentId()).getPath().filename();
-            return tui::window(tui::text(path), state->render(image_properties_, ctx));
+            auto page_str = std::format("{}/{}", state->getPageIndex() + 1, state->getPageCount());
+            return tui::window(
+                tui::text(std::format("{} page {}", path.c_str(), page_str)),
+                state->render(image_properties_, ctx));
         }
 
         return tui::emptyElement();
