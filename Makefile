@@ -30,12 +30,14 @@ deps: _prepare_target_dirs
 		--build=missing                            \
 		--profile:host=./conan/$(PROFILE).profile  \
 		--profile:build=./conan/$(PROFILE).profile \
-		--settings=build_type=$(BUILD_TYPE)
+		--settings:host=build_type=$(BUILD_TYPE)   \
+		--settings:build=build_type=$(BUILD_TYPE)
 
 configure: deps
 	cd $(BUILD_DIR) && $(CMAKE) ../../../../                       \
 		-G "Unix Makefiles"                                        \
 		-DCMAKE_TOOLCHAIN_FILE="../deps/conan_toolchain.cmake"     \
+		-DCMAKE_POLICY_DEFAULT_CMP0091=NEW                         \
 		-DCMAKE_C_COMPILER=${CC}                                   \
 		-DCMAKE_CXX_COMPILER=${CXX}                                \
 		-DCMAKE_BUILD_TYPE=$(BUILD_TYPE)                           \
