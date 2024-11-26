@@ -73,3 +73,6 @@ controller:
 
     - command: DecreaseScalingFactor
       keys: z-
+
+    - command: ToggleSidebar
+      keys: t

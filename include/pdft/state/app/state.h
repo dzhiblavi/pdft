@@ -35,11 +35,13 @@ class State : public state::State {
     void updateZoom(float coeff) override;
     void invertColors() override;
     void updateScalingFactor(float coeff) override;
+    void toggleSidebar() override;
 
     std::optional<DocumentId> getCurrentDocumentId() const override;
 
  private:
     DocumentState* getState();
+    tui::Element getSidebar();
 
     std::shared_ptr<DocumentStorage> doc_storage_;
     std::shared_ptr<view::Renderer> renderer_;
@@ -47,6 +49,7 @@ class State : public state::State {
     std::vector<DocumentState> states_;
     std::string current_input_;
     image::ImageProperties image_properties_;
+    bool show_sidebar_ = false;
 };
 
 }  // namespace pdft::state::app

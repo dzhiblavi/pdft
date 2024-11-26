@@ -26,6 +26,7 @@ class State {
     virtual void updateZoom(float coeff) = 0;
     virtual void invertColors() = 0;
     virtual void updateScalingFactor(float coeff) = 0;
+    virtual void toggleSidebar() = 0;
 
     virtual std::optional<DocumentId> getCurrentDocumentId() const = 0;
 };

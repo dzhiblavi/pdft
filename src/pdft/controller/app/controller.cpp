@@ -107,6 +107,10 @@ void Controller::bindKey(Command command, std::string_view keys, const Config& c
         case DecreaseScalingFactor:
             key_tree_.bind(keys, [this] { state_->updateScalingFactor(1.0f / 1.05f); });
             break;
+
+        case ToggleSidebar:
+            key_tree_.bind(keys, [this] { state_->toggleSidebar(); });
+            break;
     }
 }
 

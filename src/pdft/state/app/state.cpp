@@ -6,7 +6,11 @@
 
 namespace pdft::state::app {
 
-tui::Element State::render(tui::Context& ctx) {
+tui::Element State::getSidebar() {
+    if (!show_sidebar_) {
+        return tui::emptyElement();
+    }
+
     std::vector<tui::Element> elements;
     for (size_t i = 0; i < states_.size(); ++i) {
         const auto& state = states_[i];
@@ -14,10 +18,15 @@ tui::Element State::render(tui::Context& ctx) {
         auto doc_id = state.getDocumentId();
         const auto& path = doc_storage_->getDocument(doc_id).getPath();
         auto line = std::format("{}{}", is_current ? "* " : "", path.filename().c_str());
-        elements.push_back(ftxui::text(std::move(line)));
+        elements.push_back(tui::text(std::move(line)));
     }
-    auto sidebar = ftxui::vbox(std::move(elements));
 
+    return tui::vbox(std::move(elements))  //
+           | tui::border                   //
+           | tui::size(tui::WIDTH, tui::EQUAL, 20);
+}
+
+tui::Element State::render(tui::Context& ctx) {
     auto doc = [&] {
         if (auto state = getState()) {
             return state->render(image_properties_, ctx);
@@ -27,7 +36,7 @@ tui::Element State::render(tui::Context& ctx) {
     }();
 
     auto dom = tui::hbox({
-        sidebar | tui::border | tui::size(tui::WIDTH, tui::EQUAL, 20),
+        getSidebar(),
         doc | tui::flex | tui::borderLight,
     });
 
@@ -115,6 +124,10 @@ void State::invertColors() {
 
 void State::updateScalingFactor(float coeff) {
     image_properties_.scaling_factor *= coeff;
+}
+
+void State::toggleSidebar() {
+    show_sidebar_ = !show_sidebar_;
 }
 
 std::optional<DocumentId> State::getCurrentDocumentId() const {
