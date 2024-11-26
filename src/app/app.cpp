@@ -122,11 +122,7 @@ asio::awaitable<void> Application::prepareTerminal() {
 
 void Application::loadPaths(const std::vector<std::string>& paths) {
     for (auto path : paths) {
-        if (!std::filesystem::exists(path)) {
-            log::info("path {} does not exist, skipping", path.c_str());
-            continue;
-        }
-
+        PDFT_VERIFY(std::filesystem::exists(path));
         path = std::filesystem::absolute(path);
 
         auto document = media::mupdf::Document::open(media::mupdf::thisThreadContext(), path);
