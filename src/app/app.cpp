@@ -117,7 +117,7 @@ asio::awaitable<void> Application::prepareTerminal() {
     // Clear the screen
     core::io::OutBuffer init_buffer;
     terminal_->clear(init_buffer);
-    co_await console_->write(init_buffer.view());
+    co_await console_->write(init_buffer);
 }
 
 void Application::loadPaths(const std::vector<std::string>& paths) {
@@ -160,28 +160,35 @@ asio::awaitable<void> Application::runEventLoop() {
 asio::awaitable<void> Application::render(core::io::OutBuffer& buffer) {
     log::debug("========== NEW FRAME ===========");
 
+    auto tracer =
+        core::trace::getGlobalPool().getTracer(core::trace::makeStackTraceLogger(), "display_one");
+    auto screen = ftxui::Screen::Create(ftxui::Dimension::Full());
     auto ctx = tui::Context{
         .terminal = *terminal_,
         .screen_size = terminal_->getDimensions(),
         .buffer = buffer,
     };
 
-    auto tracer =
-        core::trace::getGlobalPool().getTracer(core::trace::makeStackTraceLogger(), "display_one");
-
-    core::io::clear(buffer);
-    image_display_->clear(buffer);
-
     {
         auto _ = tracer.addChild("render");
-        auto dom = state_->render(ctx);
-        auto screen = ftxui::Screen::Create(ftxui::Dimension::Full());
-        ftxui::Render(screen, dom);
+        tui::Render(screen, state_->render(ctx));
+    }
+    {
+        auto _ = tracer.addChild("clear_screen_flush");
+        core::io::OutBuffer clear_buf;
+        core::io::clear(clear_buf);
+        terminal_->clear(clear_buf);
+        image_display_->clear(clear_buf);
+        co_await console_->write(clear_buf.view());
+    }
+    {
+        auto _ = tracer.addChild("flush_tui");
         co_await console_->write(screen.ToString());
     }
-
-    auto _ = tracer.addChild("flush_display");
-    co_await console_->write(buffer.view());
+    {
+        auto _ = tracer.addChild("flush_images");
+        co_await console_->write(buffer);
+    }
 }
 
 asio::awaitable<bool> Application::waitForNextRender() {

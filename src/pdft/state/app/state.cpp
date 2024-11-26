@@ -29,7 +29,8 @@ tui::Element State::getSidebar() {
 tui::Element State::render(tui::Context& ctx) {
     auto doc = [&] {
         if (auto state = getState()) {
-            return state->render(image_properties_, ctx);
+            auto path = doc_storage_->getDocument(state->getDocumentId()).getPath().filename();
+            return tui::window(tui::text(path), state->render(image_properties_, ctx));
         }
 
         return tui::emptyElement();
@@ -37,7 +38,7 @@ tui::Element State::render(tui::Context& ctx) {
 
     return tui::hbox({
         getSidebar(),
-        doc | tui::flex | tui::borderLight,
+        doc | tui::flex,
     });
 }
 
