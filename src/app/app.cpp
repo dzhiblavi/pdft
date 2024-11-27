@@ -81,10 +81,10 @@ void Application::setup() {
     document_storage_ = std::make_shared<state::DocumentStorage>();
     state_ = std::make_shared<state::UIState>();
     state_->image_properties = config_.image;
-    auto display_state = std::make_shared<state::DisplayState>();
+    auto display_state = std::make_shared<tui::display::State>();
 
     auto renderer = std::make_shared<view::app::PageRenderer>(
-        utils::random<uint32_t>(), display_state, document_storage_, image_display_);
+        utils::random<uint32_t>(), document_storage_, std::move(display_state), image_display_);
     auto document_view =
         std::make_shared<view::app::DocumentView>(document_storage_, std::move(renderer));
     view_ = std::make_shared<view::app::View>(document_storage_, std::move(document_view));

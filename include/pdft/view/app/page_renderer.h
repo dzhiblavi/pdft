@@ -1,10 +1,11 @@
 #pragma once
 
-#include "pdft/state/display_state.h"
 #include "pdft/state/document_storage.h"
-#include "pdft/tui/display/display.h"
-#include "pdft/tui/terminal/terminal.h"
 #include "pdft/view/page_renderer.h"
+
+#include "pdft/tui/display/display.h"
+#include "pdft/tui/display/state.h"
+#include "pdft/tui/terminal/terminal.h"
 
 namespace pdft::view::app {
 
@@ -12,8 +13,8 @@ class PageRenderer : public view::PageRenderer {
  public:
     PageRenderer(
         uint32_t image_id_salt,
-        std::shared_ptr<state::DisplayState> display_state,
         std::shared_ptr<state::DocumentStorage> docs,
+        std::shared_ptr<tui::display::State> display_state,
         std::shared_ptr<tui::display::Display> display);
 
     void render(const Page& page, const PageProperties& properties, tui::Context& ctx) override;
@@ -28,8 +29,8 @@ class PageRenderer : public view::PageRenderer {
     image::ImageId getIdForPage(const Page& page) const;
 
     const uint32_t image_id_salt_;
-    std::shared_ptr<state::DisplayState> display_state_;
     std::shared_ptr<state::DocumentStorage> docs_;
+    std::shared_ptr<tui::display::State> display_state_;
     std::shared_ptr<tui::display::Display> display_;
     std::shared_ptr<tui::terminal::Terminal> terminal_;
 };

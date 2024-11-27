@@ -42,7 +42,6 @@ target_sources(
           ./utils/random.cpp
           ./state/ui_state.cpp
           ./state/document_storage.cpp
-          ./state/display_state.cpp
           ./view/app/page_renderer.cpp
           ./view/app/view.cpp
           ./view/app/document_view.cpp
@@ -61,6 +60,7 @@ target_sources(
           ./media/mupdf/page.cpp
           ./media/mupdf/pixmap_image.cpp
           ./tui/image/fit_image.cpp
+          ./tui/display/state.cpp
           ./tui/display/kitty/apc/parse_response.cpp
           ./tui/display/kitty/apc/executor_base.cpp
           ./tui/display/kitty/apc/regular/executor.cpp

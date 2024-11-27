@@ -9,12 +9,12 @@ namespace pdft::view::app {
 
 PageRenderer::PageRenderer(
     uint32_t image_id_salt,
-    std::shared_ptr<state::DisplayState> display_state,
     std::shared_ptr<state::DocumentStorage> docs,
+    std::shared_ptr<tui::display::State> display_state,
     std::shared_ptr<tui::display::Display> display)
     : image_id_salt_(image_id_salt)
-    , display_state_(std::move(display_state))
     , docs_(std::move(docs))
+    , display_state_(std::move(display_state))
     , display_(std::move(display)) {}
 
 void PageRenderer::render(const Page& page, const PageProperties& properties, tui::Context& ctx) {
