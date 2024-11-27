@@ -230,7 +230,7 @@ asio::awaitable<void> Application::cleanup() {
         this, "total stack tracer allocations: {}", core::trace::getGlobalPool().numAllocations());
 
     cleanup.finalize();
-    core::trace::logStackTrace<std::chrono::microseconds>(cleanup.getInfo());
+    core::trace::logStackTrace(cleanup.getInfo());
 }
 
 }  // namespace app

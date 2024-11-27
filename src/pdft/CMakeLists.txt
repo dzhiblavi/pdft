@@ -51,6 +51,7 @@ target_sources(
           ./core/log/load.cpp
           ./core/log/log.cpp
           ./core/trace/stack_scope_tracer.cpp
+          ./core/trace/log_stack_trace.cpp
           ./core/io/posix/console.cpp
           ./core/io/posix/terminal.cpp
           ./media/mupdf/context.cpp

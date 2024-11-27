@@ -1,15 +1,32 @@
 #pragma once
 
-#include "pdft/core/io/buffer.h"
-#include "pdft/core/log/log.h"
 #include "pdft/core/trace/detail/duration_suffix.h"
 #include "pdft/core/trace/logger.h"
 #include "pdft/core/trace/stack_scope_tracer.h"
+
+#include "pdft/core/io/buffer.h"
+#include "pdft/core/log/log.h"
+
 #include <filesystem>
 
 namespace pdft::core::trace {
 
+struct AutomaticDuration {};
+
 namespace detail {
+
+std::string getAutomaticPrettyDuration(const DurationType& duration);
+
+template <typename Duration>
+std::string getPrettyDuration(const DurationType& duration) {
+    auto dur = std::chrono::duration_cast<Duration>(duration);
+    return std::format("{}{}", dur.count(), durationSuffix<Duration>);
+}
+
+template <std::same_as<AutomaticDuration> Duration>
+std::string getPrettyDuration(const DurationType& duration) {
+    return getAutomaticPrettyDuration(duration);
+}
 
 template <typename Duration>
 void logStackTrace(const StackScopeTracerBase& info, io::OutBuffer& out) {
@@ -20,14 +37,12 @@ void logStackTrace(const StackScopeTracerBase& info, io::OutBuffer& out) {
         core::io::write(out, "  ");
     }
 
-    auto dur = std::chrono::duration_cast<Duration>(info.duration);
     core::io::write(
         out,
         std::format(
-            "[{}] {}{} loc={}:{}",
+            "[{}] {} loc={}:{}",
             info.label,
-            dur.count(),
-            durationSuffix<Duration>,
+            getPrettyDuration<Duration>(info.duration),
             std::filesystem::path(loc.file_name()).filename().c_str(),
             loc.line()));
 
@@ -36,7 +51,7 @@ void logStackTrace(const StackScopeTracerBase& info, io::OutBuffer& out) {
 
 }  // namespace detail
 
-template <typename Duration = std::chrono::milliseconds>
+template <typename Duration = AutomaticDuration>
 auto logStackTrace(const StackScopeTracerBase& info, log::LoggerPtr logger = trace::logger()) {
     io::OutBuffer out;
     detail::logStackTrace<Duration>(info, out);
