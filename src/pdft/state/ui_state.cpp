@@ -169,11 +169,11 @@ const DocumentState* UIState::getState() const {
 }
 
 void UIState::invertColors() {
-    image_properties.invert_colors = !image_properties.invert_colors;
+    invert_colors = !invert_colors;
 }
 
 void UIState::updateScalingFactor(float coeff) {
-    image_properties.scaling_factor *= coeff;
+    scaling_coeff *= coeff;
 }
 
 void UIState::toggleSidebar() {

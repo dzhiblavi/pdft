@@ -20,7 +20,7 @@ class PageRenderer : public view::PageRenderer {
     void render(const Page& page, const PageProperties& properties, tui::Context& ctx) override;
 
  private:
-    float calcFactor(media::PageSize page_size, float scaling_factor, tui::Context& ctx);
+    float calcFactor(media::PageSize page_size, float scaling_coeff, tui::Context& ctx);
 
     image::ImageId getIdForPage(const Page& page) const;
 

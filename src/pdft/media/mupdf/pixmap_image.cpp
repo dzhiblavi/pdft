@@ -40,13 +40,26 @@ image::ImageSize PixmapImage::size() const {
     };
 }
 
-std::string_view PixmapImage::samples() const {
+std::span<const uint8_t> PixmapImage::samples() const {
     PDFT_VERIFY(pixmap_ != nullptr, "invalid pixmap image");
 
     return {
-        (char*)pixmap_->samples,
+        (const uint8_t*)pixmap_->samples,
         size_t(pixmap_->w * pixmap_->h * pixmap_->n),
     };
+}
+
+std::span<uint8_t> PixmapImage::mutableSamples() {
+    PDFT_VERIFY(pixmap_ != nullptr, "invalid pixmap image");
+
+    return {
+        (uint8_t*)pixmap_->samples,
+        size_t(pixmap_->w * pixmap_->h * pixmap_->n),
+    };
+}
+
+const image::ImageProperties& PixmapImage::getProperties() const {
+    return properties_;
 }
 
 }  // namespace pdft::media::mupdf

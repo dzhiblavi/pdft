@@ -3,7 +3,6 @@
 #include "logging.h"
 
 #include "pdft/controller/app/controller.h"
-#include "pdft/image/image.h"
 
 #include <spdlog/common.h>
 
@@ -16,11 +15,16 @@ struct SystemConfig {
     bool enable_filesystem_watching = true;
 };
 
+struct DisplayConfig {
+    float scaling_coeff = 1.f;
+    bool invert_colors = false;
+};
+
 struct Config {
     SystemConfig system = {};
     LoggingConfig logging = {};
     pdft::controller::app::Controller::Config controller = {};
-    pdft::image::ImageProperties image = {};
+    DisplayConfig display = {};
 };
 
 }  // namespace app

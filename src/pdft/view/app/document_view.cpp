@@ -3,29 +3,29 @@
 namespace pdft::view::app {
 
 tui::Element DocumentView::render(
-    const state::DocumentState& state, const image::ImageProperties& image, tui::Context& ctx) {
+    const state::DocumentState& state, float scaling_coeff, bool invert_colors, tui::Context& ctx) {
     auto _ = ctx.push("render");
 
     switch (state.view_mode) {
         using enum state::ViewMode;
 
         case OnePage:
-            return renderOnePage(state, image, ctx);
+            return renderOnePage(state, scaling_coeff, invert_colors, ctx);
 
         case TwoPages:
-            return renderTwoPages(state, image, ctx);
+            return renderTwoPages(state, scaling_coeff, invert_colors, ctx);
 
         case OnePageContinuous:
-            return renderOnePageContinuous(state, image, ctx);
+            return renderOnePageContinuous(state, scaling_coeff, invert_colors, ctx);
 
         case TwoPagesContinuous:
-            return renderTwoPagesContinuous(state, image, ctx);
+            return renderTwoPagesContinuous(state, scaling_coeff, invert_colors, ctx);
     }
 }
 
 tui::Element DocumentView::renderOnePage(
-    const state::DocumentState& state, const image::ImageProperties& image, tui::Context& ctx) {
-    auto render = [&](tui::IRect rect) {
+    const state::DocumentState& state, float scaling_coeff, bool invert_colors, tui::Context& ctx) {
+    auto render = [&, scaling_coeff, invert_colors](tui::IRect rect) {
         auto _ = ctx.push("only_page");
 
         renderer_->render(
@@ -40,7 +40,8 @@ tui::Element DocumentView::renderOnePage(
                         .hor = tui::Alignment::Center,
                         .vert = tui::Alignment::Center,
                     },
-                .properties = image,
+                .scaling_coeff = scaling_coeff,
+                .invert_colors = invert_colors,
             },
             ctx);
     };
@@ -49,8 +50,8 @@ tui::Element DocumentView::renderOnePage(
 }
 
 tui::Element DocumentView::renderTwoPages(
-    const state::DocumentState& state, const image::ImageProperties& image, tui::Context& ctx) {
-    auto render_left = [&](tui::IRect rect) {
+    const state::DocumentState& state, float scaling_coeff, bool invert_colors, tui::Context& ctx) {
+    auto render_left = [&, scaling_coeff, invert_colors](tui::IRect rect) {
         auto _ = ctx.push("left_page");
 
         renderer_->render(
@@ -65,12 +66,13 @@ tui::Element DocumentView::renderTwoPages(
                         .hor = tui::Alignment::Max,
                         .vert = tui::Alignment::Center,
                     },
-                .properties = image,
+                .scaling_coeff = scaling_coeff,
+                .invert_colors = invert_colors,
             },
             ctx);
     };
 
-    auto render_right = [&](tui::IRect rect) {
+    auto render_right = [&, scaling_coeff, invert_colors](tui::IRect rect) {
         if (state.page_index + 1 >= state.page_count) {
             return;
         }
@@ -89,7 +91,8 @@ tui::Element DocumentView::renderTwoPages(
                         .hor = tui::Alignment::Min,
                         .vert = tui::Alignment::Center,
                     },
-                .properties = image,
+                .scaling_coeff = scaling_coeff,
+                .invert_colors = invert_colors,
             },
             ctx);
     };
@@ -101,8 +104,8 @@ tui::Element DocumentView::renderTwoPages(
 }
 
 tui::Element DocumentView::renderOnePageContinuous(
-    const state::DocumentState& state, const image::ImageProperties& image, tui::Context& ctx) {
-    auto render_top = [&](tui::IRect rect) {
+    const state::DocumentState& state, float scaling_coeff, bool invert_colors, tui::Context& ctx) {
+    auto render_top = [&, scaling_coeff, invert_colors](tui::IRect rect) {
         auto _ = ctx.push("top_page");
         float this_ratio = float(rect.height) / rect_.height;
 
@@ -125,12 +128,13 @@ tui::Element DocumentView::renderOnePageContinuous(
                         .hor = tui::Alignment::Center,
                         .vert = tui::Alignment::Max,
                     },
-                .properties = image,
+                .scaling_coeff = scaling_coeff,
+                .invert_colors = invert_colors,
             },
             ctx);
     };
 
-    auto render_bottom = [&](tui::IRect rect) {
+    auto render_bottom = [&, scaling_coeff, invert_colors](tui::IRect rect) {
         if (state.page_index + 1 >= state.page_count) {
             return;
         }
@@ -156,7 +160,8 @@ tui::Element DocumentView::renderOnePageContinuous(
                         .hor = tui::Alignment::Center,
                         .vert = tui::Alignment::Min,
                     },
-                .properties = image,
+                .scaling_coeff = scaling_coeff,
+                .invert_colors = invert_colors,
             },
             ctx);
     };
@@ -171,8 +176,8 @@ tui::Element DocumentView::renderOnePageContinuous(
 }
 
 tui::Element DocumentView::renderTwoPagesContinuous(
-    const state::DocumentState& state, const image::ImageProperties& image, tui::Context& ctx) {
-    auto render_top_left = [&](tui::IRect rect) {
+    const state::DocumentState& state, float scaling_coeff, bool invert_colors, tui::Context& ctx) {
+    auto render_top_left = [&, scaling_coeff, invert_colors](tui::IRect rect) {
         auto _ = ctx.push("top_left_page");
         float this_ratio = float(rect.height) / rect_.height;
 
@@ -195,12 +200,13 @@ tui::Element DocumentView::renderTwoPagesContinuous(
                         .hor = tui::Alignment::Max,
                         .vert = tui::Alignment::Max,
                     },
-                .properties = image,
+                .scaling_coeff = scaling_coeff,
+                .invert_colors = invert_colors,
             },
             ctx);
     };
 
-    auto render_top_right = [&](tui::IRect rect) {
+    auto render_top_right = [&, scaling_coeff, invert_colors](tui::IRect rect) {
         if (state.page_index + 1 >= state.page_count) {
             return;
         }
@@ -227,12 +233,13 @@ tui::Element DocumentView::renderTwoPagesContinuous(
                         .hor = tui::Alignment::Min,
                         .vert = tui::Alignment::Max,
                     },
-                .properties = image,
+                .scaling_coeff = scaling_coeff,
+                .invert_colors = invert_colors,
             },
             ctx);
     };
 
-    auto render_bottom_left = [&](tui::IRect rect) {
+    auto render_bottom_left = [&, scaling_coeff, invert_colors](tui::IRect rect) {
         if (state.page_index + 2 >= state.page_count) {
             return;
         }
@@ -259,12 +266,13 @@ tui::Element DocumentView::renderTwoPagesContinuous(
                         .hor = tui::Alignment::Max,
                         .vert = tui::Alignment::Min,
                     },
-                .properties = image,
+                .scaling_coeff = scaling_coeff,
+                .invert_colors = invert_colors,
             },
             ctx);
     };
 
-    auto render_bottom_right = [&](tui::IRect rect) {
+    auto render_bottom_right = [&, scaling_coeff, invert_colors](tui::IRect rect) {
         if (state.page_index + 3 >= state.page_count) {
             return;
         }
@@ -291,7 +299,8 @@ tui::Element DocumentView::renderTwoPagesContinuous(
                         .hor = tui::Alignment::Min,
                         .vert = tui::Alignment::Min,
                     },
-                .properties = image,
+                .scaling_coeff = scaling_coeff,
+                .invert_colors = invert_colors,
             },
             ctx);
     };

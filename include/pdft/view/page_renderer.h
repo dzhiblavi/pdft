@@ -16,7 +16,8 @@ struct PageProperties {
     const tui::IRect& rect;
     const tui::FRect& subarea = {0.f, 0.f, 1.f, 1.f};
     const tui::image::Placement& placement = {};
-    const image::ImageProperties& properties = {};
+    float scaling_coeff = 1.f;
+    bool invert_colors = false;
 };
 
 class PageRenderer {

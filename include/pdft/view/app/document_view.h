@@ -17,18 +17,31 @@ class DocumentView : public view::DocumentView {
 
     tui::Element render(
         const state::DocumentState& state,
-        const image::ImageProperties& image,
+        float scaling_coeff,
+        bool invert_colors,
         tui::Context& ctx) override;
 
  private:
     tui::Element renderOnePage(
-        const state::DocumentState& state, const image::ImageProperties& image, tui::Context& ctx);
+        const state::DocumentState& state,
+        float scaling_coeff,
+        bool invert_colors,
+        tui::Context& ctx);
     tui::Element renderTwoPages(
-        const state::DocumentState& state, const image::ImageProperties& image, tui::Context& ctx);
+        const state::DocumentState& state,
+        float scaling_coeff,
+        bool invert_colors,
+        tui::Context& ctx);
     tui::Element renderOnePageContinuous(
-        const state::DocumentState& state, const image::ImageProperties& image, tui::Context& ctx);
+        const state::DocumentState& state,
+        float scaling_coeff,
+        bool invert_colors,
+        tui::Context& ctx);
     tui::Element renderTwoPagesContinuous(
-        const state::DocumentState& state, const image::ImageProperties& image, tui::Context& ctx);
+        const state::DocumentState& state,
+        float scaling_coeff,
+        bool invert_colors,
+        tui::Context& ctx);
 
     std::shared_ptr<state::DocumentStorage> doc_storage_;
     std::shared_ptr<view::PageRenderer> renderer_;

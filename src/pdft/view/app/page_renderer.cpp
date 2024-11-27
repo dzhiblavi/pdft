@@ -20,11 +20,10 @@ PageRenderer::PageRenderer(
 void PageRenderer::render(const Page& page, const PageProperties& properties, tui::Context& ctx) {
     const auto& [doc_id, page_index] = page;
     const auto& document = docs_->getDocument(page.document_id);
-    const auto& props = properties.properties;
 
     auto id = getIdForPage(page);
     auto the_page = ctx.trace("get_page", [&] { return document.getPage(page_index); });
-    float factor = calcFactor(the_page->getDefaultSize(), props.scaling_factor, ctx);
+    float factor = calcFactor(the_page->getDefaultSize(), properties.scaling_coeff, ctx);
 
     log::debug(
         ctx, "rendering a page: doc_id={}, page_index={}, image_id={}", doc_id, page_index, id);
@@ -38,7 +37,7 @@ void PageRenderer::render(const Page& page, const PageProperties& properties, tu
             should_reload = true;
         }
 
-        if (props.invert_colors != info.invert_colors) {
+        if (properties.invert_colors != info.invert_colors) {
             log::debug("loaded image color inversion has changed, unloading id={}", id);
             should_reload = true;
         }
@@ -61,12 +60,14 @@ void PageRenderer::render(const Page& page, const PageProperties& properties, tu
             id,
             factor);
 
-        auto image = ctx.trace("get_image", [&] {
-            return the_page->getImage({
-                .scaling_factor = factor,
-                .invert_colors = props.invert_colors,
-            });
-        });
+        auto image =
+            ctx.trace("get_image", [&] { return the_page->getImage({.scaling_factor = factor}); });
+
+        if (properties.invert_colors) {
+            for (uint8_t& c : image->mutableSamples()) {
+                c = 255 - c;
+            }
+        }
 
         display_->loadImage(id, *image, ctx.buffer);
 
@@ -80,7 +81,7 @@ void PageRenderer::render(const Page& page, const PageProperties& properties, tu
                 .image_rows = image_rows,
                 .image_cols = image_cols,
                 .factor = factor,
-                .invert_colors = props.invert_colors,
+                .invert_colors = properties.invert_colors,
             });
     }
 
@@ -103,7 +104,7 @@ void PageRenderer::render(const Page& page, const PageProperties& properties, tu
     tui::image::render(image, irect, *display_, ctx);
 }
 
-float PageRenderer::calcFactor(media::PageSize page_size, float scaling_factor, tui::Context& ctx) {
+float PageRenderer::calcFactor(media::PageSize page_size, float scaling_coeff, tui::Context& ctx) {
     float dw = ctx.screen_size.width_px;
     float dh = ctx.screen_size.height_px;
     auto [pw, ph] = page_size;
@@ -120,9 +121,9 @@ float PageRenderer::calcFactor(media::PageSize page_size, float scaling_factor, 
         ctx.screen_size.width_px,
         ctx.screen_size.height_px,
         f,
-        scaling_factor);
+        scaling_coeff);
 
-    return scaling_factor * f;
+    return scaling_coeff * f;
 }
 
 image::ImageId PageRenderer::getIdForPage(const Page& page) const {

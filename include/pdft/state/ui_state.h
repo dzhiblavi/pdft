@@ -53,7 +53,8 @@ struct UIState {
     std::optional<size_t> idx = std::nullopt;
     std::vector<DocumentState> states;
     std::string current_input;
-    image::ImageProperties image_properties;
+    bool invert_colors = false;
+    float scaling_coeff = 1.f;
     bool show_sidebar = false;
 
  private:

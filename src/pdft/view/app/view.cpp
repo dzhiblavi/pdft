@@ -14,7 +14,7 @@ tui::Element View::render(const state::UIState& state, tui::Context& ctx) {
 
             return tui::window(
                 tui::text(std::format("{} page {}", path.c_str(), page_str)),
-                doc_view_->render(*doc, state.image_properties, ctx));
+                doc_view_->render(*doc, state.scaling_coeff, state.invert_colors, ctx));
         }
 
         return tui::emptyElement();

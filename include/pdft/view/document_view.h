@@ -12,7 +12,8 @@ class DocumentView {
 
     virtual tui::Element render(
         const state::DocumentState& state,
-        const image::ImageProperties& image,
+        float scaling_coeff,
+        bool invert_colors,
         tui::Context& ctx) = 0;
 };
 

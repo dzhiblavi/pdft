@@ -1,6 +1,6 @@
 #pragma once
 
-#include <string_view>
+#include <span>
 
 namespace pdft::image {
 
@@ -8,7 +8,6 @@ using ImageId = uint32_t;
 
 struct ImageProperties {
     float scaling_factor = 1.f;
-    bool invert_colors = false;
 
     bool operator==(const ImageProperties&) const = default;
 };
@@ -23,7 +22,9 @@ class Image {
     virtual ~Image() = default;
 
     virtual ImageSize size() const = 0;
-    virtual std::string_view samples() const = 0;
+    virtual std::span<const uint8_t> samples() const = 0;
+    virtual std::span<uint8_t> mutableSamples() = 0;
+    virtual const ImageProperties& getProperties() const = 0;
 };
 
 }  // namespace pdft::image

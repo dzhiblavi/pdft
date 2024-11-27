@@ -27,10 +27,12 @@ void DisplayBase::loadImage(
         {"i", std::to_string(id)},
     };
 
+    auto samples = image.samples();
+
     executor_->execute(
         {
             .command = "_G",
-            .payload = image.samples(),
+            .payload = {(const char*)samples.data(), samples.size()},
             .control_data = control_data,
             .b64_encode = true,
             .compress = true,

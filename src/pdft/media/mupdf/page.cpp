@@ -44,15 +44,7 @@ std::shared_ptr<image::Image> Page::getImage(const image::ImageProperties& prope
         core::fail("fz_new_pixmap_from_page is null");
     }
 
-    if (properties.invert_colors) {
-        uint32_t n = pix->n * pix->w * pix->h;
-
-        for (uint32_t i = 0; i < n; ++i) {
-            pix->samples[i] = 255 - pix->samples[i];
-        }
-    }
-
-    return std::shared_ptr<image::Image>(new PixmapImage(context_, pix));
+    return std::shared_ptr<image::Image>(new PixmapImage(context_, pix, properties));
 }
 
 PageSize Page::getDefaultSize() const {

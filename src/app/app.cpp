@@ -80,7 +80,8 @@ void Application::setup() {
 
     document_storage_ = std::make_shared<state::DocumentStorage>();
     state_ = std::make_shared<state::UIState>();
-    state_->image_properties = config_.image;
+    state_->scaling_coeff = config_.display.scaling_coeff;
+    state_->invert_colors = config_.display.invert_colors;
     auto display_state = std::make_shared<tui::display::State>();
 
     auto renderer = std::make_shared<view::app::PageRenderer>(

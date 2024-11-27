@@ -5,7 +5,7 @@ logging:
   directory: ../../../../logs/
   level: Trace
 
-image:
+display:
   scaling_factor: 1.1
   invert_colors: true
 
