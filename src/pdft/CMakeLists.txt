@@ -40,7 +40,7 @@ target_sources(
           ./utils/zlib.cpp
           ./utils/get_home_dir.cpp
           ./utils/random.cpp
-          ./state/state.cpp
+          ./state/ui_state.cpp
           ./state/document_storage.cpp
           ./view/app/renderer.cpp
           ./view/app/view.cpp

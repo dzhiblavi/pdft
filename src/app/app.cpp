@@ -17,7 +17,7 @@
 #include "pdft/view/app/renderer.h"
 
 #include "pdft/state/document_storage.h"
-#include "pdft/state/state.h"
+#include "pdft/state/ui_state.h"
 
 #include "pdft/media/mupdf/context.h"
 #include "pdft/media/mupdf/document.h"
@@ -78,7 +78,7 @@ void Application::setup() {
     image_display_ = resolveDisplay(console_);
 
     document_storage_ = std::make_shared<state::DocumentStorage>();
-    state_ = std::make_shared<state::State>();
+    state_ = std::make_shared<state::UIState>();
     state_->image_properties = config_.image;
 
     auto renderer = std::make_shared<view::app::Renderer>(document_storage_, image_display_);

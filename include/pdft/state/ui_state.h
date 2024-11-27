@@ -30,7 +30,7 @@ struct DocumentState {
     void applyScrollOffset(uint32_t pages_per_page);
 };
 
-struct State {
+struct UIState {
  public:
     void onInput(char key);
     void resetInput();

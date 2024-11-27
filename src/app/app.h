@@ -7,7 +7,7 @@
 #include "pdft/core/log/with_logger.h"
 #include "pdft/notify/notify.h"
 #include "pdft/state/document_storage.h"
-#include "pdft/state/state.h"
+#include "pdft/state/ui_state.h"
 #include "pdft/tui/display/display.h"
 #include "pdft/tui/terminal/terminal.h"
 #include "pdft/view/view.h"
@@ -43,7 +43,7 @@ class Application : public pdft::core::log::WithLogger {
     std::shared_ptr<pdft::tui::display::Display> image_display_;
 
     std::shared_ptr<pdft::state::DocumentStorage> document_storage_;
-    std::shared_ptr<pdft::state::State> state_;
+    std::shared_ptr<pdft::state::UIState> state_;
     std::shared_ptr<pdft::view::View> view_;
     std::shared_ptr<pdft::controller::Controller> controller_;
 

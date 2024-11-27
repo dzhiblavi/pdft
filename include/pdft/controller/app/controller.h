@@ -4,7 +4,7 @@
 #include "pdft/controller/keytree.h"
 
 #include "pdft/state/document_storage.h"
-#include "pdft/state/state.h"
+#include "pdft/state/ui_state.h"
 
 #include <vector>
 
@@ -46,7 +46,7 @@ class Controller : public controller::Controller {
 
     Controller(
         const Config& config,
-        std::shared_ptr<state::State> state,
+        std::shared_ptr<state::UIState> state,
         std::shared_ptr<state::DocumentStorage> docs);
 
     Action onKeyEvent(char key) override;
@@ -57,7 +57,7 @@ class Controller : public controller::Controller {
     void reloadDocument(state::DocumentId id, std::filesystem::path path);
 
     KeyTree key_tree_;
-    std::shared_ptr<state::State> state_;
+    std::shared_ptr<state::UIState> state_;
     std::shared_ptr<state::DocumentStorage> docs_;
     bool quit_ = false;
 };

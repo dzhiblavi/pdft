@@ -7,7 +7,7 @@ namespace pdft::controller::app {
 
 Controller::Controller(
     const Config& config,
-    std::shared_ptr<state::State> state,
+    std::shared_ptr<state::UIState> state,
     std::shared_ptr<state::DocumentStorage> docs)
     : state_(std::move(state))
     , docs_(std::move(docs)) {

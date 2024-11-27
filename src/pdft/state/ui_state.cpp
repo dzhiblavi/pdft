@@ -1,4 +1,4 @@
-#include "pdft/state/state.h"
+#include "pdft/state/ui_state.h"
 #include "pdft/core/assert.h"
 #include "pdft/core/log/log.h"
 
@@ -93,44 +93,44 @@ void DocumentState::setDocument(DocumentId id, uint32_t page_count) {
     }
 }
 
-void State::onInput(char key) {
+void UIState::onInput(char key) {
     current_input.push_back(key);
 }
 
-void State::resetInput() {
+void UIState::resetInput() {
     current_input.clear();
 }
 
-void State::addDocument(DocumentId id, uint32_t page_count) {
+void UIState::addDocument(DocumentId id, uint32_t page_count) {
     states.emplace_back(id, page_count);
     idx = idx.value_or(0);
 }
 
-void State::onDocumentChanged(DocumentId from, DocumentId to, uint32_t page_count) {
+void UIState::onDocumentChanged(DocumentId from, DocumentId to, uint32_t page_count) {
     auto it = std::ranges::find(states, from, &DocumentState::document_id);
     PDFT_VERIFY(it != states.end(), "failed to find the old document with id={}", from);
     it->setDocument(to, page_count);
 }
 
-void State::scrollNext(int rows) {
+void UIState::scrollNext(int rows) {
     if (auto state = getState()) {
         state->scrollNext(rows);
     }
 }
 
-void State::nextPage(int delta) {
+void UIState::nextPage(int delta) {
     if (auto state = getState()) {
         state->nextPage(delta);
     }
 }
 
-void State::setPageIndex(uint32_t index) {
+void UIState::setPageIndex(uint32_t index) {
     if (auto state = getState()) {
         state->setPageIndex(index);
     }
 }
 
-void State::nextDocument(int delta) {
+void UIState::nextDocument(int delta) {
     if (idx) {
         const size_t n = states.size();
         auto& i = *idx;
@@ -146,13 +146,13 @@ void State::nextDocument(int delta) {
     }
 }
 
-void State::nextLayout(int delta) {
+void UIState::nextLayout(int delta) {
     if (auto state = getState()) {
         state->nextLayout(delta);
     }
 }
 
-DocumentState* State::getState() {
+DocumentState* UIState::getState() {
     if (idx) {
         return &states[*idx];
     }
@@ -160,7 +160,7 @@ DocumentState* State::getState() {
     return nullptr;
 }
 
-const DocumentState* State::getState() const {
+const DocumentState* UIState::getState() const {
     if (idx) {
         return &states[*idx];
     }
@@ -168,19 +168,19 @@ const DocumentState* State::getState() const {
     return nullptr;
 }
 
-void State::invertColors() {
+void UIState::invertColors() {
     image_properties.invert_colors = !image_properties.invert_colors;
 }
 
-void State::updateScalingFactor(float coeff) {
+void UIState::updateScalingFactor(float coeff) {
     image_properties.scaling_factor *= coeff;
 }
 
-void State::toggleSidebar() {
+void UIState::toggleSidebar() {
     show_sidebar = !show_sidebar;
 }
 
-std::optional<DocumentId> State::getCurrentDocumentId() const {
+std::optional<DocumentId> UIState::getCurrentDocumentId() const {
     return idx.transform([this](auto i) { return states[i].document_id; });
 }
 

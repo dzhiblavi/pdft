@@ -2,7 +2,7 @@
 
 namespace pdft::view::app {
 
-tui::Element View::render(const state::State& state, tui::Context& ctx) {
+tui::Element View::render(const state::UIState& state, tui::Context& ctx) {
     auto _ = ctx.push("state");
 
     auto doc = [&] {
@@ -26,7 +26,7 @@ tui::Element View::render(const state::State& state, tui::Context& ctx) {
     });
 }
 
-tui::Element View::getSidebar(const state::State& state, tui::Context& ctx) {
+tui::Element View::getSidebar(const state::UIState& state, tui::Context& ctx) {
     if (!state.show_sidebar) {
         return tui::emptyElement();
     }

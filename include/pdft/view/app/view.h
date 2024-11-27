@@ -13,10 +13,10 @@ class View : public view::View {
         : doc_storage_(std::move(storage))
         , doc_view_(std::move(view)) {}
 
-    tui::Element render(const state::State& state, tui::Context& ctx) override;
+    tui::Element render(const state::UIState& state, tui::Context& ctx) override;
 
  private:
-    tui::Element getSidebar(const state::State& state, tui::Context& ctx);
+    tui::Element getSidebar(const state::UIState& state, tui::Context& ctx);
 
     std::shared_ptr<state::DocumentStorage> doc_storage_;
     std::shared_ptr<view::DocumentView> doc_view_;
