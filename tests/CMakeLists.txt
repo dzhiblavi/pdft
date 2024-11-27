@@ -20,13 +20,15 @@ endfunction(add_test)
 
 # Add tests here
 
+# Core
 add_test(./pdft/core/io/posix/test_console.cpp)
-
 add_test(./pdft/core/trace/test_scope_tracer.cpp)
 add_test(./pdft/core/trace/test_stack_scope_tracer.cpp)
 
-add_test(./pdft/controller/test_keytree.cpp)
+# Utils
+add_test(./pdft/utils/test_intrusive_forward_list.cpp)
 
+# TUI
 add_test(./pdft/tui/test_alignment.cpp)
 add_test(./pdft/tui/image/test_fit_image.cpp)
 add_test(./pdft/tui/terminal/ansi/test_terminal.cpp)
@@ -35,4 +37,5 @@ add_test(./pdft/tui/display/kitty/apc/test_executor_base.cpp)
 add_test(./pdft/tui/display/kitty/apc/tmux/test_executor.cpp)
 add_test(./pdft/tui/display/kitty/apc/regular/test_executor.cpp)
 
-add_test(./pdft/utils/test_intrusive_forward_list.cpp)
+# Application
+add_test(./pdft/app/controller/test_keytree.cpp)

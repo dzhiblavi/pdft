@@ -2,7 +2,7 @@
 
 #include "logging.h"
 
-#include "pdft/controller/app/controller.h"
+#include "pdft/app/controller/impl/controller.h"
 
 #include <spdlog/common.h>
 
@@ -23,7 +23,7 @@ struct DisplayConfig {
 struct Config {
     SystemConfig system = {};
     LoggingConfig logging = {};
-    pdft::controller::app::Controller::Config controller = {};
+    pdft::app::controller::impl::Controller::Config controller = {};
     DisplayConfig display = {};
 };
 

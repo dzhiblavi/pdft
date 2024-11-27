@@ -1,30 +1,29 @@
 #include "app.h"
 #include "logging.h"
-#include "pdft/view/app/document_view.h"
-#include "pdft/view/app/view.h"
 #include "resolve_display.h"
 #include "version.h"
+
+#include "pdft/app/controller/impl/controller.h"
+#include "pdft/app/state/document_storage.h"
+#include "pdft/app/state/ui_state.h"
+#include "pdft/app/view/impl/document_view.h"
+#include "pdft/app/view/impl/page_renderer.h"
+#include "pdft/app/view/impl/view.h"
+
+#include "pdft/media/mupdf/context.h"
+#include "pdft/media/mupdf/document.h"
+#include "pdft/notify/fsw/notify.h"
+#include "pdft/tui/terminal/ansi/terminal.h"
+
+#include "pdft/utils/build_info.h"
+#include "pdft/utils/random.h"
+#include "pdft/utils/visit.h"
 
 #include "pdft/core/io/posix/console.h"
 #include "pdft/core/io/posix/termctl.h"
 #include "pdft/core/log/log.h"
 #include "pdft/core/trace/log_stack_trace.h"
 #include "pdft/core/trace/stack_scope_tracer.h"
-#include "pdft/tui/terminal/ansi/terminal.h"
-
-#include "pdft/controller/app/controller.h"
-#include "pdft/notify/fsw/notify.h"
-#include "pdft/view/app/page_renderer.h"
-
-#include "pdft/state/document_storage.h"
-#include "pdft/state/ui_state.h"
-
-#include "pdft/media/mupdf/context.h"
-#include "pdft/media/mupdf/document.h"
-
-#include "pdft/utils/build_info.h"
-#include "pdft/utils/random.h"
-#include "pdft/utils/visit.h"
 
 #include <asio/experimental/awaitable_operators.hpp>
 #include <asio/io_context.hpp>
@@ -37,11 +36,22 @@ namespace app {
 using namespace pdft;
 using namespace asio::experimental::awaitable_operators;
 
+using pdft::app::controller::Action;
+
+using pdft::app::state::DocumentStorage;
+using pdft::app::state::UIState;
+
+using pdft::app::view::impl::DocumentView;
+using pdft::app::view::impl::PageRenderer;
+using pdft::app::view::impl::View;
+
+using pdft::app::controller::impl::Controller;
+
 namespace {
 
-controller::Action handleSignal(int signal) {
+Action handleSignal(int signal) {
     switch (signal) {
-        using enum controller::Action;
+        using enum Action;
 
         case SIGWINCH:
             log::info("received SIGWINCH: terminal resized, redrawing");
@@ -69,7 +79,7 @@ Application::Application(asio::io_context& context, Config config)
 }
 
 void Application::setup() {
-    app::setupMupdfLogging(media::mupdf::thisThreadContext());
+    ::app::setupMupdfLogging(media::mupdf::thisThreadContext());
     media::mupdf::thisThreadContext().registerDocumentHandlers();
 
     term_control_ = std::make_shared<core::io::posix::TermControl>();
@@ -78,20 +88,17 @@ void Application::setup() {
         context_, ::dup(STDIN_FILENO), ::dup(STDOUT_FILENO));
     image_display_ = resolveDisplay(console_);
 
-    document_storage_ = std::make_shared<state::DocumentStorage>();
-    state_ = std::make_shared<state::UIState>();
+    document_storage_ = std::make_shared<DocumentStorage>();
+    state_ = std::make_shared<UIState>();
     state_->scaling_coeff = config_.display.scaling_coeff;
     state_->invert_colors = config_.display.invert_colors;
     auto display_state = std::make_shared<tui::display::State>();
 
-    auto renderer = std::make_shared<view::app::PageRenderer>(
+    auto renderer = std::make_shared<PageRenderer>(
         utils::random<uint32_t>(), document_storage_, std::move(display_state), image_display_);
-    auto document_view =
-        std::make_shared<view::app::DocumentView>(document_storage_, std::move(renderer));
-    view_ = std::make_shared<view::app::View>(document_storage_, std::move(document_view));
-
-    controller_ = std::make_shared<controller::app::Controller>(
-        config_.controller, state_, document_storage_);
+    auto document_view = std::make_shared<DocumentView>(document_storage_, std::move(renderer));
+    view_ = std::make_shared<View>(document_storage_, std::move(document_view));
+    controller_ = std::make_shared<Controller>(config_.controller, state_, document_storage_);
 
     if (config_.system.enable_filesystem_watching) {
         fs_watcher_ = std::make_shared<pdft::notify::fsw::Notify>(context_.get_executor());
@@ -200,7 +207,7 @@ asio::awaitable<void> Application::render(core::io::OutBuffer& buffer) {
 
 asio::awaitable<bool> Application::waitForNextRender() {
     for (;;) {
-        using enum controller::Action;
+        using enum Action;
 
         auto event = co_await (
             console_->read(1) || fs_watcher_->nextEvent() ||

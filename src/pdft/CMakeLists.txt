@@ -71,10 +71,12 @@ target_sources(
           ./tui/terminal/terminal.cpp
           ./tui/terminal/ansi/terminal.cpp)
 
-target_sources(pdft PRIVATE ./state/ui_state.cpp ./state/document_storage.cpp)
-
-target_sources(pdft PRIVATE ./view/app/page_renderer.cpp ./view/app/view.cpp
-                            ./view/app/document_view.cpp)
-
-target_sources(pdft PRIVATE ./controller/keytree.cpp
-                            ./controller/app/controller.cpp)
+target_sources(
+  pdft
+  PRIVATE ./app/state/ui_state.cpp
+          ./app/state/document_storage.cpp
+          ./app/view/impl/page_renderer.cpp
+          ./app/view/impl/view.cpp
+          ./app/view/impl/document_view.cpp
+          ./app/controller/keytree.cpp
+          ./app/controller/impl/controller.cpp)
