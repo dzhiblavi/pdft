@@ -7,7 +7,7 @@
 namespace pdft::state {
 
 enum class ViewMode {
-    OnePage,
+    OnePage = 0,
     TwoPages = 1,
     OnePageContinuous = 2,
     TwoPagesContinuous = 3,
@@ -56,7 +56,7 @@ struct State {
     image::ImageProperties image_properties;
     bool show_sidebar = false;
 
-private:
+ private:
     DocumentState* getState();
 };
 
