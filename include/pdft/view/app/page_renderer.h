@@ -1,5 +1,6 @@
 #pragma once
 
+#include "pdft/state/display_state.h"
 #include "pdft/state/document_storage.h"
 #include "pdft/tui/display/display.h"
 #include "pdft/tui/terminal/terminal.h"
@@ -15,8 +16,7 @@ class PageRenderer : public view::PageRenderer {
         std::shared_ptr<state::DocumentStorage> docs,
         std::shared_ptr<tui::display::Display> display);
 
-    void render(
-        const state::Page& page, const PageProperties& properties, tui::Context& ctx) override;
+    void render(const Page& page, const PageProperties& properties, tui::Context& ctx) override;
 
  private:
     float calcFactor(
@@ -25,7 +25,7 @@ class PageRenderer : public view::PageRenderer {
         const tui::terminal::Dimensions& screen_size,
         tui::Context& ctx);
 
-    image::ImageId getIdForPage(const state::Page& page) const;
+    image::ImageId getIdForPage(const Page& page) const;
 
     const uint32_t image_id_salt_;
     std::shared_ptr<state::DisplayState> display_state_;

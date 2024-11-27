@@ -17,8 +17,7 @@ PageRenderer::PageRenderer(
     , docs_(std::move(docs))
     , display_(std::move(display)) {}
 
-void PageRenderer::render(
-    const state::Page& page, const PageProperties& properties, tui::Context& ctx) {
+void PageRenderer::render(const Page& page, const PageProperties& properties, tui::Context& ctx) {
     const auto& [doc_id, page_index] = page;
     const auto& document = docs_->getDocument(page.document_id);
     const auto& props = properties.properties;
@@ -29,16 +28,14 @@ void PageRenderer::render(
 
     if (display_state_->isLoaded(id)) {
         const auto& info = display_state_->getImage(id);
-
         bool should_reload = false;
-        auto factor = calcFactor(info.page_size, props.scaling_factor, ctx.screen_size, ctx);
 
-        if (factor != info.factor) {
+        if (info.properties.scaling_factor != props.scaling_factor) {
             log::debug("loaded image scaling factor has changed, unloading id={}", id);
             should_reload = true;
         }
 
-        if (props.invert_colors != info.inverted_colors) {
+        if (props.invert_colors != info.properties.invert_colors) {
             log::debug("loaded image color inversion has changed, unloading id={}", id);
             should_reload = true;
         }
@@ -78,11 +75,9 @@ void PageRenderer::render(
 
         display_state_->addImage(
             {
-                .page_size = page_size,
-                .inverted_colors = props.invert_colors,
-                .factor = factor,
                 .image_rows = image_rows,
                 .image_cols = image_cols,
+                .properties = properties.properties,
             },
             id);
     }
@@ -132,7 +127,7 @@ float PageRenderer::calcFactor(
     return scaling_factor * f;
 }
 
-image::ImageId PageRenderer::getIdForPage(const state::Page& page) const {
+image::ImageId PageRenderer::getIdForPage(const Page& page) const {
     auto [doc_id, page_index] = page;
     return image_id_salt_ + utils::cantorPair(doc_id, page_index + 1);
 }

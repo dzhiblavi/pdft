@@ -1,24 +1,20 @@
 #pragma once
 
-#include "pdft/state/document_storage.h"
+#include "pdft/image/image.h"
 
 #include <unordered_map>
 
 namespace pdft::state {
 
-struct Page {
-    state::DocumentId document_id;
-    uint32_t page_index;
-};
-
 class DisplayState {
  public:
     struct LoadedImage {
-        media::PageSize page_size;
-        bool inverted_colors;
-        float factor;
+        // Dimensions of the loaded image
         float image_rows;
         float image_cols;
+
+        // Other loaded image properties
+        image::ImageProperties properties;
     };
 
     image::ImageId addImage(LoadedImage loaded, image::ImageId id);
