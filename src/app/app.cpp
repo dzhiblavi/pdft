@@ -22,6 +22,7 @@
 #include "pdft/core/io/posix/console.h"
 #include "pdft/core/io/posix/termctl.h"
 #include "pdft/core/log/log.h"
+#include "pdft/core/trace/context.h"
 #include "pdft/core/trace/log_stack_trace.h"
 #include "pdft/core/trace/stack_scope_tracer.h"
 
@@ -173,6 +174,7 @@ asio::awaitable<void> Application::runEventLoop() {
 }
 
 asio::awaitable<void> Application::render(core::io::OutBuffer& buffer) {
+    using core::trace::trace;
     log::debug(this, "========== NEW FRAME ===========");
 
     auto tracer = core::trace::getGlobalPool().getTracer("display_one");
@@ -180,26 +182,17 @@ asio::awaitable<void> Application::render(core::io::OutBuffer& buffer) {
     auto ctx = tui::Context(*terminal_, buffer);
     ctx.setTracer(tracer);
 
-    {
-        auto _ = ctx.push("render");
-        tui::Render(screen, view_->render(*state_, ctx));
-    }
-    {
+    trace(ctx, "render", [&] { tui::Render(screen, view_->render(*state_, ctx)); });
+    co_await trace(ctx, "clear_screen_flush", [&]() -> asio::awaitable<void> {
         auto _ = ctx.push("clear_screen_flush");
         core::io::OutBuffer clear_buf;
         core::io::clear(clear_buf);
         terminal_->clear(clear_buf);
         image_display_->clear(clear_buf);
         co_await console_->write(clear_buf.view());
-    }
-    {
-        auto _ = ctx.push("flush_tui");
-        co_await console_->write(screen.ToString());
-    }
-    {
-        auto _ = ctx.push("flush_images");
-        co_await console_->write(buffer);
-    }
+    });
+    co_await trace(ctx, "flush_tui", console_->write(screen.ToString()));
+    co_await trace(ctx, "flush_images", console_->write(buffer));
 
     tracer.finalize();
     core::trace::logStackTrace(tracer.getInfo());

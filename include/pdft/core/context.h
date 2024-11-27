@@ -36,13 +36,6 @@ class Context : public log::WithLogger {
     void setTracer(trace::StackScopeTraceHandle tracer);
     PushHandle push(const char* label, std::source_location loc = std::source_location::current());
 
-    template <typename F>
-    decltype(auto) trace(
-        const char* label, F&& func, std::source_location loc = std::source_location::current()) {
-        auto _ = this->push(label, loc);
-        return std::forward<F>(func)();
-    }
-
  private:
     trace::StackScopeTraceHandle trace_handle_;
 
