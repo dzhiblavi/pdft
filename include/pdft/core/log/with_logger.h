@@ -17,7 +17,7 @@ class WithLogger {
     }
 
  private:
-    LoggerPtr logger_;
+    LoggerPtr logger_ = global();
 };
 
 }  // namespace pdft::core::log
