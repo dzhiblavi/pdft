@@ -21,7 +21,10 @@ void PageRenderer::render(const Page& page, const PageProperties& properties, tu
     const auto& [doc_id, page_index] = page;
     const auto& document = docs_->getDocument(page.document_id);
     const auto& props = properties.properties;
+
     auto id = getIdForPage(page);
+    auto the_page = ctx.trace("get_page", [&] { return document.getPage(page_index); });
+    float factor = calcFactor(the_page->getDefaultSize(), props.scaling_factor, ctx);
 
     log::debug(
         ctx, "rendering a page: doc_id={}, page_index={}, image_id={}", doc_id, page_index, id);
@@ -30,12 +33,12 @@ void PageRenderer::render(const Page& page, const PageProperties& properties, tu
         const auto& info = display_state_->getImage(id);
         bool should_reload = false;
 
-        if (info.properties.scaling_factor != props.scaling_factor) {
-            log::debug("loaded image scaling factor has changed, unloading id={}", id);
+        if (factor != info.factor) {
+            log::debug("loaded image factor has changed, unloading id={}", id);
             should_reload = true;
         }
 
-        if (props.invert_colors != info.properties.invert_colors) {
+        if (props.invert_colors != info.invert_colors) {
             log::debug("loaded image color inversion has changed, unloading id={}", id);
             should_reload = true;
         }
@@ -50,10 +53,6 @@ void PageRenderer::render(const Page& page, const PageProperties& properties, tu
     if (!display_state_->isLoaded(id)) {
         auto _ = ctx.push("load_image");
 
-        auto page = document.getPage(page_index);
-        auto page_size = page->getDefaultSize();
-        auto factor = calcFactor(page_size, props.scaling_factor, ctx.screen_size, ctx);
-
         log::debug(
             ctx,
             "loading page to display: index={}, doc_id={}, image_id={}, factor={}",
@@ -62,9 +61,11 @@ void PageRenderer::render(const Page& page, const PageProperties& properties, tu
             id,
             factor);
 
-        auto image = page->getImage({
-            .scaling_factor = factor,
-            .invert_colors = props.invert_colors,
+        auto image = ctx.trace("get_image", [&] {
+            return the_page->getImage({
+                .scaling_factor = factor,
+                .invert_colors = props.invert_colors,
+            });
         });
 
         display_->loadImage(id, *image, ctx.buffer);
@@ -78,7 +79,8 @@ void PageRenderer::render(const Page& page, const PageProperties& properties, tu
             {
                 .image_rows = image_rows,
                 .image_cols = image_cols,
-                .properties = properties.properties,
+                .factor = factor,
+                .invert_colors = props.invert_colors,
             });
     }
 
@@ -101,13 +103,9 @@ void PageRenderer::render(const Page& page, const PageProperties& properties, tu
     tui::image::render(image, irect, *display_, ctx);
 }
 
-float PageRenderer::calcFactor(
-    media::PageSize page_size,
-    float scaling_factor,
-    const tui::terminal::Dimensions& screen_size,
-    tui::Context& ctx) {
-    float dw = screen_size.width_px;
-    float dh = screen_size.height_px;
+float PageRenderer::calcFactor(media::PageSize page_size, float scaling_factor, tui::Context& ctx) {
+    float dw = ctx.screen_size.width_px;
+    float dh = ctx.screen_size.height_px;
     auto [pw, ph] = page_size;
 
     float fw = dw / pw;
@@ -119,8 +117,8 @@ float PageRenderer::calcFactor(
         "calc factor for page {}x{}, term {}x{}, factor={}, scale_by={}",
         page_size.width_px,
         page_size.height_px,
-        screen_size.width_px,
-        screen_size.height_px,
+        ctx.screen_size.width_px,
+        ctx.screen_size.height_px,
         f,
         scaling_factor);
 

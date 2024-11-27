@@ -9,12 +9,10 @@ namespace pdft::tui::display {
 class State {
  public:
     struct LoadedImage {
-        // Dimensions of the loaded image
         float image_rows;
         float image_cols;
-
-        // Other loaded image properties
-        pdft::image::ImageProperties properties;
+        float factor;
+        bool invert_colors;
     };
 
     pdft::image::ImageId addImage(pdft::image::ImageId id, LoadedImage loaded);
