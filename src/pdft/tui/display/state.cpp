@@ -4,22 +4,22 @@
 
 namespace pdft::tui::display {
 
-bool State::isLoaded(image::ImageId id) const {
+bool State::isLoaded(ImageId id) const {
     return loaded_.contains(id);
 }
 
-image::ImageId State::addImage(image::ImageId id, LoadedImage loaded) {
+ImageId State::addImage(ImageId id, LoadedImage loaded) {
     PDFT_VERIFY(!isLoaded(id));
     loaded_.emplace(id, loaded);
     return id;
 }
 
-void State::removeImage(image::ImageId id) {
+void State::removeImage(ImageId id) {
     PDFT_VERIFY(isLoaded(id));
     loaded_.erase(id);
 }
 
-const State::LoadedImage& State::getImage(image::ImageId id) const {
+const State::LoadedImage& State::getImage(ImageId id) const {
     PDFT_VERIFY(isLoaded(id));
     return loaded_.find(id)->second;
 }

@@ -8,23 +8,25 @@
 
 namespace pdft::tui::display {
 
+using ImageId = uint32_t;
+
 class Display {
  public:
     virtual ~Display() = default;
 
     virtual void loadImage(
-        pdft::image::ImageId id, const pdft::image::Image& image, core::io::OutBuffer& buffer) = 0;
+        ImageId id, const pdft::image::Image& image, core::io::OutBuffer& buffer) = 0;
 
     virtual void displayImage(
-        pdft::image::ImageId id, const IRect& rect, const FRect& image_subarea, Context& ctx) = 0;
+        ImageId id, const IRect& rect, const FRect& image_subarea, Context& ctx) = 0;
 
     virtual void clear(core::io::OutBuffer& buffer) = 0;
 
-    virtual void unload(pdft::image::ImageId id, core::io::OutBuffer& buffer) = 0;
+    virtual void unload(ImageId id, core::io::OutBuffer& buffer) = 0;
 
     virtual void unloadAll(core::io::OutBuffer& buffer) = 0;
 
-    virtual bool isLoaded(pdft::image::ImageId id) const = 0;
+    virtual bool isLoaded(ImageId id) const = 0;
 };
 
 }  // namespace pdft::tui::display

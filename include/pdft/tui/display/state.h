@@ -1,6 +1,6 @@
 #pragma once
 
-#include "pdft/image/image.h"
+#include "pdft/tui/display/display.h"
 
 #include <unordered_map>
 
@@ -15,14 +15,14 @@ class State {
         bool invert_colors;
     };
 
-    pdft::image::ImageId addImage(pdft::image::ImageId id, LoadedImage loaded);
-    void removeImage(pdft::image::ImageId id);
+    ImageId addImage(ImageId id, LoadedImage loaded);
+    void removeImage(ImageId id);
 
-    bool isLoaded(pdft::image::ImageId id) const;
-    const LoadedImage& getImage(pdft::image::ImageId id) const;
+    bool isLoaded(ImageId id) const;
+    const LoadedImage& getImage(ImageId id) const;
 
  private:
-    std::unordered_map<pdft::image::ImageId, LoadedImage> loaded_;
+    std::unordered_map<ImageId, LoadedImage> loaded_;
 };
 
 }  // namespace pdft::tui::display

@@ -5,12 +5,11 @@
 
 namespace pdft::tui::display::kitty {
 
-bool DisplayBase::isLoaded(image::ImageId id) const {
+bool DisplayBase::isLoaded(ImageId id) const {
     return loaded_.contains(id);
 }
 
-void DisplayBase::loadImage(
-    image::ImageId id, const image::Image& image, core::io::OutBuffer& buffer) {
+void DisplayBase::loadImage(ImageId id, const image::Image& image, core::io::OutBuffer& buffer) {
     log::debug("loading an image with id={} to the display", id);
     PDFT_VERIFY(!isLoaded(id), "image with id={} is already loaded", id);
 
@@ -57,7 +56,7 @@ void DisplayBase::clear(core::io::OutBuffer& buffer) {
         buffer);
 }
 
-void DisplayBase::unload(image::ImageId id, core::io::OutBuffer& buffer) {
+void DisplayBase::unload(ImageId id, core::io::OutBuffer& buffer) {
     log::debug("unloading an image with id={} from the display", id);
 
     auto it = loaded_.find(id);

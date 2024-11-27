@@ -22,7 +22,7 @@ class PageRenderer : public view::PageRenderer {
  private:
     float calcFactor(media::PageSize page_size, float scaling_coeff, tui::Context& ctx);
 
-    image::ImageId getIdForPage(const Page& page) const;
+    tui::display::ImageId getIdForPage(const Page& page) const;
 
     const uint32_t image_id_salt_;
     std::shared_ptr<state::DocumentStorage> docs_;

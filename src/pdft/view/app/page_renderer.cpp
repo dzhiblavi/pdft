@@ -3,6 +3,8 @@
 #include "pdft/tui/image/fit_image.h"
 #include "pdft/tui/image/image.h"
 
+#include "pdft/image/invert_colors.h"
+
 #include "pdft/utils/cantor_pair.h"
 
 namespace pdft::view::app {
@@ -123,7 +125,7 @@ float PageRenderer::calcFactor(media::PageSize page_size, float scaling_coeff, t
     return scaling_coeff * f;
 }
 
-image::ImageId PageRenderer::getIdForPage(const Page& page) const {
+tui::display::ImageId PageRenderer::getIdForPage(const Page& page) const {
     auto [doc_id, page_index] = page;
     return image_id_salt_ + utils::cantorPair(doc_id, page_index + 1);
 }

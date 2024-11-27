@@ -9,7 +9,7 @@ class UnicodeDisplay : public DisplayBase {
     using DisplayBase::DisplayBase;
 
     void displayImage(
-        image::ImageId id, const IRect& rect, const FRect& image_subarea, Context& ctx) override;
+        ImageId id, const IRect& rect, const FRect& image_subarea, Context& ctx) override;
 };
 
 }  // namespace pdft::tui::display::kitty

@@ -16,21 +16,20 @@ class DisplayBase : public display::Display {
         : executor_(std::move(executor))
         , console_(std::move(console)) {}
 
-    void loadImage(
-        image::ImageId id, const image::Image& image, core::io::OutBuffer& buffer) override;
+    void loadImage(ImageId id, const image::Image& image, core::io::OutBuffer& buffer) override;
 
     void clear(core::io::OutBuffer& buffer) override;
 
-    void unload(image::ImageId id, core::io::OutBuffer& buffer) override;
+    void unload(ImageId id, core::io::OutBuffer& buffer) override;
 
     void unloadAll(core::io::OutBuffer& buffer) override;
 
-    bool isLoaded(image::ImageId id) const override;
+    bool isLoaded(ImageId id) const override;
 
  protected:
     std::shared_ptr<apc::Executor> executor_;
     std::shared_ptr<core::io::Console> console_;
-    std::unordered_map<image::ImageId, image::ImageSize> loaded_;
+    std::unordered_map<ImageId, image::ImageSize> loaded_;
 };
 
 }  // namespace pdft::tui::display::kitty

@@ -7,10 +7,7 @@
 namespace pdft::tui::display::kitty {
 
 void UnicodeDisplay::displayImage(
-    image::ImageId id,
-    const IRect& rect,
-    const FRect& image_subarea,
-    Context& ctx) {
+    ImageId id, const IRect& rect, const FRect& image_subarea, Context& ctx) {
     PDFT_VERIFY(isLoaded(id));
 
     const auto& [x, y, w, h] = rect;
