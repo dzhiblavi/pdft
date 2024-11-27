@@ -79,6 +79,7 @@ void Application::setup() {
 
     document_storage_ = std::make_shared<state::DocumentStorage>();
     state_ = std::make_shared<state::State>();
+    state_->image_properties = config_.image;
 
     auto renderer = std::make_shared<view::app::Renderer>(document_storage_, image_display_);
     auto document_view =
