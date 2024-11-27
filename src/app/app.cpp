@@ -94,8 +94,7 @@ void Application::setup() {
         config_.controller, state_, document_storage_);
 
     if (config_.system.enable_filesystem_watching) {
-        fs_watcher_ = std::make_shared<pdft::notify::fsw::Notify<asio::io_context::executor_type>>(
-            context_.get_executor());
+        fs_watcher_ = std::make_shared<pdft::notify::fsw::Notify>(context_.get_executor());
     }
 }
 

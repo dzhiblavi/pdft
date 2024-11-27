@@ -49,6 +49,8 @@ target_sources(
           ./core/io/posix/console.cpp
           ./core/io/posix/terminal.cpp)
 
+target_sources(pdft PRIVATE ./notify/fsw/notify.cpp)
+
 target_sources(pdft PRIVATE ./image/image.cpp)
 
 target_sources(
