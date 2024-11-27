@@ -58,8 +58,4 @@ std::span<uint8_t> PixmapImage::mutableSamples() {
     };
 }
 
-const image::ImageProperties& PixmapImage::getProperties() const {
-    return properties_;
-}
-
 }  // namespace pdft::media::mupdf

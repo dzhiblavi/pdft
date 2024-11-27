@@ -16,7 +16,7 @@ class Page : public media::Page {
 
     ~Page() noexcept override;
 
-    std::shared_ptr<image::Image> getImage(const image::ImageProperties& properties) const override;
+    std::shared_ptr<image::Image> getImage(float scaling_factor) const override;
 
     PageSize getDefaultSize() const override;
     size_t getPageIndex() const override;

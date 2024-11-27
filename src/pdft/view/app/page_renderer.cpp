@@ -60,8 +60,7 @@ void PageRenderer::render(const Page& page, const PageProperties& properties, tu
             id,
             factor);
 
-        auto image =
-            ctx.trace("get_image", [&] { return the_page->getImage({.scaling_factor = factor}); });
+        auto image = ctx.trace("get_image", [&] { return the_page->getImage(factor); });
 
         if (properties.invert_colors) {
             for (uint8_t& c : image->mutableSamples()) {

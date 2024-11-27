@@ -23,13 +23,13 @@ Page::~Page() noexcept {
     fz_drop_page(context_.native(), page_);
 }
 
-std::shared_ptr<image::Image> Page::getImage(const image::ImageProperties& properties) const {
-    PDFT_VERIFY(properties.scaling_factor > 0.f, "scale factor should be positive");
+std::shared_ptr<image::Image> Page::getImage(float scaling_factor) const {
+    PDFT_VERIFY(scaling_factor > 0.f, "scale factor should be positive");
 
     auto ctx = context_.native();
     fz_pixmap* pix = nullptr;
 
-    fz_matrix ctm = fz_scale(properties.scaling_factor, properties.scaling_factor);
+    fz_matrix ctm = fz_scale(scaling_factor, scaling_factor);
     ctm = fz_pre_rotate(ctm, 0.f);
 
     fz_try(ctx) pix = fz_new_pixmap_from_page(ctx, page_, ctm, fz_device_rgb(ctx), /* alpha= */ 0);
@@ -44,7 +44,7 @@ std::shared_ptr<image::Image> Page::getImage(const image::ImageProperties& prope
         core::fail("fz_new_pixmap_from_page is null");
     }
 
-    return std::shared_ptr<image::Image>(new PixmapImage(context_, pix, properties));
+    return std::shared_ptr<image::Image>(new PixmapImage(context_, pix));
 }
 
 PageSize Page::getDefaultSize() const {
