@@ -6,7 +6,7 @@
 #include "pdft/core/io/posix/console.h"
 #include "pdft/core/io/posix/termctl.h"
 #include "pdft/core/log/log.h"
-#include "pdft/core/trace/make_stack_tracer_logger.h"
+#include "pdft/core/trace/log_stack_trace.h"
 #include "pdft/core/trace/stack_scope_tracer.h"
 #include "pdft/tui/terminal/ansi/terminal.h"
 

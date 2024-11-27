@@ -1,7 +1,5 @@
 #include "pdft/view/app/renderer.h"
 
-#include "pdft/core/trace/make_stack_tracer_logger.h"
-#include "pdft/core/trace/stack_scope_tracer.h"
 #include "pdft/utils/cantor_pair.h"
 #include "pdft/utils/random.h"
 
@@ -23,8 +21,6 @@ void Renderer::render(
     const image::ImageProperties& properties,
     const Page& page,
     tui::Context& ctx) {
-    auto _ = ctx.push("render_one");
-
     const auto& [doc_id, page_index] = page;
     const auto& document = docs_->getDocument(doc_id);
     auto id = image_id_salt_ + utils::cantorPair(doc_id, page_index + 1);
