@@ -20,4 +20,6 @@ class Image {
     virtual std::span<uint8_t> mutableSamples() = 0;
 };
 
+void invertColors(Image& image);
+
 }  // namespace pdft::image

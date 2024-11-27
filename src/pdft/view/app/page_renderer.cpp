@@ -63,9 +63,7 @@ void PageRenderer::render(const Page& page, const PageProperties& properties, tu
         auto image = ctx.trace("get_image", [&] { return the_page->getImage(factor); });
 
         if (properties.invert_colors) {
-            for (uint8_t& c : image->mutableSamples()) {
-                c = 255 - c;
-            }
+            image::invertColors(*image);
         }
 
         display_->loadImage(id, *image, ctx.buffer);
