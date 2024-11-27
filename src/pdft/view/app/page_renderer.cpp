@@ -74,12 +74,12 @@ void PageRenderer::render(const Page& page, const PageProperties& properties, tu
         float image_rows = float(image_size.height_px) / ctx.screen_size.cell_height_px;
 
         display_state_->addImage(
+            id,
             {
                 .image_rows = image_rows,
                 .image_cols = image_cols,
                 .properties = properties.properties,
-            },
-            id);
+            });
     }
 
     auto _ = ctx.push("display_image");

@@ -8,7 +8,7 @@ bool State::isLoaded(image::ImageId id) const {
     return loaded_.contains(id);
 }
 
-image::ImageId State::addImage(LoadedImage loaded, image::ImageId id) {
+image::ImageId State::addImage(image::ImageId id, LoadedImage loaded) {
     PDFT_VERIFY(!isLoaded(id));
     loaded_.emplace(id, loaded);
     return id;

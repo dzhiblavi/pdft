@@ -17,7 +17,7 @@ class State {
         pdft::image::ImageProperties properties;
     };
 
-    pdft::image::ImageId addImage(LoadedImage loaded, pdft::image::ImageId id);
+    pdft::image::ImageId addImage(pdft::image::ImageId id, LoadedImage loaded);
     void removeImage(pdft::image::ImageId id);
 
     bool isLoaded(pdft::image::ImageId id) const;
