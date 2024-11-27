@@ -1,40 +1,63 @@
 #pragma once
 
 #include "pdft/state/document_storage.h"
-#include "pdft/tui/context.h"
-#include "pdft/tui/elements.h"
+
+#include <vector>
 
 namespace pdft::state {
 
 enum class ViewMode {
-    OnePage = 0,
+    OnePage,
     TwoPages = 1,
     OnePageContinuous = 2,
     TwoPagesContinuous = 3,
 };
 
-class State {
+struct DocumentState {
+    void scrollNext(int32_t delta);
+    void nextPage(int32_t delta);
+    void setPageIndex(uint32_t index);
+    void nextLayout(int32_t delta);
+    void setDocument(DocumentId id, uint32_t page_count);
+
+    DocumentId document_id;
+    uint32_t page_count;
+    uint32_t page_index = 0;
+    int32_t scroll_offset = 0;
+    ViewMode view_mode = ViewMode::OnePage;
+
+ private:
+    void applyScrollOffset(uint32_t pages_per_page);
+};
+
+struct State {
  public:
-    virtual ~State() = default;
+    void onInput(char key);
+    void resetInput();
 
-    virtual tui::Element render(tui::Context& ctx) = 0;
+    void addDocument(DocumentId id, uint32_t page_count);
+    void onDocumentChanged(DocumentId from, DocumentId to, uint32_t page_count);
 
-    virtual void onInput(char key) = 0;
-    virtual void resetInput() = 0;
+    void scrollNext(int times);
+    void nextPage(int delta);
+    void setPageIndex(uint32_t index);
+    void nextDocument(int delta);
+    void nextLayout(int delta);
+    void invertColors();
+    void updateScalingFactor(float coeff);
+    void toggleSidebar();
 
-    virtual void addDocument(DocumentId id) = 0;
-    virtual void onDocumentChanged(DocumentId from, DocumentId to) = 0;
+    std::optional<DocumentId> getCurrentDocumentId() const;
+    const DocumentState* getState() const;
 
-    virtual void scrollNext(int times) = 0;
-    virtual void nextPage(int delta) = 0;
-    virtual void setPageIndex(uint32_t index) = 0;
-    virtual void nextDocument(int delta) = 0;
-    virtual void nextLayout(int delta) = 0;
-    virtual void invertColors() = 0;
-    virtual void updateScalingFactor(float coeff) = 0;
-    virtual void toggleSidebar() = 0;
+    std::optional<size_t> idx = std::nullopt;
+    std::vector<DocumentState> states;
+    std::string current_input;
+    image::ImageProperties image_properties;
+    bool show_sidebar = false;
 
-    virtual std::optional<DocumentId> getCurrentDocumentId() const = 0;
+private:
+    DocumentState* getState();
 };
 
 }  // namespace pdft::state

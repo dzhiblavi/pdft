@@ -10,7 +10,7 @@
 #include "pdft/state/state.h"
 #include "pdft/tui/display/display.h"
 #include "pdft/tui/terminal/terminal.h"
-#include "pdft/view/renderer.h"
+#include "pdft/view/view.h"
 
 #include <asio/awaitable.hpp>
 #include <asio/signal_set.hpp>
@@ -40,16 +40,11 @@ class Application : public pdft::core::log::WithLogger {
     std::shared_ptr<pdft::tui::terminal::Terminal> terminal_;
     std::shared_ptr<pdft::core::io::Console> console_;
     std::shared_ptr<pdft::notify::Notify> fs_watcher_;
-
-    // View
     std::shared_ptr<pdft::tui::display::Display> image_display_;
-    std::shared_ptr<pdft::view::Renderer> renderer_;
 
-    // State
     std::shared_ptr<pdft::state::DocumentStorage> document_storage_;
     std::shared_ptr<pdft::state::State> state_;
-
-    // Controller
+    std::shared_ptr<pdft::view::View> view_;
     std::shared_ptr<pdft::controller::Controller> controller_;
 
     asio::signal_set signals_;

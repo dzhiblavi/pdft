@@ -84,7 +84,7 @@ void Renderer::render(
         };
     }
 
-    auto _2 = ctx.push("display_image");
+    auto _ = ctx.push("display_image");
     PDFT_VERIFY(loaded_.contains(id));
     PDFT_VERIFY(display_->isLoaded(id));
 

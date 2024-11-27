@@ -142,6 +142,7 @@ void Controller::reloadDocument(state::DocumentId old_id, std::filesystem::path 
     log::debug("controller: removed document with id={}", old_id);
 
     auto document = media::mupdf::Document::open(media::mupdf::thisThreadContext(), path);
+    auto page_count = document.getPageCount();
     auto new_id = docs_->addDocument(
         std::unique_ptr<media::Document>(new media::mupdf::Document(std::move(document))));
 
@@ -153,7 +154,7 @@ void Controller::reloadDocument(state::DocumentId old_id, std::filesystem::path 
         old_id,
         new_id);
 
-    state_->onDocumentChanged(old_id, new_id);
+    state_->onDocumentChanged(old_id, new_id, page_count);
 }
 
 }  // namespace pdft::controller::app

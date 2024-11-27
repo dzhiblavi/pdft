@@ -40,10 +40,11 @@ target_sources(
           ./utils/zlib.cpp
           ./utils/get_home_dir.cpp
           ./utils/random.cpp
-          ./view/app/renderer.cpp
-          ./state/app/state.cpp
-          ./state/app/document_state.cpp
+          ./state/state.cpp
           ./state/document_storage.cpp
+          ./view/app/renderer.cpp
+          ./view/app/view.cpp
+          ./view/app/document_view.cpp
           ./controller/keytree.cpp
           ./controller/app/controller.cpp
           ./core/assert.cpp

@@ -1,5 +1,7 @@
 #include "app.h"
 #include "logging.h"
+#include "pdft/view/app/document_view.h"
+#include "pdft/view/app/view.h"
 #include "resolve_display.h"
 #include "version.h"
 
@@ -14,8 +16,8 @@
 #include "pdft/notify/fsw/notify.h"
 #include "pdft/view/app/renderer.h"
 
-#include "pdft/state/app/state.h"
 #include "pdft/state/document_storage.h"
+#include "pdft/state/state.h"
 
 #include "pdft/media/mupdf/context.h"
 #include "pdft/media/mupdf/document.h"
@@ -26,6 +28,7 @@
 #include <asio/experimental/awaitable_operators.hpp>
 #include <asio/io_context.hpp>
 
+#include <ftxui/screen/screen.hpp>
 #include <magic_enum.hpp>
 
 namespace app {
@@ -72,12 +75,16 @@ void Application::setup() {
     terminal_ = std::make_shared<tui::terminal::ansi::Terminal>();
     console_ = std::make_shared<core::io::posix::Console>(
         context_, ::dup(STDIN_FILENO), ::dup(STDOUT_FILENO));
+    image_display_ = resolveDisplay(console_);
 
     document_storage_ = std::make_shared<state::DocumentStorage>();
-    image_display_ = resolveDisplay(console_);
-    renderer_ = std::make_shared<view::app::Renderer>(document_storage_, image_display_);
-    state_ = std::make_shared<state::app::State>(
-        state::app::State::Config{.image_properties = config_.image}, document_storage_, renderer_);
+    state_ = std::make_shared<state::State>();
+
+    auto renderer = std::make_shared<view::app::Renderer>(document_storage_, image_display_);
+    auto document_view =
+        std::make_shared<view::app::DocumentView>(document_storage_, std::move(renderer));
+    view_ = std::make_shared<view::app::View>(document_storage_, std::move(document_view));
+
     controller_ = std::make_shared<controller::app::Controller>(
         config_.controller, state_, document_storage_);
 
@@ -126,10 +133,11 @@ void Application::loadPaths(const std::vector<std::string>& paths) {
         path = std::filesystem::absolute(path);
 
         auto document = media::mupdf::Document::open(media::mupdf::thisThreadContext(), path);
+        auto page_count = document.getPageCount();
         auto doc_id = document_storage_->addDocument(
             std::unique_ptr<media::Document>(new media::mupdf::Document(std::move(document))));
 
-        state_->addDocument(doc_id);
+        state_->addDocument(doc_id, page_count);
 
         if (config_.system.enable_filesystem_watching) {
             fs_watcher_->add(path);
@@ -163,7 +171,7 @@ asio::awaitable<void> Application::render(core::io::OutBuffer& buffer) {
 
     {
         auto _ = ctx.push("render");
-        tui::Render(screen, state_->render(ctx));
+        tui::Render(screen, view_->render(*state_, ctx));
     }
     {
         auto _ = ctx.push("clear_screen_flush");
