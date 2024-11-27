@@ -35,32 +35,29 @@ target_link_libraries(
          ftxui::dom)
 
 target_sources(
+  pdft PRIVATE ./utils/base64.cpp ./utils/zlib.cpp ./utils/get_home_dir.cpp
+               ./utils/random.cpp ./utils/base64.cpp)
+
+target_sources(
   pdft
-  PRIVATE ./utils/base64.cpp
-          ./utils/zlib.cpp
-          ./utils/get_home_dir.cpp
-          ./utils/random.cpp
-          ./image/image.cpp
-          ./state/ui_state.cpp
-          ./state/document_storage.cpp
-          ./view/app/page_renderer.cpp
-          ./view/app/view.cpp
-          ./view/app/document_view.cpp
-          ./controller/keytree.cpp
-          ./controller/app/controller.cpp
-          ./core/assert.cpp
+  PRIVATE ./core/assert.cpp
           ./core/context.cpp
           ./core/log/load.cpp
           ./core/log/log.cpp
           ./core/trace/stack_scope_tracer.cpp
           ./core/trace/log_stack_trace.cpp
           ./core/io/posix/console.cpp
-          ./core/io/posix/terminal.cpp
-          ./media/mupdf/context.cpp
-          ./media/mupdf/document.cpp
-          ./media/mupdf/page.cpp
-          ./media/mupdf/pixmap_image.cpp
-          ./tui/image/fit_image.cpp
+          ./core/io/posix/terminal.cpp)
+
+target_sources(pdft PRIVATE ./image/image.cpp)
+
+target_sources(
+  pdft PRIVATE ./media/mupdf/context.cpp ./media/mupdf/document.cpp
+               ./media/mupdf/page.cpp ./media/mupdf/pixmap_image.cpp)
+
+target_sources(
+  pdft
+  PRIVATE ./tui/image/fit_image.cpp
           ./tui/display/state.cpp
           ./tui/display/kitty/apc/parse_response.cpp
           ./tui/display/kitty/apc/executor_base.cpp
@@ -71,3 +68,11 @@ target_sources(
           ./tui/display/kitty/native_display.cpp
           ./tui/terminal/terminal.cpp
           ./tui/terminal/ansi/terminal.cpp)
+
+target_sources(pdft PRIVATE ./state/ui_state.cpp ./state/document_storage.cpp)
+
+target_sources(pdft PRIVATE ./view/app/page_renderer.cpp ./view/app/view.cpp
+                            ./view/app/document_view.cpp)
+
+target_sources(pdft PRIVATE ./controller/keytree.cpp
+                            ./controller/app/controller.cpp)
