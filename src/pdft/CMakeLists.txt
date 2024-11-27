@@ -42,7 +42,8 @@ target_sources(
           ./utils/random.cpp
           ./state/ui_state.cpp
           ./state/document_storage.cpp
-          ./view/app/renderer.cpp
+          ./state/display_state.cpp
+          ./view/app/page_renderer.cpp
           ./view/app/view.cpp
           ./view/app/document_view.cpp
           ./controller/keytree.cpp

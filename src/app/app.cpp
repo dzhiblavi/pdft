@@ -14,7 +14,7 @@
 
 #include "pdft/controller/app/controller.h"
 #include "pdft/notify/fsw/notify.h"
-#include "pdft/view/app/renderer.h"
+#include "pdft/view/app/page_renderer.h"
 
 #include "pdft/state/document_storage.h"
 #include "pdft/state/ui_state.h"
@@ -23,6 +23,7 @@
 #include "pdft/media/mupdf/document.h"
 
 #include "pdft/utils/build_info.h"
+#include "pdft/utils/random.h"
 #include "pdft/utils/visit.h"
 
 #include <asio/experimental/awaitable_operators.hpp>
@@ -80,8 +81,10 @@ void Application::setup() {
     document_storage_ = std::make_shared<state::DocumentStorage>();
     state_ = std::make_shared<state::UIState>();
     state_->image_properties = config_.image;
+    auto display_state = std::make_shared<state::DisplayState>();
 
-    auto renderer = std::make_shared<view::app::Renderer>(document_storage_, image_display_);
+    auto renderer = std::make_shared<view::app::PageRenderer>(
+        utils::random<uint32_t>(), display_state, document_storage_, image_display_);
     auto document_view =
         std::make_shared<view::app::DocumentView>(document_storage_, std::move(renderer));
     view_ = std::make_shared<view::app::View>(document_storage_, std::move(document_view));

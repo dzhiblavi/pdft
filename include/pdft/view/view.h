@@ -9,6 +9,7 @@ namespace pdft::view {
 class View {
  public:
     virtual ~View() = default;
+
     virtual tui::Element render(const state::UIState& state, tui::Context& ctx) = 0;
 };
 

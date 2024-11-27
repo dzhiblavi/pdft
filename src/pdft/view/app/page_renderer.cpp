@@ -1,45 +1,44 @@
-#include "pdft/view/app/renderer.h"
-
-#include "pdft/utils/cantor_pair.h"
-#include "pdft/utils/random.h"
+#include "pdft/view/app/page_renderer.h"
 
 #include "pdft/tui/image/fit_image.h"
 #include "pdft/tui/image/image.h"
 
+#include "pdft/utils/cantor_pair.h"
+
 namespace pdft::view::app {
 
-Renderer::Renderer(
-    std::shared_ptr<state::DocumentStorage> docs, std::shared_ptr<tui::display::Display> display)
-    : image_id_salt_(utils::random<uint32_t>(0))
+PageRenderer::PageRenderer(
+    uint32_t image_id_salt,
+    std::shared_ptr<state::DisplayState> display_state,
+    std::shared_ptr<state::DocumentStorage> docs,
+    std::shared_ptr<tui::display::Display> display)
+    : image_id_salt_(image_id_salt)
+    , display_state_(std::move(display_state))
     , docs_(std::move(docs))
     , display_(std::move(display)) {}
 
-void Renderer::render(
-    const tui::IRect& rect,
-    const tui::FRect& subarea,
-    const tui::image::Placement& place,
-    const image::ImageProperties& properties,
-    const Page& page,
-    tui::Context& ctx) {
+void PageRenderer::render(
+    const state::Page& page, const PageProperties& properties, tui::Context& ctx) {
     const auto& [doc_id, page_index] = page;
-    const auto& document = docs_->getDocument(doc_id);
-    auto id = image_id_salt_ + utils::cantorPair(doc_id, page_index + 1);
+    const auto& document = docs_->getDocument(page.document_id);
+    const auto& props = properties.properties;
+    auto id = getIdForPage(page);
 
     log::debug(
         ctx, "rendering a page: doc_id={}, page_index={}, image_id={}", doc_id, page_index, id);
 
-    if (auto it = loaded_.find(id); it != loaded_.end()) {
-        auto&& info = it->second;
+    if (display_state_->isLoaded(id)) {
+        const auto& info = display_state_->getImage(id);
 
         bool should_reload = false;
-        auto factor = calcFactor(info.page_size, properties.scaling_factor, ctx.screen_size, ctx);
+        auto factor = calcFactor(info.page_size, props.scaling_factor, ctx.screen_size, ctx);
 
         if (factor != info.factor) {
             log::debug("loaded image scaling factor has changed, unloading id={}", id);
             should_reload = true;
         }
 
-        if (properties.invert_colors != info.inverted_colors) {
+        if (props.invert_colors != info.inverted_colors) {
             log::debug("loaded image color inversion has changed, unloading id={}", id);
             should_reload = true;
         }
@@ -47,16 +46,16 @@ void Renderer::render(
         if (should_reload) {
             auto _ = ctx.push("unload_image");
             display_->unload(id, ctx.buffer);
-            loaded_.erase(it);
+            display_state_->removeImage(id);
         }
     }
 
-    if (!loaded_.contains(id)) {
+    if (!display_state_->isLoaded(id)) {
         auto _ = ctx.push("load_image");
 
         auto page = document.getPage(page_index);
         auto page_size = page->getDefaultSize();
-        auto factor = calcFactor(page_size, properties.scaling_factor, ctx.screen_size, ctx);
+        auto factor = calcFactor(page_size, props.scaling_factor, ctx.screen_size, ctx);
 
         log::debug(
             ctx,
@@ -68,7 +67,7 @@ void Renderer::render(
 
         auto image = page->getImage({
             .scaling_factor = factor,
-            .invert_colors = properties.invert_colors,
+            .invert_colors = props.invert_colors,
         });
 
         display_->loadImage(id, *image, ctx.buffer);
@@ -77,27 +76,27 @@ void Renderer::render(
         float image_cols = float(image_size.width_px) / ctx.screen_size.cell_width_px;
         float image_rows = float(image_size.height_px) / ctx.screen_size.cell_height_px;
 
-        loaded_[id] = LoadedImage{
-            .page_size = page_size,
-            .inverted_colors = properties.invert_colors,
-            .factor = factor,
-            .image_rows = image_rows,
-            .image_cols = image_cols,
-        };
+        display_state_->addImage(
+            {
+                .page_size = page_size,
+                .inverted_colors = props.invert_colors,
+                .factor = factor,
+                .image_rows = image_rows,
+                .image_cols = image_cols,
+            },
+            id);
     }
 
     auto _ = ctx.push("display_image");
-    PDFT_VERIFY(loaded_.contains(id));
-    PDFT_VERIFY(display_->isLoaded(id));
 
-    const auto& props = loaded_[id];
-    float sub_rows = props.image_rows * subarea.height;
-    float sub_cols = props.image_cols * subarea.width;
-    auto irect = tui::image::fitImage(sub_cols / sub_rows, rect, place);
-    auto image = tui::image::Image::make(id, subarea);
+    const auto& p = display_state_->getImage(id);
+    float sub_rows = p.image_rows * properties.subarea.height;
+    float sub_cols = p.image_cols * properties.subarea.width;
+    auto irect = tui::image::fitImage(sub_cols / sub_rows, properties.rect, properties.placement);
+    auto image = tui::image::Image::make(id, properties.subarea);
 
     {
-        auto [x, y, w, h] = rect;
+        auto [x, y, w, h] = properties.rect;
         log::debug(ctx, "renderer @ x={},y={},w={},h={}", x, y, w, h);
 
         auto [ix, iy, iw, ih] = irect;
@@ -107,7 +106,7 @@ void Renderer::render(
     tui::image::render(image, irect, *display_, ctx);
 }
 
-float Renderer::calcFactor(
+float PageRenderer::calcFactor(
     media::PageSize page_size,
     float scaling_factor,
     const tui::terminal::Dimensions& screen_size,
@@ -131,6 +130,11 @@ float Renderer::calcFactor(
         scaling_factor);
 
     return scaling_factor * f;
+}
+
+image::ImageId PageRenderer::getIdForPage(const state::Page& page) const {
+    auto [doc_id, page_index] = page;
+    return image_id_salt_ + utils::cantorPair(doc_id, page_index + 1);
 }
 
 }  // namespace pdft::view::app

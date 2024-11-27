@@ -9,6 +9,7 @@ namespace pdft::view {
 class DocumentView {
  public:
     virtual ~DocumentView() = default;
+
     virtual tui::Element render(
         const state::DocumentState& state,
         const image::ImageProperties& image,

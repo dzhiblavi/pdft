@@ -29,15 +29,18 @@ tui::Element DocumentView::renderOnePage(
         auto _ = ctx.push("only_page");
 
         renderer_->render(
-            rect,
-            {
-                .hor = tui::Alignment::Center,
-                .vert = tui::Alignment::Center,
-            },
-            image,
             {
                 .document_id = state.document_id,
                 .page_index = state.page_index,
+            },
+            {
+                .rect = rect,
+                .placement =
+                    {
+                        .hor = tui::Alignment::Center,
+                        .vert = tui::Alignment::Center,
+                    },
+                .properties = image,
             },
             ctx);
     };
@@ -51,15 +54,18 @@ tui::Element DocumentView::renderTwoPages(
         auto _ = ctx.push("left_page");
 
         renderer_->render(
-            rect,
-            {
-                .hor = tui::Alignment::Max,
-                .vert = tui::Alignment::Center,
-            },
-            image,
             {
                 .document_id = state.document_id,
                 .page_index = state.page_index,
+            },
+            {
+                .rect = rect,
+                .placement =
+                    {
+                        .hor = tui::Alignment::Max,
+                        .vert = tui::Alignment::Center,
+                    },
+                .properties = image,
             },
             ctx);
     };
@@ -72,15 +78,18 @@ tui::Element DocumentView::renderTwoPages(
         auto _ = ctx.push("right_page");
 
         renderer_->render(
-            rect,
-            {
-                .hor = tui::Alignment::Min,
-                .vert = tui::Alignment::Center,
-            },
-            image,
             {
                 .document_id = state.document_id,
                 .page_index = state.page_index + 1,
+            },
+            {
+                .rect = rect,
+                .placement =
+                    {
+                        .hor = tui::Alignment::Min,
+                        .vert = tui::Alignment::Center,
+                    },
+                .properties = image,
             },
             ctx);
     };
@@ -98,21 +107,25 @@ tui::Element DocumentView::renderOnePageContinuous(
         float this_ratio = float(rect.height) / rect_.height;
 
         renderer_->render(
-            rect,
-            {
-                .x = 0.f,
-                .y = 1.f - this_ratio,
-                .width = 1.f,
-                .height = this_ratio,
-            },
-            {
-                .hor = tui::Alignment::Center,
-                .vert = tui::Alignment::Max,
-            },
-            image,
             {
                 .document_id = state.document_id,
                 .page_index = state.page_index,
+            },
+            {
+                .rect = rect,
+                .subarea =
+                    {
+                        .x = 0.f,
+                        .y = 1.f - this_ratio,
+                        .width = 1.f,
+                        .height = this_ratio,
+                    },
+                .placement =
+                    {
+                        .hor = tui::Alignment::Center,
+                        .vert = tui::Alignment::Max,
+                    },
+                .properties = image,
             },
             ctx);
     };
@@ -125,21 +138,25 @@ tui::Element DocumentView::renderOnePageContinuous(
         float this_ratio = float(rect.height) / rect_.height;
 
         renderer_->render(
-            rect,
-            {
-                .x = 0.f,
-                .y = 0.f,
-                .width = 1.f,
-                .height = this_ratio,
-            },
-            {
-                .hor = tui::Alignment::Center,
-                .vert = tui::Alignment::Min,
-            },
-            image,
             {
                 .document_id = state.document_id,
                 .page_index = state.page_index + 1,
+            },
+            {
+                .rect = rect,
+                .subarea =
+                    {
+                        .x = 0.f,
+                        .y = 0.f,
+                        .width = 1.f,
+                        .height = this_ratio,
+                    },
+                .placement =
+                    {
+                        .hor = tui::Alignment::Center,
+                        .vert = tui::Alignment::Min,
+                    },
+                .properties = image,
             },
             ctx);
     };
@@ -160,21 +177,25 @@ tui::Element DocumentView::renderTwoPagesContinuous(
         float this_ratio = float(rect.height) / rect_.height;
 
         renderer_->render(
-            rect,
-            {
-                .x = 0.f,
-                .y = 1.f - this_ratio,
-                .width = 1.f,
-                .height = this_ratio,
-            },
-            {
-                .hor = tui::Alignment::Max,
-                .vert = tui::Alignment::Max,
-            },
-            image,
             {
                 .document_id = state.document_id,
                 .page_index = state.page_index,
+            },
+            {
+                .rect = rect,
+                .subarea =
+                    {
+                        .x = 0.f,
+                        .y = 1.f - this_ratio,
+                        .width = 1.f,
+                        .height = this_ratio,
+                    },
+                .placement =
+                    {
+                        .hor = tui::Alignment::Max,
+                        .vert = tui::Alignment::Max,
+                    },
+                .properties = image,
             },
             ctx);
     };
@@ -188,21 +209,25 @@ tui::Element DocumentView::renderTwoPagesContinuous(
         float this_ratio = float(rect.height) / rect_.height;
 
         renderer_->render(
-            rect,
-            {
-                .x = 0.f,
-                .y = 1.f - this_ratio,
-                .width = 1.f,
-                .height = this_ratio,
-            },
-            {
-                .hor = tui::Alignment::Min,
-                .vert = tui::Alignment::Max,
-            },
-            image,
             {
                 .document_id = state.document_id,
                 .page_index = state.page_index + 1,
+            },
+            {
+                .rect = rect,
+                .subarea =
+                    {
+                        .x = 0.f,
+                        .y = 1.f - this_ratio,
+                        .width = 1.f,
+                        .height = this_ratio,
+                    },
+                .placement =
+                    {
+                        .hor = tui::Alignment::Min,
+                        .vert = tui::Alignment::Max,
+                    },
+                .properties = image,
             },
             ctx);
     };
@@ -216,21 +241,25 @@ tui::Element DocumentView::renderTwoPagesContinuous(
         float this_ratio = float(rect.height) / rect_.height;
 
         renderer_->render(
-            rect,
-            {
-                .x = 0.f,
-                .y = 0.f,
-                .width = 1.f,
-                .height = this_ratio,
-            },
-            {
-                .hor = tui::Alignment::Max,
-                .vert = tui::Alignment::Min,
-            },
-            image,
             {
                 .document_id = state.document_id,
                 .page_index = state.page_index + 2,
+            },
+            {
+                .rect = rect,
+                .subarea =
+                    {
+                        .x = 0.f,
+                        .y = 0.f,
+                        .width = 1.f,
+                        .height = this_ratio,
+                    },
+                .placement =
+                    {
+                        .hor = tui::Alignment::Max,
+                        .vert = tui::Alignment::Min,
+                    },
+                .properties = image,
             },
             ctx);
     };
@@ -244,21 +273,25 @@ tui::Element DocumentView::renderTwoPagesContinuous(
         float this_ratio = float(rect.height) / rect_.height;
 
         renderer_->render(
-            rect,
-            {
-                .x = 0.f,
-                .y = 0.f,
-                .width = 1.f,
-                .height = this_ratio,
-            },
-            {
-                .hor = tui::Alignment::Min,
-                .vert = tui::Alignment::Min,
-            },
-            image,
             {
                 .document_id = state.document_id,
                 .page_index = state.page_index + 3,
+            },
+            {
+                .rect = rect,
+                .subarea =
+                    {
+                        .x = 0.f,
+                        .y = 0.f,
+                        .width = 1.f,
+                        .height = this_ratio,
+                    },
+                .placement =
+                    {
+                        .hor = tui::Alignment::Min,
+                        .vert = tui::Alignment::Min,
+                    },
+                .properties = image,
             },
             ctx);
     };

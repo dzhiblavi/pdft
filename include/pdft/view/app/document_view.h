@@ -1,7 +1,7 @@
 #pragma once
 
 #include "pdft/view/document_view.h"
-#include "pdft/view/renderer.h"
+#include "pdft/view/page_renderer.h"
 
 #include "pdft/state/document_storage.h"
 
@@ -11,7 +11,7 @@ class DocumentView : public view::DocumentView {
  public:
     DocumentView(
         std::shared_ptr<state::DocumentStorage> doc_storage,
-        std::shared_ptr<view::Renderer> renderer)
+        std::shared_ptr<view::PageRenderer> renderer)
         : doc_storage_(std::move(doc_storage))
         , renderer_(std::move(renderer)) {}
 
@@ -31,7 +31,7 @@ class DocumentView : public view::DocumentView {
         const state::DocumentState& state, const image::ImageProperties& image, tui::Context& ctx);
 
     std::shared_ptr<state::DocumentStorage> doc_storage_;
-    std::shared_ptr<view::Renderer> renderer_;
+    std::shared_ptr<view::PageRenderer> renderer_;
     tui::IRect rect_;
 };
 
