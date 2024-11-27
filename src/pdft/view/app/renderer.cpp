@@ -25,13 +25,14 @@ void Renderer::render(
     const auto& document = docs_->getDocument(doc_id);
     auto id = image_id_salt_ + utils::cantorPair(doc_id, page_index + 1);
 
-    log::debug("rendering a page: doc_id={}, page_index={}, image_id={}", doc_id, page_index, id);
+    log::debug(
+        ctx, "rendering a page: doc_id={}, page_index={}, image_id={}", doc_id, page_index, id);
 
     if (auto it = loaded_.find(id); it != loaded_.end()) {
         auto&& info = it->second;
 
         bool should_reload = false;
-        auto factor = calcFactor(info.page_size, properties.scaling_factor, ctx.screen_size);
+        auto factor = calcFactor(info.page_size, properties.scaling_factor, ctx.screen_size, ctx);
 
         if (factor != info.factor) {
             log::debug("loaded image scaling factor has changed, unloading id={}", id);
@@ -55,9 +56,10 @@ void Renderer::render(
 
         auto page = document.getPage(page_index);
         auto page_size = page->getDefaultSize();
-        auto factor = calcFactor(page_size, properties.scaling_factor, ctx.screen_size);
+        auto factor = calcFactor(page_size, properties.scaling_factor, ctx.screen_size, ctx);
 
         log::debug(
+            ctx,
             "loading page to display: index={}, doc_id={}, image_id={}, factor={}",
             page_index,
             doc_id,
@@ -96,17 +98,20 @@ void Renderer::render(
 
     {
         auto [x, y, w, h] = rect;
-        log::debug("renderer @ x={},y={},w={},h={}", x, y, w, h);
+        log::debug(ctx, "renderer @ x={},y={},w={},h={}", x, y, w, h);
 
         auto [ix, iy, iw, ih] = irect;
-        log::debug("renderer I ix={},iy={},iw={},ih={}", ix, iy, iw, ih);
+        log::debug(ctx, "renderer I ix={},iy={},iw={},ih={}", ix, iy, iw, ih);
     }
 
     tui::image::render(image, irect, *display_, ctx);
 }
 
 float Renderer::calcFactor(
-    media::PageSize page_size, float scaling_factor, const tui::terminal::Dimensions& screen_size) {
+    media::PageSize page_size,
+    float scaling_factor,
+    const tui::terminal::Dimensions& screen_size,
+    tui::Context& ctx) {
     float dw = screen_size.width_px;
     float dh = screen_size.height_px;
     auto [pw, ph] = page_size;
@@ -116,6 +121,7 @@ float Renderer::calcFactor(
     float f = std::fmin(fw, fh);
 
     log::debug(
+        ctx,
         "calc factor for page {}x{}, term {}x{}, factor={}, scale_by={}",
         page_size.width_px,
         page_size.height_px,

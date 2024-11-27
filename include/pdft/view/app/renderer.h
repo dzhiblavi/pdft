@@ -27,7 +27,8 @@ class Renderer : public view::Renderer {
     float calcFactor(
         media::PageSize page_size,
         float scaling_factor,
-        const tui::terminal::Dimensions& screen_size);
+        const tui::terminal::Dimensions& screen_size,
+        tui::Context& ctx);
 
     struct LoadedImage {
         media::PageSize page_size;
