@@ -27,8 +27,8 @@ using impl::warn;
 
 }  // namespace pdft::core::log
 
-namespace pdft {
+namespace pdft::log {
 
-namespace log = core::log;
+using namespace core::log;
 
-}  // namespace pdft
+}  // namespace pdft::log
