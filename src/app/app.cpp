@@ -190,10 +190,9 @@ asio::awaitable<void> Application::render(
     // Clear the terminal
     co_await core::trace::trace(ctx, "flush_clear", [&]() -> asio::awaitable<void> {
         core::io::OutBuffer clear_buf;
-        core::io::clear(clear_buf);
         terminal_->clear(clear_buf);
         image_display_->clear(clear_buf);
-        co_await console_->write(clear_buf.view());
+        co_await console_->write(clear_buf);
     });
 
     // Perform display step
@@ -231,9 +230,9 @@ asio::awaitable<bool> Application::waitForNextRender() {
 asio::awaitable<void> Application::cleanup() {
     auto cleanup = core::trace::getGlobalPool().getTracer("cleanup");
 
-    core::io::OutBuffer buffer;
     {
         auto _ = cleanup.addChild("term_clear");
+        core::io::OutBuffer buffer;
         terminal_->clear(buffer);
         image_display_->unloadAll(buffer);
         co_await console_->write(buffer.view());
