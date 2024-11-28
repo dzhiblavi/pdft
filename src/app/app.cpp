@@ -188,8 +188,7 @@ asio::awaitable<void> Application::render(
     co_await trace(ctx, "flush_control", console_->write(ctx.control_buffer));
 
     // Clear the terminal
-    co_await trace(ctx, "flush_clear", [&]() -> asio::awaitable<void> {
-        auto _ = ctx.push("clear_screen_flush");
+    co_await core::trace::trace(ctx, "flush_clear", [&]() -> asio::awaitable<void> {
         core::io::OutBuffer clear_buf;
         core::io::clear(clear_buf);
         terminal_->clear(clear_buf);
