@@ -160,10 +160,10 @@ void Application::loadPaths(const std::vector<std::string>& paths) {
 }
 
 asio::awaitable<void> Application::runEventLoop() {
-    core::io::OutBuffer buffer;
+    core::io::OutBuffer control, display;
 
     for (;;) {
-        co_await render(buffer);
+        co_await render(control, display);
 
         bool should_quit = co_await waitForNextRender();
 
@@ -173,17 +173,22 @@ asio::awaitable<void> Application::runEventLoop() {
     }
 }
 
-asio::awaitable<void> Application::render(core::io::OutBuffer& buffer) {
+asio::awaitable<void> Application::render(
+    core::io::OutBuffer& control_buffer, core::io::OutBuffer& display_buffer) {
     using core::trace::trace;
     log::debug(this, "========== NEW FRAME ===========");
 
     auto tracer = core::trace::getGlobalPool().getTracer("display_one");
     auto screen = ftxui::Screen::Create(ftxui::Dimension::Full());
-    auto ctx = tui::Context(*terminal_, buffer);
+    auto ctx = tui::Context(*terminal_, control_buffer, display_buffer);
     ctx.setTracer(tracer);
 
+    // Perform all calculations and control flushing before clearing the terminal
     trace(ctx, "render", [&] { tui::Render(screen, view_->render(*state_, ctx)); });
-    co_await trace(ctx, "clear_screen_flush", [&]() -> asio::awaitable<void> {
+    co_await trace(ctx, "flush_control", console_->write(ctx.control_buffer));
+
+    // Clear the terminal
+    co_await trace(ctx, "flush_clear", [&]() -> asio::awaitable<void> {
         auto _ = ctx.push("clear_screen_flush");
         core::io::OutBuffer clear_buf;
         core::io::clear(clear_buf);
@@ -191,8 +196,10 @@ asio::awaitable<void> Application::render(core::io::OutBuffer& buffer) {
         image_display_->clear(clear_buf);
         co_await console_->write(clear_buf.view());
     });
-    co_await trace(ctx, "flush_tui", console_->write(screen.ToString()));
-    co_await trace(ctx, "flush_images", console_->write(buffer));
+
+    // Perform display step
+    co_await trace(ctx, "flush_ui", console_->write(screen.ToString()));
+    co_await trace(ctx, "flush_display", console_->write(ctx.display_buffer));
 
     tracer.finalize();
     core::trace::logStackTrace(tracer.getInfo());

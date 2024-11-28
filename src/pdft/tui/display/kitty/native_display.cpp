@@ -52,7 +52,7 @@ void NativeDisplay::displayImage(
             .rows = static_cast<uint32_t>(y),
             .columns = static_cast<uint32_t>(x),
         },
-        ctx.buffer);
+        ctx.display_buffer);
 
     // Create a placement
     executor_->execute(
@@ -60,7 +60,7 @@ void NativeDisplay::displayImage(
             .command = "_G",
             .control_data = control_data,
         },
-        ctx.buffer);
+        ctx.display_buffer);
 }
 
 }  // namespace pdft::tui::display::kitty

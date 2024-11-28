@@ -50,14 +50,14 @@ void UnicodeDisplay::displayImage(
             .command = "_G",
             .control_data = control_data,
         },
-        ctx.buffer);
+        ctx.control_buffer);
 
     // Fill the image space with special unicode characters
     const std::string_view ImagePlaceholder = "\U0010EEEE";
     const std::string_view IdChar = detail::RowColDiacritics[(id >> 24) & 255];
 
     core::io::write(
-        ctx.buffer,
+        ctx.display_buffer,
         "\033[38:2:",
         (id >> 16) & 255,
         ":",
@@ -72,11 +72,11 @@ void UnicodeDisplay::displayImage(
                 .rows = y + row,
                 .columns = static_cast<uint32_t>(x),
             },
-            ctx.buffer);
+            ctx.display_buffer);
 
         for (uint32_t col = 0; col < w; ++col) {
             core::io::write(
-                ctx.buffer,
+                ctx.display_buffer,
                 ImagePlaceholder,
                 detail::RowColDiacritics[offset_rows + row],
                 detail::RowColDiacritics[offset_cols + col],
@@ -84,7 +84,7 @@ void UnicodeDisplay::displayImage(
         }
     }
 
-    core::io::write(ctx.buffer, "\033[39m");
+    core::io::write(ctx.display_buffer, "\033[39m");
 }
 
 }  // namespace pdft::tui::display::kitty

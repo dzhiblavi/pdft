@@ -5,6 +5,7 @@
 
 #include "pdft/image/invert_colors.h"
 
+#include "pdft/core/trace/context.h"
 #include "pdft/utils/cantor_pair.h"
 
 namespace pdft::app::view::impl {
@@ -24,7 +25,8 @@ void PageRenderer::render(const Page& page, const PageProperties& properties, tu
     const auto& document = docs_->getDocument(page.document_id);
 
     auto id = getIdForPage(page);
-    auto the_page = ctx.trace("get_page", [&] { return document.getPage(page_index); });
+    auto the_page =
+        core::trace::trace(ctx, "get_page", [&] { return document.getPage(page_index); });
     float factor = calcFactor(the_page->getDefaultSize(), properties.scaling_coeff, ctx);
 
     log::debug(
@@ -46,7 +48,7 @@ void PageRenderer::render(const Page& page, const PageProperties& properties, tu
 
         if (should_reload) {
             auto _ = ctx.push("unload_image");
-            display_->unload(id, ctx.buffer);
+            display_->unload(id, ctx.control_buffer);
             display_state_->removeImage(id);
         }
     }
@@ -62,13 +64,14 @@ void PageRenderer::render(const Page& page, const PageProperties& properties, tu
             id,
             factor);
 
-        auto image = ctx.trace("get_image", [&] { return the_page->getImage(factor); });
+        auto image =
+            core::trace::trace(ctx, "get_image", [&] { return the_page->getImage(factor); });
 
         if (properties.invert_colors) {
             image::invertColors(*image);
         }
 
-        display_->loadImage(id, *image, ctx.buffer);
+        display_->loadImage(id, *image, ctx.control_buffer);
 
         auto image_size = image->size();
         float image_cols = float(image_size.width_px) / ctx.screen_size.cell_width_px;

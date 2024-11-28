@@ -31,7 +31,8 @@ class Application : public pdft::core::log::WithLogger {
     asio::awaitable<void> prepareTerminal();
     void loadPaths(const std::vector<std::string>& paths);
     asio::awaitable<void> runEventLoop();
-    asio::awaitable<void> render(pdft::core::io::OutBuffer& buffer);
+    asio::awaitable<void> render(
+        pdft::core::io::OutBuffer& control_buffer, pdft::core::io::OutBuffer& display_buffer);
     asio::awaitable<bool> waitForNextRender();
     asio::awaitable<void> cleanup();
 
