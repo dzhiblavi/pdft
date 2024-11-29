@@ -1,5 +1,5 @@
 #include "pdft/tui/display/kitty/apc/executor_base.h"
-#include "pdft/tui/display/kitty/apc/parse_response.h"
+#include "pdft/core/assert.h"
 
 #include "pdft/utils/base64.h"
 #include "pdft/utils/zlib.h"
@@ -95,25 +95,26 @@ void ExecutorBase::execute(const Command& apc, core::io::OutBuffer& buffer) {
 }
 
 asio::awaitable<Result<Response>> ExecutorBase::executeWithResponse(
-    const Command& apc, core::io::OutBuffer& buffer) {
-    execute(std::move(apc), buffer);
+    const Command& /*apc*/, core::io::OutBuffer& /*buffer*/) {
+    PDFT_VERIFY(false, "not implemented");
+    // execute(std::move(apc), buffer);
 
-    // Flush command and receive the response
-    co_await console_->write(buffer);
+    //// Flush command and receive the response
+    // co_await console_->write(buffer);
 
-    // At least 2 chars for escape codes + 2 chars for command (\033 _G \033\)
-    std::stringstream in;
-    std::string instr;
-    co_await console_->read(5, instr);
+    //// At least 2 chars for escape codes + 2 chars for command (\033 _G \033\)
+    // std::stringstream in;
+    // std::string instr;
+    // co_await console_->read(5, instr);
 
-    in << instr;
+    // in << instr;
 
-    while (in.view().back() != '\\') {
-        co_await console_->read(1, instr);
-        in << instr;
-    }
+    // while (in.view().back() != '\\') {
+    // co_await console_->read(1, instr);
+    // in << instr;
+    //}
 
-    co_return parseResponse(in.view());
+    // co_return parseResponse(in.view());
 }
 
 }  // namespace pdft::tui::display::kitty::apc

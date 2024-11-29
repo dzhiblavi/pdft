@@ -87,7 +87,7 @@ void Application::setup() {
     terminal_ = std::make_shared<tui::terminal::ansi::Terminal>();
     console_ = std::make_shared<core::io::posix::Console>(
         context_, ::dup(STDIN_FILENO), ::dup(STDOUT_FILENO));
-    image_display_ = resolveDisplay(config_.display, console_);
+    image_display_ = resolveDisplay(config_.display);
 
     document_storage_ = std::make_shared<DocumentStorage>();
     state_ = std::make_shared<UIState>();

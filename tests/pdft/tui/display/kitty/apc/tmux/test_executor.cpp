@@ -7,7 +7,7 @@ namespace pdft::tui::display::kitty::apc::tmux {
 
 TEST_CASE("testExecuteNoPayload", "") {
     core::io::OutBuffer buffer;
-    auto executor = Executor({}, nullptr);
+    auto executor = Executor();
 
     std::pair<std::string_view, std::string> control_data[] = {
         {"m", "1"},
@@ -27,7 +27,7 @@ TEST_CASE("testExecuteNoPayload", "") {
 
 TEST_CASE("testExecuteWithPayload", "") {
     core::io::OutBuffer buffer;
-    auto executor = Executor({}, nullptr);
+    auto executor = Executor();
 
     std::pair<std::string_view, std::string> control_data[] = {
         {"m", "1"},

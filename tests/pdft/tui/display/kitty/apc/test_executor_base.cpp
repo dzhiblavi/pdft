@@ -7,7 +7,7 @@ namespace pdft::tui::display::kitty::apc {
 namespace {
 
 struct TestExecutor : ExecutorBase {
-    TestExecutor() : ExecutorBase({.max_chunk_size_bytes = 4}, nullptr) {}
+    TestExecutor() : ExecutorBase({.max_chunk_size_bytes = 4}) {}
 
  private:
     void writePrefix(core::io::OutBuffer& buffer) const override {

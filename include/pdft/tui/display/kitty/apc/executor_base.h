@@ -1,6 +1,5 @@
 #pragma once
 
-#include "pdft/core/io/console.h"
 #include "pdft/tui/display/kitty/apc/executor.h"
 
 namespace pdft::tui::display::kitty::apc {
@@ -11,9 +10,7 @@ struct Config {
 
 class ExecutorBase : public Executor {
  public:
-    ExecutorBase(const Config& config, std::shared_ptr<core::io::Console> console)
-        : max_chunk_size_(config.max_chunk_size_bytes)
-        , console_(std::move(console)) {}
+    ExecutorBase(const Config& config = {}) : max_chunk_size_(config.max_chunk_size_bytes) {}
 
     void execute(const Command& cmd, core::io::OutBuffer& buffer) override;
 
@@ -26,7 +23,6 @@ class ExecutorBase : public Executor {
 
  private:
     const size_t max_chunk_size_;
-    std::shared_ptr<core::io::Console> console_;
 };
 
 }  // namespace pdft::tui::display::kitty::apc

@@ -3,8 +3,6 @@
 #include "pdft/tui/display/display.h"
 #include "pdft/tui/display/kitty/apc/executor.h"
 
-#include "pdft/core/io/console.h"
-
 #include <memory>
 #include <unordered_map>
 
@@ -12,9 +10,7 @@ namespace pdft::tui::display::kitty {
 
 class DisplayBase : public display::Display {
  public:
-    DisplayBase(std::shared_ptr<apc::Executor> executor, std::shared_ptr<core::io::Console> console)
-        : executor_(std::move(executor))
-        , console_(std::move(console)) {}
+    DisplayBase(std::shared_ptr<apc::Executor> executor) : executor_(std::move(executor)) {}
 
     void loadImage(ImageId id, const image::Image& image, core::io::OutBuffer& buffer) override;
 
@@ -28,7 +24,6 @@ class DisplayBase : public display::Display {
 
  protected:
     std::shared_ptr<apc::Executor> executor_;
-    std::shared_ptr<core::io::Console> console_;
     std::unordered_map<ImageId, image::ImageSize> loaded_;
 };
 
