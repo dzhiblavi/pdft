@@ -79,4 +79,5 @@ target_sources(
           ./app/view/impl/view.cpp
           ./app/view/impl/document_view.cpp
           ./app/controller/keytree.cpp
-          ./app/controller/impl/controller.cpp)
+          ./app/controller/impl/controller.cpp
+          ./app/loader/impl/loader.cpp)

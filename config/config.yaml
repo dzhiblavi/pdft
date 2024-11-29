@@ -1,3 +1,5 @@
+state_path: ../../../../assets/state.json
+
 system:
   enable_filesystem_watching: true
 

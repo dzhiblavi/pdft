@@ -4,6 +4,7 @@
 #include "version.h"
 
 #include "pdft/app/controller/impl/controller.h"
+#include "pdft/app/loader/impl/loader.h"
 #include "pdft/app/state/document_storage.h"
 #include "pdft/app/state/ui_state.h"
 #include "pdft/app/view/impl/document_view.h"
@@ -31,6 +32,8 @@
 
 #include <ftxui/screen/screen.hpp>
 #include <magic_enum.hpp>
+
+#include <fstream>
 
 namespace app {
 
@@ -69,9 +72,10 @@ Action handleSignal(int signal) {
 
 }  // namespace
 
-Application::Application(asio::io_context& context, Config config)
+Application::Application(asio::io_context& context, Config config, StateMode state_mode)
     : context_(context)
     , config_(config)
+    , state_mode_(state_mode)
     , signals_(context, SIGWINCH, SIGINT, SIGSEGV) {
     setup();
 }
@@ -119,8 +123,10 @@ void Application::printAppInfo() const {
 asio::awaitable<void> Application::run(const std::vector<std::string>& paths) {
     printAppInfo();
     co_await prepareTerminal();
+    restoreState();
     loadPaths(paths);
     co_await runEventLoop();
+    saveState();
     co_await cleanup();
 }
 
@@ -134,10 +140,29 @@ asio::awaitable<void> Application::prepareTerminal() {
     co_await console_->write(init_buffer);
 }
 
+bool Application::isOpened(const std::string& abs_path) const {
+    // XXX this does not actually require linear search
+
+    for (const auto& state : ui_.states) {
+        const auto& doc = documents_->getDocument(state.document_id);
+
+        if (abs_path == doc.getPath()) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
 void Application::loadPaths(const std::vector<std::string>& paths) {
     for (auto path : paths) {
         PDFT_VERIFY(std::filesystem::exists(path));
         path = std::filesystem::absolute(path);
+
+        if (isOpened(path) && state_mode_ == StateMode::AddOnly) {
+            log::info("ignoring the new path {} because state mode is AddOnly", path.c_str());
+            continue;
+        }
 
         auto document = media::mupdf::Document::open(media::mupdf::thisThreadContext(), path);
         auto page_count = document.getPageCount();
@@ -152,6 +177,54 @@ void Application::loadPaths(const std::vector<std::string>& paths) {
 
         log::info("loaded path {}", path.c_str());
     }
+}
+
+void Application::restoreState() {
+    if (!config_.state_path.has_value()) {
+        log::info("not restoring the state");
+        return;
+    }
+
+    auto&& path = *config_.state_path;
+    auto mode_name = magic_enum::enum_name(state_mode_);
+
+    if (state_mode_ == StateMode::Standalone || state_mode_ == StateMode::Clean) {
+        pdft::log::info("not loading state because mode is {}", mode_name);
+        return;
+    }
+
+    pdft::log::info("loading state from {} because mode is {}", path.c_str(), mode_name);
+
+    pdft::app::loader::impl::Loader loader;
+    std::ifstream ifs(pdft::utils::expandHome(path));
+
+    if (auto result = loader.restore(ui_, *documents_, ifs); !result) {
+        pdft::log::warn("failed to restore state from {}: {}", path.c_str(), result.error());
+    } else {
+        pdft::log::warn("successfully restored state from {}", path.c_str());
+    }
+}
+
+void Application::saveState() {
+    if (!config_.state_path.has_value()) {
+        log::info("not saving the state");
+        return;
+    }
+
+    auto mode_name = magic_enum::enum_name(state_mode_);
+
+    if (state_mode_ == StateMode::Standalone) {
+        log::info("not saving the state because mode is {}", mode_name);
+        return;
+    }
+
+    log::info("saving the state because mode is {}", mode_name);
+
+    pdft::app::loader::impl::Loader loader;
+    std::ofstream ofs(utils::expandHome(*config_.state_path));
+    loader.save(ui_, *documents_, ofs);
+
+    log::info("saved the state to {}", config_.state_path->c_str());
 }
 
 asio::awaitable<void> Application::runEventLoop() {

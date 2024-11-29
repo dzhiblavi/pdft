@@ -20,20 +20,10 @@ spdlog::level::level_enum toSpdlogLevel(LogLevel level) {
     return static_cast<spdlog::level::level_enum>(level);
 }
 
-std::filesystem::path expandHome(const std::filesystem::path& path) {
-    std::string str = path;
-
-    if (str.starts_with('~')) {
-        str.replace(0, 1, pdft::utils::getHomeDirectory());
-    }
-
-    return str;
-}
-
 }  // namespace
 
 void setupLogging(const LoggingConfig& config) {
-    auto directory = expandHome(config.directory);
+    auto directory = utils::expandHome(config.directory);
 
     if (!std::filesystem::exists(directory)) {
         std::filesystem::create_directories(directory);

@@ -12,4 +12,14 @@ std::filesystem::path getHomeDirectory() {
     return path;
 }
 
+std::filesystem::path expandHome(const std::filesystem::path& path) {
+    std::string str = path;
+
+    if (str.starts_with('~')) {
+        str.replace(0, 1, pdft::utils::getHomeDirectory());
+    }
+
+    return str;
+}
+
 }  // namespace pdft::utils

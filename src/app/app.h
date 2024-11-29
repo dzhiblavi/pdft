@@ -1,6 +1,7 @@
 #pragma once
 
 #include "config.h"
+#include "state.h"
 
 #include "pdft/app/controller/controller.h"
 #include "pdft/app/view/view.h"
@@ -19,13 +20,16 @@ namespace app {
 
 class Application : public pdft::core::log::WithLogger {
  public:
-    Application(asio::io_context& context, Config config);
+    Application(asio::io_context& context, Config config, StateMode state_mode);
 
     asio::awaitable<void> run(const std::vector<std::string>& paths);
 
  private:
     void printAppInfo() const;
     void setup();
+    void restoreState();
+    void saveState();
+    bool isOpened(const std::string& abs_path) const;
     asio::awaitable<void> prepareTerminal();
     void loadPaths(const std::vector<std::string>& paths);
     asio::awaitable<void> runEventLoop();
@@ -36,6 +40,7 @@ class Application : public pdft::core::log::WithLogger {
 
     asio::io_context& context_;
     Config config_;
+    StateMode state_mode_;
 
     std::shared_ptr<pdft::core::io::TermControl> term_control_;
     std::shared_ptr<pdft::tui::terminal::Terminal> terminal_;
