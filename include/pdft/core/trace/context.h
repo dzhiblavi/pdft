@@ -1,3 +1,5 @@
+#pragma once
+
 #include "pdft/core/context.h"
 #include "pdft/utils/is_awaitable.h"
 

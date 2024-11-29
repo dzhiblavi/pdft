@@ -34,8 +34,6 @@ class Application : public pdft::core::log::WithLogger {
 
     asio::awaitable<void> prepareTerminal();
     asio::awaitable<void> runEventLoop();
-    asio::awaitable<void> render(
-        pdft::core::io::OutBuffer& control_buffer, pdft::core::io::OutBuffer& display_buffer);
     asio::awaitable<bool> waitForNextRender();
     asio::awaitable<void> cleanup();
 
@@ -52,8 +50,8 @@ class Application : public pdft::core::log::WithLogger {
     std::shared_ptr<pdft::app::loader::Loader> loader_;
 
     pdft::app::state::UIState ui_;
-    std::shared_ptr<pdft::app::state::DocumentStorage> documents_;
     pdft::tui::display::State display_;
+    std::shared_ptr<pdft::app::state::DocumentStorage> documents_;
 
     std::shared_ptr<pdft::app::view::View> view_;
     std::shared_ptr<pdft::app::controller::Controller> controller_;

@@ -6,6 +6,7 @@
 #include "pdft/app/controller/impl/controller.h"
 #include "pdft/app/loader/impl/loader.h"
 #include "pdft/app/persist/impl/persister.h"
+#include "pdft/app/renderer.h"
 #include "pdft/app/state/document_storage.h"
 #include "pdft/app/state/ui_state.h"
 #include "pdft/app/view/impl/document_view.h"
@@ -25,7 +26,6 @@
 #include "pdft/core/io/posix/console.h"
 #include "pdft/core/io/posix/termctl.h"
 #include "pdft/core/log/log.h"
-#include "pdft/core/trace/context.h"
 #include "pdft/core/trace/log_stack_trace.h"
 #include "pdft/core/trace/stack_scope_tracer.h"
 
@@ -191,10 +191,13 @@ void Application::saveState() {
 }
 
 asio::awaitable<void> Application::runEventLoop() {
-    core::io::OutBuffer control, display;
+    pdft::app::Renderer renderer(terminal_, console_);
 
     for (;;) {
-        co_await render(control, display);
+        co_await renderer.renderOne([this](auto& ctx) {
+            image_display_->clear(ctx.control_buffer);
+            return view_->render(ui_, display_, ctx);
+        });
 
         bool should_quit = co_await waitForNextRender();
 
@@ -202,34 +205,6 @@ asio::awaitable<void> Application::runEventLoop() {
             break;
         }
     }
-}
-
-asio::awaitable<void> Application::render(
-    core::io::OutBuffer& control_buffer, core::io::OutBuffer& display_buffer) {
-    using core::trace::trace;
-    log::debug(this, "========== NEW FRAME ===========");
-
-    auto tracer = core::trace::getGlobalPool().getTracer("display_one");
-    auto screen = ftxui::Screen::Create(ftxui::Dimension::Full());
-    auto ctx = tui::Context(*terminal_, control_buffer, display_buffer);
-    ctx.setTracer(tracer);
-
-    // First, clear all images from the display
-    image_display_->clear(ctx.control_buffer);
-
-    // Load new images to control_buffer and display them in display_buffer
-    trace(ctx, "render", [&] { tui::Render(screen, view_->render(ui_, display_, ctx)); });
-
-    // Clear the terminal before displaying a new frame
-    terminal_->clear(ctx.control_buffer);
-
-    co_await trace(
-        ctx,
-        "flush",
-        console_->writeMany(ctx.control_buffer, screen.ToString(), ctx.display_buffer));
-
-    tracer.finalize();
-    core::trace::logStackTrace(tracer.getInfo());
 }
 
 asio::awaitable<bool> Application::waitForNextRender() {
