@@ -26,12 +26,12 @@ void UnicodeDisplay::displayImage(
 
     log::debug("display I rx={},ry={},rw={},rh={}", rix, riy, riw, rih);
 
-    uint32_t image_cols = std::roundf(w / riw);
-    uint32_t image_rows = std::roundf(h / rih);
+    const uint32_t image_cols = std::roundf(w / riw);
+    const uint32_t image_rows = std::roundf(h / rih);
     log::debug("display ISZ wc={},hc={}", image_cols, image_rows);
 
-    uint32_t offset_cols = image_cols * rix;
-    uint32_t offset_rows = image_rows * riy;
+    const uint32_t offset_cols = image_cols * rix;
+    const uint32_t offset_rows = image_rows * riy;
     log::debug("display IOF c={},r={}", offset_cols, offset_rows);
 
     std::pair<std::string_view, std::string> control_data[] = {

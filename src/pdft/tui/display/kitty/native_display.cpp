@@ -25,10 +25,10 @@ void NativeDisplay::displayImage(
     const auto& image_size = loaded_[id];
     log::debug("display IS wpx={},hpx={}", image_size.width_px, image_size.height_px);
 
-    uint32_t iw_px = std::floor(image_size.width_px * riw);
-    uint32_t ih_px = std::floor(image_size.height_px * rih);
-    uint32_t ix_px = std::floor(iw_px * rix);
-    uint32_t iy_px = std::floor(ih_px * riy);
+    const uint32_t iw_px = std::floor(image_size.width_px * riw);
+    const uint32_t ih_px = std::floor(image_size.height_px * rih);
+    const uint32_t ix_px = std::floor(iw_px * rix);
+    const uint32_t iy_px = std::floor(ih_px * riy);
     log::debug("display Ipx xpx={},ypx={},wpx={},hpx={}", ix_px, iy_px, iw_px, ih_px);
 
     // x, y, w, h (pixels) control the subrectangle of the image
