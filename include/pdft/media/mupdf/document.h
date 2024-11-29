@@ -3,6 +3,8 @@
 #include "pdft/media/document.h"
 #include "pdft/media/mupdf/context.h"
 
+#include "pdft/core/result.h"
+
 struct fz_document;
 
 namespace pdft::media::mupdf {
@@ -18,7 +20,7 @@ class Document : public media::Document {
     std::shared_ptr<media::Page> getPage(int index) const override;
     const std::filesystem::path& getPath() const override;
 
-    static Document open(Context& context, const std::filesystem::path& path);
+    static Result<Document> open(Context& context, const std::filesystem::path& path);
 
  private:
     Document(Context& context, std::filesystem::path path, fz_document* document)

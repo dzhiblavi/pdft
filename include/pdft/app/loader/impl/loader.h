@@ -10,7 +10,10 @@ class Loader : public loader::Loader {
         override;
 
     Result<void> restore(
-        state::UIState& ui, state::DocumentStorage& documents, std::istream& is) override;
+        state::UIState& ui,
+        state::DocumentStorage& documents,
+        const media::Loader& loader,
+        std::istream& is) override;
 };
 
 }  // namespace pdft::app::loader::impl

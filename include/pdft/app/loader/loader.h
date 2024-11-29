@@ -2,6 +2,9 @@
 
 #include "pdft/app/state/document_storage.h"
 #include "pdft/app/state/ui_state.h"
+
+#include "pdft/media/loader.h"
+
 #include "pdft/core/result.h"
 
 #include <ostream>
@@ -16,7 +19,10 @@ class Loader {
         const state::UIState& ui, const state::DocumentStorage& documents, std::ostream& os) = 0;
 
     virtual Result<void> restore(
-        state::UIState& ui, state::DocumentStorage& documents, std::istream& is) = 0;
+        state::UIState& ui,
+        state::DocumentStorage& documents,
+        const media::Loader& loader,
+        std::istream& is) = 0;
 };
 
 }  // namespace pdft::app::loader

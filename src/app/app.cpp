@@ -12,7 +12,8 @@
 #include "pdft/app/view/impl/view.h"
 
 #include "pdft/media/mupdf/context.h"
-#include "pdft/media/mupdf/document.h"
+#include "pdft/media/mupdf/loader.h"
+
 #include "pdft/notify/fsw/notify.h"
 #include "pdft/tui/terminal/ansi/terminal.h"
 
@@ -89,6 +90,8 @@ void Application::setup() {
     console_ = std::make_shared<core::io::posix::Console>(
         context_, ::dup(STDIN_FILENO), ::dup(STDOUT_FILENO));
     image_display_ = resolveDisplay(config_.display);
+    doc_loader_ =
+        std::make_shared<pdft::media::mupdf::Loader>(pdft::media::mupdf::thisThreadContext());
 
     documents_ = std::make_shared<pdft::app::state::DocumentStorage>();
     ui_.scaling_coeff = config_.display.scaling_coeff;
@@ -98,7 +101,7 @@ void Application::setup() {
         std::make_shared<PageRenderer>(utils::random<uint32_t>(), documents_, image_display_);
     auto document_view = std::make_shared<DocumentView>(std::move(renderer));
     view_ = std::make_shared<View>(documents_, std::move(document_view));
-    controller_ = std::make_shared<Controller>(config_.controller);
+    controller_ = std::make_shared<Controller>(config_.controller, doc_loader_);
 
     if (config_.system.enable_filesystem_watching) {
         fs_watcher_ = std::make_shared<pdft::notify::fsw::Notify>(context_.get_executor());
@@ -156,7 +159,6 @@ bool Application::isOpened(const std::string& abs_path) const {
 
 void Application::loadPaths(const std::vector<std::string>& paths) {
     for (auto path : paths) {
-        PDFT_VERIFY(std::filesystem::exists(path));
         path = std::filesystem::absolute(path);
 
         if (isOpened(path) && state_mode_ == StateMode::AddOnly) {
@@ -164,11 +166,17 @@ void Application::loadPaths(const std::vector<std::string>& paths) {
             continue;
         }
 
-        auto document = media::mupdf::Document::open(media::mupdf::thisThreadContext(), path);
-        auto page_count = document.getPageCount();
-        auto doc_id = documents_->addDocument(
-            std::unique_ptr<media::Document>(new media::mupdf::Document(std::move(document))));
+        auto maybe_document = doc_loader_->load(path);
 
+        if (!maybe_document) {
+            log::warn(
+                "failed to open document by path {}: {}", path.c_str(), maybe_document.error());
+            continue;
+        }
+
+        auto document = *maybe_document;
+        auto page_count = document->getPageCount();
+        auto doc_id = documents_->addDocument(document);
         ui_.addDocument(doc_id, page_count);
 
         if (config_.system.enable_filesystem_watching) {
@@ -198,10 +206,10 @@ void Application::restoreState() {
     pdft::app::loader::impl::Loader loader;
     std::ifstream ifs(pdft::utils::expandHome(path));
 
-    if (auto result = loader.restore(ui_, *documents_, ifs); !result) {
+    if (auto result = loader.restore(ui_, *documents_, *doc_loader_, ifs); !result) {
         pdft::log::warn("failed to restore state from {}: {}", path.c_str(), result.error());
     } else {
-        pdft::log::warn("successfully restored state from {}", path.c_str());
+        pdft::log::info("successfully restored state from {}", path.c_str());
     }
 }
 

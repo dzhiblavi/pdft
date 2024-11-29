@@ -1,8 +1,5 @@
 #include "pdft/app/loader/impl/loader.h"
-#include "pdft/core/assert.h"
-
-#include "pdft/media/mupdf/context.h"
-#include "pdft/media/mupdf/document.h"
+#include "pdft/core/log/log.h"
 
 #include <rfl/json.hpp>
 
@@ -33,7 +30,10 @@ void Loader::save(
 }
 
 Result<void> Loader::restore(
-    state::UIState& ui, state::DocumentStorage& documents, std::istream& is) {
+    state::UIState& ui,
+    state::DocumentStorage& documents,
+    const media::Loader& loader,
+    std::istream& is) {
     auto maybe_state = rfl::json::read<State>(is);
 
     if (!maybe_state) {
@@ -43,19 +43,35 @@ Result<void> Loader::restore(
     auto&& state = maybe_state.value();
     ui = state.ui;
 
-    // XXX Do not abort when file does not exist
+    std::vector<size_t> to_be_removed;
+
+    pdft::log::info("states size before: {}", ui.states.size());
+
     for (size_t i = 0; i < state.paths.size(); ++i) {
         auto&& path = state.paths[i];
+        auto maybe_document = loader.load(path);
 
-        if (!std::filesystem::exists(path)) {
-            return std::unexpected(std::format("file does not exist: {}", path.c_str()));
+        if (!maybe_document) {
+            to_be_removed.push_back(i);
+            pdft::log::warn(
+                "failed to load file by path while restoring state path={}: {}",
+                path.c_str(),
+                maybe_document.error());
+            continue;
         }
 
-        auto doc = std::make_shared<media::mupdf::Document>(
-            media::mupdf::Document::open(media::mupdf::thisThreadContext(), path));
+        auto document = *maybe_document;
+        auto page_count = document->getPageCount();
+        auto id = documents.addDocument(document);
 
-        auto id = documents.addDocument(doc);
-        ui.states[i].setDocument(id, doc->getPageCount());
+        ui.states[i].setDocument(id, page_count);
+    }
+
+    std::ranges::reverse(to_be_removed);
+    for (size_t i : to_be_removed) {
+        // XXX fix this hack
+        ui.idx = 0;
+        ui.states.erase(ui.states.begin() + i);
     }
 
     return {};

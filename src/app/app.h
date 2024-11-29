@@ -6,12 +6,14 @@
 #include "pdft/app/controller/controller.h"
 #include "pdft/app/view/view.h"
 
+#include "pdft/media/loader.h"
+#include "pdft/tui/display/display.h"
+#include "pdft/tui/terminal/terminal.h"
+
 #include "pdft/core/io/console.h"
 #include "pdft/core/io/termctl.h"
 #include "pdft/core/log/with_logger.h"
 #include "pdft/notify/notify.h"
-#include "pdft/tui/display/display.h"
-#include "pdft/tui/terminal/terminal.h"
 
 #include <asio/awaitable.hpp>
 #include <asio/signal_set.hpp>
@@ -47,6 +49,7 @@ class Application : public pdft::core::log::WithLogger {
     std::shared_ptr<pdft::core::io::Console> console_;
     std::shared_ptr<pdft::notify::Notify> fs_watcher_;
     std::shared_ptr<pdft::tui::display::Display> image_display_;
+    std::shared_ptr<pdft::media::Loader> doc_loader_;
 
     pdft::app::state::UIState ui_;
     std::shared_ptr<pdft::app::state::DocumentStorage> documents_;

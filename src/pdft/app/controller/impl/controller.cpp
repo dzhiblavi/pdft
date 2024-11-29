@@ -1,11 +1,12 @@
 #include "pdft/app/controller/impl/controller.h"
 
 #include "pdft/core/log/log.h"
-#include "pdft/media/mupdf/document.h"
 
 namespace pdft::app::controller::impl {
 
-Controller::Controller(const Config& config) : config_(config) {
+Controller::Controller(const Config& config, std::shared_ptr<const media::Loader> doc_loader)
+    : config_(config)
+    , doc_loader_(std::move(doc_loader)) {
     for (const auto& [command, keys] : config.key_mappings) {
         bindKey(command, keys);
     }
@@ -172,8 +173,7 @@ Action Controller::onFilesystemEvent(
     const notify::Event& event, state::UIState& ui, state::DocumentStorage& documents) {
     log::debug("controller: fs event on path={}", event.path.c_str());
 
-    auto old_id = documents.getIdByPath(event.path);
-    reloadDocument(old_id, event.path, ui, documents);
+    reloadDocument(documents.getIdByPath(event.path), event.path, ui, documents);
     return Action::Redraw;
 }
 
@@ -187,20 +187,24 @@ void Controller::reloadDocument(
     documents.removeDocument(old_id);
     log::debug("controller: removed document with id={}", old_id);
 
-    auto document = media::mupdf::Document::open(media::mupdf::thisThreadContext(), path);
-    auto page_count = document.getPageCount();
-    auto new_id = documents.addDocument(
-        std::unique_ptr<media::Document>(new media::mupdf::Document(std::move(document))));
+    auto maybe_document = doc_loader_->load(path);
+    if (!maybe_document) {
+        log::warn("failed to reload document by path {}: {}", path.c_str(), maybe_document.error());
+        ui.removeDocument(old_id);
+        return;
+    }
+
+    auto document = *maybe_document;
+    auto page_count = document->getPageCount();
+    auto new_id = documents.addDocument(document);
+    ui.onDocumentChanged(old_id, new_id, page_count);
 
     log::debug("controller: added document with id={}", new_id);
-
     log::info(
         "controller: replaced document with path={} old_id={}, new_id={}",
         path.c_str(),
         old_id,
         new_id);
-
-    ui.onDocumentChanged(old_id, new_id, page_count);
 }
 
 }  // namespace pdft::app::controller::impl

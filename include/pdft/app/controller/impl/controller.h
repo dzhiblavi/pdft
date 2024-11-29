@@ -4,6 +4,8 @@
 #include "pdft/app/controller/keytree.h"
 #include "pdft/app/state/document_storage.h"
 
+#include "pdft/media/loader.h"
+
 #include <vector>
 
 namespace pdft::app::controller::impl {
@@ -42,7 +44,7 @@ class Controller : public controller::Controller {
         int32_t rows_per_scroll = 10;
     };
 
-    explicit Controller(const Config& config);
+    Controller(const Config& config, std::shared_ptr<const media::Loader> doc_loader);
 
     Action onKeyEvent(char key, state::UIState& ui, state::DocumentStorage& documents) override;
     Action onFilesystemEvent(
@@ -68,6 +70,7 @@ class Controller : public controller::Controller {
     Config config_;
     KeyTree key_tree_;
     PendingCommand command_;
+    std::shared_ptr<const media::Loader> doc_loader_;
 };
 
 }  // namespace pdft::app::controller::impl

@@ -36,6 +36,7 @@ struct UIState {
     void resetInput();
 
     void addDocument(DocumentId id, uint32_t page_count);
+    void removeDocument(DocumentId id);
     void onDocumentChanged(DocumentId from, DocumentId to, uint32_t page_count);
 
     void scrollNext(int times);

@@ -107,6 +107,25 @@ void UIState::addDocument(DocumentId id, uint32_t page_count) {
     idx = idx.value_or(0);
 }
 
+void UIState::removeDocument(DocumentId id) {
+    PDFT_VERIFY(idx);
+
+    auto it = std::ranges::find(states, id, &DocumentState::document_id);
+    PDFT_VERIFY(it != states.end());
+
+    size_t index = it - states.begin();
+
+    if (index < *idx) {
+        *idx -= 1;
+    }
+
+    if (states.empty()) {
+        idx = std::nullopt;
+    }
+
+    states.erase(it);
+}
+
 void UIState::onDocumentChanged(DocumentId from, DocumentId to, uint32_t page_count) {
     auto it = std::ranges::find(states, from, &DocumentState::document_id);
     PDFT_VERIFY(it != states.end(), "failed to find the old document with id={}", from);

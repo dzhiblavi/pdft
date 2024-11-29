@@ -42,10 +42,7 @@ std::shared_ptr<media::Page> Document::getPage(int index) const {
         core::fail("fz_load_page");
     }
 
-    if (!page) {
-        core::fail("fz_load_page is null");
-    }
-
+    PDFT_VERIFY(page);
     return std::shared_ptr<media::Page>(new Page(index, context_, page));
 }
 
@@ -53,20 +50,18 @@ const std::filesystem::path& Document::getPath() const {
     return path_;
 }
 
-Document Document::open(Context& context, const std::filesystem::path& path) {
+Result<Document> Document::open(Context& context, const std::filesystem::path& path) {
     auto ctx = context.native();
     fz_document* doc = nullptr;
 
     fz_try(ctx) doc = fz_open_document(ctx, path.c_str());
     fz_catch(ctx) {
-        throw std::runtime_error(std::format("failed to open a document by path {}", path.c_str()));
+        fz_report_error(ctx);
+        return std::unexpected(std::format("mupdft open document failed: {}", ctx->error.message));
     }
 
-    if (!doc) {
-        core::fail("fz_open_document is null");
-    }
-
-    return {context, path, doc};
+    PDFT_VERIFY(doc);
+    return Document(context, path, doc);
 }
 
 }  // namespace pdft::media::mupdf

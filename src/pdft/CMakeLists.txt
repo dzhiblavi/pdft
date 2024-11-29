@@ -55,7 +55,7 @@ target_sources(pdft PRIVATE ./image/image.cpp)
 
 target_sources(
   pdft PRIVATE ./media/mupdf/context.cpp ./media/mupdf/document.cpp
-               ./media/mupdf/page.cpp ./media/mupdf/pixmap_image.cpp)
+               ./media/mupdf/page.cpp ./media/mupdf/pixmap_image.cpp ./media/mupdf/loader.cpp)
 
 target_sources(
   pdft
