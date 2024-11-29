@@ -39,9 +39,6 @@ using namespace asio::experimental::awaitable_operators;
 
 using pdft::app::controller::Action;
 
-using pdft::app::state::DocumentStorage;
-using pdft::app::state::UIState;
-
 using pdft::app::view::impl::DocumentView;
 using pdft::app::view::impl::PageRenderer;
 using pdft::app::view::impl::View;
@@ -89,17 +86,15 @@ void Application::setup() {
         context_, ::dup(STDIN_FILENO), ::dup(STDOUT_FILENO));
     image_display_ = resolveDisplay(config_.display);
 
-    document_storage_ = std::make_shared<DocumentStorage>();
-    state_ = std::make_shared<UIState>();
-    state_->scaling_coeff = config_.display.scaling_coeff;
-    state_->invert_colors = config_.display.invert_colors;
-    auto display_state = std::make_shared<tui::display::State>();
+    documents_ = std::make_shared<pdft::app::state::DocumentStorage>();
+    ui_.scaling_coeff = config_.display.scaling_coeff;
+    ui_.invert_colors = config_.display.invert_colors;
 
-    auto renderer = std::make_shared<PageRenderer>(
-        utils::random<uint32_t>(), document_storage_, std::move(display_state), image_display_);
-    auto document_view = std::make_shared<DocumentView>(document_storage_, std::move(renderer));
-    view_ = std::make_shared<View>(document_storage_, std::move(document_view));
-    controller_ = std::make_shared<Controller>(config_.controller, state_, document_storage_);
+    auto renderer =
+        std::make_shared<PageRenderer>(utils::random<uint32_t>(), documents_, image_display_);
+    auto document_view = std::make_shared<DocumentView>(std::move(renderer));
+    view_ = std::make_shared<View>(documents_, std::move(document_view));
+    controller_ = std::make_shared<Controller>(config_.controller);
 
     if (config_.system.enable_filesystem_watching) {
         fs_watcher_ = std::make_shared<pdft::notify::fsw::Notify>(context_.get_executor());
@@ -146,10 +141,10 @@ void Application::loadPaths(const std::vector<std::string>& paths) {
 
         auto document = media::mupdf::Document::open(media::mupdf::thisThreadContext(), path);
         auto page_count = document.getPageCount();
-        auto doc_id = document_storage_->addDocument(
+        auto doc_id = documents_->addDocument(
             std::unique_ptr<media::Document>(new media::mupdf::Document(std::move(document))));
 
-        state_->addDocument(doc_id, page_count);
+        ui_.addDocument(doc_id, page_count);
 
         if (config_.system.enable_filesystem_watching) {
             fs_watcher_->add(path);
@@ -187,7 +182,7 @@ asio::awaitable<void> Application::render(
     image_display_->clear(ctx.control_buffer);
 
     // Load new images to control_buffer and display them in display_buffer
-    trace(ctx, "render", [&] { tui::Render(screen, view_->render(*state_, ctx)); });
+    trace(ctx, "render", [&] { tui::Render(screen, view_->render(ui_, display_, ctx)); });
 
     // Clear the terminal before displaying a new frame
     terminal_->clear(ctx.control_buffer);
@@ -211,8 +206,10 @@ asio::awaitable<bool> Application::waitForNextRender() {
 
         auto action = utils::visit(
             event,
-            [&](std::string event) { return controller_->onKeyEvent(event[0]); },
-            [&](notify::Event event) { return controller_->onFilesystemEvent(event); },
+            [&](std::string event) { return controller_->onKeyEvent(event[0], ui_, *documents_); },
+            [&](notify::Event event) {
+                return controller_->onFilesystemEvent(event, ui_, *documents_);
+            },
             [&](int signal) { return handleSignal(signal); });
 
         if (action == Quit) {

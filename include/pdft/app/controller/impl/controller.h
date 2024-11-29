@@ -3,7 +3,6 @@
 #include "pdft/app/controller/controller.h"
 #include "pdft/app/controller/keytree.h"
 #include "pdft/app/state/document_storage.h"
-#include "pdft/app/state/ui_state.h"
 
 #include <vector>
 
@@ -43,22 +42,32 @@ class Controller : public controller::Controller {
         int32_t rows_per_scroll = 10;
     };
 
-    Controller(
-        const Config& config,
-        std::shared_ptr<state::UIState> state,
-        std::shared_ptr<state::DocumentStorage> docs);
+    explicit Controller(const Config& config);
 
-    Action onKeyEvent(char key) override;
-    Action onFilesystemEvent(const notify::Event& event) override;
+    Action onKeyEvent(char key, state::UIState& ui, state::DocumentStorage& documents) override;
+    Action onFilesystemEvent(
+        const notify::Event& event, state::UIState& ui, state::DocumentStorage& documents) override;
 
  private:
-    void bindKey(Command command, std::string_view keys, const Config& config);
-    void reloadDocument(state::DocumentId id, std::filesystem::path path);
+    Action applyPendingCommand(state::UIState& ui, state::DocumentStorage& documents);
+    void bindKey(Command command, std::string_view keys);
+    void reloadDocument(
+        state::DocumentId id,
+        std::filesystem::path path,
+        state::UIState& ui,
+        state::DocumentStorage& documents);
 
+    KeyTree::CallbackType commandCallback(Command command);
+    KeyTree::NumberCallbackType numCommandCallback(Command command);
+
+    struct PendingCommand {
+        uint32_t count;
+        Command command;
+    };
+
+    Config config_;
     KeyTree key_tree_;
-    std::shared_ptr<state::UIState> state_;
-    std::shared_ptr<state::DocumentStorage> docs_;
-    bool quit_ = false;
+    PendingCommand command_;
 };
 
-}  // namespace pdft::controller::app
+}  // namespace pdft::app::controller::impl

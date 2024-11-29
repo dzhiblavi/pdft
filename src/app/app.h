@@ -3,8 +3,6 @@
 #include "config.h"
 
 #include "pdft/app/controller/controller.h"
-#include "pdft/app/state/document_storage.h"
-#include "pdft/app/state/ui_state.h"
 #include "pdft/app/view/view.h"
 
 #include "pdft/core/io/console.h"
@@ -45,8 +43,10 @@ class Application : public pdft::core::log::WithLogger {
     std::shared_ptr<pdft::notify::Notify> fs_watcher_;
     std::shared_ptr<pdft::tui::display::Display> image_display_;
 
-    std::shared_ptr<pdft::app::state::DocumentStorage> document_storage_;
-    std::shared_ptr<pdft::app::state::UIState> state_;
+    pdft::app::state::UIState ui_;
+    std::shared_ptr<pdft::app::state::DocumentStorage> documents_;
+    pdft::tui::display::State display_;
+
     std::shared_ptr<pdft::app::view::View> view_;
     std::shared_ptr<pdft::app::controller::Controller> controller_;
 

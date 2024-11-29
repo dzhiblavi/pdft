@@ -3,6 +3,7 @@
 #include "pdft/app/state/ui_state.h"
 
 #include "pdft/tui/context.h"
+#include "pdft/tui/display/state.h"
 #include "pdft/tui/elements.h"
 
 namespace pdft::app::view {
@@ -12,9 +13,10 @@ class DocumentView {
     virtual ~DocumentView() = default;
 
     virtual tui::Element render(
-        const state::DocumentState& state,
+        const state::DocumentState& doc,
         float scaling_coeff,
         bool invert_colors,
+        tui::display::State& state,
         tui::Context& ctx) = 0;
 };
 

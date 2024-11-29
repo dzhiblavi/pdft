@@ -12,17 +12,19 @@ namespace pdft::app::view::impl {
 
 PageRenderer::PageRenderer(
     uint32_t image_id_salt,
-    std::shared_ptr<state::DocumentStorage> docs,
-    std::shared_ptr<tui::display::State> display_state,
+    std::shared_ptr<const state::DocumentStorage> documents,
     std::shared_ptr<tui::display::Display> display)
     : image_id_salt_(image_id_salt)
-    , docs_(std::move(docs))
-    , display_state_(std::move(display_state))
+    , documents_(std::move(documents))
     , display_(std::move(display)) {}
 
-void PageRenderer::render(const Page& page, const PageProperties& properties, tui::Context& ctx) {
+void PageRenderer::render(
+    const Page& page,
+    const PageProperties& properties,
+    tui::display::State& display,
+    tui::Context& ctx) {
     const auto& [doc_id, page_index] = page;
-    const auto& document = docs_->getDocument(page.document_id);
+    const auto& document = documents_->getDocument(page.document_id);
 
     auto id = getIdForPage(page);
     auto the_page =
@@ -32,8 +34,8 @@ void PageRenderer::render(const Page& page, const PageProperties& properties, tu
     log::debug(
         ctx, "rendering a page: doc_id={}, page_index={}, image_id={}", doc_id, page_index, id);
 
-    if (display_state_->isLoaded(id)) {
-        const auto& info = display_state_->getImage(id);
+    if (display.isLoaded(id)) {
+        const auto& info = display.getImage(id);
         bool should_reload = false;
 
         if (factor != info.factor) {
@@ -49,11 +51,11 @@ void PageRenderer::render(const Page& page, const PageProperties& properties, tu
         if (should_reload) {
             auto _ = ctx.push("unload_image");
             display_->unload(id, ctx.control_buffer);
-            display_state_->removeImage(id);
+            display.removeImage(id);
         }
     }
 
-    if (!display_state_->isLoaded(id)) {
+    if (!display.isLoaded(id)) {
         auto _ = ctx.push("load_image");
 
         log::debug(
@@ -77,7 +79,7 @@ void PageRenderer::render(const Page& page, const PageProperties& properties, tu
         float image_cols = float(image_size.width_px) / ctx.screen_size.cell_width_px;
         float image_rows = float(image_size.height_px) / ctx.screen_size.cell_height_px;
 
-        display_state_->addImage(
+        display.addImage(
             id,
             {
                 .image_rows = image_rows,
@@ -89,7 +91,7 @@ void PageRenderer::render(const Page& page, const PageProperties& properties, tu
 
     auto _ = ctx.push("display_image");
 
-    const auto& p = display_state_->getImage(id);
+    const auto& p = display.getImage(id);
     float sub_rows = p.image_rows * properties.subarea.height;
     float sub_cols = p.image_cols * properties.subarea.width;
     auto irect = tui::image::fitImage(sub_cols / sub_rows, properties.rect, properties.placement);

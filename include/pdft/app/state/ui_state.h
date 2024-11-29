@@ -48,7 +48,7 @@ struct UIState {
     void toggleSidebar();
 
     std::optional<DocumentId> getCurrentDocumentId() const;
-    const DocumentState* getState() const;
+    const DocumentState* getImmutableState() const;
 
     std::optional<size_t> idx = std::nullopt;
     std::vector<DocumentState> states;

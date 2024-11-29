@@ -161,7 +161,7 @@ DocumentState* UIState::getState() {
     return nullptr;
 }
 
-const DocumentState* UIState::getState() const {
+const DocumentState* UIState::getImmutableState() const {
     if (idx) {
         return &states[*idx];
     }

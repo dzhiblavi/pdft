@@ -3,35 +3,43 @@
 namespace pdft::app::view::impl {
 
 tui::Element DocumentView::render(
-    const state::DocumentState& state, float scaling_coeff, bool invert_colors, tui::Context& ctx) {
+    const state::DocumentState& doc,
+    float scaling_coeff,
+    bool invert_colors,
+    tui::display::State& state,
+    tui::Context& ctx) {
     auto _ = ctx.push("render");
 
-    switch (state.view_mode) {
+    switch (doc.view_mode) {
         using enum state::ViewMode;
 
         case OnePage:
-            return renderOnePage(state, scaling_coeff, invert_colors, ctx);
+            return renderOnePage(doc, scaling_coeff, invert_colors, state, ctx);
 
         case TwoPages:
-            return renderTwoPages(state, scaling_coeff, invert_colors, ctx);
+            return renderTwoPages(doc, scaling_coeff, invert_colors, state, ctx);
 
         case OnePageContinuous:
-            return renderOnePageContinuous(state, scaling_coeff, invert_colors, ctx);
+            return renderOnePageContinuous(doc, scaling_coeff, invert_colors, state, ctx);
 
         case TwoPagesContinuous:
-            return renderTwoPagesContinuous(state, scaling_coeff, invert_colors, ctx);
+            return renderTwoPagesContinuous(doc, scaling_coeff, invert_colors, state, ctx);
     }
 }
 
 tui::Element DocumentView::renderOnePage(
-    const state::DocumentState& state, float scaling_coeff, bool invert_colors, tui::Context& ctx) {
+    const state::DocumentState& doc,
+    float scaling_coeff,
+    bool invert_colors,
+    tui::display::State& state,
+    tui::Context& ctx) {
     auto render = [&, scaling_coeff, invert_colors](tui::IRect rect) {
         auto _ = ctx.push("only_page");
 
         renderer_->render(
             {
-                .document_id = state.document_id,
-                .page_index = state.page_index,
+                .document_id = doc.document_id,
+                .page_index = doc.page_index,
             },
             {
                 .rect = rect,
@@ -43,6 +51,7 @@ tui::Element DocumentView::renderOnePage(
                 .scaling_coeff = scaling_coeff,
                 .invert_colors = invert_colors,
             },
+            state,
             ctx);
     };
 
@@ -50,14 +59,18 @@ tui::Element DocumentView::renderOnePage(
 }
 
 tui::Element DocumentView::renderTwoPages(
-    const state::DocumentState& state, float scaling_coeff, bool invert_colors, tui::Context& ctx) {
+    const state::DocumentState& doc,
+    float scaling_coeff,
+    bool invert_colors,
+    tui::display::State& state,
+    tui::Context& ctx) {
     auto render_left = [&, scaling_coeff, invert_colors](tui::IRect rect) {
         auto _ = ctx.push("left_page");
 
         renderer_->render(
             {
-                .document_id = state.document_id,
-                .page_index = state.page_index,
+                .document_id = doc.document_id,
+                .page_index = doc.page_index,
             },
             {
                 .rect = rect,
@@ -69,11 +82,12 @@ tui::Element DocumentView::renderTwoPages(
                 .scaling_coeff = scaling_coeff,
                 .invert_colors = invert_colors,
             },
+            state,
             ctx);
     };
 
     auto render_right = [&, scaling_coeff, invert_colors](tui::IRect rect) {
-        if (state.page_index + 1 >= state.page_count) {
+        if (doc.page_index + 1 >= doc.page_count) {
             return;
         }
 
@@ -81,8 +95,8 @@ tui::Element DocumentView::renderTwoPages(
 
         renderer_->render(
             {
-                .document_id = state.document_id,
-                .page_index = state.page_index + 1,
+                .document_id = doc.document_id,
+                .page_index = doc.page_index + 1,
             },
             {
                 .rect = rect,
@@ -94,6 +108,7 @@ tui::Element DocumentView::renderTwoPages(
                 .scaling_coeff = scaling_coeff,
                 .invert_colors = invert_colors,
             },
+            state,
             ctx);
     };
 
@@ -104,15 +119,19 @@ tui::Element DocumentView::renderTwoPages(
 }
 
 tui::Element DocumentView::renderOnePageContinuous(
-    const state::DocumentState& state, float scaling_coeff, bool invert_colors, tui::Context& ctx) {
+    const state::DocumentState& doc,
+    float scaling_coeff,
+    bool invert_colors,
+    tui::display::State& state,
+    tui::Context& ctx) {
     auto render_top = [&, scaling_coeff, invert_colors](tui::IRect rect) {
         auto _ = ctx.push("top_page");
         float this_ratio = float(rect.height) / rect_.height;
 
         renderer_->render(
             {
-                .document_id = state.document_id,
-                .page_index = state.page_index,
+                .document_id = doc.document_id,
+                .page_index = doc.page_index,
             },
             {
                 .rect = rect,
@@ -131,11 +150,12 @@ tui::Element DocumentView::renderOnePageContinuous(
                 .scaling_coeff = scaling_coeff,
                 .invert_colors = invert_colors,
             },
+            state,
             ctx);
     };
 
     auto render_bottom = [&, scaling_coeff, invert_colors](tui::IRect rect) {
-        if (state.page_index + 1 >= state.page_count) {
+        if (doc.page_index + 1 >= doc.page_count) {
             return;
         }
         auto _ = ctx.push("bottom_page");
@@ -143,8 +163,8 @@ tui::Element DocumentView::renderOnePageContinuous(
 
         renderer_->render(
             {
-                .document_id = state.document_id,
-                .page_index = state.page_index + 1,
+                .document_id = doc.document_id,
+                .page_index = doc.page_index + 1,
             },
             {
                 .rect = rect,
@@ -163,28 +183,33 @@ tui::Element DocumentView::renderOnePageContinuous(
                 .scaling_coeff = scaling_coeff,
                 .invert_colors = invert_colors,
             },
+            state,
             ctx);
     };
 
     return tui::vbox({
                tui::withSize(render_top) | tui::flex |
-                   tui::size(tui::HEIGHT, tui::EQUAL, 100 - state.scroll_offset),
+                   tui::size(tui::HEIGHT, tui::EQUAL, 100 - doc.scroll_offset),
                tui::withSize(render_bottom) | tui::flex |
-                   tui::size(tui::HEIGHT, tui::EQUAL, state.scroll_offset),
+                   tui::size(tui::HEIGHT, tui::EQUAL, doc.scroll_offset),
            }) |
            tui::reflect(rect_);
 }
 
 tui::Element DocumentView::renderTwoPagesContinuous(
-    const state::DocumentState& state, float scaling_coeff, bool invert_colors, tui::Context& ctx) {
+    const state::DocumentState& doc,
+    float scaling_coeff,
+    bool invert_colors,
+    tui::display::State& state,
+    tui::Context& ctx) {
     auto render_top_left = [&, scaling_coeff, invert_colors](tui::IRect rect) {
         auto _ = ctx.push("top_left_page");
         float this_ratio = float(rect.height) / rect_.height;
 
         renderer_->render(
             {
-                .document_id = state.document_id,
-                .page_index = state.page_index,
+                .document_id = doc.document_id,
+                .page_index = doc.page_index,
             },
             {
                 .rect = rect,
@@ -203,11 +228,12 @@ tui::Element DocumentView::renderTwoPagesContinuous(
                 .scaling_coeff = scaling_coeff,
                 .invert_colors = invert_colors,
             },
+            state,
             ctx);
     };
 
     auto render_top_right = [&, scaling_coeff, invert_colors](tui::IRect rect) {
-        if (state.page_index + 1 >= state.page_count) {
+        if (doc.page_index + 1 >= doc.page_count) {
             return;
         }
 
@@ -216,8 +242,8 @@ tui::Element DocumentView::renderTwoPagesContinuous(
 
         renderer_->render(
             {
-                .document_id = state.document_id,
-                .page_index = state.page_index + 1,
+                .document_id = doc.document_id,
+                .page_index = doc.page_index + 1,
             },
             {
                 .rect = rect,
@@ -236,11 +262,12 @@ tui::Element DocumentView::renderTwoPagesContinuous(
                 .scaling_coeff = scaling_coeff,
                 .invert_colors = invert_colors,
             },
+            state,
             ctx);
     };
 
     auto render_bottom_left = [&, scaling_coeff, invert_colors](tui::IRect rect) {
-        if (state.page_index + 2 >= state.page_count) {
+        if (doc.page_index + 2 >= doc.page_count) {
             return;
         }
 
@@ -249,8 +276,8 @@ tui::Element DocumentView::renderTwoPagesContinuous(
 
         renderer_->render(
             {
-                .document_id = state.document_id,
-                .page_index = state.page_index + 2,
+                .document_id = doc.document_id,
+                .page_index = doc.page_index + 2,
             },
             {
                 .rect = rect,
@@ -269,11 +296,12 @@ tui::Element DocumentView::renderTwoPagesContinuous(
                 .scaling_coeff = scaling_coeff,
                 .invert_colors = invert_colors,
             },
+            state,
             ctx);
     };
 
     auto render_bottom_right = [&, scaling_coeff, invert_colors](tui::IRect rect) {
-        if (state.page_index + 3 >= state.page_count) {
+        if (doc.page_index + 3 >= doc.page_count) {
             return;
         }
 
@@ -282,8 +310,8 @@ tui::Element DocumentView::renderTwoPagesContinuous(
 
         renderer_->render(
             {
-                .document_id = state.document_id,
-                .page_index = state.page_index + 3,
+                .document_id = doc.document_id,
+                .page_index = doc.page_index + 3,
             },
             {
                 .rect = rect,
@@ -302,21 +330,22 @@ tui::Element DocumentView::renderTwoPagesContinuous(
                 .scaling_coeff = scaling_coeff,
                 .invert_colors = invert_colors,
             },
+            state,
             ctx);
     };
 
     return tui::vbox({
                tui::hbox({
                    tui::withSize(render_top_left) | tui::flex |
-                       tui::size(tui::HEIGHT, tui::EQUAL, 100 - state.scroll_offset),
+                       tui::size(tui::HEIGHT, tui::EQUAL, 100 - doc.scroll_offset),
                    tui::withSize(render_top_right) | tui::flex |
-                       tui::size(tui::HEIGHT, tui::EQUAL, 100 - state.scroll_offset),
+                       tui::size(tui::HEIGHT, tui::EQUAL, 100 - doc.scroll_offset),
                }) | tui::flex,
                tui::hbox({
                    tui::withSize(render_bottom_left) | tui::flex |
-                       tui::size(tui::HEIGHT, tui::EQUAL, state.scroll_offset),
+                       tui::size(tui::HEIGHT, tui::EQUAL, doc.scroll_offset),
                    tui::withSize(render_bottom_right) | tui::flex |
-                       tui::size(tui::HEIGHT, tui::EQUAL, state.scroll_offset),
+                       tui::size(tui::HEIGHT, tui::EQUAL, doc.scroll_offset),
                }) | tui::flex,
            }) |
            tui::reflect(rect_);
