@@ -4,7 +4,7 @@ CMakeUserPresets.json
 /cmake-build-*
 /target
 /_target*
-/.dvimws.yaml
+/.dvimws.lua
 lcov.info
 perf.*
 *.sw*
