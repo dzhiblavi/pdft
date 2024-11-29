@@ -32,6 +32,8 @@ class Terminal {
     virtual void setCursorPosition(CursorPosition position, core::io::OutBuffer& buffer) = 0;
     virtual void moveCursorHorizontally(int32_t shift, core::io::OutBuffer& buffer) = 0;
     virtual void moveCursorVertically(int32_t shift, core::io::OutBuffer& buffer) = 0;
+    virtual void hideCursor(core::io::OutBuffer& buffer) = 0;
+    virtual void showCursor(core::io::OutBuffer& buffer) = 0;
 };
 
 }  // namespace pdft::tui::terminal

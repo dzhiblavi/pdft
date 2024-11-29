@@ -143,6 +143,7 @@ asio::awaitable<void> Application::prepareTerminal() {
 
     // Clear the screen
     core::io::OutBuffer init_buffer;
+    terminal_->hideCursor(init_buffer);
     terminal_->clear(init_buffer);
     co_await console_->write(init_buffer);
 }
@@ -263,6 +264,7 @@ asio::awaitable<void> Application::cleanup() {
     {
         auto _ = cleanup.addChild("term_clear");
         core::io::OutBuffer buffer;
+        terminal_->showCursor(buffer);
         terminal_->clear(buffer);
         image_display_->unloadAll(buffer);
         co_await console_->write(buffer.view());

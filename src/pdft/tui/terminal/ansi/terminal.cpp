@@ -34,4 +34,14 @@ void Terminal::moveCursorVertically(int32_t shift, core::io::OutBuffer& buffer) 
     }
 }
 
+void Terminal::hideCursor(core::io::OutBuffer& buffer) {
+    // Lehidden
+    core::io::write(buffer, "\x1b[?25l");
+}
+
+void Terminal::showCursor(core::io::OutBuffer& buffer) {
+    // HonestlyTheCursorWillBeVisible
+    core::io::write(buffer, "\x1b[?25h");
+}
+
 }  // namespace pdft::tui::terminal::ansi
