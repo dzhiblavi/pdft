@@ -77,7 +77,7 @@ StackScopeTracerBase* StackScopeTracerPool::getTracerBase() {
 StackScopeTracerPool::~StackScopeTracerPool() {
     size_t total_freed = 0;
 
-    free_list_.forEach([&](auto& item) {
+    free_list_.forEachUnordered([&](auto& item) {
         ++total_freed;
         delete &item;
     });
@@ -114,7 +114,7 @@ void StackScopeTracerPool::release(StackScopeTracerBase* item) {
     --item->refcount;
 
     if (item->refcount == 0) {
-        item->children.forEach(&StackScopeTracerBase::release);
+        item->children.forEachUnordered(&StackScopeTracerBase::release);
         free_list_.pushFront(*item);
     }
 }

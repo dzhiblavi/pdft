@@ -61,6 +61,11 @@ class IntrusiveForwardList {
     }
 
     template <typename F>
+    void forEachUnordered(F func) {
+        forEachReversed(std::move(func));
+    }
+
+    template <typename F>
     void forEachReversed(F func) {
         T* curr = head_;
 
