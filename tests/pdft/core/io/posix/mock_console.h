@@ -62,6 +62,13 @@ struct MockConsole : Console {
         co_return;
     }
 
+    asio::awaitable<void> writeMany(std::vector<asio::const_buffer> buffers) override {
+        for (const auto& s : buffers) {
+            out_fd_w.write({(const char*)s.data(), s.size()});
+        }
+        co_return;
+    }
+
     asio::awaitable<void> read(size_t num_bytes, std::string& out) override {
         out = in_fd_r.read(num_bytes);
         co_return;

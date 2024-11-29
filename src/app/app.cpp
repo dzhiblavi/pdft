@@ -183,21 +183,19 @@ asio::awaitable<void> Application::render(
     auto ctx = tui::Context(*terminal_, control_buffer, display_buffer);
     ctx.setTracer(tracer);
 
-    // Perform all calculations and control flushing before clearing the terminal
+    // First, clear all images from the display
+    image_display_->clear(ctx.control_buffer);
+
+    // Load new images to control_buffer and display them in display_buffer
     trace(ctx, "render", [&] { tui::Render(screen, view_->render(*state_, ctx)); });
-    co_await trace(ctx, "flush_control", console_->write(ctx.control_buffer));
 
-    // Clear the terminal
-    co_await core::trace::trace(ctx, "flush_clear", [&]() -> asio::awaitable<void> {
-        core::io::OutBuffer clear_buf;
-        terminal_->clear(clear_buf);
-        image_display_->clear(clear_buf);
-        co_await console_->write(clear_buf);
-    });
+    // Clear the terminal before displaying a new frame
+    terminal_->clear(ctx.control_buffer);
 
-    // Perform display step
-    co_await trace(ctx, "flush_ui", console_->write(screen.ToString()));
-    co_await trace(ctx, "flush_display", console_->write(ctx.display_buffer));
+    co_await trace(
+        ctx,
+        "flush",
+        console_->writeMany(ctx.control_buffer, screen.ToString(), ctx.display_buffer));
 
     tracer.finalize();
     core::trace::logStackTrace(tracer.getInfo());

@@ -15,6 +15,13 @@ struct MockConsole : Console {
         co_return;
     }
 
+    asio::awaitable<void> writeMany(std::vector<asio::const_buffer> buffers) override {
+        for (const auto& buf : buffers) {
+            out_ += std::string_view{(const char*)buf.data(), buf.size()};
+        }
+        co_return;
+    }
+
     asio::awaitable<void> read(size_t num_bytes, std::string& out) override {
         auto result = readFrom(in_, num_bytes);
         std::cerr << std::format("read '{}' from console (requested {} bytes)", result, num_bytes)

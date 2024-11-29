@@ -15,6 +15,10 @@ asio::awaitable<void> Console::write(std::string_view bytes) {
     co_await asio::async_write(stdout_, asio::buffer(bytes), asio::use_awaitable);
 }
 
+asio::awaitable<void> Console::writeMany(std::vector<asio::const_buffer> buffers) {
+    co_await asio::async_write(stdout_, std::move(buffers), asio::use_awaitable);
+}
+
 asio::awaitable<void> Console::read(size_t num_bytes, std::string& out) {
     out.resize(num_bytes);
     co_await asio::async_read(stdin_, asio::buffer(out), asio::use_awaitable);
