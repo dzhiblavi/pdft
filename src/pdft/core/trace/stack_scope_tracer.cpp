@@ -15,15 +15,6 @@ void StackScopeTracerBase::addChild(StackScopeTracerBase* child) {
     children.pushFront(*child);
 }
 
-StackScopeTracerBase* StackScopeTracerPool::getTracerBase() {
-    if (free_list_.isEmpty()) {
-        ++num_allocations_;
-        return new StackScopeTracerBase;
-    }
-
-    return &free_list_.popFront();
-}
-
 StackScopeTraceHandle::StackScopeTraceHandle(const StackScopeTracerOwner& owner)
     : StackScopeTraceHandle(owner.base_) {}
 
@@ -72,6 +63,15 @@ void StackScopeTracerOwner::release() {
 
     base_->release();
     base_ = nullptr;
+}
+
+StackScopeTracerBase* StackScopeTracerPool::getTracerBase() {
+    if (free_list_.isEmpty()) {
+        ++num_allocations_;
+        return new StackScopeTracerBase;
+    }
+
+    return &free_list_.popFront();
 }
 
 StackScopeTracerPool::~StackScopeTracerPool() {
