@@ -1,9 +1,9 @@
 #pragma once
 
 #include "config.h"
-#include "state.h"
 
 #include "pdft/app/controller/controller.h"
+#include "pdft/app/loader/loader.h"
 #include "pdft/app/view/view.h"
 
 #include "pdft/media/loader.h"
@@ -22,18 +22,17 @@ namespace app {
 
 class Application : public pdft::core::log::WithLogger {
  public:
-    Application(asio::io_context& context, Config config, StateMode state_mode);
+    Application(asio::io_context& context, Config config, pdft::app::loader::StateMode state_mode);
 
     asio::awaitable<void> run(const std::vector<std::string>& paths);
 
  private:
     void printAppInfo() const;
     void setup();
-    void restoreState();
+    void load(const std::vector<std::string>& paths);
     void saveState();
-    bool isOpened(const std::string& abs_path) const;
+
     asio::awaitable<void> prepareTerminal();
-    void loadPaths(const std::vector<std::string>& paths);
     asio::awaitable<void> runEventLoop();
     asio::awaitable<void> render(
         pdft::core::io::OutBuffer& control_buffer, pdft::core::io::OutBuffer& display_buffer);
@@ -42,7 +41,7 @@ class Application : public pdft::core::log::WithLogger {
 
     asio::io_context& context_;
     Config config_;
-    StateMode state_mode_;
+    pdft::app::loader::StateMode state_mode_;
 
     std::shared_ptr<pdft::core::io::TermControl> term_control_;
     std::shared_ptr<pdft::tui::terminal::Terminal> terminal_;
@@ -50,6 +49,7 @@ class Application : public pdft::core::log::WithLogger {
     std::shared_ptr<pdft::notify::Notify> fs_watcher_;
     std::shared_ptr<pdft::tui::display::Display> image_display_;
     std::shared_ptr<pdft::media::Loader> doc_loader_;
+    std::shared_ptr<pdft::app::loader::Loader> loader_;
 
     pdft::app::state::UIState ui_;
     std::shared_ptr<pdft::app::state::DocumentStorage> documents_;

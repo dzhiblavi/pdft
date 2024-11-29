@@ -1,77 +1,76 @@
 #include "pdft/app/loader/impl/loader.h"
+
 #include "pdft/core/log/log.h"
 
-#include <rfl/json.hpp>
-
-#include <vector>
+#include <magic_enum.hpp>
 
 namespace pdft::app::loader::impl {
 
 namespace {
 
-struct State {
-    state::UIState ui;
-    std::vector<std::string> paths;
-};
+bool isOpened(
+    const std::string& abs_path,
+    const state::UIState& ui,
+    const state::DocumentStorage& documents) {
+    // XXX this does not actually require linear search
+
+    for (const auto& state : ui.states) {
+        const auto& doc = documents.getDocument(state.document_id);
+
+        if (abs_path == doc.getPath()) {
+            return true;
+        }
+    }
+
+    return false;
+}
 
 }  // namespace
 
 void Loader::save(
     const state::UIState& ui, const state::DocumentStorage& documents, std::ostream& os) {
-    State state;
-    state.ui = ui;
-
-    for (const auto& doc : ui.states) {
-        auto id = doc.document_id;
-        state.paths.push_back(documents.getDocument(id).getPath());
-    }
-
-    rfl::json::write(state, os);
+    persister_->save(ui, documents, os);
+    log::info("the state has been successfully");
 }
 
-Result<void> Loader::restore(
+Result<void> Loader::load(
+    const std::vector<std::string>& paths,
     state::UIState& ui,
     state::DocumentStorage& documents,
-    const media::Loader& loader,
+    StateMode mode,
     std::istream& is) {
-    auto maybe_state = rfl::json::read<State>(is);
+    auto mode_name = magic_enum::enum_name(mode);
 
-    if (!maybe_state) {
-        return std::unexpected(maybe_state.error()->what());
+    if (mode != StateMode::Standalone && mode != StateMode::Clean) {
+        pdft::log::info("loading the state because mode is {}", mode_name);
+
+        if (auto result = persister_->restore(ui, documents, is); !result) {
+            pdft::log::warn("failed to restore the state: {}; ignoring", result.error());
+        } else {
+            pdft::log::info("the state has been successfully restored");
+        }
     }
 
-    auto&& state = maybe_state.value();
-    ui = state.ui;
+    for (auto path : paths) {
+        path = std::filesystem::absolute(path);
 
-    std::vector<size_t> to_be_removed;
+        if (isOpened(path, ui, documents) && mode == StateMode::AddOnly) {
+            log::info("ignoring the new path {} because state mode is AddOnly", path.c_str());
+            continue;
+        }
 
-    pdft::log::info("states size before: {}", ui.states.size());
-
-    for (size_t i = 0; i < state.paths.size(); ++i) {
-        auto&& path = state.paths[i];
-        auto maybe_document = loader.load(path);
-
+        auto maybe_document = doc_loader_->load(path);
         if (!maybe_document) {
-            to_be_removed.push_back(i);
-            pdft::log::warn(
-                "failed to load file by path while restoring state path={}: {}",
-                path.c_str(),
-                maybe_document.error());
+            log::warn(
+                "failed to open document by path {}: {}", path.c_str(), maybe_document.error());
             continue;
         }
 
         auto document = *maybe_document;
         auto page_count = document->getPageCount();
-        auto id = documents.addDocument(document);
-
-        ui.states[i].setDocument(id, page_count);
-    }
-
-    std::ranges::reverse(to_be_removed);
-    for (size_t i : to_be_removed) {
-        // XXX fix this hack
-        ui.idx = 0;
-        ui.states.erase(ui.states.begin() + i);
+        auto doc_id = documents.addDocument(document);
+        ui.addDocument(doc_id, page_count);
+        log::info("loaded path {}", path.c_str());
     }
 
     return {};

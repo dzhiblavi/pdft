@@ -5,6 +5,7 @@
 
 #include "pdft/app/controller/impl/controller.h"
 #include "pdft/app/loader/impl/loader.h"
+#include "pdft/app/persist/impl/persister.h"
 #include "pdft/app/state/document_storage.h"
 #include "pdft/app/state/ui_state.h"
 #include "pdft/app/view/impl/document_view.h"
@@ -73,7 +74,8 @@ Action handleSignal(int signal) {
 
 }  // namespace
 
-Application::Application(asio::io_context& context, Config config, StateMode state_mode)
+Application::Application(
+    asio::io_context& context, Config config, pdft::app::loader::StateMode state_mode)
     : context_(context)
     , config_(config)
     , state_mode_(state_mode)
@@ -92,6 +94,9 @@ void Application::setup() {
     image_display_ = resolveDisplay(config_.display);
     doc_loader_ =
         std::make_shared<pdft::media::mupdf::Loader>(pdft::media::mupdf::thisThreadContext());
+
+    auto persister = std::make_shared<pdft::app::persist::impl::Persister>(doc_loader_);
+    loader_ = std::make_shared<pdft::app::loader::impl::Loader>(persister, doc_loader_);
 
     documents_ = std::make_shared<pdft::app::state::DocumentStorage>();
     ui_.scaling_coeff = config_.display.scaling_coeff;
@@ -126,8 +131,7 @@ void Application::printAppInfo() const {
 asio::awaitable<void> Application::run(const std::vector<std::string>& paths) {
     printAppInfo();
     co_await prepareTerminal();
-    restoreState();
-    loadPaths(paths);
+    load(paths);
     co_await runEventLoop();
     saveState();
     co_await cleanup();
@@ -143,73 +147,32 @@ asio::awaitable<void> Application::prepareTerminal() {
     co_await console_->write(init_buffer);
 }
 
-bool Application::isOpened(const std::string& abs_path) const {
-    // XXX this does not actually require linear search
-
-    for (const auto& state : ui_.states) {
-        const auto& doc = documents_->getDocument(state.document_id);
-
-        if (abs_path == doc.getPath()) {
-            return true;
-        }
-    }
-
-    return false;
-}
-
-void Application::loadPaths(const std::vector<std::string>& paths) {
-    for (auto path : paths) {
-        path = std::filesystem::absolute(path);
-
-        if (isOpened(path) && state_mode_ == StateMode::AddOnly) {
-            log::info("ignoring the new path {} because state mode is AddOnly", path.c_str());
-            continue;
-        }
-
-        auto maybe_document = doc_loader_->load(path);
-
-        if (!maybe_document) {
-            log::warn(
-                "failed to open document by path {}: {}", path.c_str(), maybe_document.error());
-            continue;
-        }
-
-        auto document = *maybe_document;
-        auto page_count = document->getPageCount();
-        auto doc_id = documents_->addDocument(document);
-        ui_.addDocument(doc_id, page_count);
-
-        if (config_.system.enable_filesystem_watching) {
-            fs_watcher_->add(path);
-        }
-
-        log::info("loaded path {}", path.c_str());
-    }
-}
-
-void Application::restoreState() {
+void Application::load(const std::vector<std::string>& paths) {
     if (!config_.state_path.has_value()) {
         log::info("not restoring the state");
         return;
     }
 
-    auto&& path = *config_.state_path;
-    auto mode_name = magic_enum::enum_name(state_mode_);
+    log::info("restoring the state from {}", config_.state_path->c_str());
+    auto state_path = std::filesystem::absolute(utils::expandHome(*config_.state_path));
+    std::ifstream ifs(state_path);
 
-    if (state_mode_ == StateMode::Standalone || state_mode_ == StateMode::Clean) {
-        pdft::log::info("not loading state because mode is {}", mode_name);
+    auto err = loader_->load(paths, ui_, *documents_, state_mode_, ifs);
+    if (!err.has_value()) {
+        log::err(
+            "failed to load state_path={}, error={}", config_.state_path->c_str(), err.error());
         return;
     }
 
-    pdft::log::info("loading state from {} because mode is {}", path.c_str(), mode_name);
+    if (!config_.system.enable_filesystem_watching) {
+        log::info("filesystem watching is disabled");
+    }
 
-    pdft::app::loader::impl::Loader loader;
-    std::ifstream ifs(pdft::utils::expandHome(path));
+    for (auto&& doc : ui_.states) {
+        const auto& path = documents_->getDocument(doc.document_id).getPath();
 
-    if (auto result = loader.restore(ui_, *documents_, *doc_loader_, ifs); !result) {
-        pdft::log::warn("failed to restore state from {}: {}", path.c_str(), result.error());
-    } else {
-        pdft::log::info("successfully restored state from {}", path.c_str());
+        log::info("adding path {} to filesystem watching", path.c_str());
+        fs_watcher_->add(path);
     }
 }
 
@@ -219,20 +182,11 @@ void Application::saveState() {
         return;
     }
 
-    auto mode_name = magic_enum::enum_name(state_mode_);
-
-    if (state_mode_ == StateMode::Standalone) {
-        log::info("not saving the state because mode is {}", mode_name);
-        return;
+    if (pdft::app::loader::shouldSave(state_mode_)) {
+        auto state_path = std::filesystem::absolute(utils::expandHome(*config_.state_path));
+        std::ofstream ofs(state_path);
+        loader_->save(ui_, *documents_, ofs);
     }
-
-    log::info("saving the state because mode is {}", mode_name);
-
-    pdft::app::loader::impl::Loader loader;
-    std::ofstream ofs(utils::expandHome(*config_.state_path));
-    loader.save(ui_, *documents_, ofs);
-
-    log::info("saved the state to {}", config_.state_path->c_str());
 }
 
 asio::awaitable<void> Application::runEventLoop() {

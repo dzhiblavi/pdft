@@ -54,8 +54,10 @@ target_sources(pdft PRIVATE ./notify/fsw/notify.cpp)
 target_sources(pdft PRIVATE ./image/image.cpp)
 
 target_sources(
-  pdft PRIVATE ./media/mupdf/context.cpp ./media/mupdf/document.cpp
-               ./media/mupdf/page.cpp ./media/mupdf/pixmap_image.cpp ./media/mupdf/loader.cpp)
+  pdft
+  PRIVATE ./media/mupdf/context.cpp ./media/mupdf/document.cpp
+          ./media/mupdf/page.cpp ./media/mupdf/pixmap_image.cpp
+          ./media/mupdf/loader.cpp)
 
 target_sources(
   pdft
@@ -80,4 +82,5 @@ target_sources(
           ./app/view/impl/document_view.cpp
           ./app/controller/keytree.cpp
           ./app/controller/impl/controller.cpp
-          ./app/loader/impl/loader.cpp)
+          ./app/loader/impl/loader.cpp
+          ./app/persist/impl/persister.cpp)
