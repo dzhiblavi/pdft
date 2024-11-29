@@ -29,10 +29,10 @@ std::shared_ptr<tui::display::kitty::apc::Executor> resolveAPCExecutor(
 }  // namespace
 
 std::shared_ptr<pdft::tui::display::Display> resolveDisplay(
-    std::shared_ptr<pdft::core::io::Console> console) {
+    const DisplayConfig& config, std::shared_ptr<pdft::core::io::Console> console) {
     auto executor = resolveAPCExecutor(console);
 
-    if (auto _ = ::getenv("TMUX")) {
+    if (auto _ = ::getenv("TMUX") || config.force_unicode_kitty_display) {
         log::info("Resolved Unicode Kitty display");
         return std::make_shared<tui::display::kitty::UnicodeDisplay>(
             std::move(executor), std::move(console));

@@ -8,6 +8,7 @@ logging:
 display:
   scaling_factor: 1.1
   invert_colors: true
+  force_unicode_kitty_display: false
 
 controller:
   rows_per_scroll: 10

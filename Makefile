@@ -61,6 +61,9 @@ run-gdb: build
 run: build
 	cd $(BUILD_DIR) && ./src/app/app $(path)
 
+install-dev: build
+	cd $(BUILD_DIR) && cp ./src/app/app ~/.bin/pdft-dev
+
 install-local: build
 	cd $(BUILD_DIR) && cp ./src/app/app ~/.bin/pdft
 
