@@ -15,6 +15,7 @@ class Controller : public controller::Controller {
     enum class Command {
         Quit,
         Reload,
+        CloseDocument,
         ScrollNext,
         ScrollPrev,
         NumNextPage,

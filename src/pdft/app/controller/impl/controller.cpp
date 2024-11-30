@@ -19,6 +19,7 @@ void Controller::bindKey(Command command, std::string_view keys) {
 
         case Quit:
         case Reload:
+        case CloseDocument:
         case ScrollNext:
         case ScrollPrev:
         case GoToFirstPage:
@@ -77,6 +78,13 @@ Action Controller::applyPendingCommand(state::UIState& ui, state::DocumentStorag
                 PDFT_VERIFY(maybe_document);
                 auto document = *maybe_document;
                 reloadDocument(*id, document->getPath(), ui, documents);
+            }
+            return Action::Redraw;
+
+        case CloseDocument:
+            if (auto id = ui.getCurrentDocumentId()) {
+                ui.removeDocument(*id);
+                PDFT_VERIFY(documents.removeDocument(*id));
             }
             return Action::Redraw;
 

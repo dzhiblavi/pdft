@@ -117,13 +117,15 @@ void UIState::removeDocument(DocumentId id) {
 
     if (index < *idx) {
         *idx -= 1;
+    } else if (index == *idx && states.size() >= 2) {
+        *idx = std::min(states.size() - 2, *idx);
     }
+
+    states.erase(it);
 
     if (states.empty()) {
         idx = std::nullopt;
     }
-
-    states.erase(it);
 }
 
 void UIState::onDocumentChanged(DocumentId from, DocumentId to, uint32_t page_count) {

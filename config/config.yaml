@@ -23,6 +23,9 @@ controller:
     - command: Reload
       keys: r
 
+    - command: CloseDocument
+      keys: x
+
     - command: ScrollNext
       keys: j
 
