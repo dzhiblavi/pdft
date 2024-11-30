@@ -1,5 +1,6 @@
 #include "pdft/app/controller/impl/controller.h"
 
+#include "pdft/core/assert.h"
 #include "pdft/core/log/log.h"
 
 namespace pdft::app::controller::impl {
@@ -72,7 +73,10 @@ Action Controller::applyPendingCommand(state::UIState& ui, state::DocumentStorag
 
         case Reload:
             if (auto id = ui.getCurrentDocumentId()) {
-                reloadDocument(*id, documents.getDocument(*id).getPath(), ui, documents);
+                auto maybe_document = documents.getDocument(*id);
+                PDFT_VERIFY(maybe_document);
+                auto document = *maybe_document;
+                reloadDocument(*id, document->getPath(), ui, documents);
             }
             return Action::Redraw;
 
@@ -173,7 +177,13 @@ Action Controller::onFilesystemEvent(
     const notify::Event& event, state::UIState& ui, state::DocumentStorage& documents) {
     log::debug("controller: fs event on path={}", event.path.c_str());
 
-    reloadDocument(documents.getIdByPath(event.path), event.path, ui, documents);
+    auto maybe_doc_id = documents.getIdByPath(event.path);
+    if (!maybe_doc_id) {
+        log::warn("received a filesystem event for unknown path {}", event.path.c_str());
+        return Action::None;
+    }
+
+    reloadDocument(*maybe_doc_id, event.path, ui, documents);
     return Action::Redraw;
 }
 
@@ -184,7 +194,7 @@ void Controller::reloadDocument(
     state::DocumentStorage& documents) {
     log::debug("controller: old_id={}", old_id);
 
-    documents.removeDocument(old_id);
+    PDFT_VERIFY(documents.removeDocument(old_id));
     log::debug("controller: removed document with id={}", old_id);
 
     auto maybe_document = doc_loader_->load(path);

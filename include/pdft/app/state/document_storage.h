@@ -12,11 +12,11 @@ class DocumentStorage {
  public:
     DocumentId addDocument(std::shared_ptr<media::Document> document);
 
-    void removeDocument(DocumentId id);
+    [[nodiscard]] bool removeDocument(DocumentId id);
 
-    const media::Document& getDocument(DocumentId id) const;
+    std::optional<std::shared_ptr<const media::Document>> getDocument(DocumentId id) const;
 
-    DocumentId getIdByPath(const std::filesystem::path& path) const;
+    std::optional<DocumentId> getIdByPath(const std::filesystem::path& path) const;
 
  private:
     std::unordered_map<DocumentId, std::shared_ptr<media::Document>> documents_;

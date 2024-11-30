@@ -24,11 +24,14 @@ void PageRenderer::render(
     tui::display::State& display,
     tui::Context& ctx) {
     const auto& [doc_id, page_index] = page;
-    const auto& document = documents_->getDocument(page.document_id);
+
+    auto maybe_document = documents_->getDocument(page.document_id);
+    PDFT_VERIFY(maybe_document);
+    auto document = *maybe_document;
 
     auto id = getIdForPage(page);
     auto the_page =
-        core::trace::trace(ctx, "get_page", [&] { return document.getPage(page_index); });
+        core::trace::trace(ctx, "get_page", [&] { return document->getPage(page_index); });
     float factor = calcFactor(the_page->getDefaultSize(), properties.scaling_coeff, ctx);
 
     log::debug(

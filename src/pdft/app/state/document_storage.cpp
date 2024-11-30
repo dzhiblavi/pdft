@@ -1,7 +1,5 @@
 #include "pdft/app/state/document_storage.h"
 
-#include "pdft/core/assert.h"
-
 namespace pdft::app::state {
 
 DocumentId DocumentStorage::addDocument(std::shared_ptr<media::Document> document) {
@@ -13,23 +11,33 @@ DocumentId DocumentStorage::addDocument(std::shared_ptr<media::Document> documen
     return id;
 }
 
-void DocumentStorage::removeDocument(DocumentId id) {
+bool DocumentStorage::removeDocument(DocumentId id) {
     auto it = documents_.find(id);
-    PDFT_VERIFY(it != documents_.end(), "trying to delete an unknown document with id={}", id);
+    if (it == documents_.end()) {
+        return false;
+    }
+
     ids_by_path_.erase(it->second->getPath());
     documents_.erase(it);
+    return true;
 }
 
-const media::Document& DocumentStorage::getDocument(DocumentId id) const {
+std::optional<std::shared_ptr<const media::Document>> DocumentStorage::getDocument(
+    DocumentId id) const {
     auto it = documents_.find(id);
-    PDFT_VERIFY(it != documents_.end(), "trying to get an unknown document with id={}", id);
-    return *it->second;
+    if (it == documents_.end()) {
+        return std::nullopt;
+    }
+
+    return it->second;
 }
 
-DocumentId DocumentStorage::getIdByPath(const std::filesystem::path& path) const {
+std::optional<DocumentId> DocumentStorage::getIdByPath(const std::filesystem::path& path) const {
     auto it = ids_by_path_.find(path);
-    PDFT_VERIFY(
-        it != ids_by_path_.end(), "no document with exists with this path={}", path.c_str());
+    if (it == ids_by_path_.end()) {
+        return std::nullopt;
+    }
+
     return it->second;
 }
 

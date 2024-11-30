@@ -1,4 +1,5 @@
 #include "pdft/app/persist/impl/persister.h"
+#include "pdft/core/assert.h"
 #include "pdft/core/log/log.h"
 
 #include <rfl/json.hpp>
@@ -23,7 +24,10 @@ void Persister::save(
 
     for (const auto& doc : ui.states) {
         auto id = doc.document_id;
-        state.paths.push_back(documents.getDocument(id).getPath());
+        auto maybe_document = documents.getDocument(id);
+        PDFT_VERIFY(maybe_document);
+        auto document = *maybe_document;
+        state.paths.push_back(document->getPath());
     }
 
     rfl::json::write(state, os);

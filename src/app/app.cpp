@@ -170,7 +170,10 @@ void Application::load(const std::vector<std::string>& paths) {
     }
 
     for (auto&& doc : ui_.states) {
-        const auto& path = documents_->getDocument(doc.document_id).getPath();
+        auto maybe_doc = documents_->getDocument(doc.document_id);
+        PDFT_VERIFY(maybe_doc);
+        auto document = *maybe_doc;
+        const auto& path = document->getPath();
 
         log::info("adding path {} to filesystem watching", path.c_str());
         fs_watcher_->add(path);

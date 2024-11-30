@@ -1,5 +1,6 @@
 #include "pdft/app/loader/impl/loader.h"
 
+#include "pdft/core/assert.h"
 #include "pdft/core/log/log.h"
 
 #include <magic_enum.hpp>
@@ -15,9 +16,11 @@ bool isOpened(
     // XXX this does not actually require linear search
 
     for (const auto& state : ui.states) {
-        const auto& doc = documents.getDocument(state.document_id);
+        auto maybe_doc = documents.getDocument(state.document_id);
+        PDFT_VERIFY(maybe_doc);
+        auto doc = *maybe_doc;
 
-        if (abs_path == doc.getPath()) {
+        if (abs_path == doc->getPath()) {
             return true;
         }
     }

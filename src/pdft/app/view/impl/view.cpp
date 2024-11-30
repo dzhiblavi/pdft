@@ -9,7 +9,11 @@ tui::Element View::render(const state::UIState& ui, tui::display::State& state, 
         if (auto doc = ui.getImmutableState()) {
             auto _ = ctx.push("render_doc");
 
-            auto path = documents_->getDocument(doc->document_id).getPath().filename();
+            auto maybe_document = documents_->getDocument(doc->document_id);
+            PDFT_VERIFY(maybe_document);
+            auto document = *maybe_document;
+
+            auto path = document->getPath().filename();
             auto page_str = std::format("{}/{}", doc->page_index + 1, doc->page_count);
 
             return tui::window(
@@ -38,7 +42,12 @@ tui::Element View::getSidebar(const state::UIState& ui, tui::Context& ctx) {
         const auto& st = ui.states[i];
         bool is_current = i == *ui.idx;
         auto doc_id = st.document_id;
-        const auto& path = documents_->getDocument(doc_id).getPath();
+
+        auto maybe_document = documents_->getDocument(doc_id);
+        PDFT_VERIFY(maybe_document);
+        auto document = *maybe_document;
+
+        const auto& path = document->getPath();
         auto line = std::format("{}{}", is_current ? "* " : "", path.filename().c_str());
         elements.push_back(tui::text(std::move(line)));
     }
