@@ -8,10 +8,10 @@ namespace pdft::tui::display::kitty {
 
 void UnicodeDisplay::displayImage(
     ImageId id, const IRect& rect, const FRect& image_subarea, Context& ctx) {
+    log::debug("display @ {}", rect);
     PDFT_VERIFY(isLoaded(id));
 
     const auto& [x, y, w, h] = rect;
-    log::debug("display @ x={},y={},w={},h={}", x, y, w, h);
     PDFT_VERIFY(x >= 0 && y >= 0, "rect offset must not be negative: x={},y={}", x, y);
     PDFT_VERIFY(w >= 0 && h >= 0, "rect dimensions must not be negative: w={},h={}", w, h);
 
@@ -20,11 +20,9 @@ void UnicodeDisplay::displayImage(
     }
 
     const auto& [rix, riy, riw, rih] = image_subarea;
-    log::debug("display I rx={},ry={},rw={},rh={}", rix, riy, riw, rih);
+    log::debug("display I {}", image_subarea);
     PDFT_VERIFY(rix >= 0 && riy >= 0, "image offset must not be negative: x={},y={}", rix, riy);
     PDFT_VERIFY(riw > 0 && rih > 0, "image dimensions must be positive: w={},h={}", riw, rih);
-
-    log::debug("display I rx={},ry={},rw={},rh={}", rix, riy, riw, rih);
 
     const uint32_t image_cols = std::roundf(w / riw);
     const uint32_t image_rows = std::roundf(h / rih);

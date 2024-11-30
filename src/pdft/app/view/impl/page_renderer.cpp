@@ -34,8 +34,7 @@ void PageRenderer::render(
         core::trace::trace(ctx, "get_page", [&] { return document->getPage(page_index); });
     float factor = calcFactor(the_page->getDefaultSize(), properties.scaling_coeff, ctx);
 
-    log::debug(
-        ctx, "rendering a page: doc_id={}, page_index={}, image_id={}", doc_id, page_index, id);
+    log::debug(ctx, "rendering a page: {}, image_id={}", page, id);
 
     if (display.isLoaded(id)) {
         const auto& info = display.getImage(id);
@@ -60,14 +59,7 @@ void PageRenderer::render(
 
     if (!display.isLoaded(id)) {
         auto _ = ctx.push("load_image");
-
-        log::debug(
-            ctx,
-            "loading page to display: index={}, doc_id={}, image_id={}, factor={}",
-            page_index,
-            doc_id,
-            id,
-            factor);
+        log::debug(ctx, "loading page to display: {}, image_id={}, factor={}", page, id, factor);
 
         auto image =
             core::trace::trace(ctx, "get_image", [&] { return the_page->getImage(factor); });
@@ -100,13 +92,8 @@ void PageRenderer::render(
     auto irect = tui::image::fitImage(sub_cols / sub_rows, properties.rect, properties.placement);
     auto image = tui::image::Image::make(id, properties.subarea);
 
-    {
-        auto [x, y, w, h] = properties.rect;
-        log::debug(ctx, "renderer @ x={},y={},w={},h={}", x, y, w, h);
-
-        auto [ix, iy, iw, ih] = irect;
-        log::debug(ctx, "renderer I ix={},iy={},iw={},ih={}", ix, iy, iw, ih);
-    }
+    log::debug(ctx, "renderer @ {}", properties.rect);
+    log::debug(ctx, "renderer I {}", irect);
 
     tui::image::render(image, irect, *display_, ctx);
 }

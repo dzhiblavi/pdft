@@ -1,5 +1,7 @@
 #pragma once
 
+#include "pdft/core/log/fmt_adapter.h"
+
 #include <concepts>
 #include <cstdint>
 
@@ -40,3 +42,5 @@ Rect<T> offsetRect(const Rect<T>& rect, T x_offset, T y_offset) {
 }
 
 }  // namespace pdft::tui
+
+PDFT_LOG_ADAPT_TEMPLATE_JSON(pdft::tui, Rect, T);
