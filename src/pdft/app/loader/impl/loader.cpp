@@ -33,7 +33,7 @@ bool isOpened(
 void Loader::save(
     const state::UIState& ui, const state::DocumentStorage& documents, std::ostream& os) {
     persister_->save(ui, documents, os);
-    log::info("the state has been successfully");
+    log::info("the state has been successfully saved");
 }
 
 Result<void> Loader::load(
