@@ -6,7 +6,6 @@
 #include "pdft/app/controller/impl/controller.h"
 #include "pdft/app/loader/impl/loader.h"
 #include "pdft/app/persist/impl/persister.h"
-#include "pdft/app/renderer.h"
 #include "pdft/app/state/document_storage.h"
 #include "pdft/app/state/ui_state.h"
 #include "pdft/app/view/impl/document_view.h"
@@ -17,6 +16,7 @@
 #include "pdft/media/mupdf/loader.h"
 
 #include "pdft/notify/fsw/notify.h"
+#include "pdft/tui/render.h"
 #include "pdft/tui/terminal/ansi/terminal.h"
 
 #include "pdft/utils/build_info.h"
@@ -191,7 +191,7 @@ void Application::saveState() {
 }
 
 asio::awaitable<void> Application::runEventLoop() {
-    pdft::app::Renderer renderer(terminal_, console_);
+    pdft::tui::Renderer renderer(terminal_, console_);
 
     for (;;) {
         co_await renderer.renderOne([this](auto& ctx) {

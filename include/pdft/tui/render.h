@@ -1,6 +1,5 @@
 #pragma once
 
-#include "pdft/core/trace/log_stack_trace.h"
 #include "pdft/tui/context.h"
 #include "pdft/tui/elements.h"
 #include "pdft/tui/terminal/terminal.h"
@@ -8,13 +7,14 @@
 #include "pdft/core/io/buffer.h"
 #include "pdft/core/io/console.h"
 #include "pdft/core/trace/context.h"
+#include "pdft/core/trace/log_stack_trace.h"
 #include "pdft/core/trace/stack_scope_tracer.h"
 
 #include <ftxui/screen/screen.hpp>
 
 #include <asio/awaitable.hpp>
 
-namespace pdft::app {
+namespace pdft::tui {
 
 class Renderer {
  public:
@@ -57,4 +57,4 @@ class Renderer {
     std::shared_ptr<core::io::Console> console_;
 };
 
-}  // namespace pdft::app
+}  // namespace pdft::tui
