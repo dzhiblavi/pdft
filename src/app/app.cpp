@@ -214,6 +214,7 @@ asio::awaitable<bool> Application::waitForNextRender() {
     for (;;) {
         using enum Action;
 
+        // XXX debouncing?
         auto event = co_await (
             console_->read(1) || fs_watcher_->nextEvent() ||
             signals_.async_wait(asio::use_awaitable));
