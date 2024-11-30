@@ -45,6 +45,9 @@ class Renderer {
         terminal_->clear(control_);
         co_await trace(ctx, "renderFlush", console_->writeMany(control_, tui, display_));
 
+        core::io::clear(control_);
+        core::io::clear(display_);
+
         tracer.finalize();
         core::trace::logStackTrace(tracer.getInfo());
     }

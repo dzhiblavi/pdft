@@ -16,14 +16,12 @@ class Console {
 
     asio::awaitable<void> write(OutBuffer& buffer) {
         co_await this->write(buffer.view());
-        io::clear(buffer);
     }
 
     template <typename... Buffers>
     asio::awaitable<void> writeMany(Buffers&&... buffers) {
         std::vector<asio::const_buffer> views_vec{asio::buffer(getView(buffers))...};
         co_await this->writeMany(std::move(views_vec));
-        (clear(buffers), ...);
     }
 
     virtual asio::awaitable<void> read(size_t num_bytes, std::string& buffer) = 0;
@@ -42,12 +40,6 @@ class Console {
     static std::string_view getView(std::string_view view) {
         return view;
     }
-
-    static void clear(OutBuffer& buffer) {
-        io::clear(buffer);
-    }
-
-    static void clear(std::string_view) {}
 };
 
 }  // namespace pdft::core::io
