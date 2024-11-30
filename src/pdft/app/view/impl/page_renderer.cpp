@@ -3,7 +3,7 @@
 #include "pdft/tui/image/fit_image.h"
 #include "pdft/tui/image/image.h"
 
-#include "pdft/image/invert_colors.h"
+#include "pdft/image/operations.h"
 
 #include "pdft/core/trace/context.h"
 #include "pdft/utils/cantor_pair.h"
