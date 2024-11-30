@@ -12,21 +12,13 @@ namespace pdft::media::mupdf {
 PixmapImage::PixmapImage(PixmapImage&& rhs)
     : context_(rhs.context_)
     , pixmap_(std::exchange(rhs.pixmap_, nullptr)) {
-    assert(pixmap_);
+    PDFT_VERIFY(pixmap_);
 }
 
 PixmapImage::~PixmapImage() noexcept {
     if (pixmap_ == nullptr) {
         return;
     }
-
-    /*
-       [...]
-       Bit 1: If set, free the samples buffer when the pixmap is destroyed.
-    */
-    // if (pixmap_->flags & (1 << 1)) {
-    //::free(pixmap_->samples);
-    //}
 
     fz_drop_pixmap(context_.native(), pixmap_);
 }
