@@ -1,7 +1,7 @@
 #pragma once
 
-#include "pdft/tui/context.h"
 #include "pdft/tui/elements.h"
+#include "pdft/tui/screen.h"
 #include "pdft/tui/terminal/terminal.h"
 
 #include "pdft/core/io/buffer.h"
@@ -27,15 +27,16 @@ class Renderer {
         PDFT_VERIFY(console_);
     }
 
-    template <std::invocable<tui::Context&> Renderer>
+    template <std::invocable<core::Context&, Screen&> Renderer>
     asio::awaitable<void> renderOne(Renderer renderer) {
         using core::trace::trace;
 
         auto tracer = core::trace::getGlobalPool().getTracer("renderOne");
-        auto ctx = tui::Context(*terminal_, control_, display_);
+        auto ctx = core::Context();
         ctx.setTracer(tracer);
+        auto screen = Screen{terminal_->getDimensions(), {control_, display_}};
 
-        auto dom = trace(ctx, "renderUser", [&] { return renderer(ctx); });
+        auto dom = trace(ctx, "renderUser", [&] { return renderer(ctx, screen); });
         auto tui = trace(ctx, "renderTUI", [&] {
             auto screen = ftxui::Screen::Create(ftxui::Dimension::Full());
             tui::Render(screen, dom);

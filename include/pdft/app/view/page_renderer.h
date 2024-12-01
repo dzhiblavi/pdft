@@ -2,11 +2,13 @@
 
 #include "pdft/app/state/document_storage.h"
 
-#include "pdft/tui/context.h"
 #include "pdft/tui/image/fit_image.h"
 #include "pdft/tui/rect.h"
+#include "pdft/tui/screen.h"
 
 #include "pdft/image/palette.h"
+
+#include "pdft/core/context.h"
 
 namespace pdft::app::view {
 
@@ -32,10 +34,11 @@ class PageRenderer {
     virtual ~PageRenderer() = default;
 
     virtual void render(
+        Context& ctx,
         const Page& page,
         const PagePosition& pos,
         const DisplayProperties& props,
-        tui::Context& ctx) = 0;
+        tui::Screen& screen) = 0;
 };
 
 }  // namespace pdft::app::view

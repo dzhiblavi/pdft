@@ -30,6 +30,10 @@ void Context::setTracer(trace::StackScopeTraceHandle tracer) {
 }
 
 PushHandle Context::push(const char* label, std::source_location loc) {
+    if (!trace_handle_.isValid()) {
+        return {};
+    }
+
     PushHandle handle(trace_handle_.addChild(label, loc), this->trace_handle_, this);
     this->trace_handle_ = handle.tracer;
     return handle;

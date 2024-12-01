@@ -13,13 +13,14 @@ class DisplayBase : public display::Display {
     DisplayBase(std::shared_ptr<apc::Executor> executor) : executor_(std::move(executor)) {}
 
     void loadImage(
-        ImageId id, const pdft::image::Image& image, core::io::OutBuffer& buffer) override;
+        Context& ctx,
+        ImageId id,
+        const pdft::image::Image& image,
+        core::io::OutBuffer& buffer) override;
 
-    void clear(core::io::OutBuffer& buffer) override;
-
-    void unload(ImageId id, core::io::OutBuffer& buffer) override;
-
-    void unloadAll(core::io::OutBuffer& buffer) override;
+    void clear(Context& ctx, core::io::OutBuffer& buffer) override;
+    void unload(Context& ctx, ImageId id, core::io::OutBuffer& buffer) override;
+    void unloadAll(Context& ctx, core::io::OutBuffer& buffer) override;
 
     bool isLoaded(ImageId id) const override;
 

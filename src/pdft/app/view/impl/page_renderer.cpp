@@ -1,7 +1,6 @@
 #include "pdft/app/view/impl/page_renderer.h"
 
 #include "pdft/tui/image/fit_image.h"
-#include "pdft/tui/image/image.h"
 
 #include "pdft/image/operations.h"
 #include "pdft/image/palette.h"
@@ -42,10 +41,12 @@ PageRenderer::PageRenderer(
     , display_(std::move(display)) {}
 
 void PageRenderer::render(
+    Context& ctx,
     const Page& page,
     const PagePosition& pos,
     const DisplayProperties& properties,
-    tui::Context& ctx) {
+    tui::Screen& screen) {
+    using core::trace::trace;
     const auto& [doc_id, page_index] = page;
 
     auto maybe_document = documents_->getDocument(page.document_id);
@@ -53,9 +54,9 @@ void PageRenderer::render(
     auto document = *maybe_document;
 
     auto id = getIdForPage(page);
-    auto the_page =
-        core::trace::trace(ctx, "get_page", [&] { return document->getPage(page_index); });
-    float factor = calcFactor(the_page->getDefaultSize(), properties.scaling_coeff, ctx);
+    auto the_page = trace(ctx, "get_page", [&] { return document->getPage(page_index); });
+    float factor =
+        calcFactor(ctx, the_page->getDefaultSize(), properties.scaling_coeff, screen.size);
 
     log::debug(ctx, "rendering a page: {}, image_id={}", page, id);
 
@@ -81,7 +82,7 @@ void PageRenderer::render(
 
         if (should_reload) {
             auto _ = ctx.push("unload_image");
-            display_->unload(id, ctx.control_buffer);
+            display_->unload(ctx, id, screen.buffers.control_buffer);
             state_.removeImage(id);
         }
     }
@@ -90,24 +91,25 @@ void PageRenderer::render(
         auto _ = ctx.push("load_image");
         log::debug(ctx, "loading page to display: {}, image_id={}, factor={}", page, id, factor);
 
-        auto image =
-            core::trace::trace(ctx, "get_image", [&] { return the_page->getImage(factor); });
+        auto image = trace(ctx, "get_image", [&] { return the_page->getImage(factor); });
 
         if (properties.invert_colors) {
-            core::trace::trace(ctx, "invert_colors", [&] { image::invertColors(*image); });
+            auto _ = ctx.push("invert_colors");
+            image::invertColors(*image);
         }
 
         if (properties.palette.has_value()) {
-            core::trace::trace(ctx, "apply_palette", [&] {
-                image::applyPalette(image->mutableSamples(), *properties.palette);
-            });
+            auto _ = ctx.push("apply_palette");
+            image::applyPalette(image->mutableSamples(), *properties.palette);
         }
 
-        display_->loadImage(id, *image, ctx.control_buffer);
+        trace(ctx, "load_image", [&] {
+            display_->loadImage(ctx, id, *image, screen.buffers.control_buffer);
+        });
 
         auto image_size = image->size();
-        float image_cols = float(image_size.width_px) / ctx.screen_size.cell_width_px;
-        float image_rows = float(image_size.height_px) / ctx.screen_size.cell_height_px;
+        float image_cols = float(image_size.width_px) / screen.size.cell_width_px;
+        float image_rows = float(image_size.height_px) / screen.size.cell_height_px;
 
         state_.addImage(
             id,
@@ -128,17 +130,20 @@ void PageRenderer::render(
     float sub_rows = p.image_rows * pos.subarea.height;
     float sub_cols = p.image_cols * pos.subarea.width;
     auto irect = tui::image::fitImage(sub_cols / sub_rows, pos.rect, pos.placement);
-    auto image = tui::image::Image::make(id, pos.subarea);
 
     log::debug(ctx, "renderer @ {}", pos.rect);
     log::debug(ctx, "renderer I {}", irect);
 
-    tui::image::render(image, irect, *display_, ctx);
+    display_->displayImage(ctx, id, irect, pos.subarea, screen.buffers);
 }
 
-float PageRenderer::calcFactor(media::PageSize page_size, float scaling_coeff, tui::Context& ctx) {
-    float dw = ctx.screen_size.width_px;
-    float dh = ctx.screen_size.height_px;
+float PageRenderer::calcFactor(
+    Context& ctx,
+    media::PageSize page_size,
+    float scaling_coeff,
+    const tui::terminal::Dimensions& dims) {
+    float dw = dims.width_px;
+    float dh = dims.height_px;
     auto [pw, ph] = page_size;
 
     float fw = dw / pw;
@@ -150,8 +155,8 @@ float PageRenderer::calcFactor(media::PageSize page_size, float scaling_coeff, t
         "calc factor for page {}x{}, term {}x{}, factor={}, scale_by={}",
         page_size.width_px,
         page_size.height_px,
-        ctx.screen_size.width_px,
-        ctx.screen_size.height_px,
+        dims.width_px,
+        dims.height_px,
         f,
         scaling_coeff);
 

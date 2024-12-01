@@ -27,15 +27,18 @@ std::shared_ptr<tui::display::kitty::apc::Executor> resolveAPCExecutor() {
 
 }  // namespace
 
-std::shared_ptr<pdft::tui::display::Display> resolveDisplay(const DisplayConfig& config) {
+std::shared_ptr<pdft::tui::display::Display> resolveDisplay(
+    const DisplayConfig& config, std::shared_ptr<const pdft::tui::terminal::Terminal> terminal) {
     auto executor = resolveAPCExecutor();
 
     if (auto _ = ::getenv("TMUX") || config.force_unicode_kitty_display) {
         log::info("Resolved Unicode Kitty display");
-        return std::make_shared<tui::display::kitty::UnicodeDisplay>(std::move(executor));
+        return std::make_shared<tui::display::kitty::UnicodeDisplay>(
+            std::move(executor), std::move(terminal));
     } else {
         log::info("Resolved Native Kitty display");
-        return std::make_shared<tui::display::kitty::NativeDisplay>(std::move(executor));
+        return std::make_shared<tui::display::kitty::NativeDisplay>(
+            std::move(executor), std::move(terminal));
     }
 }
 

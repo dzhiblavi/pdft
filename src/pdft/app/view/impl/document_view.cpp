@@ -3,32 +3,39 @@
 namespace pdft::app::view::impl {
 
 tui::Element DocumentView::render(
-    const state::DocumentState& doc, const DisplayProperties& properties, tui::Context& ctx) {
+    Context& ctx,
+    const state::DocumentState& doc,
+    const DisplayProperties& properties,
+    tui::Screen& screen) const {
     auto _ = ctx.push("render");
 
     switch (doc.view_mode) {
         using enum state::ViewMode;
 
         case OnePage:
-            return renderOnePage(doc, properties, ctx);
+            return renderOnePage(ctx, doc, properties, screen);
 
         case TwoPages:
-            return renderTwoPages(doc, properties, ctx);
+            return renderTwoPages(ctx, doc, properties, screen);
 
         case OnePageContinuous:
-            return renderOnePageContinuous(doc, properties, ctx);
+            return renderOnePageContinuous(ctx, doc, properties, screen);
 
         case TwoPagesContinuous:
-            return renderTwoPagesContinuous(doc, properties, ctx);
+            return renderTwoPagesContinuous(ctx, doc, properties, screen);
     }
 }
 
 tui::Element DocumentView::renderOnePage(
-    const state::DocumentState& doc, const DisplayProperties& properties, tui::Context& ctx) {
+    Context& ctx,
+    const state::DocumentState& doc,
+    const DisplayProperties& properties,
+    tui::Screen& screen) const {
     auto render = [&, properties](tui::IRect rect) {
         auto _ = ctx.push("only_page");
 
         renderer_->render(
+            ctx,
             {
                 .document_id = doc.document_id,
                 .page_index = doc.page_index,
@@ -42,18 +49,22 @@ tui::Element DocumentView::renderOnePage(
                     },
             },
             properties,
-            ctx);
+            screen);
     };
 
     return tui::withSize(render);
 }
 
 tui::Element DocumentView::renderTwoPages(
-    const state::DocumentState& doc, const DisplayProperties& properties, tui::Context& ctx) {
+    Context& ctx,
+    const state::DocumentState& doc,
+    const DisplayProperties& properties,
+    tui::Screen& screen) const {
     auto render_left = [&, properties](tui::IRect rect) {
         auto _ = ctx.push("left_page");
 
         renderer_->render(
+            ctx,
             {
                 .document_id = doc.document_id,
                 .page_index = doc.page_index,
@@ -67,7 +78,7 @@ tui::Element DocumentView::renderTwoPages(
                     },
             },
             properties,
-            ctx);
+            screen);
     };
 
     auto render_right = [&, properties](tui::IRect rect) {
@@ -78,6 +89,7 @@ tui::Element DocumentView::renderTwoPages(
         auto _ = ctx.push("right_page");
 
         renderer_->render(
+            ctx,
             {
                 .document_id = doc.document_id,
                 .page_index = doc.page_index + 1,
@@ -91,7 +103,7 @@ tui::Element DocumentView::renderTwoPages(
                     },
             },
             properties,
-            ctx);
+            screen);
     };
 
     return tui::hbox({
@@ -101,12 +113,16 @@ tui::Element DocumentView::renderTwoPages(
 }
 
 tui::Element DocumentView::renderOnePageContinuous(
-    const state::DocumentState& doc, const DisplayProperties& properties, tui::Context& ctx) {
+    Context& ctx,
+    const state::DocumentState& doc,
+    const DisplayProperties& properties,
+    tui::Screen& screen) const {
     auto render_top = [&, properties](tui::IRect rect) {
         auto _ = ctx.push("top_page");
         float this_ratio = float(rect.height) / rect_.height;
 
         renderer_->render(
+            ctx,
             {
                 .document_id = doc.document_id,
                 .page_index = doc.page_index,
@@ -127,7 +143,7 @@ tui::Element DocumentView::renderOnePageContinuous(
                     },
             },
             properties,
-            ctx);
+            screen);
     };
 
     auto render_bottom = [&, properties](tui::IRect rect) {
@@ -138,6 +154,7 @@ tui::Element DocumentView::renderOnePageContinuous(
         float this_ratio = float(rect.height) / rect_.height;
 
         renderer_->render(
+            ctx,
             {
                 .document_id = doc.document_id,
                 .page_index = doc.page_index + 1,
@@ -158,7 +175,7 @@ tui::Element DocumentView::renderOnePageContinuous(
                     },
             },
             properties,
-            ctx);
+            screen);
     };
 
     return tui::vbox({
@@ -171,12 +188,16 @@ tui::Element DocumentView::renderOnePageContinuous(
 }
 
 tui::Element DocumentView::renderTwoPagesContinuous(
-    const state::DocumentState& doc, const DisplayProperties& properties, tui::Context& ctx) {
+    Context& ctx,
+    const state::DocumentState& doc,
+    const DisplayProperties& properties,
+    tui::Screen& screen) const {
     auto render_top_left = [&, properties](tui::IRect rect) {
         auto _ = ctx.push("top_left_page");
         float this_ratio = float(rect.height) / rect_.height;
 
         renderer_->render(
+            ctx,
             {
                 .document_id = doc.document_id,
                 .page_index = doc.page_index,
@@ -197,7 +218,7 @@ tui::Element DocumentView::renderTwoPagesContinuous(
                     },
             },
             properties,
-            ctx);
+            screen);
     };
 
     auto render_top_right = [&, properties](tui::IRect rect) {
@@ -209,6 +230,7 @@ tui::Element DocumentView::renderTwoPagesContinuous(
         float this_ratio = float(rect.height) / rect_.height;
 
         renderer_->render(
+            ctx,
             {
                 .document_id = doc.document_id,
                 .page_index = doc.page_index + 1,
@@ -229,7 +251,7 @@ tui::Element DocumentView::renderTwoPagesContinuous(
                     },
             },
             properties,
-            ctx);
+            screen);
     };
 
     auto render_bottom_left = [&, properties](tui::IRect rect) {
@@ -241,6 +263,7 @@ tui::Element DocumentView::renderTwoPagesContinuous(
         float this_ratio = float(rect.height) / rect_.height;
 
         renderer_->render(
+            ctx,
             {
                 .document_id = doc.document_id,
                 .page_index = doc.page_index + 2,
@@ -261,7 +284,7 @@ tui::Element DocumentView::renderTwoPagesContinuous(
                     },
             },
             properties,
-            ctx);
+            screen);
     };
 
     auto render_bottom_right = [&, properties](tui::IRect rect) {
@@ -273,6 +296,7 @@ tui::Element DocumentView::renderTwoPagesContinuous(
         float this_ratio = float(rect.height) / rect_.height;
 
         renderer_->render(
+            ctx,
             {
                 .document_id = doc.document_id,
                 .page_index = doc.page_index + 3,
@@ -293,7 +317,7 @@ tui::Element DocumentView::renderTwoPagesContinuous(
                     },
             },
             properties,
-            ctx);
+            screen);
     };
 
     return tui::vbox({

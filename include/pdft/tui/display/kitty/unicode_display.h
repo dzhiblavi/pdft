@@ -1,15 +1,23 @@
 #pragma once
 
 #include "pdft/tui/display/kitty/display_base.h"
+#include "pdft/tui/terminal/terminal.h"
 
 namespace pdft::tui::display::kitty {
 
 class UnicodeDisplay : public DisplayBase {
  public:
-    using DisplayBase::DisplayBase;
+    UnicodeDisplay(
+        std::shared_ptr<apc::Executor> executor, std::shared_ptr<const terminal::Terminal> terminal)
+        : DisplayBase(std::move(executor))
+        , terminal_(std::move(terminal)) {}
 
     void displayImage(
-        ImageId id, const IRect& rect, const FRect& image_subarea, Context& ctx) override;
+        Context& ctx, ImageId id, const IRect& rect, const FRect& image_subarea, BufPair& buffers)
+        override;
+
+ private:
+    std::shared_ptr<const terminal::Terminal> terminal_;
 };
 
 }  // namespace pdft::tui::display::kitty

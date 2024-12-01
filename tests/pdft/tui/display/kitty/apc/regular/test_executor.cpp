@@ -6,6 +6,7 @@
 namespace pdft::tui::display::kitty::apc::regular {
 
 TEST_CASE("testExecuteNoPayload", "") {
+    core::Context ctx;
     core::io::OutBuffer buffer;
     auto executor = Executor();
 
@@ -16,6 +17,7 @@ TEST_CASE("testExecuteNoPayload", "") {
     };
 
     executor.execute(
+        ctx,
         {
             .command = "_G",
             .control_data = control_data,
@@ -26,6 +28,7 @@ TEST_CASE("testExecuteNoPayload", "") {
 }
 
 TEST_CASE("testExecuteWithPayload", "") {
+    core::Context ctx;
     core::io::OutBuffer buffer;
     auto executor = Executor();
 
@@ -36,6 +39,7 @@ TEST_CASE("testExecuteWithPayload", "") {
     };
 
     executor.execute(
+        ctx,
         {
             .command = "_G",
             .payload = "hello",

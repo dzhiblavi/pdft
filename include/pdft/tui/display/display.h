@@ -1,10 +1,11 @@
 #pragma once
 
-#include "pdft/tui/context.h"
+#include "pdft/tui/bufpair.h"
 #include "pdft/tui/rect.h"
 
-#include "pdft/core/io/buffer.h"
 #include "pdft/image/image.h"
+
+#include "pdft/core/context.h"
 
 namespace pdft::tui::display {
 
@@ -15,16 +16,14 @@ class Display {
     virtual ~Display() = default;
 
     virtual void loadImage(
-        ImageId id, const pdft::image::Image& image, core::io::OutBuffer& buffer) = 0;
+        Context& ctx, ImageId id, const pdft::image::Image& image, core::io::OutBuffer& buffer) = 0;
 
     virtual void displayImage(
-        ImageId id, const IRect& rect, const FRect& image_subarea, Context& ctx) = 0;
+        Context& ctx, ImageId id, const IRect& rect, const FRect& subarea, BufPair& buffers) = 0;
 
-    virtual void clear(core::io::OutBuffer& buffer) = 0;
-
-    virtual void unload(ImageId id, core::io::OutBuffer& buffer) = 0;
-
-    virtual void unloadAll(core::io::OutBuffer& buffer) = 0;
+    virtual void clear(Context& ctx, core::io::OutBuffer& buffer) = 0;
+    virtual void unload(Context& ctx, ImageId id, core::io::OutBuffer& buffer) = 0;
+    virtual void unloadAll(Context& ctx, core::io::OutBuffer& buffer) = 0;
 
     virtual bool isLoaded(ImageId id) const = 0;
 };

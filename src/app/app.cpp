@@ -91,7 +91,7 @@ void Application::setup() {
     terminal_ = std::make_shared<tui::terminal::ansi::Terminal>();
     console_ = std::make_shared<core::io::posix::Console>(
         context_, ::dup(STDIN_FILENO), ::dup(STDOUT_FILENO));
-    image_display_ = resolveDisplay(config_.display);
+    image_display_ = resolveDisplay(config_.display, terminal_);
     doc_loader_ =
         std::make_shared<pdft::media::mupdf::Loader>(pdft::media::mupdf::thisThreadContext());
 
@@ -197,9 +197,9 @@ asio::awaitable<void> Application::runEventLoop() {
     pdft::tui::Renderer renderer(terminal_, console_);
 
     for (;;) {
-        co_await renderer.renderOne([this](auto& ctx) {
-            image_display_->clear(ctx.control_buffer);
-            return view_->render(ui_, ctx);
+        co_await renderer.renderOne([this](auto& ctx, auto& screen) {
+            image_display_->clear(ctx, screen.buffers.control_buffer);
+            return view_->render(ctx, ui_, screen);
         });
 
         bool should_quit = co_await waitForNextRender();
@@ -238,27 +238,29 @@ asio::awaitable<bool> Application::waitForNextRender() {
 }
 
 asio::awaitable<void> Application::cleanup() {
-    auto cleanup = core::trace::getGlobalPool().getTracer("cleanup");
+    auto tracer = core::trace::getGlobalPool().getTracer("cleanup");
+    core::Context ctx;
+    ctx.setTracer(tracer);
 
     {
-        auto _ = cleanup.addChild("term_clear");
+        auto _ = ctx.push("term_clear");
         core::io::OutBuffer buffer;
         terminal_->showCursor(buffer);
         terminal_->clear(buffer);
-        image_display_->unloadAll(buffer);
+        image_display_->unloadAll(ctx, buffer);
         co_await console_->write(buffer.view());
     }
 
     if (config_.system.enable_filesystem_watching) {
-        auto _ = cleanup.addChild("notify_stop");
+        auto _ = ctx.push("notify_stop");
         fs_watcher_->stop();
     }
 
     log::debug(
         this, "total stack tracer allocations: {}", core::trace::getGlobalPool().numAllocations());
 
-    cleanup.finalize();
-    core::trace::logStackTrace(cleanup.getInfo());
+    tracer.finalize();
+    core::trace::logStackTrace(tracer.getInfo());
 }
 
 }  // namespace app

@@ -7,8 +7,8 @@
 namespace pdft::tui::display::kitty {
 
 void UnicodeDisplay::displayImage(
-    ImageId id, const IRect& rect, const FRect& image_subarea, Context& ctx) {
-    log::debug("display @ {}", rect);
+    Context& ctx, ImageId id, const IRect& rect, const FRect& image_subarea, BufPair& buffers) {
+    log::debug(ctx, "display @ {}", rect);
     PDFT_VERIFY(isLoaded(id));
 
     const auto& [x, y, w, h] = rect;
@@ -20,17 +20,17 @@ void UnicodeDisplay::displayImage(
     }
 
     const auto& [rix, riy, riw, rih] = image_subarea;
-    log::debug("display I {}", image_subarea);
+    log::debug(ctx, "display I {}", image_subarea);
     PDFT_VERIFY(rix >= 0 && riy >= 0, "image offset must not be negative: x={},y={}", rix, riy);
     PDFT_VERIFY(riw > 0 && rih > 0, "image dimensions must be positive: w={},h={}", riw, rih);
 
     const uint32_t image_cols = std::roundf(w / riw);
     const uint32_t image_rows = std::roundf(h / rih);
-    log::debug("display ISZ wc={},hc={}", image_cols, image_rows);
+    log::debug(ctx, "display ISZ wc={},hc={}", image_cols, image_rows);
 
     const uint32_t offset_cols = image_cols * rix;
     const uint32_t offset_rows = image_rows * riy;
-    log::debug("display IOF c={},r={}", offset_cols, offset_rows);
+    log::debug(ctx, "display IOF c={},r={}", offset_cols, offset_rows);
 
     std::pair<std::string_view, std::string> control_data[] = {
         {"q", "2"},
@@ -44,18 +44,21 @@ void UnicodeDisplay::displayImage(
 
     // Create a virtual PagePlacement
     executor_->execute(
+        ctx,
         {
             .command = "_G",
             .control_data = control_data,
         },
-        ctx.control_buffer);
+        buffers.control_buffer);
 
     // Fill the image space with special unicode characters
     const std::string_view ImagePlaceholder = "\U0010EEEE";
     const std::string_view IdChar = detail::RowColDiacritics[(id >> 24) & 255];
 
+    auto _ = ctx.push("unicode_placement");
+
     core::io::write(
-        ctx.display_buffer,
+        buffers.display_buffer,
         "\033[38:2:",
         (id >> 16) & 255,
         ":",
@@ -65,16 +68,16 @@ void UnicodeDisplay::displayImage(
         "m");
 
     for (uint32_t row = 0; row < h; ++row) {
-        ctx.terminal.setCursorPosition(
+        terminal_->setCursorPosition(
             tui::terminal::CursorPosition{
                 .rows = y + row,
                 .columns = static_cast<uint32_t>(x),
             },
-            ctx.display_buffer);
+            buffers.display_buffer);
 
         for (uint32_t col = 0; col < w; ++col) {
             core::io::write(
-                ctx.display_buffer,
+                buffers.display_buffer,
                 ImagePlaceholder,
                 detail::RowColDiacritics[offset_rows + row],
                 detail::RowColDiacritics[offset_cols + col],
@@ -82,7 +85,7 @@ void UnicodeDisplay::displayImage(
         }
     }
 
-    core::io::write(ctx.display_buffer, "\033[39m");
+    core::io::write(buffers.display_buffer, "\033[39m");
 }
 
 }  // namespace pdft::tui::display::kitty

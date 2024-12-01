@@ -54,6 +54,7 @@ class StackScopeTraceHandle {
 class StackScopeTracerOwner {
  public:
     ~StackScopeTracerOwner();
+    StackScopeTracerOwner() = default;
     StackScopeTracerOwner(StackScopeTracerOwner&& rhs);
 
     StackScopeTracerOwner& operator=(StackScopeTracerOwner&&) = delete;
@@ -72,7 +73,7 @@ class StackScopeTracerOwner {
 
     void release();
 
-    StackScopeTracerBase* base_;
+    StackScopeTracerBase* base_ = nullptr;
 
     friend class StackScopeTraceHandle;
     friend class StackScopeTracerPool;

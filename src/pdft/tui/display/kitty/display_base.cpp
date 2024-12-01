@@ -9,8 +9,9 @@ bool DisplayBase::isLoaded(ImageId id) const {
     return loaded_.contains(id);
 }
 
-void DisplayBase::loadImage(ImageId id, const image::Image& image, core::io::OutBuffer& buffer) {
-    log::debug("loading an image with id={} to the display", id);
+void DisplayBase::loadImage(
+    Context& ctx, ImageId id, const image::Image& image, core::io::OutBuffer& buffer) {
+    log::debug(ctx, "loading an image with id={} to the display", id);
     PDFT_VERIFY(!isLoaded(id), "image with id={} is already loaded", id);
 
     auto image_size = image.size();
@@ -29,6 +30,7 @@ void DisplayBase::loadImage(ImageId id, const image::Image& image, core::io::Out
     auto samples = image.samples();
 
     executor_->execute(
+        ctx,
         {
             .command = "_G",
             .payload = {(const char*)samples.data(), samples.size()},
@@ -39,8 +41,8 @@ void DisplayBase::loadImage(ImageId id, const image::Image& image, core::io::Out
         buffer);
 }
 
-void DisplayBase::clear(core::io::OutBuffer& buffer) {
-    log::debug("clearing all placements from the display");
+void DisplayBase::clear(Context& ctx, core::io::OutBuffer& buffer) {
+    log::debug(ctx, "clearing all placements from the display");
 
     std::pair<std::string_view, std::string> control_data[] = {
         {"q", "2"},
@@ -49,6 +51,7 @@ void DisplayBase::clear(core::io::OutBuffer& buffer) {
     };
 
     executor_->execute(
+        ctx,
         {
             .command = "_G",
             .control_data = control_data,
@@ -56,8 +59,8 @@ void DisplayBase::clear(core::io::OutBuffer& buffer) {
         buffer);
 }
 
-void DisplayBase::unload(ImageId id, core::io::OutBuffer& buffer) {
-    log::debug("unloading an image with id={} from the display", id);
+void DisplayBase::unload(Context& ctx, ImageId id, core::io::OutBuffer& buffer) {
+    log::debug(ctx, "unloading an image with id={} from the display", id);
 
     auto it = loaded_.find(id);
     PDFT_VERIFY(it != loaded_.end(), "tried to unload an image with unknown id {}", id);
@@ -71,6 +74,7 @@ void DisplayBase::unload(ImageId id, core::io::OutBuffer& buffer) {
     };
 
     executor_->execute(
+        ctx,
         {
             .command = "_G",
             .control_data = control_data,
@@ -78,8 +82,8 @@ void DisplayBase::unload(ImageId id, core::io::OutBuffer& buffer) {
         buffer);
 }
 
-void DisplayBase::unloadAll(core::io::OutBuffer& buffer) {
-    log::debug("unloading all {} images from the display", loaded_.size());
+void DisplayBase::unloadAll(Context& ctx, core::io::OutBuffer& buffer) {
+    log::debug(ctx, "unloading all {} images from the display", loaded_.size());
     loaded_.clear();
 
     std::pair<std::string_view, std::string> control_data[] = {
@@ -91,6 +95,7 @@ void DisplayBase::unloadAll(core::io::OutBuffer& buffer) {
     };
 
     executor_->execute(
+        ctx,
         {
             .command = "_G",
             .control_data = control_data,

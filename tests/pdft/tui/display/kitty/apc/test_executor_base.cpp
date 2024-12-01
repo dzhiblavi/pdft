@@ -22,10 +22,12 @@ struct TestExecutor : ExecutorBase {
 }  // namespace
 
 TEST_CASE("testExecuteNoControlDataNoPayload", "") {
+    core::Context ctx;
     core::io::OutBuffer buffer;
     auto executor = TestExecutor();
 
     executor.execute(
+        ctx,
         {
             .command = "_G",
             .control_data = {},
@@ -36,6 +38,7 @@ TEST_CASE("testExecuteNoControlDataNoPayload", "") {
 }
 
 TEST_CASE("testExecuteWithControlDataNoPayload", "") {
+    core::Context ctx;
     core::io::OutBuffer buffer;
     auto executor = TestExecutor();
 
@@ -45,6 +48,7 @@ TEST_CASE("testExecuteWithControlDataNoPayload", "") {
     };
 
     executor.execute(
+        ctx,
         {
             .command = "_G",
             .control_data = control_data,
@@ -55,10 +59,12 @@ TEST_CASE("testExecuteWithControlDataNoPayload", "") {
 }
 
 TEST_CASE("testExecuteNoControlDataWithPayloadOneChunk", "") {
+    core::Context ctx;
     core::io::OutBuffer buffer;
     auto executor = TestExecutor();
 
     executor.execute(
+        ctx,
         {
             .command = "_G",
             .payload = "abcd",  // max chunk size
@@ -70,6 +76,7 @@ TEST_CASE("testExecuteNoControlDataWithPayloadOneChunk", "") {
 }
 
 TEST_CASE("testExecuteWithControlDataWithPayloadOneChunk", "") {
+    core::Context ctx;
     core::io::OutBuffer buffer;
     auto executor = TestExecutor();
 
@@ -79,6 +86,7 @@ TEST_CASE("testExecuteWithControlDataWithPayloadOneChunk", "") {
     };
 
     executor.execute(
+        ctx,
         {
             .command = "_G",
             .payload = "abcd",  // max chunk size
@@ -90,6 +98,7 @@ TEST_CASE("testExecuteWithControlDataWithPayloadOneChunk", "") {
 }
 
 TEST_CASE("testExecuteWithControlDataWithPayloadMultipleChunks", "") {
+    core::Context ctx;
     core::io::OutBuffer buffer;
     auto executor = TestExecutor();
 
@@ -99,6 +108,7 @@ TEST_CASE("testExecuteWithControlDataWithPayloadMultipleChunks", "") {
     };
 
     executor.execute(
+        ctx,
         {
             .command = "_G",
             .payload = "abcdefgh012345",
@@ -110,6 +120,7 @@ TEST_CASE("testExecuteWithControlDataWithPayloadMultipleChunks", "") {
 }
 
 TEST_CASE("testExecuteBase64EncodeSingleChunk", "") {
+    core::Context ctx;
     core::io::OutBuffer buffer;
     auto executor = TestExecutor();
 
@@ -119,6 +130,7 @@ TEST_CASE("testExecuteBase64EncodeSingleChunk", "") {
     };
 
     executor.execute(
+        ctx,
         {
             .command = "_G",
             .payload = "+-=",
@@ -131,6 +143,7 @@ TEST_CASE("testExecuteBase64EncodeSingleChunk", "") {
 }
 
 TEST_CASE("testExecuteBase64EncodeMultipleChunks", "") {
+    core::Context ctx;
     core::io::OutBuffer buffer;
     auto executor = TestExecutor();
 
@@ -140,6 +153,7 @@ TEST_CASE("testExecuteBase64EncodeMultipleChunks", "") {
     };
 
     executor.execute(
+        ctx,
         {
             .command = "_G",
             .payload = "+-=abcd%%%",
@@ -151,4 +165,4 @@ TEST_CASE("testExecuteBase64EncodeMultipleChunks", "") {
     CHECK(buffer.view() == "P_Ga=p,C=1,m=1;Ky09SP_Gm=1;YWJjSP_Gm=1;ZCUlSP_Gm=0;JQ==S");
 }
 
-}  // namespace pdft::display::kitty::apc
+}  // namespace pdft::tui::display::kitty::apc

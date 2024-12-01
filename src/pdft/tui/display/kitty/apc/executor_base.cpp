@@ -44,15 +44,18 @@ void writeControlData(const Command& apc, core::io::OutBuffer& buffer) {
     }
 }
 
-std::string_view preparePayload(const Command& apc, std::string& encoded_payload) {
+std::string_view preparePayload(
+    core::Context& ctx, const Command& apc, std::string& encoded_payload) {
     std::string_view payload = apc.payload;
 
     if (apc.compress) {
+        auto _ = ctx.push("compress");
         encoded_payload = utils::zlibCompress(payload);
         payload = encoded_payload;
     }
 
     if (apc.b64_encode) {
+        auto _ = ctx.push("base64_encode");
         encoded_payload = utils::encodeBase64(payload);
         payload = encoded_payload;
     }
@@ -62,9 +65,9 @@ std::string_view preparePayload(const Command& apc, std::string& encoded_payload
 
 }  // namespace
 
-void ExecutorBase::execute(const Command& apc, core::io::OutBuffer& buffer) {
+void ExecutorBase::execute(core::Context& ctx, const Command& apc, core::io::OutBuffer& buffer) {
     std::string encoded_payload;
-    auto payload = preparePayload(apc, encoded_payload);
+    auto payload = preparePayload(ctx, apc, encoded_payload);
     auto first_chunk = nextChunk(payload, max_chunk_size_);
 
     // Write the first chunk
@@ -95,7 +98,7 @@ void ExecutorBase::execute(const Command& apc, core::io::OutBuffer& buffer) {
 }
 
 asio::awaitable<Result<Response>> ExecutorBase::executeWithResponse(
-    const Command& /*apc*/, core::io::OutBuffer& /*buffer*/) {
+    core::Context& /*ctx*/, const Command& /*apc*/, core::io::OutBuffer& /*buffer*/) {
     PDFT_VERIFY(false, "not implemented");
     // execute(std::move(apc), buffer);
 

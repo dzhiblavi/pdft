@@ -13,6 +13,8 @@ class PushHandle {
     ~PushHandle();
 
  private:
+    PushHandle() = default;
+
     PushHandle(
         core::trace::StackScopeTracerOwner tracer,
         core::trace::StackScopeTraceHandle previous,
@@ -43,3 +45,9 @@ class Context : public log::WithLogger {
 };
 
 }  // namespace pdft::core
+
+namespace pdft {
+
+using core::Context;
+
+};  // namespace pdft

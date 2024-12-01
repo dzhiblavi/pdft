@@ -3,6 +3,7 @@
 #include "pdft/app/view/page_renderer.h"
 
 #include "pdft/tui/display/display.h"
+#include "pdft/tui/terminal/terminal.h"
 
 namespace pdft::app::view::impl {
 
@@ -37,13 +38,18 @@ class PageRenderer : public view::PageRenderer {
         std::shared_ptr<tui::display::Display> display);
 
     void render(
+        Context& ctx,
         const Page& page,
         const PagePosition& pos,
         const DisplayProperties& props,
-        tui::Context& ctx) override;
+        tui::Screen& screen) override;
 
  private:
-    float calcFactor(media::PageSize page_size, float scaling_coeff, tui::Context& ctx);
+    float calcFactor(
+        Context& ctx,
+        media::PageSize page_size,
+        float scaling_coeff,
+        const tui::terminal::Dimensions& dims);
 
     tui::display::ImageId getIdForPage(const Page& page) const;
 

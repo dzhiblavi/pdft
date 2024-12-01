@@ -2,7 +2,7 @@
 
 namespace pdft::app::view::impl {
 
-tui::Element View::render(const state::UIState& ui, tui::Context& ctx) {
+tui::Element View::render(Context& ctx, const state::UIState& ui, tui::Screen& screen) {
     auto _ = ctx.push("state");
 
     auto doc = [&] {
@@ -26,19 +26,19 @@ tui::Element View::render(const state::UIState& ui, tui::Context& ctx) {
 
             return tui::window(
                 tui::text(std::format("{} page {}", path.c_str(), page_str)),
-                doc_view_->render(*doc, display_properties, ctx));
+                doc_view_->render(ctx, *doc, display_properties, screen));
         }
 
         return tui::emptyElement();
     }();
 
     return tui::hbox({
-        getSidebar(ui, ctx),
+        getSidebar(ctx, ui),
         doc | tui::flex,
     });
 }
 
-tui::Element View::getSidebar(const state::UIState& ui, tui::Context& ctx) {
+tui::Element View::getSidebar(Context& ctx, const state::UIState& ui) {
     if (!ui.show_sidebar) {
         return tui::emptyElement();
     }

@@ -9,17 +9,17 @@ class View : public view::View {
  public:
     View(
         std::shared_ptr<const state::DocumentStorage> documents,
-        std::shared_ptr<view::DocumentView> view)
+        std::shared_ptr<const view::DocumentView> view)
         : documents_(std::move(documents))
         , doc_view_(std::move(view)) {}
 
-    tui::Element render(const state::UIState& ui, tui::Context& ctx) override;
+    tui::Element render(Context& ctx, const state::UIState& ui, tui::Screen& screen) override;
 
  private:
-    tui::Element getSidebar(const state::UIState& ui, tui::Context& ctx);
+    tui::Element getSidebar(Context& ctx, const state::UIState& ui);
 
     std::shared_ptr<const state::DocumentStorage> documents_;
-    std::shared_ptr<view::DocumentView> doc_view_;
+    std::shared_ptr<const view::DocumentView> doc_view_;
 };
 
 }  // namespace pdft::app::view::impl

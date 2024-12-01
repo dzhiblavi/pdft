@@ -5,8 +5,8 @@
 namespace pdft::tui::display::kitty {
 
 void NativeDisplay::displayImage(
-    ImageId id, const IRect& rect, const FRect& image_subarea, Context& ctx) {
-    log::debug("display @ {}", rect);
+    Context& ctx, ImageId id, const IRect& rect, const FRect& image_subarea, BufPair& buffers) {
+    log::debug(ctx, "display @ {}", rect);
     PDFT_VERIFY(isLoaded(id));
 
     const auto& [x, y, w, h] = rect;
@@ -18,12 +18,12 @@ void NativeDisplay::displayImage(
     }
 
     const auto& [rix, riy, riw, rih] = image_subarea;
-    log::debug("display I {}", image_subarea);
+    log::debug(ctx, "display I {}", image_subarea);
     PDFT_VERIFY(rix >= 0 && riy >= 0, "image offset must not be negative: x={},y={}", rix, riy);
     PDFT_VERIFY(riw > 0 && rih > 0, "image dimensions must be positive: w={},h={}", riw, rih);
 
     const auto& image_size = loaded_[id];
-    log::debug("display IS wpx={},hpx={}", image_size.width_px, image_size.height_px);
+    log::debug(ctx, "display IS wpx={},hpx={}", image_size.width_px, image_size.height_px);
 
     const FRect ipx = {
         .x = std::floor(image_size.width_px * riw * rix),
@@ -31,7 +31,7 @@ void NativeDisplay::displayImage(
         .width = std::floor(image_size.width_px * riw),
         .height = std::floor(image_size.height_px * rih),
     };
-    log::debug("display Ipx {}", ipx);
+    log::debug(ctx, "display Ipx {}", ipx);
 
     // x, y, w, h (pixels) control the subrectangle of the image
     // c, r (columns and rows) control the rectangle at which the image will be displayed
@@ -49,20 +49,21 @@ void NativeDisplay::displayImage(
     };
 
     // Position cursor to the top left corner
-    ctx.terminal.setCursorPosition(
+    terminal_->setCursorPosition(
         tui::terminal::CursorPosition{
             .rows = static_cast<uint32_t>(y),
             .columns = static_cast<uint32_t>(x),
         },
-        ctx.display_buffer);
+        buffers.display_buffer);
 
     // Create a placement
     executor_->execute(
+        ctx,
         {
             .command = "_G",
             .control_data = control_data,
         },
-        ctx.display_buffer);
+        buffers.display_buffer);
 }
 
 }  // namespace pdft::tui::display::kitty

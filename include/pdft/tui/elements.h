@@ -6,9 +6,7 @@
 
 namespace pdft::tui {
 
-using namespace ftxui;
-
-inline IRect toRect(const Box& box) {
+inline IRect toRect(const ftxui::Box& box) {
     return {
         .x = static_cast<unsigned int>(box.x_min),
         .y = static_cast<unsigned int>(box.y_min),
@@ -18,12 +16,12 @@ inline IRect toRect(const Box& box) {
 }
 
 template <typename F>
-struct WithSize : Node {
+struct WithSize : ftxui::Node {
  public:
     explicit WithSize(F f) : func_(std::move(f)) {}
 
-    void Render(Screen& screen) {
-        std::move(func_)(toRect(Box::Intersection(screen.stencil, box_)));
+    void Render(ftxui::Screen& screen) {
+        std::move(func_)(toRect(ftxui::Box::Intersection(screen.stencil, box_)));
     }
 
  private:
@@ -31,9 +29,9 @@ struct WithSize : Node {
     [[no_unique_address]] F func_;
 };
 
-class ReflectRect : public Node {
+class ReflectRect : public ftxui::Node {
  public:
-    ReflectRect(Element child, IRect& rect)
+    ReflectRect(ftxui::Element child, IRect& rect)
         : Node(unpack(std::move(child)))
         , reflected_rect_(rect) {}
 
@@ -42,14 +40,14 @@ class ReflectRect : public Node {
         requirement_ = children_[0]->requirement();
     }
 
-    void SetBox(Box box) final {
+    void SetBox(ftxui::Box box) final {
         reflected_rect_ = toRect(box);
         Node::SetBox(box);
         children_[0]->SetBox(box);
     }
 
-    void Render(Screen& screen) final {
-        reflected_rect_ = toRect(Box::Intersection(screen.stencil, box_));
+    void Render(ftxui::Screen& screen) final {
+        reflected_rect_ = toRect(ftxui::Box::Intersection(screen.stencil, box_));
         return Node::Render(screen);
     }
 
@@ -59,8 +57,8 @@ class ReflectRect : public Node {
 
 using ftxui::reflect;
 
-inline Decorator reflect(IRect& rect) {
-    return [&](Element child) -> Element {
+inline ftxui::Decorator reflect(IRect& rect) {
+    return [&](ftxui::Element child) -> ftxui::Element {
         return std::make_shared<ReflectRect>(std::move(child), rect);
     };
 }
@@ -69,5 +67,24 @@ template <std::invocable<IRect> F>
 ftxui::Element withSize(F f) {
     return std::make_shared<WithSize<F>>(std::move(f));
 }
+
+using Element = ftxui::Element;
+using Box = ftxui::Box;
+
+using ftxui::size;
+
+using ftxui::border;
+using ftxui::flex;
+
+using ftxui::emptyElement;
+using ftxui::hbox;
+using ftxui::text;
+using ftxui::vbox;
+using ftxui::window;
+
+using ftxui::Render;
+
+using enum ftxui::WidthOrHeight;
+using enum ftxui::Constraint;
 
 }  // namespace pdft::tui
