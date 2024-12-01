@@ -3,6 +3,7 @@
 #include "pdft/image/color.h"
 
 #include <span>
+#include <unordered_map>
 
 namespace pdft::image {
 
@@ -10,6 +11,6 @@ using PaletteRef = std::span<const RGBColor>;
 
 void applyPalette(std::span<uint8_t> pixels, PaletteRef palette);
 
-PaletteRef getDefaultPalette();
+const std::unordered_map<std::string, PaletteRef>& getBuiltinPalettes();
 
 }  // namespace pdft::image

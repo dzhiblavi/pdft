@@ -19,8 +19,9 @@ tui::Element View::render(const state::UIState& ui, tui::Context& ctx) {
             auto display_properties = DisplayProperties{
                 .scaling_coeff = ui.scaling_coeff,
                 .invert_colors = ui.invert_colors,
-                .palette =
-                    ui.use_palette ? std::optional{image::getDefaultPalette()} : std::nullopt,
+                .palette = ui.palette_name.transform([&](auto&& name) {
+                    return image::getBuiltinPalettes().at(name);
+                }),
             };
 
             return tui::window(

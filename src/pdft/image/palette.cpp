@@ -98,15 +98,17 @@ int getClosest(const RGBColor& pixel, PaletteRef palette) {
     return index;
 }
 
-const std::array<RGBColor, 2>& getDefaultStaticPalette() {
-    // https://colorhunt.co/palette/1e201e3c3d37697565ecdfcc
-    static const std::array<RGBColor, 2> palette{
-        // rgbFromHex("#1E201E"),
-        // rgbFromHex("#3C3D37"),
-        // rgbFromHex("#697565"),
-        // rgbFromHex("#ECDFCC"),
-        rgbFromHex("#2d2d2d"),
-        rgbFromHex("#ffffff"),
+const auto& getSkimPalette() {
+    // Skim-like gray shades
+    static const auto palette = std::array{
+        RGBColor::gray(45),
+        RGBColor::gray(69),
+        RGBColor::gray(99),
+        RGBColor::gray(120),
+        RGBColor::gray(140),
+        RGBColor::gray(160),
+        RGBColor::gray(190),
+        RGBColor::gray(255),
     };
 
     return palette;
@@ -133,8 +135,12 @@ void applyPalette(std::span<uint8_t> pixels, PaletteRef palette) {
     }
 }
 
-PaletteRef getDefaultPalette() {
-    return getDefaultStaticPalette();
+const std::unordered_map<std::string, PaletteRef>& getBuiltinPalettes() {
+    static std::unordered_map<std::string, PaletteRef> palettes{
+        {"skim", getSkimPalette()},
+    };
+
+    return palettes;
 }
 
 }  // namespace pdft::image

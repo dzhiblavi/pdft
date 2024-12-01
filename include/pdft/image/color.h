@@ -11,6 +11,10 @@ struct RGBColor {
     uint8_t b;
 
     bool operator==(const RGBColor&) const = default;
+
+    static RGBColor gray(uint8_t shade) {
+        return {shade, shade, shade};
+    }
 };
 
 inline RGBColor rgbFromHex(std::string_view hex) {

@@ -58,8 +58,8 @@ struct UIState {
     std::string current_input;
     bool show_sidebar = false;
     bool invert_colors = false;
-    bool use_palette = false;
     float scaling_coeff = 1.f;
+    std::optional<std::string> palette_name = std::nullopt;
 
  private:
     DocumentState* getState();

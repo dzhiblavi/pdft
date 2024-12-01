@@ -203,7 +203,11 @@ void UIState::toggleSidebar() {
 }
 
 void UIState::togglePalette() {
-    use_palette = !use_palette;
+    if (palette_name) {
+        palette_name = std::nullopt;
+    } else {
+        palette_name = "skim";
+    }
 }
 
 std::optional<DocumentId> UIState::getCurrentDocumentId() const {
