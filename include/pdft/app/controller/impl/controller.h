@@ -33,6 +33,7 @@ class Controller : public controller::Controller {
         IncreaseScalingFactor,
         DecreaseScalingFactor,
         ToggleSidebar,
+        TogglePalette,
     };
 
     struct KeyMapping {

@@ -50,7 +50,6 @@ class Application : public pdft::core::log::WithLogger {
     std::shared_ptr<pdft::app::loader::Loader> loader_;
 
     pdft::app::state::UIState ui_;
-    pdft::tui::display::State display_;
     std::shared_ptr<pdft::app::state::DocumentStorage> documents_;
 
     std::shared_ptr<pdft::app::view::View> view_;

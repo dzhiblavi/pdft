@@ -12,7 +12,8 @@ class DisplayBase : public display::Display {
  public:
     DisplayBase(std::shared_ptr<apc::Executor> executor) : executor_(std::move(executor)) {}
 
-    void loadImage(ImageId id, const image::Image& image, core::io::OutBuffer& buffer) override;
+    void loadImage(
+        ImageId id, const pdft::image::Image& image, core::io::OutBuffer& buffer) override;
 
     void clear(core::io::OutBuffer& buffer) override;
 
@@ -24,7 +25,7 @@ class DisplayBase : public display::Display {
 
  protected:
     std::shared_ptr<apc::Executor> executor_;
-    std::unordered_map<ImageId, image::ImageSize> loaded_;
+    std::unordered_map<ImageId, pdft::image::ImageSize> loaded_;
 };
 
 }  // namespace pdft::tui::display::kitty

@@ -32,6 +32,7 @@ void Controller::bindKey(Command command, std::string_view keys) {
         case IncreaseScalingFactor:
         case DecreaseScalingFactor:
         case ToggleSidebar:
+        case TogglePalette:
             key_tree_.bind(keys, commandCallback(command));
             break;
 
@@ -156,6 +157,10 @@ Action Controller::applyPendingCommand(state::UIState& ui, state::DocumentStorag
 
         case ToggleSidebar:
             ui.toggleSidebar();
+            return Action::Redraw;
+
+        case TogglePalette:
+            ui.togglePalette();
             return Action::Redraw;
     }
 }

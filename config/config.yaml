@@ -76,3 +76,6 @@ controller:
 
     - command: ToggleSidebar
       keys: t
+
+    - command: TogglePalette
+      keys: p

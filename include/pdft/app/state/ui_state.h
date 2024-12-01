@@ -1,6 +1,7 @@
 #pragma once
 
 #include "pdft/app/state/document_storage.h"
+#include "pdft/app/view/page_renderer.h"
 
 #include <vector>
 
@@ -47,6 +48,7 @@ struct UIState {
     void invertColors();
     void updateScalingFactor(float coeff);
     void toggleSidebar();
+    void togglePalette();
 
     std::optional<DocumentId> getCurrentDocumentId() const;
     const DocumentState* getImmutableState() const;
@@ -54,9 +56,10 @@ struct UIState {
     std::optional<size_t> idx = std::nullopt;
     std::vector<DocumentState> states;
     std::string current_input;
-    bool invert_colors = false;
-    float scaling_coeff = 1.f;
     bool show_sidebar = false;
+    bool invert_colors = false;
+    bool use_palette = false;
+    float scaling_coeff = 1.f;
 
  private:
     DocumentState* getState();

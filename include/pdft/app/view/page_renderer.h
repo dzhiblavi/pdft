@@ -3,9 +3,10 @@
 #include "pdft/app/state/document_storage.h"
 
 #include "pdft/tui/context.h"
-#include "pdft/tui/display/state.h"
 #include "pdft/tui/image/fit_image.h"
 #include "pdft/tui/rect.h"
+
+#include "pdft/image/palette.h"
 
 namespace pdft::app::view {
 
@@ -14,12 +15,16 @@ struct Page {
     uint32_t page_index;
 };
 
-struct PageProperties {
+struct PagePosition {
     const tui::IRect& rect;
     const tui::FRect& subarea = {0.f, 0.f, 1.f, 1.f};
     const tui::image::Placement& placement = {};
+};
+
+struct DisplayProperties {
     float scaling_coeff = 1.f;
     bool invert_colors = false;
+    std::optional<image::PaletteRef> palette = std::nullopt;
 };
 
 class PageRenderer {
@@ -28,8 +33,8 @@ class PageRenderer {
 
     virtual void render(
         const Page& page,
-        const PageProperties& properties,
-        tui::display::State& display,
+        const PagePosition& pos,
+        const DisplayProperties& props,
         tui::Context& ctx) = 0;
 };
 

@@ -199,7 +199,7 @@ asio::awaitable<void> Application::runEventLoop() {
     for (;;) {
         co_await renderer.renderOne([this](auto& ctx) {
             image_display_->clear(ctx.control_buffer);
-            return view_->render(ui_, display_, ctx);
+            return view_->render(ui_, ctx);
         });
 
         bool should_quit = co_await waitForNextRender();

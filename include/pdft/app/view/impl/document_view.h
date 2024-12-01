@@ -12,36 +12,18 @@ class DocumentView : public view::DocumentView {
 
     tui::Element render(
         const state::DocumentState& doc,
-        float scaling_coeff,
-        bool invert_colors,
-        tui::display::State& display,
+        const DisplayProperties& properties,
         tui::Context& ctx) override;
 
  private:
     tui::Element renderOnePage(
-        const state::DocumentState& doc,
-        float scaling_coeff,
-        bool invert_colors,
-        tui::display::State& state,
-        tui::Context& ctx);
+        const state::DocumentState& doc, const DisplayProperties& properties, tui::Context& ctx);
     tui::Element renderTwoPages(
-        const state::DocumentState& doc,
-        float scaling_coeff,
-        bool invert_colors,
-        tui::display::State& state,
-        tui::Context& ctx);
+        const state::DocumentState& doc, const DisplayProperties& properties, tui::Context& ctx);
     tui::Element renderOnePageContinuous(
-        const state::DocumentState& doc,
-        float scaling_coeff,
-        bool invert_colors,
-        tui::display::State& state,
-        tui::Context& ctx);
+        const state::DocumentState& doc, const DisplayProperties& properties, tui::Context& ctx);
     tui::Element renderTwoPagesContinuous(
-        const state::DocumentState& doc,
-        float scaling_coeff,
-        bool invert_colors,
-        tui::display::State& state,
-        tui::Context& ctx);
+        const state::DocumentState& doc, const DisplayProperties& properties, tui::Context& ctx);
 
     std::shared_ptr<view::PageRenderer> renderer_;
     tui::IRect rect_;

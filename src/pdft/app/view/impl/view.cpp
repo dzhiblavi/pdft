@@ -2,7 +2,7 @@
 
 namespace pdft::app::view::impl {
 
-tui::Element View::render(const state::UIState& ui, tui::display::State& state, tui::Context& ctx) {
+tui::Element View::render(const state::UIState& ui, tui::Context& ctx) {
     auto _ = ctx.push("state");
 
     auto doc = [&] {
@@ -16,9 +16,16 @@ tui::Element View::render(const state::UIState& ui, tui::display::State& state, 
             auto path = document->getPath().filename();
             auto page_str = std::format("{}/{}", doc->page_index + 1, doc->page_count);
 
+            auto display_properties = DisplayProperties{
+                .scaling_coeff = ui.scaling_coeff,
+                .invert_colors = ui.invert_colors,
+                .palette =
+                    ui.use_palette ? std::optional{image::getDefaultPalette()} : std::nullopt,
+            };
+
             return tui::window(
                 tui::text(std::format("{} page {}", path.c_str(), page_str)),
-                doc_view_->render(*doc, ui.scaling_coeff, ui.invert_colors, state, ctx));
+                doc_view_->render(*doc, display_properties, ctx));
         }
 
         return tui::emptyElement();

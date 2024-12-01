@@ -51,7 +51,7 @@ target_sources(
 
 target_sources(pdft PRIVATE ./notify/fsw/notify.cpp)
 
-target_sources(pdft PRIVATE ./image/image.cpp)
+target_sources(pdft PRIVATE ./image/operations.cpp ./image/palette.cpp)
 
 target_sources(
   pdft
@@ -62,7 +62,6 @@ target_sources(
 target_sources(
   pdft
   PRIVATE ./tui/image/fit_image.cpp
-          ./tui/display/state.cpp
           ./tui/display/kitty/apc/parse_response.cpp
           ./tui/display/kitty/apc/executor_base.cpp
           ./tui/display/kitty/apc/regular/executor.cpp

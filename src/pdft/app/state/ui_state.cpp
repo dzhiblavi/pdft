@@ -202,6 +202,10 @@ void UIState::toggleSidebar() {
     show_sidebar = !show_sidebar;
 }
 
+void UIState::togglePalette() {
+    use_palette = !use_palette;
+}
+
 std::optional<DocumentId> UIState::getCurrentDocumentId() const {
     return idx.transform([this](auto i) { return states[i].document_id; });
 }

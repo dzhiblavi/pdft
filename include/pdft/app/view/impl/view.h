@@ -13,8 +13,7 @@ class View : public view::View {
         : documents_(std::move(documents))
         , doc_view_(std::move(view)) {}
 
-    tui::Element render(
-        const state::UIState& ui, tui::display::State& display, tui::Context& ctx) override;
+    tui::Element render(const state::UIState& ui, tui::Context& ctx) override;
 
  private:
     tui::Element getSidebar(const state::UIState& ui, tui::Context& ctx);

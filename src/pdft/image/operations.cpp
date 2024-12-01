@@ -1,4 +1,4 @@
-#include "pdft/image/image.h"
+#include "pdft/image/operations.h"
 
 namespace pdft::image {
 

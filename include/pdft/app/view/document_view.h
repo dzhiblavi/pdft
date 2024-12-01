@@ -1,9 +1,9 @@
 #pragma once
 
 #include "pdft/app/state/ui_state.h"
+#include "pdft/app/view/page_renderer.h"
 
 #include "pdft/tui/context.h"
-#include "pdft/tui/display/state.h"
 #include "pdft/tui/elements.h"
 
 namespace pdft::app::view {
@@ -14,9 +14,7 @@ class DocumentView {
 
     virtual tui::Element render(
         const state::DocumentState& doc,
-        float scaling_coeff,
-        bool invert_colors,
-        tui::display::State& state,
+        const DisplayProperties& properties,
         tui::Context& ctx) = 0;
 };
 

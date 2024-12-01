@@ -25,6 +25,10 @@ add_test(./pdft/core/io/posix/test_console.cpp)
 add_test(./pdft/core/trace/test_scope_tracer.cpp)
 add_test(./pdft/core/trace/test_stack_scope_tracer.cpp)
 
+# Image
+add_test(./pdft/image/color.cpp)
+add_test(./pdft/image/palette.cpp)
+
 # Utils
 add_test(./pdft/utils/test_intrusive_forward_list.cpp)
 
