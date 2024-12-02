@@ -1,6 +1,8 @@
 #include "pdft/media/mupdf/context.h"
 #include "pdft/core/assert.h"
 
+#include "fz_assert.h"
+
 extern "C" {
 #include <mupdf/fitz/archive.h>
 #include <mupdf/fitz/context.h>
@@ -17,9 +19,13 @@ Context::Builder& Context::Builder::setStorageSize(int size) {
 }
 
 Context Context::Builder::build() {
-    auto* context = fz_new_context(NULL, NULL, size_);
-    PDFT_VERIFY(context, "failed to create new fz_context");
-    return Context{context};
+    auto* ctx = fz_new_context(NULL, NULL, size_);
+    PDFT_VERIFY(ctx, "failed to create new fz_context");
+
+    PDFT_FZ_VERIFY(fz_enable_icc(ctx));
+    PDFT_FZ_VERIFY(fz_set_text_aa_level(ctx, 8));
+    PDFT_FZ_VERIFY(fz_set_graphics_aa_level(ctx, 8));
+    return Context{ctx};
 }
 
 Context::Context(Context&& rhs) : context_(std::exchange(rhs.context_, nullptr)) {}
@@ -34,11 +40,7 @@ fz_context* Context::native() const {
 
 void Context::registerDocumentHandlers() const {
     auto ctx = native();
-
-    fz_try(ctx) fz_register_document_handlers(ctx);
-    fz_catch(ctx) {
-        core::panic("fz_register_document_handlers");
-    }
+    PDFT_FZ_VERIFY(fz_register_document_handlers(ctx));
 }
 
 Context& thisThreadContext() {

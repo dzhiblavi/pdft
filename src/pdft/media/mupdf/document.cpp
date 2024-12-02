@@ -2,12 +2,12 @@
 #include "pdft/core/assert.h"
 #include "pdft/media/mupdf/page.h"
 
+#include "fz_assert.h"
+
 extern "C" {
 #include <mupdf/fitz/archive.h>
 #include <mupdf/fitz/document.h>
 }
-
-#include <format>
 
 namespace pdft::media::mupdf {
 
@@ -24,11 +24,7 @@ size_t Document::getPageCount() const {
     auto ctx = context_.native();
     int page_count = 0;
 
-    fz_try(ctx) page_count = fz_count_pages(ctx, document_);
-    fz_catch(ctx) {
-        core::panic("fz_count_pages");
-    }
-
+    PDFT_FZ_VERIFY(page_count = fz_count_pages(ctx, document_));
     return page_count;
 }
 
@@ -37,11 +33,7 @@ std::shared_ptr<media::Page> Document::getPage(int index) const {
     auto ctx = context_.native();
     fz_page* page = nullptr;
 
-    fz_try(ctx) page = fz_load_page(ctx, document_, index);
-    fz_catch(ctx) {
-        core::panic("fz_load_page");
-    }
-
+    PDFT_FZ_VERIFY(page = fz_load_page(ctx, document_, index));
     PDFT_VERIFY(page);
     return std::shared_ptr<media::Page>(new Page(index, context_, page));
 }
@@ -54,12 +46,7 @@ Result<Document> Document::open(Context& context, const std::filesystem::path& p
     auto ctx = context.native();
     fz_document* doc = nullptr;
 
-    fz_try(ctx) doc = fz_open_document(ctx, path.c_str());
-    fz_catch(ctx) {
-        fz_report_error(ctx);
-        return std::unexpected(std::format("mupdft open document failed: {}", ctx->error.message));
-    }
-
+    PDFT_FZ_VERIFY(doc = fz_open_document(ctx, path.c_str()));
     PDFT_VERIFY(doc);
     return Document(context, path, doc);
 }
