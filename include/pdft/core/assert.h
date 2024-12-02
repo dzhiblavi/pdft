@@ -46,18 +46,18 @@ constexpr bool containsFormatPlaceholder(std::string_view str) {
 
 }  // namespace pdft::core
 
-#define PDFT_VERIFY(expr, ...)                                                                     \
-    do {                                                                                           \
-        if (!static_cast<bool>(expr)) [[unlikely]] {                                               \
-            constexpr bool containsFormatPlaceholder =                                             \
-                ::pdft::core::containsFormatPlaceholder(#expr);                                    \
-                                                                                                   \
-            if constexpr (containsFormatPlaceholder) {                                             \
-                static_assert(                                                                     \
-                    !containsFormatPlaceholder,                                                    \
-                    "expression should not contain format placeholders: " #expr);                  \
-            } else {                                                                               \
-                ::pdft::core::panic("PDFT_VERIFY paniced: '" #expr "' is not true: " __VA_ARGS__); \
-            }                                                                                      \
-        }                                                                                          \
+#define PDFT_VERIFY(expr, ...)                                                                    \
+    do {                                                                                          \
+        if (!static_cast<bool>(expr)) [[unlikely]] {                                              \
+            constexpr bool containsFormatPlaceholder =                                            \
+                ::pdft::core::containsFormatPlaceholder(#expr);                                   \
+                                                                                                  \
+            if constexpr (containsFormatPlaceholder) {                                            \
+                static_assert(                                                                    \
+                    !containsFormatPlaceholder,                                                   \
+                    "expression should not contain format placeholders: " #expr);                 \
+            } else {                                                                              \
+                ::pdft::core::panic("PDFT_VERIFY failed: '" #expr "' is not true: " __VA_ARGS__); \
+            }                                                                                     \
+        }                                                                                         \
     } while (0)
