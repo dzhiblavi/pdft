@@ -12,16 +12,16 @@ using DocumentId = uint32_t;
 
 class DocumentStorage {
  public:
-    DocumentId addDocument(std::shared_ptr<media::Document> document);
+    DocumentId addDocument(Arc<media::Document> document);
 
     [[nodiscard]] bool removeDocument(DocumentId id);
 
-    Maybe<std::shared_ptr<const media::Document>> getDocument(DocumentId id) const;
+    Maybe<Arc<const media::Document>> getDocument(DocumentId id) const;
 
     Maybe<DocumentId> getIdByPath(const std::filesystem::path& path) const;
 
  private:
-    std::unordered_map<DocumentId, std::shared_ptr<media::Document>> documents_;
+    std::unordered_map<DocumentId, Arc<media::Document>> documents_;
     std::unordered_map<std::string, DocumentId> ids_by_path_;
 };
 

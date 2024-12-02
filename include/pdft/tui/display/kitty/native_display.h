@@ -8,7 +8,7 @@ namespace pdft::tui::display::kitty {
 class NativeDisplay : public DisplayBase {
  public:
     NativeDisplay(
-        std::shared_ptr<apc::Executor> executor, std::shared_ptr<const terminal::Terminal> terminal)
+        Arc<apc::Executor> executor, Arc<const terminal::Terminal> terminal)
         : DisplayBase(std::move(executor))
         , terminal_(std::move(terminal)) {}
 
@@ -17,7 +17,7 @@ class NativeDisplay : public DisplayBase {
         override;
 
  private:
-    std::shared_ptr<const terminal::Terminal> terminal_;
+    Arc<const terminal::Terminal> terminal_;
 };
 
 }  // namespace pdft::tui::display::kitty

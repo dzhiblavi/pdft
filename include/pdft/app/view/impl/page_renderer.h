@@ -34,8 +34,8 @@ class PageRenderer : public view::PageRenderer {
  public:
     PageRenderer(
         uint32_t image_id_salt,
-        std::shared_ptr<const state::DocumentStorage> documents_,
-        std::shared_ptr<tui::display::Display> display);
+        Arc<const state::DocumentStorage> documents_,
+        Arc<tui::display::Display> display);
 
     void render(
         Context& ctx,
@@ -55,8 +55,8 @@ class PageRenderer : public view::PageRenderer {
 
     const uint32_t image_id_salt_;
     State state_;
-    std::shared_ptr<const state::DocumentStorage> documents_;
-    std::shared_ptr<tui::display::Display> display_;
+    Arc<const state::DocumentStorage> documents_;
+    Arc<tui::display::Display> display_;
 };
 
 }  // namespace pdft::app::view::impl

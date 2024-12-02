@@ -8,7 +8,7 @@ namespace pdft::app::view::impl {
 
 class DocumentView : public view::DocumentView {
  public:
-    explicit DocumentView(std::shared_ptr<view::PageRenderer> renderer)
+    explicit DocumentView(Arc<view::PageRenderer> renderer)
         : renderer_(std::move(renderer)) {}
 
     tui::Element render(
@@ -39,7 +39,7 @@ class DocumentView : public view::DocumentView {
         const DisplayProperties& properties,
         tui::Screen& screen) const;
 
-    std::shared_ptr<view::PageRenderer> renderer_;
+    Arc<view::PageRenderer> renderer_;
     mutable tui::IRect rect_;
 };
 

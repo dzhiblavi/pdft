@@ -34,8 +34,8 @@ const State::LoadedImage& State::getImage(ImageId id) const {
 
 PageRenderer::PageRenderer(
     uint32_t image_id_salt,
-    std::shared_ptr<const state::DocumentStorage> documents,
-    std::shared_ptr<tui::display::Display> display)
+    Arc<const state::DocumentStorage> documents,
+    Arc<tui::display::Display> display)
     : image_id_salt_(image_id_salt)
     , documents_(std::move(documents))
     , display_(std::move(display)) {}

@@ -1,4 +1,5 @@
 #include "pdft/core/io/console.h"
+#include "pdft/core/rc.h"
 
 #include <format>
 #include <iostream>
@@ -55,7 +56,7 @@ struct MockConsole : Console {
     std::string out_;
 };
 
-inline std::shared_ptr<MockConsole> makeMockConsole() {
+inline Arc<MockConsole> makeMockConsole() {
     return std::make_shared<MockConsole>();
 }
 

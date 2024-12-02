@@ -9,7 +9,7 @@ class Loader {
  public:
     virtual ~Loader() = default;
 
-    virtual Result<std::shared_ptr<Document>> load(const std::filesystem::path& path) const = 0;
+    virtual Result<Arc<Document>> load(const std::filesystem::path& path) const = 0;
 };
 
 }  // namespace pdft::media

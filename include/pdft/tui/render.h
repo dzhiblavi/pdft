@@ -6,6 +6,7 @@
 
 #include "pdft/core/io/buffer.h"
 #include "pdft/core/io/console.h"
+#include "pdft/core/rc.h"
 #include "pdft/core/trace/context.h"
 #include "pdft/core/trace/log_stack_trace.h"
 #include "pdft/core/trace/stack_scope_tracer.h"
@@ -18,9 +19,7 @@ namespace pdft::tui {
 
 class Renderer {
  public:
-    Renderer(
-        std::shared_ptr<tui::terminal::Terminal> terminal,
-        std::shared_ptr<core::io::Console> console)
+    Renderer(Arc<const tui::terminal::Terminal> terminal, Arc<core::io::Console> console)
         : terminal_(std::move(terminal))
         , console_(std::move(console)) {
         PDFT_VERIFY(terminal_);
@@ -57,8 +56,8 @@ class Renderer {
     core::io::OutBuffer control_;
     core::io::OutBuffer display_;
 
-    std::shared_ptr<tui::terminal::Terminal> terminal_;
-    std::shared_ptr<core::io::Console> console_;
+    Arc<const tui::terminal::Terminal> terminal_;
+    Arc<core::io::Console> console_;
 };
 
 }  // namespace pdft::tui

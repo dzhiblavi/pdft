@@ -10,7 +10,7 @@ namespace pdft::tui::display::kitty {
 
 class DisplayBase : public display::Display {
  public:
-    DisplayBase(std::shared_ptr<apc::Executor> executor) : executor_(std::move(executor)) {}
+    DisplayBase(Arc<apc::Executor> executor) : executor_(std::move(executor)) {}
 
     void loadImage(
         Context& ctx,
@@ -25,7 +25,7 @@ class DisplayBase : public display::Display {
     bool isLoaded(ImageId id) const override;
 
  protected:
-    std::shared_ptr<apc::Executor> executor_;
+    Arc<apc::Executor> executor_;
     std::unordered_map<ImageId, pdft::image::ImageSize> loaded_;
 };
 

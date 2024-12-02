@@ -53,7 +53,7 @@ void loadLogger(const std::string& name, const LoggerConfig& config) {
     sinks.reserve(config.sinks.size());
     std::transform(config.sinks.begin(), config.sinks.end(), std::back_inserter(sinks), loadSink);
 
-    auto logger = [&]() -> std::shared_ptr<spdlog::logger> {
+    auto logger = [&]() -> Arc<spdlog::logger> {
         switch (config.sync_mode) {
             using enum SyncMode;
             using enum spdlog::async_overflow_policy;

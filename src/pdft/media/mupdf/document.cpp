@@ -28,14 +28,14 @@ size_t Document::getPageCount() const {
     return page_count;
 }
 
-std::shared_ptr<media::Page> Document::getPage(int index) const {
+Arc<media::Page> Document::getPage(int index) const {
     PDFT_VERIFY(index >= 0 && index < static_cast<int>(getPageCount()));
     auto ctx = context_.native();
     fz_page* page = nullptr;
 
     PDFT_FZ_VERIFY(page = fz_load_page(ctx, document_, index));
     PDFT_VERIFY(page);
-    return std::shared_ptr<media::Page>(new Page(index, context_, page));
+    return Arc<media::Page>(new Page(index, context_, page));
 }
 
 const std::filesystem::path& Document::getPath() const {

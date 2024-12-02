@@ -24,7 +24,7 @@ Page::~Page() noexcept {
     fz_drop_page(context_.native(), page_);
 }
 
-std::shared_ptr<image::Image> Page::getImage(float scaling_factor) const {
+Arc<image::Image> Page::getImage(float scaling_factor) const {
     PDFT_VERIFY(scaling_factor > 0.f, "scale factor should be positive");
 
     auto ctx = context_.native();
@@ -36,7 +36,7 @@ std::shared_ptr<image::Image> Page::getImage(float scaling_factor) const {
     PDFT_VERIFY(pix->w > 0 && pix->h > 0, "loaded an image with negative size");
     PDFT_VERIFY(pix, "fz_new_pixmap_from_page is null");
 
-    return std::shared_ptr<image::Image>(new PixmapImage(context_, pix));
+    return Arc<image::Image>(new PixmapImage(context_, pix));
 }
 
 PageSize Page::getDefaultSize() const {

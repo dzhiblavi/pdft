@@ -37,7 +37,7 @@ LoggerPtr logger(const std::string& name) {
     return nullptr;
 }
 
-void setGlobalLogger(std::shared_ptr<spdlog::logger> logger) {
+void setGlobalLogger(Arc<spdlog::logger> logger) {
     GlobalLogger::instance().set(std::move(logger));
 }
 

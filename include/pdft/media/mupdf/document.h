@@ -17,7 +17,7 @@ class Document : public media::Document {
     ~Document() noexcept override;
 
     size_t getPageCount() const override;
-    std::shared_ptr<media::Page> getPage(int index) const override;
+    Arc<media::Page> getPage(int index) const override;
     const std::filesystem::path& getPath() const override;
 
     static Result<Document> open(Context& context, const std::filesystem::path& path);

@@ -13,7 +13,7 @@ using namespace pdft;
 
 namespace {
 
-std::shared_ptr<tui::display::kitty::apc::Executor> resolveAPCExecutor() {
+Arc<tui::display::kitty::apc::Executor> resolveAPCExecutor() {
     if (auto _ = ::getenv("TMUX")) {
         log::info("Resolved TMUX APC Executor");
         return std::make_shared<tui::display::kitty::apc::tmux::Executor>(
@@ -27,8 +27,8 @@ std::shared_ptr<tui::display::kitty::apc::Executor> resolveAPCExecutor() {
 
 }  // namespace
 
-std::shared_ptr<pdft::tui::display::Display> resolveDisplay(
-    const DisplayConfig& config, std::shared_ptr<const pdft::tui::terminal::Terminal> terminal) {
+Arc<pdft::tui::display::Display> resolveDisplay(
+    const DisplayConfig& config, Arc<const pdft::tui::terminal::Terminal> terminal) {
     auto executor = resolveAPCExecutor();
 
     if (auto _ = ::getenv("TMUX") || config.force_unicode_kitty_display) {

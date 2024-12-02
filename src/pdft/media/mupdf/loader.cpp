@@ -3,7 +3,7 @@
 
 namespace pdft::media::mupdf {
 
-Result<std::shared_ptr<media::Document>> Loader::load(const std::filesystem::path& path) const {
+Result<Arc<media::Document>> Loader::load(const std::filesystem::path& path) const {
     return Document::open(context_, path).transform([](auto document) {
         return std::make_shared<Document>(std::move(document));
     });

@@ -2,7 +2,7 @@
 
 namespace pdft::app::state {
 
-DocumentId DocumentStorage::addDocument(std::shared_ptr<media::Document> document) {
+DocumentId DocumentStorage::addDocument(Arc<media::Document> document) {
     static DocumentId next_id = 0;
 
     auto id = next_id++;
@@ -22,7 +22,7 @@ bool DocumentStorage::removeDocument(DocumentId id) {
     return true;
 }
 
-Maybe<std::shared_ptr<const media::Document>> DocumentStorage::getDocument(DocumentId id) const {
+Maybe<Arc<const media::Document>> DocumentStorage::getDocument(DocumentId id) const {
     auto it = documents_.find(id);
     if (it == documents_.end()) {
         return std::nullopt;

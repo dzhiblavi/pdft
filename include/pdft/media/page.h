@@ -2,7 +2,7 @@
 
 #include "pdft/image/image.h"
 
-#include <memory>
+#include "pdft/core/rc.h"
 
 namespace pdft::media {
 
@@ -15,7 +15,7 @@ class Page {
  public:
     virtual ~Page() = default;
 
-    virtual std::shared_ptr<image::Image> getImage(float scaling_factor) const = 0;
+    virtual Arc<image::Image> getImage(float scaling_factor) const = 0;
 
     virtual PageSize getDefaultSize() const = 0;
     virtual size_t getPageIndex() const = 0;

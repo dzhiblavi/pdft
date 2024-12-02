@@ -5,7 +5,7 @@
 
 namespace pdft::app::controller::impl {
 
-Controller::Controller(const Config& config, std::shared_ptr<const media::Loader> doc_loader)
+Controller::Controller(const Config& config, Arc<const media::Loader> doc_loader)
     : config_(config)
     , doc_loader_(std::move(doc_loader)) {
     for (const auto& [command, keys] : config.key_mappings) {

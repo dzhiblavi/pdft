@@ -9,7 +9,7 @@ class Loader : public media::Loader {
  public:
     explicit Loader(Context& context) : context_(context) {}
 
-    Result<std::shared_ptr<media::Document>> load(const std::filesystem::path& path) const;
+    Result<Arc<media::Document>> load(const std::filesystem::path& path) const;
 
  private:
     Context& context_;

@@ -8,8 +8,8 @@ namespace pdft::app::view::impl {
 class View : public view::View {
  public:
     View(
-        std::shared_ptr<const state::DocumentStorage> documents,
-        std::shared_ptr<const view::DocumentView> view)
+        Arc<const state::DocumentStorage> documents,
+        Arc<const view::DocumentView> view)
         : documents_(std::move(documents))
         , doc_view_(std::move(view)) {}
 
@@ -18,8 +18,8 @@ class View : public view::View {
  private:
     tui::Element getSidebar(Context& ctx, const state::UIState& ui);
 
-    std::shared_ptr<const state::DocumentStorage> documents_;
-    std::shared_ptr<const view::DocumentView> doc_view_;
+    Arc<const state::DocumentStorage> documents_;
+    Arc<const view::DocumentView> doc_view_;
 };
 
 }  // namespace pdft::app::view::impl

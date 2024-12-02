@@ -2,18 +2,19 @@
 
 #include "config.h"
 
-#include "pdft/app/controller/controller.h"
 #include "pdft/app/loader/loader.h"
-#include "pdft/app/view/view.h"
 
+#include "pdft/app/view/view.h"
 #include "pdft/media/loader.h"
 #include "pdft/tui/display/display.h"
 #include "pdft/tui/terminal/terminal.h"
 
+#include "pdft/notify/notify.h"
+
 #include "pdft/core/io/console.h"
 #include "pdft/core/io/termctl.h"
 #include "pdft/core/log/with_logger.h"
-#include "pdft/notify/notify.h"
+#include "pdft/core/rc.h"
 
 #include <asio/awaitable.hpp>
 #include <asio/signal_set.hpp>
@@ -37,25 +38,22 @@ class Application : public pdft::core::log::WithLogger {
     asio::awaitable<bool> waitForNextRender();
     asio::awaitable<void> cleanup();
 
+    const Config config_;
     asio::io_context& context_;
-    Config config_;
     pdft::app::loader::StateMode state_mode_;
-
-    std::shared_ptr<pdft::core::io::TermControl> term_control_;
-    std::shared_ptr<pdft::tui::terminal::Terminal> terminal_;
-    std::shared_ptr<pdft::core::io::Console> console_;
-    std::shared_ptr<pdft::notify::Notify> fs_watcher_;
-    std::shared_ptr<pdft::tui::display::Display> image_display_;
-    std::shared_ptr<pdft::media::Loader> doc_loader_;
-    std::shared_ptr<pdft::app::loader::Loader> loader_;
-
     pdft::app::state::UIState ui_;
-    std::shared_ptr<pdft::app::state::DocumentStorage> documents_;
-
-    std::shared_ptr<pdft::app::view::View> view_;
-    std::shared_ptr<pdft::app::controller::Controller> controller_;
-
     asio::signal_set signals_;
+
+    pdft::Arc<pdft::core::io::TermControl> term_control_;
+    pdft::Arc<pdft::tui::terminal::Terminal> terminal_;
+    pdft::Arc<pdft::core::io::Console> console_;
+    pdft::Arc<pdft::notify::Notify> fs_watcher_;
+    pdft::Arc<pdft::tui::display::Display> image_display_;
+    pdft::Arc<pdft::media::Loader> doc_loader_;
+    pdft::Arc<pdft::app::loader::Loader> loader_;
+    pdft::Arc<pdft::app::state::DocumentStorage> documents_;
+    pdft::Arc<pdft::app::view::View> view_;
+    pdft::Arc<pdft::app::controller::Controller> controller_;
 };
 
 }  // namespace app

@@ -1,4 +1,5 @@
 #include "pdft/core/io/console.h"
+#include "pdft/core/rc.h"
 
 #include <asio/co_spawn.hpp>
 #include <asio/detached.hpp>
@@ -93,7 +94,7 @@ struct MockConsole : Console {
     detail::FileDescriptor in_fd_r, in_fd_w, out_fd_r, out_fd_w;
 };
 
-inline std::shared_ptr<MockConsole> makeMockConsole() {
+inline Arc<MockConsole> makeMockConsole() {
     int in_fds[2];
     (void)pipe(in_fds);
 

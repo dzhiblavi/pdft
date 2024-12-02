@@ -46,7 +46,7 @@ class Controller : public controller::Controller {
         int32_t rows_per_scroll = 10;
     };
 
-    Controller(const Config& config, std::shared_ptr<const media::Loader> doc_loader);
+    Controller(const Config& config, Arc<const media::Loader> doc_loader);
 
     Result<Action> onKeyEvent(char key, state::UIState& ui, state::DocumentStorage& documents) override;
 
@@ -73,7 +73,7 @@ class Controller : public controller::Controller {
     Config config_;
     KeyTree key_tree_;
     PendingCommand command_;
-    std::shared_ptr<const media::Loader> doc_loader_;
+    Arc<const media::Loader> doc_loader_;
 };
 
 }  // namespace pdft::app::controller::impl

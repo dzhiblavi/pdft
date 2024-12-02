@@ -76,8 +76,8 @@ Result<Action> handleSignal(int signal) {
 
 Application::Application(
     asio::io_context& context, Config config, pdft::app::loader::StateMode state_mode)
-    : context_(context)
-    , config_(config)
+    : config_(config)
+    , context_(context)
     , state_mode_(state_mode)
     , signals_(context, SIGWINCH, SIGINT, SIGSEGV) {
     setup();

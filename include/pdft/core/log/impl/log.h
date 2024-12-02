@@ -1,14 +1,16 @@
 #pragma once
 
-#include <source_location>
+#include "pdft/core/rc.h"
+
 #include <spdlog/common.h>
 #include <spdlog/logger.h>
 
 #include <memory>
+#include <source_location>
 
 namespace pdft::core::log::impl {
 
-using LoggerPtr = std::shared_ptr<spdlog::logger>;
+using LoggerPtr = Arc<spdlog::logger>;
 
 LoggerPtr global();
 
