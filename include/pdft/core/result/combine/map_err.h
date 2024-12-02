@@ -17,13 +17,14 @@ struct [[nodiscard]] MapErr {
     MapErr& operator=(const MapErr&) = delete;
 
     template <typename T>
-    Result<T> Pipe(Result<T> r) {
-        return std::move(r).transform_error(user);
+    Result<T> pipe(Result<T> r) && {
+        return std::move(r).transform_error(std::move(user));
     }
 };
 
 }  // namespace pipe
 
+// Result<T> -> (E -> Result<T>) -> Result<T>
 template <typename F>
 auto mapErr(F user) {
     return pipe::MapErr{std::move(user)};

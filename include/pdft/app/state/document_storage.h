@@ -2,6 +2,8 @@
 
 #include "pdft/media/document.h"
 
+#include "pdft/core/result/type/result.h"
+
 #include <unordered_map>
 
 namespace pdft::app::state {
@@ -14,9 +16,9 @@ class DocumentStorage {
 
     [[nodiscard]] bool removeDocument(DocumentId id);
 
-    std::optional<std::shared_ptr<const media::Document>> getDocument(DocumentId id) const;
+    Maybe<std::shared_ptr<const media::Document>> getDocument(DocumentId id) const;
 
-    std::optional<DocumentId> getIdByPath(const std::filesystem::path& path) const;
+    Maybe<DocumentId> getIdByPath(const std::filesystem::path& path) const;
 
  private:
     std::unordered_map<DocumentId, std::shared_ptr<media::Document>> documents_;

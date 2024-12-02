@@ -3,17 +3,15 @@
 #include "pdft/core/result/make/err.h"
 #include "pdft/core/result/type/result.h"
 
-#include <optional>
-
 namespace pdft::result {
 
 namespace pipe {
 
-struct AsResult {
+struct Lift {
     std::string error;
 
     template <typename T>
-    Result<T> Pipe(std::optional<T> opt) {
+    Result<T> pipe(Maybe<T> opt) && {
         if (opt.has_value()) {
             return ok(std::move(*opt));
         }
@@ -24,8 +22,9 @@ struct AsResult {
 
 }  // namespace pipe
 
-inline auto asResult(std::string error) {
-    return pipe::AsResult(std::move(error));
+// Maybe<T> -> Result<T>
+inline auto lift(std::string error) {
+    return pipe::Lift(std::move(error));
 }
 
 }  // namespace pdft::result

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "pdft/app/state/document_storage.h"
-#include "pdft/app/view/page_renderer.h"
+#include "pdft/core/result/type/result.h"
 
 #include <vector>
 
@@ -50,7 +50,7 @@ struct UIState {
     void toggleSidebar();
     void togglePalette();
 
-    std::optional<DocumentId> getCurrentDocumentId() const;
+    Maybe<DocumentId> getCurrentDocumentId() const;
     const DocumentState* getImmutableState() const;
 
     std::optional<size_t> idx = std::nullopt;

@@ -7,7 +7,7 @@
 #include "pdft/core/result/make/ok.h"
 
 #include "pdft/core/result/combine/and_then.h"
-#include "pdft/core/result/combine/as_result.h"
+#include "pdft/core/result/combine/lift.h"
 #include "pdft/core/result/combine/map.h"
 #include "pdft/core/result/combine/map_err.h"
 #include "pdft/core/result/combine/or_else.h"

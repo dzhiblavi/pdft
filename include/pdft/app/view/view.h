@@ -5,6 +5,8 @@
 #include "pdft/tui/elements.h"
 #include "pdft/tui/screen.h"
 
+#include "pdft/core/context.h"
+
 namespace pdft::app::view {
 
 class View {

@@ -20,13 +20,19 @@ struct [[nodiscard]] Map {
     using U = std::invoke_result_t<F, T>;
 
     template <typename T>
-    Result<U<T>> Pipe(Result<T> r) {
-        return std::move(r).transform(user);
+    Result<U<T>> pipe(Result<T> r) && {
+        return std::move(r).transform(std::move(user));
+    }
+
+    template <typename T>
+    Maybe<U<T>> pipe(Maybe<T> r) && {
+        return std::move(r).transform(std::move(user));
     }
 };
 
 }  // namespace pipe
 
+// Result<T> -> (T -> U) -> Result<U>
 template <typename F>
 auto map(F user) {
     return pipe::Map{std::move(user)};

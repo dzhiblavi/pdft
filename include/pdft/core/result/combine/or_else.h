@@ -17,13 +17,19 @@ struct [[nodiscard]] OrElse {
     OrElse& operator=(const OrElse&) = delete;
 
     template <typename T>
-    Result<T> Pipe(Result<T> r) {
-        return std::move(r).or_else(user);
+    Result<T> pipe(Result<T> r) && {
+        return std::move(r).or_else(std::move(user));
+    }
+
+    template <typename T>
+    Maybe<T> pipe(Result<T> opt) && {
+        return std::move(opt).or_else(std::move(user));
     }
 };
 
 }  // namespace pipe
 
+// Result<T> -> (() -> Result<T>) -> Result<T>
 template <typename F>
 auto orElse(F user) {
     return pipe::OrElse{std::move(user)};

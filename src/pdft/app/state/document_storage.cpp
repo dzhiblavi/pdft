@@ -22,8 +22,7 @@ bool DocumentStorage::removeDocument(DocumentId id) {
     return true;
 }
 
-std::optional<std::shared_ptr<const media::Document>> DocumentStorage::getDocument(
-    DocumentId id) const {
+Maybe<std::shared_ptr<const media::Document>> DocumentStorage::getDocument(DocumentId id) const {
     auto it = documents_.find(id);
     if (it == documents_.end()) {
         return std::nullopt;
@@ -32,7 +31,7 @@ std::optional<std::shared_ptr<const media::Document>> DocumentStorage::getDocume
     return it->second;
 }
 
-std::optional<DocumentId> DocumentStorage::getIdByPath(const std::filesystem::path& path) const {
+Maybe<DocumentId> DocumentStorage::getIdByPath(const std::filesystem::path& path) const {
     auto it = ids_by_path_.find(path);
     if (it == ids_by_path_.end()) {
         return std::nullopt;

@@ -3,10 +3,6 @@
 #include "pdft/core/result/trait/value_of.h"
 #include "pdft/core/result/type/result.h"
 
-#include "pdft/core/result/make/err.h"
-#include "pdft/core/result/make/ok.h"
-
-#include <optional>
 #include <type_traits>
 
 namespace pdft::result {
@@ -27,22 +23,19 @@ struct [[nodiscard]] AndThen {
     using U = result::trait::ValueOf<std::invoke_result_t<F, T>>;
 
     template <typename T>
-    Result<U<T>> Pipe(Result<T> r) {
-        return std::move(r).and_then(user);
+    Result<U<T>> pipe(Result<T> r) && {
+        return std::move(r).and_then(std::move(user));
     }
 
     template <typename T>
-    Result<U<T>> Pipe(std::optional<T> opt) {
-        if (opt.has_value()) {
-            return user(std::move(*opt));
-        }
-
-        return err("empty optional");
+    Maybe<U<T>> pipe(Maybe<T> opt) && {
+        return std::move(opt).and_then(std::move(user));
     }
 };
 
 }  // namespace pipe
 
+// Result<T> -> (T -> Result<U>) -> Result<U>
 template <typename F>
 auto andThen(F user) {
     return pipe::AndThen{std::move(user)};

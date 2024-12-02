@@ -12,14 +12,14 @@ namespace pipe {
 
 struct Unwrap {
     template <typename T>
-    T Pipe(std::optional<T> optional) {
-        PDFT_VERIFY(optional.has_value());
+    T pipe(std::optional<T> optional) && {
+        PDFT_VERIFY(optional.has_value(), "unwrap empty Maybe");
         return std::move(*optional);
     }
 
     template <typename T>
-    T Pipe(Result<T> result) {
-        PDFT_VERIFY(result.has_value());
+    T pipe(Result<T> result) && {
+        PDFT_VERIFY(result.has_value(), "unwrap Result err: {}", result.error());
         return std::move(*result);
     }
 };

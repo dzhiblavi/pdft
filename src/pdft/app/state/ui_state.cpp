@@ -210,7 +210,7 @@ void UIState::togglePalette() {
     }
 }
 
-std::optional<DocumentId> UIState::getCurrentDocumentId() const {
+Maybe<DocumentId> UIState::getCurrentDocumentId() const {
     return idx.transform([this](auto i) { return states[i].document_id; });
 }
 
