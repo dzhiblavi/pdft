@@ -1,7 +1,6 @@
 #include "pdft/tui/terminal/terminal.h"
 #include "pdft/core/assert.h"
 
-#include <format>
 #include <stdio.h>
 #include <sys/ioctl.h>
 #include <unistd.h>
@@ -12,7 +11,7 @@ Dimensions Terminal::getDimensions() const {
     winsize sz;
 
     if (ioctl(STDIN_FILENO, TIOCGWINSZ, &sz) != 0) {
-        core::fail(std::format("ioctl failed, errno={} ({})", errno, strerror(errno)).c_str());
+        core::panic("ioctl failed, errno={} ({})", errno, strerror(errno));
     }
 
     PDFT_VERIFY(sz.ws_row > 0 && sz.ws_col > 0, "terminal does not support ioctl TIOCGWINSZ fully");

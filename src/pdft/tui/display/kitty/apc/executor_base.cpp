@@ -99,7 +99,7 @@ void ExecutorBase::execute(core::Context& ctx, const Command& apc, core::io::Out
 
 asio::awaitable<Result<Response>> ExecutorBase::executeWithResponse(
     core::Context& /*ctx*/, const Command& /*apc*/, core::io::OutBuffer& /*buffer*/) {
-    PDFT_VERIFY(false, "not implemented");
+    return core::panic("not implemented");
     // execute(std::move(apc), buffer);
 
     //// Flush command and receive the response

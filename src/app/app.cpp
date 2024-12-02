@@ -65,10 +65,10 @@ Action handleSignal(int signal) {
             return Quit;
 
         case SIGSEGV:
-            pdft::core::fail("received SIGSEGV");
+            return core::panic("received SIGSEGV");
 
         default:
-            pdft::core::fail(std::format("received unknown signal ({})", signal).c_str());
+            return core::panic(std::format("received unknown signal ({})", signal).c_str());
     }
 }
 

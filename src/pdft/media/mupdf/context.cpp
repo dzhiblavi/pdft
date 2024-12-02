@@ -37,7 +37,7 @@ void Context::registerDocumentHandlers() const {
 
     fz_try(ctx) fz_register_document_handlers(ctx);
     fz_catch(ctx) {
-        core::fail("fz_register_document_handlers");
+        core::panic("fz_register_document_handlers");
     }
 }
 

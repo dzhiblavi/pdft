@@ -41,7 +41,7 @@ struct log {
         Level level,
         fmt::format_string<const Args&...> fmt,
         const Args&... args,
-        const std::source_location loc = std::source_location::current()) {
+        const std::source_location& loc = std::source_location::current()) {
         auto spdlog_loc = spdlog::source_loc(loc.file_name(), loc.line(), loc.function_name());
         getLogger(logger)->log(spdlog_loc, level, fmt::format(fmt, args...));
     }
@@ -49,7 +49,7 @@ struct log {
     log(const Logger& logger,
         Level level,
         const Args&... args,
-        const std::source_location loc = std::source_location::current()) {
+        const std::source_location& loc = std::source_location::current()) {
         auto spdlog_loc = spdlog::source_loc(loc.file_name(), loc.line(), loc.function_name());
         getLogger(logger)->log(spdlog_loc, level, args...);
     }
@@ -69,7 +69,7 @@ log(const Logger&, Level, const Msg&) -> log<Logger, Msg>;
             const Logger& logger,                                                           \
             fmt::format_string<const Args&...> fmt,                                         \
             const Args&... args,                                                            \
-            const std::source_location loc = std::source_location::current()) {             \
+            const std::source_location& loc = std::source_location::current()) {            \
             auto spdlog_loc =                                                               \
                 spdlog::source_loc(loc.file_name(), loc.line(), loc.function_name());       \
             getLogger(logger)->log(spdlog_loc, Level::level, fmt::format(fmt, args...));    \
@@ -77,7 +77,7 @@ log(const Logger&, Level, const Msg&) -> log<Logger, Msg>;
         level(                                                                              \
             const Logger& logger,                                                           \
             const Args&... args,                                                            \
-            const std::source_location loc = std::source_location::current()) {             \
+            const std::source_location& loc = std::source_location::current()) {            \
             auto spdlog_loc =                                                               \
                 spdlog::source_loc(loc.file_name(), loc.line(), loc.function_name());       \
             getLogger(logger)->log(spdlog_loc, Level::level, args...);                      \
@@ -85,14 +85,14 @@ log(const Logger&, Level, const Msg&) -> log<Logger, Msg>;
         level(                                                                              \
             fmt::format_string<const Args&...> fmt,                                         \
             const Args&... args,                                                            \
-            const std::source_location loc = std::source_location::current()) {             \
+            const std::source_location& loc = std::source_location::current()) {            \
             auto spdlog_loc =                                                               \
                 spdlog::source_loc(loc.file_name(), loc.line(), loc.function_name());       \
             global()->log(spdlog_loc, Level::level, fmt::format(fmt, args...));             \
         }                                                                                   \
         level(                                                                              \
             const Args&... args,                                                            \
-            const std::source_location loc = std::source_location::current()) {             \
+            const std::source_location& loc = std::source_location::current()) {            \
             auto spdlog_loc =                                                               \
                 spdlog::source_loc(loc.file_name(), loc.line(), loc.function_name());       \
             global()->log(spdlog_loc, Level::level, args...);                               \

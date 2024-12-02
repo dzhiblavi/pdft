@@ -34,14 +34,14 @@ std::shared_ptr<image::Image> Page::getImage(float scaling_factor) const {
 
     fz_try(ctx) pix = fz_new_pixmap_from_page(ctx, page_, ctm, fz_device_rgb(ctx), /* alpha= */ 0);
     fz_catch(ctx) {
-        core::fail("fz_new_pixmap_from_page");
+        core::panic("fz_new_pixmap_from_page");
     }
 
     PDFT_VERIFY(pix->w > 0 && pix->h > 0, "loaded an image with negative size");
     log::debug("loaded an image {}x{} pixels", pix->w, pix->h);
 
     if (pix == nullptr) {
-        core::fail("fz_new_pixmap_from_page is null");
+        core::panic("fz_new_pixmap_from_page is null");
     }
 
     return std::shared_ptr<image::Image>(new PixmapImage(context_, pix));
@@ -53,7 +53,7 @@ PageSize Page::getDefaultSize() const {
 
     fz_try(ctx) rect = fz_bound_page(ctx, page_);
     fz_catch(ctx) {
-        core::fail("fz_bound_page");
+        core::panic("fz_bound_page");
     }
 
     return {

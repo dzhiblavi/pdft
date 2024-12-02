@@ -26,7 +26,7 @@ size_t Document::getPageCount() const {
 
     fz_try(ctx) page_count = fz_count_pages(ctx, document_);
     fz_catch(ctx) {
-        core::fail("fz_count_pages");
+        core::panic("fz_count_pages");
     }
 
     return page_count;
@@ -39,7 +39,7 @@ std::shared_ptr<media::Page> Document::getPage(int index) const {
 
     fz_try(ctx) page = fz_load_page(ctx, document_, index);
     fz_catch(ctx) {
-        core::fail("fz_load_page");
+        core::panic("fz_load_page");
     }
 
     PDFT_VERIFY(page);
