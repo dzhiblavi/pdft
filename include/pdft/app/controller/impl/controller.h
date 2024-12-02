@@ -48,14 +48,15 @@ class Controller : public controller::Controller {
 
     Controller(const Config& config, std::shared_ptr<const media::Loader> doc_loader);
 
-    Action onKeyEvent(char key, state::UIState& ui, state::DocumentStorage& documents) override;
-    Action onFilesystemEvent(
+    Result<Action> onKeyEvent(char key, state::UIState& ui, state::DocumentStorage& documents) override;
+
+    Result<Action> onFilesystemEvent(
         const notify::Event& event, state::UIState& ui, state::DocumentStorage& documents) override;
 
  private:
-    Action applyPendingCommand(state::UIState& ui, state::DocumentStorage& documents);
+    Result<Action> applyPendingCommand(state::UIState& ui, state::DocumentStorage& documents);
     void bindKey(Command command, std::string_view keys);
-    void reloadDocument(
+    Status reloadDocument(
         state::DocumentId id,
         std::filesystem::path path,
         state::UIState& ui,

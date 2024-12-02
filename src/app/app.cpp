@@ -52,7 +52,7 @@ using pdft::app::controller::impl::Controller;
 
 namespace {
 
-Action handleSignal(int signal) {
+Result<Action> handleSignal(int signal) {
     switch (signal) {
         using enum Action;
 
@@ -226,12 +226,15 @@ asio::awaitable<bool> Application::waitForNextRender() {
             },
             [&](int signal) { return handleSignal(signal); });
 
-        if (action == Quit) {
-            co_return true;
-        }
-
-        if (action == Redraw) {
-            co_return false;
+        if (action.has_value()) {
+            if (action == Quit) {
+                co_return true;
+            }
+            if (action == Redraw) {
+                co_return false;
+            }
+        } else {
+            log::err("error in controller loop: {}", action.error());
         }
     }
 }
