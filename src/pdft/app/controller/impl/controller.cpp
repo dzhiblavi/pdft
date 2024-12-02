@@ -188,11 +188,11 @@ Action Controller::onKeyEvent(char key, state::UIState& ui, state::DocumentStora
 
 Action Controller::onFilesystemEvent(
     const notify::Event& event, state::UIState& ui, state::DocumentStorage& documents) {
-    log::debug("controller: fs event on path={}", event.path.c_str());
+    log::debug("controller: fs event on path={}", event.path);
 
     auto maybe_doc_id = documents.getIdByPath(event.path);
     if (!maybe_doc_id) {
-        log::warn("received a filesystem event for unknown path {}", event.path.c_str());
+        log::warn("received a filesystem event for unknown path {}", event.path);
         return Action::None;
     }
 
@@ -212,7 +212,7 @@ void Controller::reloadDocument(
 
     auto maybe_document = doc_loader_->load(path);
     if (!maybe_document) {
-        log::warn("failed to reload document by path {}: {}", path.c_str(), maybe_document.error());
+        log::warn("failed to reload document by path {}: {}", path, maybe_document.error());
         ui.removeDocument(old_id);
         return;
     }
@@ -224,10 +224,7 @@ void Controller::reloadDocument(
 
     log::debug("controller: added document with id={}", new_id);
     log::info(
-        "controller: replaced document with path={} old_id={}, new_id={}",
-        path.c_str(),
-        old_id,
-        new_id);
+        "controller: replaced document with path={} old_id={}, new_id={}", path, old_id, new_id);
 }
 
 }  // namespace pdft::app::controller::impl

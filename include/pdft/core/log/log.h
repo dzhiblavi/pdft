@@ -2,6 +2,8 @@
 
 #include "./impl/log.h"
 
+#include "pdft/core/log/common_adapters.h"
+
 namespace pdft::core::log {
 
 using impl::Level;

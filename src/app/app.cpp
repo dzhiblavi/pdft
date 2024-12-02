@@ -68,7 +68,7 @@ Action handleSignal(int signal) {
             return core::panic("received SIGSEGV");
 
         default:
-            return core::panic(std::format("received unknown signal ({})", signal).c_str());
+            return core::panic("received unknown signal ({})", signal);
     }
 }
 
@@ -154,14 +154,13 @@ void Application::load(const std::vector<std::string>& paths) {
         return;
     }
 
-    log::info("restoring the state from {}", config_.state_path->c_str());
+    log::info("restoring the state from {}", *config_.state_path);
     auto state_path = std::filesystem::absolute(utils::expandHome(*config_.state_path));
     std::ifstream ifs(state_path);
 
     auto err = loader_->load(paths, ui_, *documents_, state_mode_, ifs);
     if (!err.has_value()) {
-        log::err(
-            "failed to load state_path={}, error={}", config_.state_path->c_str(), err.error());
+        log::err("failed to load state_path={}, error={}", *config_.state_path, err.error());
         return;
     }
 
@@ -175,7 +174,7 @@ void Application::load(const std::vector<std::string>& paths) {
         auto document = *maybe_doc;
         const auto& path = document->getPath();
 
-        log::info("adding path {} to filesystem watching", path.c_str());
+        log::info("adding path {} to filesystem watching", path);
         fs_watcher_->add(path);
     }
 }

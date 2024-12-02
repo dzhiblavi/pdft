@@ -58,14 +58,13 @@ Result<void> Loader::load(
         path = std::filesystem::absolute(path);
 
         if (isOpened(path, ui, documents) && mode == StateMode::AddOnly) {
-            log::info("ignoring the new path {} because state mode is AddOnly", path.c_str());
+            log::info("ignoring the new path {} because state mode is AddOnly", path);
             continue;
         }
 
         auto maybe_document = doc_loader_->load(path);
         if (!maybe_document) {
-            log::warn(
-                "failed to open document by path {}: {}", path.c_str(), maybe_document.error());
+            log::warn("failed to open document by path {}: {}", path, maybe_document.error());
             continue;
         }
 
@@ -73,7 +72,7 @@ Result<void> Loader::load(
         auto page_count = document->getPageCount();
         auto doc_id = documents.addDocument(document);
         ui.addDocument(doc_id, page_count);
-        log::info("loaded path {}", path.c_str());
+        log::info("loaded path {}", path);
     }
 
     return {};

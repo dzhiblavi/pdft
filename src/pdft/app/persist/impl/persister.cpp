@@ -53,7 +53,7 @@ Result<void> Persister::restore(
             to_be_removed.push_back(i);
             pdft::log::warn(
                 "failed to load file by path while restoring state path={}: {}",
-                path.c_str(),
+                path,
                 maybe_document.error());
             continue;
         }
