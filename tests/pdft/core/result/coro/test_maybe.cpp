@@ -5,12 +5,65 @@
 
 namespace pdft {
 
+using namespace result;
+
 Maybe<int> just(int x) {
     co_return x;
 }
 
 Maybe<int> faulty() {
     return std::nullopt;
+}
+
+TEST_CASE("testAndThenMaybeNone") {
+    auto x = Maybe<int>{} | andThen([](int) { return some(10); });
+    CHECK(!x.has_value());
+}
+
+TEST_CASE("testAndThenMaybeSome") {
+    auto x = some(10) | andThen([](int x) { return some(x * 2); });
+    CHECK(x.has_value());
+    CHECK(*x == 20);
+}
+
+TEST_CASE("testLiftNone") {
+    auto x = Maybe<int>{} | lift("an error");
+    CHECK(!x.has_value());
+    CHECK(x.error() == "an error");
+}
+
+TEST_CASE("testLiftSome") {
+    auto x = some(10) | lift("an error");
+    CHECK(x.has_value());
+    CHECK(*x == 10);
+}
+
+TEST_CASE("testMapMaybeNone") {
+    auto x = Maybe<int>{} | map([](int) { return 10; });
+    CHECK(!x.has_value());
+}
+
+TEST_CASE("testMapMaybeSome") {
+    auto x = some(10) | map([](int x) { return x * 2; });
+    CHECK(x.has_value());
+    CHECK(*x == 20);
+}
+
+TEST_CASE("testOrElseMaybeNone") {
+    auto x = Maybe<int>{} | orElse([] { return some(10); });
+    CHECK(x.has_value());
+    CHECK(*x == 10);
+}
+
+TEST_CASE("testOrElseMaybeSome") {
+    auto x = some(20) | orElse([] { return some(10); });
+    CHECK(x.has_value());
+    CHECK(*x == 20);
+}
+
+TEST_CASE("testUnwrapSome") {
+    int x = some(20) | unwrap;
+    CHECK(x == 20);
 }
 
 TEST_CASE("testCoroMaybeOk") {

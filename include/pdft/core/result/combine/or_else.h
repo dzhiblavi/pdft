@@ -1,7 +1,7 @@
 #pragma once
 
-#include "pdft/core/result/type/result.h"
 #include "pdft/core/result/type/maybe.h"
+#include "pdft/core/result/type/result.h"
 
 namespace pdft::result {
 
@@ -23,7 +23,7 @@ struct [[nodiscard]] OrElse {
     }
 
     template <typename T>
-    Maybe<T> pipe(Result<T> opt) && {
+    Maybe<T> pipe(Maybe<T> opt) && {
         return std::move(opt).or_else(std::move(user));
     }
 };

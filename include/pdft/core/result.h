@@ -5,6 +5,9 @@
 #include "pdft/core/result/make/err.h"
 #include "pdft/core/result/make/ok.h"
 
+#include "pdft/core/result/make/none.h"
+#include "pdft/core/result/make/some.h"
+
 #include "pdft/core/result/combine/and_then.h"
 #include "pdft/core/result/combine/lift.h"
 #include "pdft/core/result/combine/map.h"

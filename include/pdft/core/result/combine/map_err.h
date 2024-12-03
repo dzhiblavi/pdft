@@ -24,7 +24,7 @@ struct [[nodiscard]] MapErr {
 
 }  // namespace pipe
 
-// Result<T> -> (E -> Result<T>) -> Result<T>
+// Result<T> -> (E -> E) -> Result<T>
 template <typename F>
 auto mapErr(F user) {
     return pipe::MapErr{std::move(user)};

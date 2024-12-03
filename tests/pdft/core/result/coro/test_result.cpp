@@ -6,12 +6,49 @@
 
 namespace pdft {
 
+using namespace result;
+
 Result<int> just(int x) {
     co_return x;
 }
 
 Result<int> faulty(std::string error) {
     return result::err(error);
+}
+
+TEST_CASE("testAndThenResultErr") {
+    auto x = Result<int>{err("err")} | andThen([](int) { return ok(10); });
+    CHECK(!x.has_value());
+    CHECK(x.error() == "err");
+}
+
+TEST_CASE("testAndThenResultOk") {
+    auto x = ok(10) | andThen([](int x) { return ok(x * 2); });
+    CHECK(x.has_value());
+    CHECK(*x == 20);
+}
+
+TEST_CASE("testMapResultErr") {
+    auto x = Result<int>(err("err")) | map([](int) { return 10; });
+    CHECK(!x.has_value());
+}
+
+TEST_CASE("testMapResultOk") {
+    auto x = ok(10) | map([](int x) { return x * 2; });
+    CHECK(x.has_value());
+    CHECK(*x == 20);
+}
+
+TEST_CASE("testMapErrErr") {
+    auto x = Result<int>(err("err")) | mapErr([](auto e) { return "err: " + e; });
+    CHECK(!x.has_value());
+    CHECK(x.error() == "err: err");
+}
+
+TEST_CASE("testMapErrOk") {
+    auto x = ok(10) | mapErr([](auto e) { return "err: " + e; });
+    CHECK(x.has_value());
+    CHECK(*x == 10);
 }
 
 TEST_CASE("testCoroResultOk") {
