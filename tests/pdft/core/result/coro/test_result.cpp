@@ -1,4 +1,5 @@
 #include "pdft/core/result.h"
+#include "pdft/core/result/coro/result.h"
 
 #include <catch2/catch_test_macros.hpp>
 
@@ -12,7 +13,7 @@ Result<int> faulty(std::string error) {
     return result::err(error);
 }
 
-TEST_CASE("testMaybeResultOk") {
+TEST_CASE("testCoroResultOk") {
     auto x = [] -> Result<int> {
         int x = co_await just(10);
         int y = co_await just(20);
@@ -23,22 +24,25 @@ TEST_CASE("testMaybeResultOk") {
     CHECK(*x == 30);
 }
 
-TEST_CASE("testMaybeResultFaulty") {
-    bool reached = false;
+TEST_CASE("testCoroResultFaulty") {
+    int count = 0;
 
-    auto x = [&reached] -> Result<int> {
+    auto x = [&count] -> Result<int> {
         int x = co_await just(10);
+        ++count;
         int y = co_await just(20);
-        reached = true;
-        co_return x + y + co_await faulty("an error");
+        ++count;
+        int z = co_await faulty("an error");
+        ++count;
+        co_return x + y + z;
     }();
 
     CHECK(!x.has_value());
     CHECK(x.error() == "an error");
-    CHECK(reached);
+    CHECK(count == 2);
 }
 
-TEST_CASE("testMaybeResultFaultyMidWay") {
+TEST_CASE("testCoroResultFaultyMidWay") {
     int count = 0;
 
     auto x = [&count] -> Result<int> {
@@ -54,7 +58,7 @@ TEST_CASE("testMaybeResultFaultyMidWay") {
     CHECK(count == 1);
 }
 
-TEST_CASE("testMaybeResultConvertError") {
+TEST_CASE("testCoroResultConvertError") {
     int count = 0;
 
     auto x = [&count] -> Result<int> {

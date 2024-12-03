@@ -14,9 +14,20 @@ Dimensions Terminal::getDimensions() const {
         core::panic("ioctl failed, errno={} ({})", errno, strerror(errno));
     }
 
-    PDFT_VERIFY(sz.ws_row > 0 && sz.ws_col > 0, "terminal does not support ioctl TIOCGWINSZ fully");
-    PDFT_VERIFY(
-        sz.ws_ypixel > 0 && sz.ws_xpixel > 0, "terminal does not support ioctl TIOCGWINSZ fully");
+    if (sz.ws_row == 0) {
+        return {
+            .rows = 10,
+            .columns = 10,
+            .height_px = 100,
+            .width_px = 100,
+            .cell_height_px = 10,
+            .cell_width_px = 10,
+        };
+    }
+
+    // PDFT_VERIFY(sz.ws_row > 0 && sz.ws_col > 0, "terminal does not support ioctl TIOCGWINSZ
+    // fully"); PDFT_VERIFY( sz.ws_ypixel > 0 && sz.ws_xpixel > 0, "terminal does not support ioctl
+    // TIOCGWINSZ fully");
 
     return {
         .rows = sz.ws_row,

@@ -1,10 +1,11 @@
 #pragma once
 
+#include <fmt/core.h>
+
 #include <algorithm>
+#include <exception>
 #include <source_location>
 #include <string_view>
-
-#include <fmt/core.h>
 
 namespace pdft::core {
 
@@ -46,18 +47,15 @@ constexpr bool containsFormatPlaceholder(std::string_view str) {
 
 }  // namespace pdft::core
 
-#define PDFT_VERIFY(expr, ...)                                                                    \
-    do {                                                                                          \
-        if (!static_cast<bool>(expr)) [[unlikely]] {                                              \
-            constexpr bool containsFormatPlaceholder =                                            \
-                ::pdft::core::containsFormatPlaceholder(#expr);                                   \
-                                                                                                  \
-            if constexpr (containsFormatPlaceholder) {                                            \
-                static_assert(                                                                    \
-                    !containsFormatPlaceholder,                                                   \
-                    "expression should not contain format placeholders: " #expr);                 \
-            } else {                                                                              \
-                ::pdft::core::panic("PDFT_VERIFY failed: '" #expr "' is not true: " __VA_ARGS__); \
-            }                                                                                     \
-        }                                                                                         \
+#define PDFT_VERIFY(expr, ...)                                                                \
+    do {                                                                                      \
+        if (!static_cast<bool>(expr)) [[unlikely]] {                                          \
+            ::pdft::core::panic("PDFT_VERIFY failed: '" #expr "' is not true: " __VA_ARGS__); \
+        }                                                                                     \
     } while (0)
+
+#ifndef NDEBUG
+#define PDFT_VERIFY_DBG PDFT_VERIFY
+#else
+#define PDFT_VERIFY_DBG(...)
+#endif

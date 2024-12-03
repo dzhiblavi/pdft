@@ -3,6 +3,9 @@
 #include "pdft/core/assert.h"
 #include "pdft/core/log/log.h"
 
+#include "pdft/core/result/coro/maybe.h"
+#include "pdft/core/result/coro/result.h"
+
 namespace pdft::app::controller::impl {
 
 Controller::Controller(const Config& config, Arc<const media::Loader> doc_loader)

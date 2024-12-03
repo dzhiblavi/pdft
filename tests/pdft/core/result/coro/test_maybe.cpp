@@ -1,4 +1,5 @@
 #include "pdft/core/result.h"
+#include "pdft/core/result/coro/maybe.h"
 
 #include <catch2/catch_test_macros.hpp>
 
@@ -12,7 +13,7 @@ Maybe<int> faulty() {
     return std::nullopt;
 }
 
-TEST_CASE("testMaybeMonadOk") {
+TEST_CASE("testCoroMaybeOk") {
     auto x = [] -> Maybe<int> {
         int x = co_await just(10);
         int y = co_await just(20);
@@ -23,7 +24,7 @@ TEST_CASE("testMaybeMonadOk") {
     CHECK(*x == 30);
 }
 
-TEST_CASE("testMaybeMonadFail") {
+TEST_CASE("testCoroMaybeFail") {
     bool reached = false;
 
     auto x = [&reached] -> Maybe<int> {
@@ -37,7 +38,7 @@ TEST_CASE("testMaybeMonadFail") {
     CHECK(reached);
 }
 
-TEST_CASE("testMaybeMonadNoAwaitOk") {
+TEST_CASE("testCoroMaybeNoAwaitOk") {
     auto x = [] -> Maybe<int> {
         Maybe<int> x = just(10);
         return x;
@@ -47,7 +48,7 @@ TEST_CASE("testMaybeMonadNoAwaitOk") {
     CHECK(*x == 10);
 }
 
-TEST_CASE("testMaybeMonadNoAwaitFaulty") {
+TEST_CASE("testCoroMaybeNoAwaitFaulty") {
     auto x = [] -> Maybe<int> {
         Maybe<int> x = faulty();
         return x.value_or(20);

@@ -13,6 +13,7 @@ namespace app {
 
 asio::awaitable<void> main(asio::io_context& context, Config config, const CliArgs& args) {
     setupLogging(config.logging);
+
     auto app = Application(context, std::move(config), args.state_mode);
     app.setLogger(pdft::core::log::global());
     co_await app.run(args.paths);
@@ -39,6 +40,11 @@ int main(int argc, const char** argv) {
 
     asio::io_context context(1);
     asio::co_spawn(context, app::main(context, *config, *cli_args), asio::detached);
-    context.run();
+
+    try {
+        context.run();
+    } catch (...) {
+        pdft::core::panic("an unexpected exception");
+    }
     return 0;
 }

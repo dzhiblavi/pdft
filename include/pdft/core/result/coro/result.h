@@ -11,7 +11,7 @@ namespace pdft::result {
 
 template <typename T>
 struct ResultPromise {
-    ReturnedObjectHolder<Result<T>>* owner;
+    ResultPromise() = default;
 
     auto get_return_object() noexcept {
         return ReturnedObjectHolder{&owner};
@@ -26,31 +26,37 @@ struct ResultPromise {
     }
 
     void return_value(T x) {
-        owner->mutObject().emplace(std::move(x));
+        PDFT_VERIFY_DBG(owner);
+        owner->assign(ok(std::move(x)));
     }
 
     [[noreturn]] void unhandled_exception() noexcept {
         core::panic("unhandled promise exception");
         std::unreachable();
     }
+
+    ReturnedObjectHolder<Result<T>>* owner = nullptr;
 };
 
 template <typename T>
 struct ResultAwaitable {
     Result<T> object;
 
-    auto await_ready() noexcept {
+    bool await_ready() noexcept {
         return object.has_value();
     }
 
-    auto await_resume() {
+    T await_resume() {
+        PDFT_VERIFY_DBG(object.has_value());
         return std::move(*object);
     }
 
     template <typename U>
     void await_suspend(std::coroutine_handle<ResultPromise<U>> h) {
-        h.promise().owner->mutObject() = err(std::move(object.error()));
-        h.destroy();
+        auto&& promise = h.promise();
+        auto* owner = promise.owner;
+        PDFT_VERIFY_DBG(owner);
+        owner->assign(err(std::move(object.error())));
     }
 };
 

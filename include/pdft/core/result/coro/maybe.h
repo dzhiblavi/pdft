@@ -11,7 +11,7 @@ namespace pdft::result {
 
 template <typename T>
 struct MaybePromise {
-    ReturnedObjectHolder<Maybe<T>>* owner;
+    MaybePromise() = default;
 
     auto get_return_object() noexcept {
         return ReturnedObjectHolder{&owner};
@@ -25,14 +25,16 @@ struct MaybePromise {
         return std::suspend_never{};
     }
 
-    void return_value(T x) {
-        owner->mutObject().emplace(std::move(x));
+    void return_value(T value) {
+        PDFT_VERIFY_DBG(owner);
+        owner->assign(Maybe<T>(std::move(value)));
     }
 
     [[noreturn]] void unhandled_exception() noexcept {
-        core::panic("unhandled promise exception");
         std::unreachable();
     }
+
+    ReturnedObjectHolder<Maybe<T>>* owner = nullptr;
 };
 
 template <typename T>
@@ -44,13 +46,16 @@ struct MaybeAwaitable {
     }
 
     auto await_resume() {
+        PDFT_VERIFY_DBG(object.has_value());
         return std::move(*object);
     }
 
     template <typename U>
     void await_suspend(std::coroutine_handle<MaybePromise<U>> h) {
-        h.promise().owner->mutObject() = std::nullopt;
-        h.destroy();
+        auto&& promise = h.promise();
+        auto* owner = promise.owner;
+        PDFT_VERIFY_DBG(owner);
+        owner->assign(std::nullopt);
     }
 };
 

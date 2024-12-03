@@ -1,33 +1,38 @@
 #pragma once
 
+#include "pdft/core/assert.h"
+
+#include <optional>
 #include <utility>
 
 template <typename T>
 class ReturnedObjectHolder {
  public:
-    explicit ReturnedObjectHolder(ReturnedObjectHolder** owner) : object{}, owner(owner) {
-        *owner = this;
+    explicit ReturnedObjectHolder(ReturnedObjectHolder** owner) : owner_(owner) {
+        *owner_ = this;
     }
 
+    // Pinned
+    ReturnedObjectHolder(ReturnedObjectHolder&&) = delete;
     ReturnedObjectHolder(ReturnedObjectHolder const&) = delete;
-    ReturnedObjectHolder(ReturnedObjectHolder&& other)
-        : object(std::move(other.object))
-        , owner(std::exchange(other.owner, nullptr)) {
-        *owner = this;
-    }
-
     ReturnedObjectHolder& operator=(ReturnedObjectHolder const&) = delete;
     ReturnedObjectHolder& operator=(ReturnedObjectHolder&&) = delete;
 
-    T& mutObject() {
-        return object;
+    void* ptr() {
+        return &object_;
     }
 
-    /* implicit */ operator T() {
-        return std::move(object);
+    void assign(T object) {
+        PDFT_VERIFY_DBG(!object_.has_value(), "double assign");
+        object_.emplace(std::move(object));
+    }
+
+    /* implicit */ operator T() && {
+        PDFT_VERIFY_DBG(object_.has_value(), "not assigned");
+        return std::move(*object_);
     }
 
  private:
-    T object;
-    ReturnedObjectHolder** owner = nullptr;
+    std::optional<T> object_ = std::nullopt;
+    ReturnedObjectHolder** owner_ = nullptr;
 };
