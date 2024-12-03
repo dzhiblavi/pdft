@@ -5,6 +5,12 @@
 
 namespace pdft::tui::display::kitty::apc {
 
+enum class ParseResponseError {
+    MalformedResponse,
+};
+
+const std::error_category& parseResponseErrorCategory();
+
 Result<Response> parseResponse(std::string_view response);
 
 }  // namespace pdft::tui::display::kitty::apc

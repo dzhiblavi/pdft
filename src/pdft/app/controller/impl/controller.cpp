@@ -191,8 +191,9 @@ Result<Action> Controller::onFilesystemEvent(
     using namespace result;
     log::debug("controller: fs event on path={}", event.path);
 
-    auto id =
-        co_await (documents.getIdByPath(event.path) | lift("failed to find document by path"));
+    auto id = co_await (
+        documents.getIdByPath(event.path) |
+        lift(std::make_error_code(std::errc::io_error)));  // XXX
 
     co_await reloadDocument(id, event.path, ui, documents);
     co_return Action::Redraw;
@@ -202,7 +203,8 @@ Result<Unit> Controller::reloadCurrentDocument(
     state::UIState& ui, state::DocumentStorage& documents) {
     using namespace result;
 
-    auto id = co_await (ui.getCurrentDocumentId() | lift("no document is opened"));
+    auto id = co_await (
+        ui.getCurrentDocumentId() | lift(std::make_error_code(std::errc::io_error)));  // XXX
     auto document = documents.getDocument(id) | unwrap;
 
     co_return co_await reloadDocument(id, document->getPath(), ui, documents);

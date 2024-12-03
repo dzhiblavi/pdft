@@ -27,13 +27,15 @@ TEST_CASE("testAndThenMaybeSome") {
 }
 
 TEST_CASE("testLiftNone") {
-    auto x = Maybe<int>{} | lift("an error");
+    auto err = std::make_error_code(std::errc::io_error);
+    auto x = Maybe<int>{} | lift(err);
     CHECK(!x.has_value());
-    CHECK(x.error() == "an error");
+    CHECK(x.error() == err);
 }
 
 TEST_CASE("testLiftSome") {
-    auto x = some(10) | lift("an error");
+    auto err = std::make_error_code(std::errc::io_error);
+    auto x = some(10) | lift(err);
     CHECK(x.has_value());
     CHECK(*x == 10);
 }

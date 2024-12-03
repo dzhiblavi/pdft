@@ -12,14 +12,15 @@ Result<int> just(int x) {
     co_return x;
 }
 
-Result<int> faulty(std::string error) {
-    return result::err(error);
+Result<int> faulty(std::errc value) {
+    return result::err(std::make_error_code(value));
 }
 
 TEST_CASE("testAndThenResultErr") {
-    auto x = Result<int>{err("err")} | andThen([](int) { return ok(10); });
+    auto e = std::make_error_code(std::errc::io_error);
+    auto x = Result<int>{err(e)} | andThen([](int) { return ok(10); });
     CHECK(!x.has_value());
-    CHECK(x.error() == "err");
+    CHECK(x.error() == e);
 }
 
 TEST_CASE("testAndThenResultOk") {
@@ -29,7 +30,8 @@ TEST_CASE("testAndThenResultOk") {
 }
 
 TEST_CASE("testMapResultErr") {
-    auto x = Result<int>(err("err")) | map([](int) { return 10; });
+    auto e = std::make_error_code(std::errc::io_error);
+    auto x = Result<int>(err(e)) | map([](int) { return 10; });
     CHECK(!x.has_value());
 }
 
@@ -40,13 +42,16 @@ TEST_CASE("testMapResultOk") {
 }
 
 TEST_CASE("testMapErrErr") {
-    auto x = Result<int>(err("err")) | mapErr([](auto e) { return "err: " + e; });
+    auto e = std::make_error_code(std::errc::io_error);
+    auto x = Result<int>(err(e)) |
+             mapErr([](auto) { return std::make_error_code(std::errc::executable_format_error); });
     CHECK(!x.has_value());
-    CHECK(x.error() == "err: err");
+    CHECK(x.error() == std::make_error_code(std::errc::executable_format_error));
 }
 
 TEST_CASE("testMapErrOk") {
-    auto x = ok(10) | mapErr([](auto e) { return "err: " + e; });
+    auto x = ok(10) |
+             mapErr([](auto) { return std::make_error_code(std::errc::executable_format_error); });
     CHECK(x.has_value());
     CHECK(*x == 10);
 }
@@ -70,13 +75,13 @@ TEST_CASE("testCoroResultFaulty") {
         ++count;
         int y = co_await just(20);
         ++count;
-        int z = co_await faulty("an error");
+        int z = co_await faulty(std::errc::io_error);
         ++count;
         co_return x + y + z;
     }();
 
     CHECK(!x.has_value());
-    CHECK(x.error() == "an error");
+    CHECK(x.error() == std::make_error_code(std::errc::io_error));
     CHECK(count == 2);
 }
 
@@ -86,13 +91,13 @@ TEST_CASE("testCoroResultFaultyMidWay") {
     auto x = [&count] -> Result<int> {
         int x = co_await just(10);
         ++count;
-        int y = co_await faulty("an error");
+        int y = co_await faulty(std::errc::io_error);
         ++count;
         co_return x + y;
     }();
 
     CHECK(!x.has_value());
-    CHECK(x.error() == "an error");
+    CHECK(x.error() == std::make_error_code(std::errc::io_error));
     CHECK(count == 1);
 }
 
@@ -102,13 +107,15 @@ TEST_CASE("testCoroResultConvertError") {
     auto x = [&count] -> Result<int> {
         int x = co_await just(10);
         ++count;
-        int y = co_await (faulty("kek") | result::mapErr([](auto err) { return "error: " + err; }));
+        int y = co_await (faulty(std::errc::io_error) | result::mapErr([](auto) {
+                              return std::make_error_code(std::errc::executable_format_error);
+                          }));
         ++count;
         co_return x + y;
     }();
 
     CHECK(!x.has_value());
-    CHECK(x.error() == "error: kek");
+    CHECK(x.error() == std::make_error_code(std::errc::executable_format_error));
     CHECK(count == 1);
 }
 
@@ -124,7 +131,7 @@ TEST_CASE("testCoroResultConvertUnit") {
     int z = 0;
 
     auto x = [&] -> Result<Unit> {
-        z = co_await (get_int() | result::lift("hello"));
+        z = co_await (get_int() | result::lift(std::make_error_code(std::errc::io_error)));
         co_await aunit();
         co_return unit;
     }();

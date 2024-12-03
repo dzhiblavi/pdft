@@ -8,21 +8,21 @@ TEST_CASE("testParseResponseEmpty", "") {
     auto resp = parseResponse("");
 
     CHECK(!resp.has_value());
-    CHECK(resp.error() == "too short APC response to be valid");
+    CHECK(resp.error() == makeErrorCode(ParseResponseError::MalformedResponse));
 }
 
 TEST_CASE("testParseResponseNoFirstEscapeCode", "") {
     auto resp = parseResponse("_Ga=b;\033");
 
     CHECK(!resp.has_value());
-    CHECK(resp.error() == "APC response does not start with the escape code");
+    CHECK(resp.error() == makeErrorCode(ParseResponseError::MalformedResponse));
 }
 
 TEST_CASE("testParseResponseNoLastEscapeCode", "") {
     auto resp = parseResponse("\033_Ga=b;\033b");
 
     CHECK(!resp.has_value());
-    CHECK(resp.error() == "APC response does not end with the backslash");
+    CHECK(resp.error() == makeErrorCode(ParseResponseError::MalformedResponse));
 }
 
 TEST_CASE("testParseResponseNoControlDataNoPayload", "") {
@@ -40,7 +40,7 @@ TEST_CASE("testParseResponseNoPayloadDelimiter", "") {
     auto resp = parseResponse("\033_Ga=b\033\\");
 
     CHECK(!resp.has_value());
-    CHECK(resp.error() == "command _G did not terminate its control data with ;");
+    CHECK(resp.error() == makeErrorCode(ParseResponseError::MalformedResponse));
 }
 
 TEST_CASE("testParseResponseSingleControlDataNoPayload", "") {
@@ -85,14 +85,14 @@ TEST_CASE("testParseResponseInvalidControlDataEmpty", "") {
     auto resp = parseResponse("\033_G,,,,;\033\\");
 
     CHECK(!resp.has_value());
-    CHECK(resp.error() == "malformed key-value control data item: ");
+    CHECK(resp.error() == makeErrorCode(ParseResponseError::MalformedResponse));
 }
 
 TEST_CASE("testParseResponseInvalidControlDataNotAKeyValue", "") {
     auto resp = parseResponse("\033_GAB;\033\\");
 
     CHECK(!resp.has_value());
-    CHECK(resp.error() == "malformed key-value control data item: AB");
+    CHECK(resp.error() == makeErrorCode(ParseResponseError::MalformedResponse));
 }
 
 }  // namespace pdft::tui::display::kitty::apc

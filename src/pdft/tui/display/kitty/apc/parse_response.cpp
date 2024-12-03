@@ -1,7 +1,5 @@
 #include "pdft/tui/display/kitty/apc/parse_response.h"
 
-#include <format>
-
 namespace pdft::tui::display::kitty::apc {
 
 namespace {
@@ -13,7 +11,7 @@ Result<ControlDataItem> parseControlDataItem(std::string_view item_view) {
     auto equal_sign_pos = item_view.find('=');
 
     if (equal_sign_pos == std::string::npos || equal_sign_pos == 0) {
-        return std::unexpected(std::format("malformed key-value control data item: {}", item_view));
+        return result::err(makeErrorCode(ParseResponseError::MalformedResponse));
     }
 
     return std::make_pair(
@@ -53,15 +51,15 @@ Result<ControlData> parseControlData(std::string_view control_data) {
 // \033_Ga=b,c=d;OK\033 and backslash
 Result<Response> parseResponse(std::string_view response) {
     if (response.size() <= 4) {
-        return std::unexpected("too short APC response to be valid");
+        return result::err(makeErrorCode(ParseResponseError::MalformedResponse));
     }
 
     if (response[0] != '\033') {
-        return std::unexpected("APC response does not start with the escape code");
+        return result::err(makeErrorCode(ParseResponseError::MalformedResponse));
     }
 
     if (response.back() != '\\') {
-        return std::unexpected("APC response does not end with the backslash");
+        return result::err(makeErrorCode(ParseResponseError::MalformedResponse));
     }
 
     // The first two bytes after escape code are interpreted as command code (_G)
@@ -71,8 +69,7 @@ Result<Response> parseResponse(std::string_view response) {
     auto end_of_control_data = response.find(';', 3);
 
     if (end_of_control_data == std::string::npos) {
-        return std::unexpected(
-            std::format("command {} did not terminate its control data with ;", command_view));
+        return result::err(makeErrorCode(ParseResponseError::MalformedResponse));
     }
 
     auto control_data_view = response.substr(3, end_of_control_data - 3);
