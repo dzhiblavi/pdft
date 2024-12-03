@@ -53,7 +53,7 @@ Notify::Notify(asio::any_io_executor executor) : channel_(executor, 10) {
     PDFT_VERIFY(fsw_add_event_type_filter(handle_, filter) == FSW_OK);
 
     // XXX Add a dummy path because FSW requires that at least one path
-    // exists before polling is started
+    // is added before polling is started
     add(".");
 
     fsw_thread_ = std::thread(monitorRunLoop, this);
