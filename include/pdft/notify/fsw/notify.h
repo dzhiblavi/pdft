@@ -2,7 +2,7 @@
 
 #include "pdft/notify/notify.h"
 
-#include <asio/experimental/channel.hpp>
+#include <asio/experimental/concurrent_channel.hpp>
 #include <asio/use_awaitable.hpp>
 #include <asio/use_future.hpp>
 
@@ -24,8 +24,8 @@ class Notify : public notify::Notify {
     AsyncResult<Event> nextEvent() override;
 
  private:
-    using EventChannel =
-        asio::experimental::channel<asio::any_io_executor, void(asio::error_code, Event)>;
+    using EventChannel = asio::experimental::
+        concurrent_channel<asio::any_io_executor, void(asio::error_code, Event)>;
 
     static void monitorRunLoop(Notify* self);
     static void processEvents(const fsw_cevent* const events, unsigned count, void* context);
