@@ -28,9 +28,14 @@ template <typename T>
 requires std::is_enum_v<T>
 struct fmt::formatter<T> : fmt::ostream_formatter {};
 
-inline std::ostream& operator<<(std::ostream& os, const std::error_code& ec) {
-    return os << ec.category().name() << ": " << ec.category().message(ec.value());
-}
-
 template <>
-struct fmt::formatter<std::error_code> : fmt::ostream_formatter {};
+struct fmt::formatter<std::error_code> {
+    constexpr decltype(auto) parse(format_parse_context& ctx) {
+        return ctx.end();
+    }
+
+    template <typename FormatContext>
+    decltype(auto) format(const std::error_code& ec, FormatContext& ctx) {
+        return fmt::format_to(ctx.out(), "ec(cat={},msg={})", ec.category().name(), ec.message());
+    }
+};

@@ -4,6 +4,7 @@
 #include <type_traits>
 
 #include <magic_enum.hpp>
+#include <rfl/type_name_t.hpp>
 
 namespace pdft {
 
@@ -12,10 +13,12 @@ using Error = std::error_code;
 template <typename T>
 requires std::is_scoped_enum_v<T>
 const std::error_category& enumErrorCodeErrorCategory() {
+    static const auto Name = rfl::type_name_t<T>().name();
+
     class Category : public std::error_category {
      public:
         const char* name() const noexcept override {
-            return "hello";
+            return Name.data();
         }
 
         std::string message(std::underlying_type_t<T> value) const override {
