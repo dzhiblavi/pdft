@@ -47,11 +47,17 @@ constexpr bool containsFormatPlaceholder(std::string_view str) {
 
 }  // namespace pdft::core
 
-#define PDFT_VERIFY(expr, ...)                                                                \
-    do {                                                                                      \
-        if (!static_cast<bool>(expr)) [[unlikely]] {                                          \
-            ::pdft::core::panic("PDFT_VERIFY failed: '" #expr "' is not true: " __VA_ARGS__); \
-        }                                                                                     \
+namespace pdft {
+
+using core::panic;
+
+}  // namespace pdft
+
+#define PDFT_VERIFY(expr, ...)                                                          \
+    do {                                                                                \
+        if (!static_cast<bool>(expr)) [[unlikely]] {                                    \
+            ::pdft::panic("PDFT_VERIFY failed: '" #expr "' is not true: " __VA_ARGS__); \
+        }                                                                               \
     } while (0)
 
 #ifndef NDEBUG

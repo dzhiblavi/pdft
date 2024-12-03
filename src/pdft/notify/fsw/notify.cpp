@@ -39,7 +39,7 @@ Notify::Notify(asio::any_io_executor executor) : channel_(executor, 10) {
             break;
 
         case Unknown:
-            core::panic("this platform is not supported by filesystem watcher");
+            panic("this platform is not supported by filesystem watcher");
             break;
     }
 

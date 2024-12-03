@@ -31,7 +31,7 @@ struct ResultPromise {
     }
 
     [[noreturn]] void unhandled_exception() noexcept {
-        core::panic("unhandled promise exception");
+        panic("unhandled promise exception");
         std::unreachable();
     }
 

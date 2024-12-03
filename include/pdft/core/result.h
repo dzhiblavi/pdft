@@ -1,7 +1,6 @@
-#include "pdft/core/result/type/error.h"
+#include "pdft/core/result/type/maybe.h"
 #include "pdft/core/result/type/result.h"
 #include "pdft/core/result/type/status.h"
-#include "pdft/core/result/type/unit.h"
 
 #include "pdft/core/result/make/err.h"
 #include "pdft/core/result/make/ok.h"

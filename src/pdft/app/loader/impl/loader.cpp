@@ -1,6 +1,5 @@
 #include "pdft/app/loader/impl/loader.h"
 
-#include "pdft/core/assert.h"
 #include "pdft/core/log/log.h"
 
 #include <magic_enum.hpp>
@@ -16,9 +15,7 @@ bool isOpened(
     // XXX this does not actually require linear search
 
     for (const auto& state : ui.states) {
-        auto maybe_doc = documents.getDocument(state.document_id);
-        PDFT_VERIFY(maybe_doc);
-        auto doc = *maybe_doc;
+        auto doc = documents.getDocument(state.document_id) | result::unwrap;
 
         if (abs_path == doc->getPath()) {
             return true;
@@ -45,12 +42,12 @@ Result<void> Loader::load(
     auto mode_name = magic_enum::enum_name(mode);
 
     if (mode != StateMode::Standalone && mode != StateMode::Clean) {
-        pdft::log::info("loading the state because mode is {}", mode_name);
+        log::info("loading the state because mode is {}", mode_name);
 
         if (auto result = persister_->restore(ui, documents, is); !result) {
-            pdft::log::warn("failed to restore the state: {}; ignoring", result.error());
+            log::warn("failed to restore the state: {}; ignoring", result.error());
         } else {
-            pdft::log::info("the state has been successfully restored");
+            log::info("the state has been successfully restored");
         }
     }
 

@@ -11,9 +11,10 @@ Dimensions Terminal::getDimensions() const {
     winsize sz;
 
     if (ioctl(STDIN_FILENO, TIOCGWINSZ, &sz) != 0) {
-        core::panic("ioctl failed, errno={} ({})", errno, strerror(errno));
+        panic("ioctl failed, errno={} ({})", errno, strerror(errno));
     }
 
+    // XXX For debugging purposes
     if (sz.ws_row == 0) {
         return {
             .rows = 10,

@@ -44,7 +44,8 @@ int main(int argc, const char** argv) {
     try {
         context.run();
     } catch (...) {
-        pdft::core::panic("an unexpected exception");
+        pdft::panic("an unexpected exception");
     }
+
     return 0;
 }

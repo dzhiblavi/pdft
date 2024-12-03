@@ -26,7 +26,7 @@ T getOffset(T outer, T inner, Alignment strategy) {
             return (outer - inner) / static_cast<T>(2);
 
         default:
-            core::panic("getOffset unexpected FitStrategy");
+            panic("getOffset unexpected FitStrategy");
     }
 }
 

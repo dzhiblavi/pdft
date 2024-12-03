@@ -66,10 +66,10 @@ Result<Action> handleSignal(int signal) {
             return Quit;
 
         case SIGSEGV:
-            return core::panic("received SIGSEGV");
+            return panic("received SIGSEGV");
 
         default:
-            return core::panic("received unknown signal ({})", signal);
+            return panic("received unknown signal ({})", signal);
     }
 }
 

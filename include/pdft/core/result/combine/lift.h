@@ -2,6 +2,7 @@
 
 #include "pdft/core/result/make/err.h"
 #include "pdft/core/result/type/result.h"
+#include "pdft/core/result/type/maybe.h"
 
 namespace pdft::result {
 

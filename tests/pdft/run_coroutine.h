@@ -16,7 +16,7 @@ void runCoroutine(F func) {
     try {
         context.run();
     } catch (...) {
-        core::panic("unhandled exception");
+        panic("unhandled exception");
     }
 }
 

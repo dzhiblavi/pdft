@@ -1,6 +1,7 @@
 #pragma once
 
 #include "pdft/core/result/type/result.h"
+#include "pdft/core/result/type/maybe.h"
 
 namespace pdft::result {
 
