@@ -25,7 +25,7 @@ struct ResultPromise {
         return std::suspend_never{};
     }
 
-    [[clang::noinline]] void return_value(T x) {
+    void return_value(T x) {
         PDFT_VERIFY_DBG(owner);
         owner->assign(ok(std::move(x)));
     }

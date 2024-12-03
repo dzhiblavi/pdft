@@ -25,7 +25,7 @@ struct MaybePromise {
         return std::suspend_never{};
     }
 
-    [[clang::noinline]] void return_value(T value) {
+    void return_value(T value) {
         PDFT_VERIFY_DBG(owner);
         owner->assign(Maybe<T>(std::move(value)));
     }
