@@ -1,4 +1,5 @@
 #include "pdft/core/result.h"
+#include "pdft/core/result/coro/maybe.h"
 #include "pdft/core/result/coro/result.h"
 
 #include <catch2/catch_test_macros.hpp>
@@ -72,6 +73,27 @@ TEST_CASE("testCoroResultConvertError") {
     CHECK(!x.has_value());
     CHECK(x.error() == "error: kek");
     CHECK(count == 1);
+}
+
+Maybe<int> get_int() {
+    co_return 10;
+}
+
+Result<Unit> aunit() {
+    co_return unit;
+}
+
+TEST_CASE("testCoroResultConvertUnit") {
+    int z = 0;
+
+    auto x = [&] -> Result<Unit> {
+        z = co_await (get_int() | result::lift("hello"));
+        co_await aunit();
+        co_return unit;
+    }();
+
+    CHECK(x.has_value());
+    CHECK(z == 10);
 }
 
 }  // namespace pdft
