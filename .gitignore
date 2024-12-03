@@ -1,4 +1,5 @@
 compile_commands.json
+env.sh
 CMakeUserPresets.json
 /build*/
 /cmake-build-*

@@ -33,6 +33,7 @@ add_test(./pdft/image/color.cpp)
 
 # Utils
 add_test(./pdft/utils/test_intrusive_forward_list.cpp)
+add_test(./pdft/utils/test_visit.cpp)
 
 # TUI
 add_test(./pdft/tui/test_alignment.cpp)

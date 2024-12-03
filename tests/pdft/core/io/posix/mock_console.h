@@ -58,21 +58,21 @@ struct MockConsole : Console {
     using Console::read;
     using Console::write;
 
-    asio::awaitable<void> write(std::string_view bytes) override {
+    AsyncResult<void> write(std::string_view bytes) override {
         out_fd_w.write(bytes);
-        co_return;
+        co_return asio::error_code();
     }
 
-    asio::awaitable<void> writeMany(std::vector<asio::const_buffer> buffers) override {
+    AsyncResult<void> writeMany(std::vector<asio::const_buffer> buffers) override {
         for (const auto& s : buffers) {
             out_fd_w.write({(const char*)s.data(), s.size()});
         }
-        co_return;
+        co_return asio::error_code();
     }
 
-    asio::awaitable<void> read(size_t num_bytes, std::string& out) override {
+    AsyncResult<void> read(size_t num_bytes, std::string& out) override {
         out = in_fd_r.read(num_bytes);
-        co_return;
+        co_return asio::error_code();
     }
 
     void put(std::string s) {

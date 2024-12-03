@@ -11,17 +11,20 @@ Console::Console(asio::io_context& context, int stdin_fd, int stdout_fd)
     : stdin_(context, stdin_fd)
     , stdout_(context, stdout_fd) {}
 
-asio::awaitable<void> Console::write(std::string_view bytes) {
-    co_await asio::async_write(stdout_, asio::buffer(bytes), asio::use_awaitable);
+AsyncResult<void> Console::write(std::string_view bytes) {
+    co_await asio::async_write(stdout_, asio::buffer(bytes), asio_coro);
+    co_return asio::error_code();
 }
 
-asio::awaitable<void> Console::writeMany(std::vector<asio::const_buffer> buffers) {
-    co_await asio::async_write(stdout_, std::move(buffers), asio::use_awaitable);
+AsyncResult<void> Console::writeMany(std::vector<asio::const_buffer> buffers) {
+    co_await asio::async_write(stdout_, std::move(buffers), asio_coro);
+    co_return asio::error_code();
 }
 
-asio::awaitable<void> Console::read(size_t num_bytes, std::string& out) {
+AsyncResult<void> Console::read(size_t num_bytes, std::string& out) {
     out.resize(num_bytes);
-    co_await asio::async_read(stdin_, asio::buffer(out), asio::use_awaitable);
+    co_await asio::async_read(stdin_, asio::buffer(out), asio_coro);
+    co_return asio::error_code();
 }
 
 }  // namespace pdft::core::io::posix

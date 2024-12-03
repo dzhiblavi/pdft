@@ -23,6 +23,7 @@
 #include "pdft/utils/random.h"
 #include "pdft/utils/visit.h"
 
+#include "pdft/core/awaitable.h"
 #include "pdft/core/io/posix/console.h"
 #include "pdft/core/io/posix/termctl.h"
 #include "pdft/core/log/log.h"
@@ -215,16 +216,17 @@ asio::awaitable<bool> Application::waitForNextRender() {
 
         // XXX debouncing?
         auto event = co_await (
-            console_->read(1) || fs_watcher_->nextEvent() ||
-            signals_.async_wait(asio::use_awaitable));
+            console_->read(1) || fs_watcher_->nextEvent() || signals_.async_wait(asio_coro));
 
-        auto action = utils::visit(
+        auto action = utils::visitUnpack(
             event,
-            [&](std::string event) { return controller_->onKeyEvent(event[0], ui_, *documents_); },
-            [&](notify::Event event) {
+            [&](auto, std::string event) {
+                return controller_->onKeyEvent(event[0], ui_, *documents_);
+            },
+            [&](auto, notify::Event event) {
                 return controller_->onFilesystemEvent(event, ui_, *documents_);
             },
-            [&](int signal) { return handleSignal(signal); });
+            [&](auto, int signal) { return handleSignal(signal); });
 
         if (action.has_value()) {
             if (action == Quit) {

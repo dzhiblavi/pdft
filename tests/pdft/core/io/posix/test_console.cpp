@@ -4,9 +4,16 @@
 
 #include <asio/co_spawn.hpp>
 #include <asio/detached.hpp>
+
+#include <asio/experimental/awaitable_operators.hpp>
+#include <asio/experimental/channel.hpp>
+#include <asio/redirect_error.hpp>
+
 #include <catch2/catch_test_macros.hpp>
 
 namespace pdft::core::io {
+
+using namespace asio::experimental::awaitable_operators;
 
 TEST_CASE("testPosixConsoleWrite", "") {
     tests::runCoroutine([](auto& context) -> asio::awaitable<void> {
@@ -25,25 +32,30 @@ TEST_CASE("testPosixConsoleRead", "") {
 
         mock->put("abacaba");
         auto out = co_await console.read(3);
-        CHECK(out == "aba");
+        CHECK(std::get<1>(out) == "aba");
     });
 }
 
 TEST_CASE("testPosixConsoleMixed", "") {
     tests::runCoroutine([](auto& context) -> asio::awaitable<void> {
+        asio::error_code ec;
+        std::string read;
         auto mock = test::makeMockConsole();
         auto console = posix::Console(context, mock->inFd(), mock->outFd());
 
         mock->put("hello");
-        CHECK(co_await console.read(3) == "hel");
+        std::tie(ec, read) = co_await console.read(3);
+        CHECK(read == "hel");
 
         co_await console.write("test");
         CHECK(mock->written() == "test");
 
         mock->put("abacaba");
-        CHECK(co_await console.read(5) == "loaba");
+        std::tie(ec, read) = co_await console.read(5);
+        CHECK(read == "loaba");
 
-        CHECK(co_await console.read(4) == "caba");
+        std::tie(ec, read) = co_await console.read(4);
+        CHECK(read == "caba");
     });
 }
 

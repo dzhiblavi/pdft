@@ -1,3 +1,5 @@
+#include "pdft/core/assert.h"
+
 #include <asio/co_spawn.hpp>
 #include <asio/detached.hpp>
 #include <asio/io_context.hpp>
@@ -10,7 +12,12 @@ template <typename F>
 void runCoroutine(F func) {
     asio::io_context context;
     asio::co_spawn(context, func(context), asio::detached);
-    context.run();
+
+    try {
+        context.run();
+    } catch (...) {
+        core::panic("unhandled exception");
+    }
 }
 
 }  // namespace pdft::tests

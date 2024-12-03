@@ -14,10 +14,9 @@ class Console : public io::Console {
     using io::Console::read;
     using io::Console::write;
 
-    asio::awaitable<void> write(std::string_view bytes) override;
-    asio::awaitable<void> writeMany(std::vector<asio::const_buffer> bytes) override;
-
-    asio::awaitable<void> read(size_t num_bytes, std::string& buffer) override;
+    AsyncResult<void> write(std::string_view bytes) override;
+    AsyncResult<void> writeMany(std::vector<asio::const_buffer> bytes) override;
+    AsyncResult<void> read(size_t num_bytes, std::string& buffer) override;
 
  private:
     asio::posix::stream_descriptor stdin_;

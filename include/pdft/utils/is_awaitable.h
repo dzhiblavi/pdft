@@ -10,5 +10,4 @@ constexpr bool isAwaitable = false;
 template <typename T>
 constexpr bool isAwaitable<asio::awaitable<T>> = true;
 
-
 }  // namespace pdft::utils

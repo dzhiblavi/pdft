@@ -52,6 +52,10 @@ Notify::Notify(asio::any_io_executor executor) : channel_(executor, 10) {
     filter.flag = Updated;
     PDFT_VERIFY(fsw_add_event_type_filter(handle_, filter) == FSW_OK);
 
+    // XXX Add a dummy path because FSW requires that at least one path
+    // exists before polling is started
+    add(".");
+
     fsw_thread_ = std::thread(monitorRunLoop, this);
 }
 
@@ -81,31 +85,31 @@ void Notify::add(const std::filesystem::path& path) {
     PDFT_VERIFY(fsw_add_path(handle_, path.c_str()) == FSW_OK);
 }
 
-asio::awaitable<Event> Notify::nextEvent() {
-    co_return co_await channel_.async_receive(asio::use_awaitable);
+AsyncResult<Event> Notify::nextEvent() {
+    co_return co_await channel_.async_receive(asio_coro);
 }
 
 void Notify::monitorRunLoop(Notify* self) {
-    core::log::debug("start fswatch monitorRunLoop");
+    log::debug("start fswatch monitorRunLoop");
 
     while (!self->should_exit_.load(std::memory_order_acquire)) {
         fsw_start_monitor(self->handle_);
     }
 
-    core::log::debug("end fswatch monitorRunLoop");
+    log::debug("end fswatch monitorRunLoop");
 }
 
 void Notify::processEvents(const fsw_cevent* const events, unsigned count, void* context) {
     auto* self = static_cast<Notify*>(context);
     log::trace("received {} filesystem events", count);
 
-    for (unsigned i = 0; i < count; ++i) {
+    for (unsigned i = 0; i < count && !self->isStopped(); ++i) {
         if (events[i].flags_num > 0 &&
             (events[i].flags[0] == NoOp || events[i].flags[0] == PlatformSpecific)) {
             continue;
         }
 
-        core::log::trace("received a filesystem event for path {}", events[i].path);
+        log::trace("received a filesystem event for path {}", events[i].path);
 
         for (unsigned j = 0; j < events[i].flags_num; ++j) {
             log::trace(

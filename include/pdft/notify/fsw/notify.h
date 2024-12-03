@@ -21,7 +21,7 @@ class Notify : public notify::Notify {
     void stop() override;
     bool isStopped() const override;
     void add(const std::filesystem::path& path) override;
-    asio::awaitable<Event> nextEvent() override;
+    AsyncResult<Event> nextEvent() override;
 
  private:
     using EventChannel =
