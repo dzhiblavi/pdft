@@ -48,7 +48,8 @@ class Controller : public controller::Controller {
 
     Controller(const Config& config, Arc<const media::Loader> doc_loader);
 
-    Result<Action> onKeyEvent(char key, state::UIState& ui, state::DocumentStorage& documents) override;
+    Result<Action> onKeyEvent(
+        char key, state::UIState& ui, state::DocumentStorage& documents) override;
 
     Result<Action> onFilesystemEvent(
         const notify::Event& event, state::UIState& ui, state::DocumentStorage& documents) override;
@@ -56,6 +57,7 @@ class Controller : public controller::Controller {
  private:
     Result<Action> applyPendingCommand(state::UIState& ui, state::DocumentStorage& documents);
     void bindKey(Command command, std::string_view keys);
+    Result<Unit> reloadCurrentDocument(state::UIState& ui, state::DocumentStorage& documents);
     Status reloadDocument(
         state::DocumentId id,
         std::filesystem::path path,

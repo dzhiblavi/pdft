@@ -76,12 +76,7 @@ Result<Action> Controller::applyPendingCommand(
             return Action::Quit;
 
         case Reload:
-            return ui.getCurrentDocumentId() | lift("no document is opened") |
-                   andThen([&](auto id) {
-                       auto document = documents.getDocument(id) | unwrap;
-                       return reloadDocument(id, document->getPath(), ui, documents);
-                   }) |
-                   map([](auto) { return Action::Redraw; });
+            return reloadCurrentDocument(ui, documents) | map([](Unit) { return Action::Redraw; });
 
         case CloseDocument:
             if (auto id = ui.getCurrentDocumentId()) {
@@ -193,9 +188,21 @@ Result<Action> Controller::onFilesystemEvent(
     using namespace result;
     log::debug("controller: fs event on path={}", event.path);
 
-    return documents.getIdByPath(event.path) | lift("failed to find document by path") |
-           andThen([&](auto id) { return reloadDocument(id, event.path, ui, documents); }) |
-           andThen([](auto) { return result::ok(Action::Redraw); });
+    auto id =
+        co_await (documents.getIdByPath(event.path) | lift("failed to find document by path"));
+
+    co_await reloadDocument(id, event.path, ui, documents);
+    co_return Action::Redraw;
+}
+
+Result<Unit> Controller::reloadCurrentDocument(
+    state::UIState& ui, state::DocumentStorage& documents) {
+    using namespace result;
+
+    auto id = co_await (ui.getCurrentDocumentId() | lift("no document is opened"));
+    auto document = documents.getDocument(id) | unwrap;
+
+    co_return co_await reloadDocument(id, document->getPath(), ui, documents);
 }
 
 Status Controller::reloadDocument(
@@ -208,21 +215,19 @@ Status Controller::reloadDocument(
     PDFT_VERIFY(documents.removeDocument(old_id));
     log::debug("controller: removed document with id={}", old_id);
 
-    return doc_loader_->load(path) |  //
-           andThen([&](auto document) {
-               auto page_count = document->getPageCount();
-               auto new_id = documents.addDocument(document);
-               ui.onDocumentChanged(old_id, new_id, page_count);
+    auto document =
+        co_await (doc_loader_->load(path) | mapErr([&](auto error) {
+                      log::warn("failed to reload document by path {}: {}", path, error);
+                      ui.removeDocument(old_id);
+                      return error;
+                  }));
 
-               log::info(
-                   "replaced document with path={} old_id={}, new_id={}", path, old_id, new_id);
-               return ok(unit);
-           }) |
-           mapErr([&](auto error) {
-               log::warn("failed to reload document by path {}: {}", path, error);
-               ui.removeDocument(old_id);
-               return error;
-           });
+    auto page_count = document->getPageCount();
+    auto new_id = documents.addDocument(document);
+    ui.onDocumentChanged(old_id, new_id, page_count);
+
+    log::info("replaced document with path={} old_id={}, new_id={}", path, old_id, new_id);
+    co_return unit;
 }
 
 }  // namespace pdft::app::controller::impl

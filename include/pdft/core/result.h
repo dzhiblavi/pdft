@@ -14,3 +14,6 @@
 #include "pdft/core/result/combine/unwrap.h"
 
 #include "pdft/core/result/syntax/pipe.h"
+
+#include "pdft/core/result/coro/maybe.h"
+#include "pdft/core/result/coro/result.h"
