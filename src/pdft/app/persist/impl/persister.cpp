@@ -30,8 +30,7 @@ void AppPersister::save(
     rfl::json::write(state, os);
 }
 
-Result<void> AppPersister::restore(
-    UIState& ui, DocumentStorage& documents, std::istream& is) const {
+Status AppPersister::restore(UIState& ui, DocumentStorage& documents, std::istream& is) const {
     auto maybe_state = rfl::json::read<State>(is);
 
     if (!maybe_state) {

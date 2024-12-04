@@ -1,4 +1,6 @@
 #include "pdft/core/io/posix_console.h"
+#include "pdft/core/result/combine/unwrap.h"
+#include "pdft/core/result/syntax/pipe.h"
 #include "tests/pdft/core/io/mock_fd_console.h"
 #include "tests/pdft/run_coroutine.h"
 
@@ -31,8 +33,8 @@ TEST_CASE("testPosixConsoleRead", "") {
         auto console = PosixConsole(context, mock->inFd(), mock->outFd());
 
         mock->put("abacaba");
-        auto out = co_await console.read(3);
-        CHECK(std::get<1>(out) == "aba");
+        auto out = co_await console.read(3) | result::unwrap;
+        CHECK(out == "aba");
     });
 }
 
@@ -44,17 +46,17 @@ TEST_CASE("testPosixConsoleMixed", "") {
         auto console = PosixConsole(context, mock->inFd(), mock->outFd());
 
         mock->put("hello");
-        std::tie(ec, read) = co_await console.read(3);
+        read = co_await console.read(3) | result::unwrap;
         CHECK(read == "hel");
 
         co_await console.write("test");
         CHECK(mock->written() == "test");
 
         mock->put("abacaba");
-        std::tie(ec, read) = co_await console.read(5);
+        read = co_await console.read(5) | result::unwrap;
         CHECK(read == "loaba");
 
-        std::tie(ec, read) = co_await console.read(4);
+        read = co_await console.read(4) | result::unwrap;
         CHECK(read == "caba");
     });
 }

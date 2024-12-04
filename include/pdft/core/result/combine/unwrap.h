@@ -3,6 +3,7 @@
 #include "pdft/core/result/type/result.h"
 
 #include "pdft/core/assert.h"
+#include "pdft/core/log/common_adapters.h"
 
 #include <optional>
 

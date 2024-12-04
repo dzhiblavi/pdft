@@ -33,7 +33,7 @@ class Loader {
 
     virtual void save(const UIState& ui, const DocumentStorage& documents, std::ostream& os) = 0;
 
-    virtual Result<void> load(
+    virtual Status load(
         const std::vector<std::string>& paths,
         UIState& ui,
         DocumentStorage& documents,

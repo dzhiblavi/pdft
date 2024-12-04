@@ -20,7 +20,7 @@ class Persister {
     virtual void save(
         const UIState& ui, const DocumentStorage& documents, std::ostream& os) const = 0;
 
-    virtual Result<void> restore(
+    virtual Status restore(
         UIState& ui, DocumentStorage& documents, std::istream& is) const = 0;
 };
 

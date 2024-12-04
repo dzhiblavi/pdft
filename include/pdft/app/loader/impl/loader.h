@@ -15,7 +15,7 @@ class AppLoader : public Loader {
 
     void save(const UIState& ui, const DocumentStorage& documents, std::ostream& os) override;
 
-    Result<void> load(
+    Status load(
         const std::vector<std::string>& paths,
         UIState& ui,
         DocumentStorage& documents,

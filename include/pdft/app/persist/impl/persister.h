@@ -13,7 +13,7 @@ class AppPersister : public Persister {
 
     void save(const UIState& ui, const DocumentStorage& documents, std::ostream& os) const override;
 
-    Result<void> restore(UIState& ui, DocumentStorage& documents, std::istream& is) const override;
+    Status restore(UIState& ui, DocumentStorage& documents, std::istream& is) const override;
 
  private:
     Arc<const media::Loader> doc_loader_;

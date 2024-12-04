@@ -123,14 +123,14 @@ Maybe<int> get_int() {
     co_return 10;
 }
 
-Result<Unit> aunit() {
+Status aunit() {
     co_return;
 }
 
 TEST_CASE("testCoroResultConvertUnit") {
     int z = 0;
 
-    auto x = [&] -> Result<Unit> {
+    auto x = [&] -> Status {
         z = co_await (get_int() | result::lift(std::make_error_code(std::errc::io_error)));
         co_await aunit();
         co_return;

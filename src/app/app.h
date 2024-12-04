@@ -34,6 +34,7 @@ class Application : public pdft::log::WithLogger {
     void load(const std::vector<std::string>& paths);
     void saveState();
 
+    pdft::AsyncResult<int> awaitSignal();
     asio::awaitable<void> prepareTerminal();
     asio::awaitable<void> runEventLoop();
     asio::awaitable<bool> waitForNextRender();

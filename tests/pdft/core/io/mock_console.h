@@ -10,25 +10,25 @@ struct MockConsole : Console {
     using Console::read;
     using Console::write;
 
-    AsyncResult<void> write(std::string_view bytes) override {
+    AsyncStatus write(std::string_view bytes) override {
         std::cerr << std::format("write '{}' to console", bytes) << std::endl;
         out_ += bytes;
-        co_return asio::error_code{};
+        co_return result::ok();
     }
 
-    AsyncResult<void> writeMany(std::vector<asio::const_buffer> buffers) override {
+    AsyncStatus writeMany(std::vector<asio::const_buffer> buffers) override {
         for (const auto& buf : buffers) {
             out_ += std::string_view{(const char*)buf.data(), buf.size()};
         }
-        co_return asio::error_code{};
+        co_return result::ok();
     }
 
-    AsyncResult<void> read(size_t num_bytes, std::string& out) override {
+    AsyncStatus read(size_t num_bytes, std::string& out) override {
         auto result = readFrom(in_, num_bytes);
         std::cerr << std::format("read '{}' from console (requested {} bytes)", result, num_bytes)
                   << std::endl;
         out = result;
-        co_return asio::error_code{};
+        co_return result::ok();
     }
 
     void put(std::string s) {

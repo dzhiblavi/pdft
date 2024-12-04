@@ -205,23 +205,38 @@ asio::awaitable<void> Application::runEventLoop() {
     }
 }
 
+pdft::AsyncResult<int> Application::awaitSignal() {
+    auto [ec, signal] = co_await signals_.async_wait(asio_coro_as_tuple);
+
+    if (ec) {
+        co_return result::err(ec);
+    }
+
+    co_return result::ok(signal);
+}
+
 asio::awaitable<bool> Application::waitForNextRender() {
     for (;;) {
         using enum ControllerAction;
 
-        // XXX debouncing?
-        auto event = co_await (
-            console_->read(1) || fs_watcher_->nextEvent() || signals_.async_wait(asio_coro));
+        // XXX Debouncing?
+        auto event = co_await (console_->read(1) || fs_watcher_->nextEvent() || awaitSignal());
 
+        // XXX Handle errors!
         auto action = utils::visitUnpack(
             event,
-            [&](auto, std::string event) {
-                return controller_->onKeyEvent(event[0], ui_, *documents_);
+            [&](Result<std::string> r) {
+                char c = (r | result::unwrap)[0];
+                return controller_->onKeyEvent(c, ui_, *documents_);
             },
-            [&](auto, notify::Event event) {
+            [&](Result<notify::Event> r) {
+                auto&& event = r | result::unwrap;
                 return controller_->onFilesystemEvent(event, ui_, *documents_);
             },
-            [&](auto, int signal) { return handleSignal(signal); });
+            [&](Result<int> r) {
+                int signal = r | result::unwrap;
+                return handleSignal(signal);
+            });
 
         if (action.has_value()) {
             if (action == Quit) {

@@ -1,4 +1,6 @@
 #include "pdft/core/io/posix_console.h"
+#include "pdft/core/result/make/err.h"
+#include "pdft/core/result/make/ok.h"
 
 #include <asio/read.hpp>
 #include <asio/streambuf.hpp>
@@ -11,20 +13,35 @@ PosixConsole::PosixConsole(asio::io_context& context, int stdin_fd, int stdout_f
     : stdin_(context, stdin_fd)
     , stdout_(context, stdout_fd) {}
 
-AsyncResult<void> PosixConsole::write(std::string_view bytes) {
-    co_await asio::async_write(stdout_, asio::buffer(bytes), asio_coro);
-    co_return asio::error_code();
+AsyncStatus PosixConsole::write(std::string_view bytes) {
+    auto [ec, _] = co_await asio::async_write(stdout_, asio::buffer(bytes), asio_coro_as_tuple);
+
+    if (ec) {
+        co_return result::err(ec);
+    }
+
+    co_return result::ok();
 }
 
-AsyncResult<void> PosixConsole::writeMany(std::vector<asio::const_buffer> buffers) {
-    co_await asio::async_write(stdout_, std::move(buffers), asio_coro);
-    co_return asio::error_code();
+AsyncStatus PosixConsole::writeMany(std::vector<asio::const_buffer> buffers) {
+    auto [ec, _] = co_await asio::async_write(stdout_, std::move(buffers), asio_coro_as_tuple);
+
+    if (ec) {
+        co_return result::err(ec);
+    }
+
+    co_return result::ok();
 }
 
-AsyncResult<void> PosixConsole::read(size_t num_bytes, std::string& out) {
+AsyncStatus PosixConsole::read(size_t num_bytes, std::string& out) {
     out.resize(num_bytes);
-    co_await asio::async_read(stdin_, asio::buffer(out), asio_coro);
-    co_return asio::error_code();
+    auto [ec, _] = co_await asio::async_read(stdin_, asio::buffer(out), asio_coro_as_tuple);
+
+    if (ec) {
+        co_return result::err(ec);
+    }
+
+    co_return result::ok();
 }
 
 }  // namespace pdft::io

@@ -29,7 +29,7 @@ void AppLoader::save(const UIState& ui, const DocumentStorage& documents, std::o
     log::info("the state has been successfully saved");
 }
 
-Result<void> AppLoader::load(
+Status AppLoader::load(
     const std::vector<std::string>& paths,
     UIState& ui,
     DocumentStorage& documents,
