@@ -1,10 +1,10 @@
-#include "pdft/app/controller/keytree.h"
+#include "pdft/app/controller/impl/keytree.h"
 
 #include "pdft/core/assert.h"
 
 #include <stack>
 
-namespace pdft::app::controller {
+namespace pdft::app {
 
 KeyTree::~KeyTree() noexcept {
     std::stack<Node*> nodes;
@@ -141,4 +141,4 @@ void KeyTree::reset() {
     state_ = State::None;
 }
 
-}  // namespace pdft::app::controller
+}  // namespace pdft::app

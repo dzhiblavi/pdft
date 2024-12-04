@@ -43,19 +43,18 @@ namespace app {
 using namespace pdft;
 using namespace asio::experimental::awaitable_operators;
 
-using pdft::app::controller::Action;
+using pdft::app::ControllerAction;
 
+using pdft::app::AppController;
 using pdft::app::AppDocumentView;
 using pdft::app::AppPageRenderer;
 using pdft::app::AppView;
 
-using pdft::app::controller::impl::Controller;
-
 namespace {
 
-Result<Action> handleSignal(int signal) {
+Result<ControllerAction> handleSignal(int signal) {
     switch (signal) {
-        using enum Action;
+        using enum ControllerAction;
 
         case SIGWINCH:
             log::info("received SIGWINCH: terminal resized, redrawing");
@@ -106,7 +105,7 @@ void Application::setup() {
         std::make_shared<AppPageRenderer>(utils::random<uint32_t>(), documents_, image_display_);
     auto document_view = std::make_shared<AppDocumentView>(std::move(renderer));
     view_ = std::make_shared<AppView>(documents_, std::move(document_view));
-    controller_ = std::make_shared<Controller>(config_.controller, doc_loader_);
+    controller_ = std::make_shared<AppController>(config_.controller, doc_loader_);
 
     if (config_.system.enable_filesystem_watching) {
         fs_watcher_ = std::make_shared<pdft::notify::FswNotify>(context_.get_executor());
@@ -209,7 +208,7 @@ asio::awaitable<void> Application::runEventLoop() {
 
 asio::awaitable<bool> Application::waitForNextRender() {
     for (;;) {
-        using enum Action;
+        using enum ControllerAction;
 
         // XXX debouncing?
         auto event = co_await (

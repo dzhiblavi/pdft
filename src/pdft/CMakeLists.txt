@@ -79,7 +79,7 @@ target_sources(
           ./app/view/impl/page_renderer.cpp
           ./app/view/impl/view.cpp
           ./app/view/impl/document_view.cpp
-          ./app/controller/keytree.cpp
+          ./app/controller/impl/keytree.cpp
           ./app/controller/impl/controller.cpp
           ./app/loader/impl/loader.cpp
           ./app/persist/impl/persister.cpp)

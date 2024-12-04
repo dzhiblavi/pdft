@@ -1,8 +1,8 @@
-#include "pdft/app/controller/keytree.h"
+#include "pdft/app/controller/impl/keytree.h"
 
 #include <catch2/catch_test_macros.hpp>
 
-namespace pdft::app::controller {
+namespace pdft::app {
 
 using enum KeyTree::Result;
 
@@ -206,4 +206,4 @@ TEST_CASE("testKeytreeFeedsAfterResetNumbers", "") {
     CHECK((a == 0 && b == 1));
 }
 
-}  // namespace pdft::app::controller
+}  // namespace pdft::app

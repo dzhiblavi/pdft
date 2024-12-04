@@ -1,16 +1,16 @@
 #pragma once
 
 #include "pdft/app/controller/controller.h"
-#include "pdft/app/controller/keytree.h"
+#include "pdft/app/controller/impl/keytree.h"
 #include "pdft/app/state/document_storage.h"
 
 #include "pdft/media/loader.h"
 
 #include <vector>
 
-namespace pdft::app::controller::impl {
+namespace pdft::app {
 
-class Controller : public controller::Controller {
+class AppController : public Controller {
  public:
     enum class Command {
         Quit,
@@ -46,16 +46,16 @@ class Controller : public controller::Controller {
         int32_t rows_per_scroll = 10;
     };
 
-    Controller(const Config& config, Arc<const media::Loader> doc_loader);
+    AppController(const Config& config, Arc<const media::Loader> doc_loader);
 
-    Result<Action> onKeyEvent(char key, UIState& ui, DocumentStorage& documents) override;
+    Result<ControllerAction> onKeyEvent(char key, UIState& ui, DocumentStorage& documents) override;
 
-    Result<Action> onFilesystemEvent(
+    Result<ControllerAction> onFilesystemEvent(
         const notify::Event& event, UIState& ui, DocumentStorage& documents) override;
 
  private:
     void bindKey(Command command, std::string_view keys);
-    Result<Action> applyPendingCommand(UIState& ui, DocumentStorage& documents);
+    Result<ControllerAction> applyPendingCommand(UIState& ui, DocumentStorage& documents);
     Status reloadCurrentDocument(UIState& ui, DocumentStorage& documents);
     Status reloadDocument(
         DocumentId id, std::filesystem::path path, UIState& ui, DocumentStorage& documents);
@@ -74,4 +74,4 @@ class Controller : public controller::Controller {
     Arc<const media::Loader> doc_loader_;
 };
 
-}  // namespace pdft::app::controller::impl
+}  // namespace pdft::app

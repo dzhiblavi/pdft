@@ -3,7 +3,7 @@
 #include <functional>
 #include <unordered_map>
 
-namespace pdft::app::controller {
+namespace pdft::app {
 
 class KeyTree {
  public:
@@ -53,4 +53,4 @@ class KeyTree {
     uint32_t number_ = 0;
 };
 
-}  // namespace pdft::app::controller
+}  // namespace pdft::app

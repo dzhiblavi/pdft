@@ -25,7 +25,7 @@ struct Config {
     std::optional<std::string> state_path = {};
     SystemConfig system = {};
     LoggingConfig logging = {};
-    pdft::app::controller::impl::Controller::Config controller = {};
+    pdft::app::AppController::Config controller = {};
     DisplayConfig display = {};
 };
 

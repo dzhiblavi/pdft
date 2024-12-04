@@ -54,7 +54,7 @@ class Application : public pdft::core::log::WithLogger {
     pdft::Arc<pdft::app::Loader> loader_;
     pdft::Arc<pdft::app::DocumentStorage> documents_;
     pdft::Arc<pdft::app::View> view_;
-    pdft::Arc<pdft::app::controller::Controller> controller_;
+    pdft::Arc<pdft::app::Controller> controller_;
 };
 
 }  // namespace app
