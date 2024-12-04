@@ -96,7 +96,7 @@ void Application::setup() {
     doc_loader_ =
         std::make_shared<pdft::media::mupdf::Loader>(pdft::media::mupdf::thisThreadContext());
 
-    auto persister = std::make_shared<pdft::app::persist::impl::Persister>(doc_loader_);
+    auto persister = std::make_shared<pdft::app::AppPersister>(doc_loader_);
     loader_ = std::make_shared<pdft::app::loader::impl::Loader>(persister, doc_loader_);
 
     documents_ = std::make_shared<pdft::app::DocumentStorage>();

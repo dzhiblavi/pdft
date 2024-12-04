@@ -7,7 +7,7 @@
 
 #include <ostream>
 
-namespace pdft::app::persist {
+namespace pdft::app {
 
 enum class PersisterError {
     FailedToReadState,
@@ -24,4 +24,4 @@ class Persister {
         UIState& ui, DocumentStorage& documents, std::istream& is) const = 0;
 };
 
-}  // namespace pdft::app::persist
+}  // namespace pdft::app

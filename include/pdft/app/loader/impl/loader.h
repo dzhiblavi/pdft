@@ -9,7 +9,7 @@ namespace pdft::app::loader::impl {
 
 class Loader : public loader::Loader {
  public:
-    Loader(Arc<const persist::Persister> persister, Arc<const media::Loader> doc_loader)
+    Loader(Arc<const Persister> persister, Arc<const media::Loader> doc_loader)
         : persister_(std::move(persister))
         , doc_loader_(std::move(doc_loader)) {}
 
@@ -23,7 +23,7 @@ class Loader : public loader::Loader {
         std::istream& is) override;
 
  private:
-    Arc<const persist::Persister> persister_;
+    Arc<const Persister> persister_;
     Arc<const media::Loader> doc_loader_;
 };
 

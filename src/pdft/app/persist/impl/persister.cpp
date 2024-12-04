@@ -5,7 +5,7 @@
 
 #include <vector>
 
-namespace pdft::app::persist::impl {
+namespace pdft::app {
 
 namespace {
 
@@ -16,7 +16,8 @@ struct State {
 
 }  // namespace
 
-void Persister::save(const UIState& ui, const DocumentStorage& documents, std::ostream& os) const {
+void AppPersister::save(
+    const UIState& ui, const DocumentStorage& documents, std::ostream& os) const {
     State state;
     state.ui = ui;
 
@@ -29,7 +30,8 @@ void Persister::save(const UIState& ui, const DocumentStorage& documents, std::o
     rfl::json::write(state, os);
 }
 
-Result<void> Persister::restore(UIState& ui, DocumentStorage& documents, std::istream& is) const {
+Result<void> AppPersister::restore(
+    UIState& ui, DocumentStorage& documents, std::istream& is) const {
     auto maybe_state = rfl::json::read<State>(is);
 
     if (!maybe_state) {
@@ -70,4 +72,4 @@ Result<void> Persister::restore(UIState& ui, DocumentStorage& documents, std::is
     return {};
 }
 
-}  // namespace pdft::app::persist::impl
+}  // namespace pdft::app

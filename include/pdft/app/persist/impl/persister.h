@@ -4,11 +4,12 @@
 
 #include "pdft/media/loader.h"
 
-namespace pdft::app::persist::impl {
+namespace pdft::app {
 
-class Persister : public persist::Persister {
+class AppPersister : public Persister {
  public:
-    explicit Persister(Arc<const media::Loader> doc_loader) : doc_loader_(std::move(doc_loader)) {}
+    explicit AppPersister(Arc<const media::Loader> doc_loader)
+        : doc_loader_(std::move(doc_loader)) {}
 
     void save(const UIState& ui, const DocumentStorage& documents, std::ostream& os) const override;
 
@@ -18,4 +19,4 @@ class Persister : public persist::Persister {
     Arc<const media::Loader> doc_loader_;
 };
 
-}  // namespace pdft::app::persist::impl
+}  // namespace pdft::app
