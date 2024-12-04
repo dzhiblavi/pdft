@@ -1,5 +1,6 @@
 #pragma once
 
+#include "pdft/image/color.h"
 #include "pdft/image/size.h"
 
 #include <span>
@@ -11,8 +12,8 @@ class Image {
     virtual ~Image() = default;
 
     virtual ImageSize size() const = 0;
-    virtual std::span<const uint8_t> samples() const = 0;
-    virtual std::span<uint8_t> mutableSamples() = 0;
+    virtual std::span<const RGBColor> samples() const = 0;
+    virtual std::span<RGBColor> mutableSamples() = 0;
 };
 
 }  // namespace pdft::image

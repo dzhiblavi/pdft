@@ -202,6 +202,10 @@ void UIState::toggleSidebar() {
     show_sidebar = !show_sidebar;
 }
 
+void UIState::toggleBold() {
+    make_bolder = !make_bolder;
+}
+
 void UIState::togglePalette() {
     if (palette_name) {
         palette_name = std::nullopt;

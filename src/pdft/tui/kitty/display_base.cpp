@@ -33,7 +33,7 @@ void KittyDisplayBase::loadImage(
         ctx,
         {
             .command = "_G",
-            .payload = {(const char*)samples.data(), samples.size()},
+            .payload = {(const char*)samples.data(), 3 * samples.size()},
             .control_data = control_data,
             .b64_encode = true,
             .compress = true,

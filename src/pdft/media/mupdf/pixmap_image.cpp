@@ -32,21 +32,21 @@ image::ImageSize PixmapMupdfImage::size() const {
     };
 }
 
-std::span<const uint8_t> PixmapMupdfImage::samples() const {
+std::span<const image::RGBColor> PixmapMupdfImage::samples() const {
     PDFT_VERIFY(pixmap_ != nullptr, "invalid pixmap image");
 
     return {
-        (const uint8_t*)pixmap_->samples,
-        size_t(pixmap_->w * pixmap_->h * pixmap_->n),
+        (const image::RGBColor*)pixmap_->samples,
+        size_t(pixmap_->w * pixmap_->h),
     };
 }
 
-std::span<uint8_t> PixmapMupdfImage::mutableSamples() {
+std::span<image::RGBColor> PixmapMupdfImage::mutableSamples() {
     PDFT_VERIFY(pixmap_ != nullptr, "invalid pixmap image");
 
     return {
-        (uint8_t*)pixmap_->samples,
-        size_t(pixmap_->w * pixmap_->h * pixmap_->n),
+        (image::RGBColor*)pixmap_->samples,
+        size_t(pixmap_->w * pixmap_->h),
     };
 }
 

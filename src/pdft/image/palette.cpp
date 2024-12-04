@@ -116,16 +116,13 @@ const auto& getSkimPalette() {
 
 }  // namespace
 
-void applyPalette(std::span<uint8_t> pixels, PaletteRef palette) {
+void applyPalette(std::span<RGBColor> pixels, PaletteRef palette) {
     // Two-element cache for background and text colors
     Cache<2> cache;
 
-    const size_t num_pixels = pixels.size() / 3;
-
-    for (size_t i = 0; i < num_pixels; ++i) {
-        RGBColor& pixel = *reinterpret_cast<RGBColor*>(&pixels[3 * i]);
-
+    for (auto& pixel : pixels) {
         int index;
+
         if (!cache.get(pixel, index)) {
             index = getClosest(pixel, palette);
             cache.insert(pixel, index);

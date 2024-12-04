@@ -35,6 +35,7 @@ void AppController::bindKey(Command command, std::string_view keys) {
         case IncreaseScalingFactor:
         case DecreaseScalingFactor:
         case ToggleSidebar:
+        case ToggleBold:
         case TogglePalette:
             key_tree_.bind(keys, commandCallback(command));
             break;
@@ -157,6 +158,10 @@ Result<ControllerAction> AppController::applyPendingCommand(
 
         case ToggleSidebar:
             ui.toggleSidebar();
+            return ControllerAction::Redraw;
+
+        case ToggleBold:
+            ui.toggleBold();
             return ControllerAction::Redraw;
 
         case TogglePalette:

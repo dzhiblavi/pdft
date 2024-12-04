@@ -9,7 +9,7 @@ namespace pdft::image {
 
 using PaletteRef = std::span<const RGBColor>;
 
-void applyPalette(std::span<uint8_t> pixels, PaletteRef palette);
+void applyPalette(std::span<RGBColor> pixels, PaletteRef palette);
 
 const std::unordered_map<std::string, PaletteRef>& getBuiltinPalettes();
 

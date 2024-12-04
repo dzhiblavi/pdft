@@ -70,6 +70,11 @@ void AppPageRenderer::render(
             should_reload = true;
         }
 
+        if (properties.make_bolder != info.make_bolder) {
+            log::debug("loaded image make_bolder has changed, unloading id={}", id);
+            should_reload = true;
+        }
+
         if ((properties.palette.has_value() && properties.palette->data() != info.palette_ptr) ||
             (!properties.palette.has_value() && info.palette_ptr != nullptr)) {
             log::debug("loaded image palette pointer has changed, unloading id={}", id);
@@ -94,6 +99,11 @@ void AppPageRenderer::render(
             image::invertColors(*image);
         }
 
+        if (properties.make_bolder) {
+            auto _ = ctx.push("make_bolder");
+            image::makeBolder(*image);
+        }
+
         if (properties.palette.has_value()) {
             auto _ = ctx.push("apply_palette");
             image::applyPalette(image->mutableSamples(), *properties.palette);
@@ -114,6 +124,7 @@ void AppPageRenderer::render(
                 .image_cols = image_cols,
                 .factor = factor,
                 .invert_colors = properties.invert_colors,
+                .make_bolder = properties.make_bolder,
                 .palette_ptr =
                     properties.palette.transform([](auto&& palette) { return palette.data(); })
                         .value_or(nullptr),

@@ -14,6 +14,7 @@ class State {
         float image_cols;
         float factor;
         bool invert_colors;
+        bool make_bolder;
 
         // XXX Do not read from this pointer;
         // It should be used to determine whether the palette has been changed

@@ -26,6 +26,7 @@ struct PagePosition {
 struct DisplayProperties {
     float scaling_coeff = 1.f;
     bool invert_colors = false;
+    bool make_bolder = false;
     std::optional<image::PaletteRef> palette = std::nullopt;
 };
 

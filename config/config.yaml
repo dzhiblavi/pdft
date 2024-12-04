@@ -77,5 +77,8 @@ controller:
     - command: ToggleSidebar
       keys: t
 
+    - command: ToggleBold
+      keys: b
+
     - command: TogglePalette
       keys: p

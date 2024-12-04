@@ -33,6 +33,7 @@ class AppController : public Controller {
         IncreaseScalingFactor,
         DecreaseScalingFactor,
         ToggleSidebar,
+        ToggleBold,
         TogglePalette,
     };
 

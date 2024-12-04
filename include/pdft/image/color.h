@@ -2,6 +2,7 @@
 
 #include "pdft/core/assert.h"
 #include "pdft/core/log/fmt_adapter.h"
+#include "pdft/utils/sat.h"
 
 namespace pdft::image {
 
@@ -16,6 +17,22 @@ struct RGBColor {
         return {shade, shade, shade};
     }
 };
+
+inline RGBColor operator+(const RGBColor& a, const RGBColor& b) {
+    return {utils::add_sat(a.r, b.r), utils::add_sat(a.g, b.g), utils::add_sat(a.b, b.b)};
+}
+
+inline RGBColor operator-(const RGBColor& a, const RGBColor& b) {
+    return {utils::sub_sat(a.r, b.r), utils::sub_sat(a.g, b.g), utils::sub_sat(a.b, b.b)};
+}
+
+inline RGBColor operator/(const RGBColor& a, const RGBColor& b) {
+    return {
+        static_cast<uint8_t>(a.r / b.r),
+        static_cast<uint8_t>(a.g / b.g),
+        static_cast<uint8_t>(a.b / b.b),
+    };
+}
 
 inline RGBColor rgbFromHex(std::string_view hex) {
     PDFT_VERIFY(hex.size() == 7);

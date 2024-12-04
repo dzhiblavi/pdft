@@ -47,6 +47,7 @@ struct UIState {
     void invertColors();
     void updateScalingFactor(float coeff);
     void toggleSidebar();
+    void toggleBold();
     void togglePalette();
 
     Maybe<DocumentId> getCurrentDocumentId() const;
@@ -57,6 +58,7 @@ struct UIState {
     std::string current_input;
     bool show_sidebar = false;
     bool invert_colors = false;
+    bool make_bolder = false;
     float scaling_coeff = 1.f;
     std::optional<std::string> palette_name = std::nullopt;
 
