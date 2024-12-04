@@ -9,7 +9,6 @@ namespace pdft::app::controller {
 
 enum class ControllerError {
     UnkownFilePath,
-    NoDocumentIsOpened,
 };
 
 enum class Action {

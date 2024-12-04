@@ -201,11 +201,10 @@ Result<Action> Controller::onFilesystemEvent(
 Status Controller::reloadCurrentDocument(state::UIState& ui, state::DocumentStorage& documents) {
     using namespace result;
 
-    auto id = co_await (
-        ui.getCurrentDocumentId() | lift(makeErrorCode(ControllerError::NoDocumentIsOpened)));
-    auto document = documents.getDocument(id) | unwrap;
-
-    co_await reloadDocument(id, document->getPath(), ui, documents);
+    if (auto id = ui.getCurrentDocumentId()) {
+        auto document = documents.getDocument(*id) | unwrap;
+        co_await reloadDocument(*id, document->getPath(), ui, documents);
+    }
 }
 
 Status Controller::reloadDocument(
