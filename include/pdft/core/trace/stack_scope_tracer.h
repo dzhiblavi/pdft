@@ -107,4 +107,4 @@ class StackScopeTracerPool {
 
 StackScopeTracerPool& getGlobalPool();
 
-}  // namespace pdft::core::trace
+}  // namespace pdft::trace

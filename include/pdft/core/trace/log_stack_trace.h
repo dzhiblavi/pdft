@@ -29,15 +29,15 @@ std::string getPrettyDuration(const DurationType& duration) {
 }
 
 template <typename Duration>
-void logStackTrace(const StackScopeTracerBase& info, core::io::OutBuffer& out) {
+void logStackTrace(const StackScopeTracerBase& info, io::OutBuffer& out) {
     const auto& loc = info.loc;
 
-    core::io::write(out, '\n');
+    io::write(out, '\n');
     for (int d = info.depth; d > 0; d--) {
-        core::io::write(out, "  ");
+        io::write(out, "  ");
     }
 
-    core::io::write(
+    io::write(
         out,
         std::format(
             "[{}] {} loc={}:{}",
@@ -53,7 +53,7 @@ void logStackTrace(const StackScopeTracerBase& info, core::io::OutBuffer& out) {
 
 template <typename Duration = AutomaticDuration>
 auto logStackTrace(const StackScopeTracerBase& info, log::LoggerPtr logger = trace::logger()) {
-    core::io::OutBuffer out;
+    io::OutBuffer out;
     detail::logStackTrace<Duration>(info, out);
     logger->trace(out.view());
 }

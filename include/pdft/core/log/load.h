@@ -8,4 +8,4 @@ void loadLogger(const std::string& name, const LoggerConfig& config);
 
 void loadConfig(const LogConfig& config);
 
-}  // namespace pdft::core::log
+}  // namespace pdft::log

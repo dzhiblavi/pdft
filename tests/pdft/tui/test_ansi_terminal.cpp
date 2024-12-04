@@ -6,7 +6,7 @@
 namespace pdft::tui {
 
 TEST_CASE("testsetCursorPosition", "") {
-    core::io::OutBuffer buffer;
+    io::OutBuffer buffer;
     auto terminal = AnsiTerminal();
 
     terminal.setCursorPosition(CursorPosition{10, 20}, buffer);
@@ -14,7 +14,7 @@ TEST_CASE("testsetCursorPosition", "") {
 }
 
 TEST_CASE("testClearScreen", "") {
-    core::io::OutBuffer buffer;
+    io::OutBuffer buffer;
     auto terminal = AnsiTerminal();
 
     terminal.clear(buffer);

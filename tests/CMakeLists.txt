@@ -21,7 +21,7 @@ endfunction(add_test)
 # Add tests here
 
 # Core
-add_test(./pdft/core/io/posix/test_console.cpp)
+add_test(./pdft/core/io/test_posix_console.cpp)
 add_test(./pdft/core/trace/test_scope_tracer.cpp)
 add_test(./pdft/core/trace/test_stack_scope_tracer.cpp)
 

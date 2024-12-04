@@ -19,7 +19,7 @@ namespace pdft::tui {
 
 class Renderer {
  public:
-    Renderer(Arc<const tui::Terminal> terminal, Arc<core::io::Console> console)
+    Renderer(Arc<const tui::Terminal> terminal, Arc<io::Console> console)
         : terminal_(std::move(terminal))
         , console_(std::move(console)) {
         PDFT_VERIFY(terminal_);
@@ -45,19 +45,19 @@ class Renderer {
         terminal_->clear(control_);
         co_await trace(ctx, "renderFlush", console_->writeMany(control_, tui, display_));
 
-        core::io::clear(control_);
-        core::io::clear(display_);
+        io::clear(control_);
+        io::clear(display_);
 
         tracer.finalize();
         trace::logStackTrace(tracer.getInfo());
     }
 
  private:
-    core::io::OutBuffer control_;
-    core::io::OutBuffer display_;
+    io::OutBuffer control_;
+    io::OutBuffer display_;
 
     Arc<const tui::Terminal> terminal_;
-    Arc<core::io::Console> console_;
+    Arc<io::Console> console_;
 };
 
 }  // namespace pdft::tui

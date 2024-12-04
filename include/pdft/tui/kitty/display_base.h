@@ -15,11 +15,11 @@ class KittyDisplayBase : public Display {
         Context& ctx,
         ImageId id,
         const pdft::image::Image& image,
-        core::io::OutBuffer& buffer) override;
+        io::OutBuffer& buffer) override;
 
-    void clear(Context& ctx, core::io::OutBuffer& buffer) override;
-    void unload(Context& ctx, ImageId id, core::io::OutBuffer& buffer) override;
-    void unloadAll(Context& ctx, core::io::OutBuffer& buffer) override;
+    void clear(Context& ctx, io::OutBuffer& buffer) override;
+    void unload(Context& ctx, ImageId id, io::OutBuffer& buffer) override;
+    void unloadAll(Context& ctx, io::OutBuffer& buffer) override;
     bool isLoaded(ImageId id) const override;
 
  protected:

@@ -12,4 +12,4 @@ inline log::LoggerPtr logger() {
     return log::global();
 }
 
-}  // namespace pdft::core::trace
+}  // namespace pdft::trace

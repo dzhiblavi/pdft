@@ -29,12 +29,12 @@ class Terminal {
 
     TerminalDimensions getDimensions() const;
 
-    virtual void clear(core::io::OutBuffer& buffer) const = 0;
-    virtual void setCursorPosition(CursorPosition position, core::io::OutBuffer& buffer) const = 0;
-    virtual void moveCursorHorizontally(int32_t shift, core::io::OutBuffer& buffer) const = 0;
-    virtual void moveCursorVertically(int32_t shift, core::io::OutBuffer& buffer) const = 0;
-    virtual void hideCursor(core::io::OutBuffer& buffer) const = 0;
-    virtual void showCursor(core::io::OutBuffer& buffer) const = 0;
+    virtual void clear(io::OutBuffer& buffer) const = 0;
+    virtual void setCursorPosition(CursorPosition position, io::OutBuffer& buffer) const = 0;
+    virtual void moveCursorHorizontally(int32_t shift, io::OutBuffer& buffer) const = 0;
+    virtual void moveCursorVertically(int32_t shift, io::OutBuffer& buffer) const = 0;
+    virtual void hideCursor(io::OutBuffer& buffer) const = 0;
+    virtual void showCursor(io::OutBuffer& buffer) const = 0;
 };
 
 }  // namespace pdft::tui

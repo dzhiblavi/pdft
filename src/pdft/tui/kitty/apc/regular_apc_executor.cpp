@@ -2,12 +2,12 @@
 
 namespace pdft::tui {
 
-void RegularAPCExecutor::writePrefix(core::io::OutBuffer& buffer) const {
-    core::io::write(buffer, '\033');
+void RegularAPCExecutor::writePrefix(io::OutBuffer& buffer) const {
+    io::write(buffer, '\033');
 }
 
-void RegularAPCExecutor::writeSuffix(core::io::OutBuffer& buffer) const {
-    core::io::write(buffer, "\033\\");
+void RegularAPCExecutor::writeSuffix(io::OutBuffer& buffer) const {
+    io::write(buffer, "\033\\");
 }
 
 }  // namespace pdft::tui

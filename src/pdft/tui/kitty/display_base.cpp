@@ -10,7 +10,7 @@ bool KittyDisplayBase::isLoaded(ImageId id) const {
 }
 
 void KittyDisplayBase::loadImage(
-    Context& ctx, ImageId id, const image::Image& image, core::io::OutBuffer& buffer) {
+    Context& ctx, ImageId id, const image::Image& image, io::OutBuffer& buffer) {
     log::debug(ctx, "loading an image with id={} to the display", id);
     PDFT_VERIFY(!isLoaded(id), "image with id={} is already loaded", id);
 
@@ -41,7 +41,7 @@ void KittyDisplayBase::loadImage(
         buffer);
 }
 
-void KittyDisplayBase::clear(Context& ctx, core::io::OutBuffer& buffer) {
+void KittyDisplayBase::clear(Context& ctx, io::OutBuffer& buffer) {
     log::debug(ctx, "clearing all placements from the display");
 
     std::pair<std::string_view, std::string> control_data[] = {
@@ -59,7 +59,7 @@ void KittyDisplayBase::clear(Context& ctx, core::io::OutBuffer& buffer) {
         buffer);
 }
 
-void KittyDisplayBase::unload(Context& ctx, ImageId id, core::io::OutBuffer& buffer) {
+void KittyDisplayBase::unload(Context& ctx, ImageId id, io::OutBuffer& buffer) {
     log::debug(ctx, "unloading an image with id={} from the display", id);
 
     auto it = loaded_.find(id);
@@ -82,7 +82,7 @@ void KittyDisplayBase::unload(Context& ctx, ImageId id, core::io::OutBuffer& buf
         buffer);
 }
 
-void KittyDisplayBase::unloadAll(Context& ctx, core::io::OutBuffer& buffer) {
+void KittyDisplayBase::unloadAll(Context& ctx, io::OutBuffer& buffer) {
     log::debug(ctx, "unloading all {} images from the display", loaded_.size());
     loaded_.clear();
 

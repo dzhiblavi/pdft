@@ -20,19 +20,19 @@ std::string_view nextChunk(std::string_view& data, size_t max_chunk_size) {
 }
 
 template <typename Arg>
-void writeControlData(core::io::OutBuffer& buffer, Arg&& value) {
+void writeControlData(io::OutBuffer& buffer, Arg&& value) {
     auto&& [k, v] = value;
     buffer << k << '=' << v;
 }
 
 template <typename Arg, typename... Args>
-void writeControlData(core::io::OutBuffer& buffer, Arg&& arg, Args&&... rest) {
+void writeControlData(io::OutBuffer& buffer, Arg&& arg, Args&&... rest) {
     writeControlData(buffer, std::forward<Arg>(arg));
     buffer << ',';
     writeControlData(buffer, std::forward<Args>(rest)...);
 }
 
-void writeControlData(const Command& apc, core::io::OutBuffer& buffer) {
+void writeControlData(const Command& apc, io::OutBuffer& buffer) {
     for (size_t i = 0; i < apc.control_data.size(); ++i) {
         auto&& [key, value] = apc.control_data[i];
         buffer << key << '=' << value;
@@ -63,7 +63,7 @@ std::string_view preparePayload(Context& ctx, const Command& apc, std::string& e
 
 }  // namespace
 
-void APCExecutorBase::execute(Context& ctx, const Command& apc, core::io::OutBuffer& buffer) {
+void APCExecutorBase::execute(Context& ctx, const Command& apc, io::OutBuffer& buffer) {
     std::string encoded_payload;
     auto payload = preparePayload(ctx, apc, encoded_payload);
     auto first_chunk = nextChunk(payload, max_chunk_size_);

@@ -5,8 +5,8 @@
 namespace pdft::tui {
 
 struct BufPair {
-    core::io::OutBuffer& control_buffer;
-    core::io::OutBuffer& display_buffer;
+    io::OutBuffer& control_buffer;
+    io::OutBuffer& display_buffer;
 };
 
 }  // namespace pdft::tui

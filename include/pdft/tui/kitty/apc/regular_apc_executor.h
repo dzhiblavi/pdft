@@ -9,8 +9,8 @@ class RegularAPCExecutor : public APCExecutorBase {
     using APCExecutorBase::APCExecutorBase;
 
  private:
-    void writePrefix(core::io::OutBuffer& buffer) const override;
-    void writeSuffix(core::io::OutBuffer& buffer) const override;
+    void writePrefix(io::OutBuffer& buffer) const override;
+    void writeSuffix(io::OutBuffer& buffer) const override;
 };
 
 }  // namespace pdft::tui

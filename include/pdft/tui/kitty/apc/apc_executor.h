@@ -14,7 +14,7 @@ class APCExecutor {
  public:
     virtual ~APCExecutor() = default;
 
-    virtual void execute(Context& ctx, const Command& cmd, core::io::OutBuffer& buffer) = 0;
+    virtual void execute(Context& ctx, const Command& cmd, io::OutBuffer& buffer) = 0;
 };
 
 }  // namespace pdft::tui

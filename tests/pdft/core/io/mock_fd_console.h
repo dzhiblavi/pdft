@@ -7,7 +7,7 @@
 #include <iostream>
 #include <unistd.h>
 
-namespace pdft::core::io::test {
+namespace pdft::io::test {
 
 namespace detail {
 
@@ -109,4 +109,4 @@ inline Arc<MockConsole> makeMockConsole() {
     return std::make_shared<MockConsole>(in_fds, out_fds);
 }
 
-}  // namespace pdft::core::io::test
+}  // namespace pdft::io::test

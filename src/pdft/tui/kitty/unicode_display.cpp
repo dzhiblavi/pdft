@@ -58,7 +58,7 @@ void UnicodeKittyDisplay::displayImage(
 
     auto _ = ctx.push("unicode_placement");
 
-    core::io::write(
+    io::write(
         buffers.display_buffer,
         "\033[38:2:",
         (id >> 16) & 255,
@@ -77,7 +77,7 @@ void UnicodeKittyDisplay::displayImage(
             buffers.display_buffer);
 
         for (uint32_t col = 0; col < w; ++col) {
-            core::io::write(
+            io::write(
                 buffers.display_buffer,
                 ImagePlaceholder,
                 detail::RowColDiacritics[offset_rows + row],
@@ -86,7 +86,7 @@ void UnicodeKittyDisplay::displayImage(
         }
     }
 
-    core::io::write(buffers.display_buffer, "\033[39m");
+    io::write(buffers.display_buffer, "\033[39m");
 }
 
 }  // namespace pdft::tui

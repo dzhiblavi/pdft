@@ -56,4 +56,4 @@ struct LogConfig {
     std::map<std::string, LoggerConfig> loggers;
 };
 
-}  // namespace pdft::core::log
+}  // namespace pdft::log

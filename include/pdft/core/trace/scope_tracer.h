@@ -8,7 +8,8 @@ template <std::invocable<DurationType> Callback>
 class ScopeTracer {
  public:
     explicit ScopeTracer(Callback callback)
-        : scope_enter_(ClockType::now()), callback_(std::move(callback)) {}
+        : scope_enter_(ClockType::now())
+        , callback_(std::move(callback)) {}
 
     ~ScopeTracer() noexcept {
         try {
@@ -23,4 +24,4 @@ class ScopeTracer {
     [[no_unique_address]] Callback callback_;
 };
 
-}  // namespace pdft::core::trace
+}  // namespace pdft::trace

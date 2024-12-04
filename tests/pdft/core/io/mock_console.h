@@ -4,7 +4,7 @@
 #include <format>
 #include <iostream>
 
-namespace pdft::core::io::test {
+namespace pdft::io::test {
 
 struct MockConsole : Console {
     using Console::read;
@@ -60,4 +60,4 @@ inline Arc<MockConsole> makeMockConsole() {
     return std::make_shared<MockConsole>();
 }
 
-}  // namespace pdft::core::io::test
+}  // namespace pdft::io::test

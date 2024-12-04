@@ -2,7 +2,7 @@
 
 #include <optional>
 
-namespace pdft::core::io {
+namespace pdft::io {
 
 enum class ControlType {
     Input,
@@ -21,4 +21,4 @@ class TermControl {
     virtual void ioControl(ControlType type, const IoControl& control) = 0;
 };
 
-}  // namespace pdft::core::io
+}  // namespace pdft::io

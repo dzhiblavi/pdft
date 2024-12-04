@@ -1,11 +1,11 @@
-#include "pdft/core/io/posix/termctl.h"
+#include "pdft/core/io/posix_termctl.h"
 
 #include <termios.h>
 #include <unistd.h>
 
-namespace pdft::core::io::posix {
+namespace pdft::io {
 
-void TermControl::ioControl(ControlType type, const IoControl& control) {
+void PosixTermControl::ioControl(ControlType type, const IoControl& control) {
     struct termios term_old;
     tcgetattr(STDIN_FILENO, &term_old);
     struct termios newt = term_old;
@@ -30,4 +30,4 @@ void TermControl::ioControl(ControlType type, const IoControl& control) {
     tcsetattr(fileno, TCSANOW, &newt);
 }
 
-}  // namespace pdft::core::io::posix
+}  // namespace pdft::io

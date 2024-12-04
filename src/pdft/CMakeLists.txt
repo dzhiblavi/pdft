@@ -46,8 +46,8 @@ target_sources(
           ./core/log/log.cpp
           ./core/trace/stack_scope_tracer.cpp
           ./core/trace/log_stack_trace.cpp
-          ./core/io/posix/console.cpp
-          ./core/io/posix/terminal.cpp)
+          ./core/io/posix_console.cpp
+          ./core/io/posix_terminal.cpp)
 
 target_sources(pdft PRIVATE ./notify/fsw_notify.cpp)
 

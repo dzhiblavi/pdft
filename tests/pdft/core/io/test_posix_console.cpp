@@ -1,5 +1,5 @@
-#include "pdft/core/io/posix/console.h"
-#include "tests/pdft/core/io/posix/mock_console.h"
+#include "pdft/core/io/posix_console.h"
+#include "tests/pdft/core/io/mock_fd_console.h"
 #include "tests/pdft/run_coroutine.h"
 
 #include <asio/co_spawn.hpp>
@@ -11,14 +11,14 @@
 
 #include <catch2/catch_test_macros.hpp>
 
-namespace pdft::core::io {
+namespace pdft::io {
 
 using namespace asio::experimental::awaitable_operators;
 
 TEST_CASE("testPosixConsoleWrite", "") {
     tests::runCoroutine([](auto& context) -> asio::awaitable<void> {
         auto mock = test::makeMockConsole();
-        auto console = posix::Console(context, mock->inFd(), mock->outFd());
+        auto console = PosixConsole(context, mock->inFd(), mock->outFd());
 
         co_await console.write("hello, world!");
         CHECK(mock->written() == "hello, world!");
@@ -28,7 +28,7 @@ TEST_CASE("testPosixConsoleWrite", "") {
 TEST_CASE("testPosixConsoleRead", "") {
     tests::runCoroutine([](auto& context) -> asio::awaitable<void> {
         auto mock = test::makeMockConsole();
-        auto console = posix::Console(context, mock->inFd(), mock->outFd());
+        auto console = PosixConsole(context, mock->inFd(), mock->outFd());
 
         mock->put("abacaba");
         auto out = co_await console.read(3);
@@ -41,7 +41,7 @@ TEST_CASE("testPosixConsoleMixed", "") {
         asio::error_code ec;
         std::string read;
         auto mock = test::makeMockConsole();
-        auto console = posix::Console(context, mock->inFd(), mock->outFd());
+        auto console = PosixConsole(context, mock->inFd(), mock->outFd());
 
         mock->put("hello");
         std::tie(ec, read) = co_await console.read(3);
@@ -59,4 +59,4 @@ TEST_CASE("testPosixConsoleMixed", "") {
     });
 }
 
-}  // namespace pdft::core::io
+}  // namespace pdft::io

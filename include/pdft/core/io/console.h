@@ -6,7 +6,7 @@
 #include <asio/awaitable.hpp>
 #include <asio/buffer.hpp>
 
-namespace pdft::core::io {
+namespace pdft::io {
 
 class Console {
  public:
@@ -42,4 +42,4 @@ class Console {
     }
 };
 
-}  // namespace pdft::core::io
+}  // namespace pdft::io

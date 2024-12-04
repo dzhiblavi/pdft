@@ -7,7 +7,7 @@ namespace pdft::tui {
 
 TEST_CASE("testExecuteNoPayload", "") {
     Context ctx;
-    core::io::OutBuffer buffer;
+    io::OutBuffer buffer;
     auto executor = TmuxAPCExecutor();
 
     std::pair<std::string_view, std::string> control_data[] = {
@@ -29,7 +29,7 @@ TEST_CASE("testExecuteNoPayload", "") {
 
 TEST_CASE("testExecuteWithPayload", "") {
     Context ctx;
-    core::io::OutBuffer buffer;
+    io::OutBuffer buffer;
     auto executor = TmuxAPCExecutor();
 
     std::pair<std::string_view, std::string> control_data[] = {

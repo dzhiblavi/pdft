@@ -2,11 +2,11 @@
 
 #include "pdft/core/io/termctl.h"
 
-namespace pdft::core::io::posix {
+namespace pdft::io {
 
-class TermControl : public io::TermControl {
+class PosixTermControl : public TermControl {
  public:
     void ioControl(ControlType type, const IoControl& control) override;
 };
 
-}  // namespace pdft::core::io::posix
+}  // namespace pdft::io

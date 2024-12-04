@@ -10,12 +10,12 @@ struct TestExecutor : APCExecutorBase {
     TestExecutor() : APCExecutorBase({.max_chunk_size_bytes = 4}) {}
 
  private:
-    void writePrefix(core::io::OutBuffer& buffer) const override {
-        core::io::write(buffer, "P");
+    void writePrefix(io::OutBuffer& buffer) const override {
+        io::write(buffer, "P");
     }
 
-    void writeSuffix(core::io::OutBuffer& buffer) const override {
-        core::io::write(buffer, "S");
+    void writeSuffix(io::OutBuffer& buffer) const override {
+        io::write(buffer, "S");
     }
 };
 
@@ -23,7 +23,7 @@ struct TestExecutor : APCExecutorBase {
 
 TEST_CASE("testExecuteNoControlDataNoPayload", "") {
     Context ctx;
-    core::io::OutBuffer buffer;
+    io::OutBuffer buffer;
     auto executor = TestExecutor();
 
     executor.execute(
@@ -39,7 +39,7 @@ TEST_CASE("testExecuteNoControlDataNoPayload", "") {
 
 TEST_CASE("testExecuteWithControlDataNoPayload", "") {
     Context ctx;
-    core::io::OutBuffer buffer;
+    io::OutBuffer buffer;
     auto executor = TestExecutor();
 
     std::pair<std::string_view, std::string> control_data[] = {
@@ -60,7 +60,7 @@ TEST_CASE("testExecuteWithControlDataNoPayload", "") {
 
 TEST_CASE("testExecuteNoControlDataWithPayloadOneChunk", "") {
     Context ctx;
-    core::io::OutBuffer buffer;
+    io::OutBuffer buffer;
     auto executor = TestExecutor();
 
     executor.execute(
@@ -77,7 +77,7 @@ TEST_CASE("testExecuteNoControlDataWithPayloadOneChunk", "") {
 
 TEST_CASE("testExecuteWithControlDataWithPayloadOneChunk", "") {
     Context ctx;
-    core::io::OutBuffer buffer;
+    io::OutBuffer buffer;
     auto executor = TestExecutor();
 
     std::pair<std::string_view, std::string> control_data[] = {
@@ -99,7 +99,7 @@ TEST_CASE("testExecuteWithControlDataWithPayloadOneChunk", "") {
 
 TEST_CASE("testExecuteWithControlDataWithPayloadMultipleChunks", "") {
     Context ctx;
-    core::io::OutBuffer buffer;
+    io::OutBuffer buffer;
     auto executor = TestExecutor();
 
     std::pair<std::string_view, std::string> control_data[] = {
@@ -121,7 +121,7 @@ TEST_CASE("testExecuteWithControlDataWithPayloadMultipleChunks", "") {
 
 TEST_CASE("testExecuteBase64EncodeSingleChunk", "") {
     Context ctx;
-    core::io::OutBuffer buffer;
+    io::OutBuffer buffer;
     auto executor = TestExecutor();
 
     std::pair<std::string_view, std::string> control_data[] = {
@@ -144,7 +144,7 @@ TEST_CASE("testExecuteBase64EncodeSingleChunk", "") {
 
 TEST_CASE("testExecuteBase64EncodeMultipleChunks", "") {
     Context ctx;
-    core::io::OutBuffer buffer;
+    io::OutBuffer buffer;
     auto executor = TestExecutor();
 
     std::pair<std::string_view, std::string> control_data[] = {

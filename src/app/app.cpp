@@ -24,8 +24,8 @@
 #include "pdft/utils/visit.h"
 
 #include "pdft/core/awaitable.h"
-#include "pdft/core/io/posix/console.h"
-#include "pdft/core/io/posix/termctl.h"
+#include "pdft/core/io/posix_console.h"
+#include "pdft/core/io/posix_termctl.h"
 #include "pdft/core/log.h"
 #include "pdft/core/trace/log_stack_trace.h"
 #include "pdft/core/trace/stack_scope_tracer.h"
@@ -86,10 +86,10 @@ void Application::setup() {
     ::app::setupMupdfLogging(media::mupdf::thisThreadContext());
     media::mupdf::thisThreadContext().registerDocumentHandlers();
 
-    term_control_ = std::make_shared<core::io::posix::TermControl>();
+    term_control_ = std::make_shared<io::PosixTermControl>();
     terminal_ = std::make_shared<tui::AnsiTerminal>();
-    console_ = std::make_shared<core::io::posix::Console>(
-        context_, ::dup(STDIN_FILENO), ::dup(STDOUT_FILENO));
+    console_ =
+        std::make_shared<io::PosixConsole>(context_, ::dup(STDIN_FILENO), ::dup(STDOUT_FILENO));
     image_display_ = resolveDisplay(config_.display, terminal_);
     doc_loader_ =
         std::make_shared<pdft::media::mupdf::Loader>(pdft::media::mupdf::thisThreadContext());
@@ -138,10 +138,10 @@ asio::awaitable<void> Application::run(const std::vector<std::string>& paths) {
 
 asio::awaitable<void> Application::prepareTerminal() {
     // Configure terminal
-    term_control_->ioControl(core::io::ControlType::Input, {.canonical = false, .echo = false});
+    term_control_->ioControl(io::ControlType::Input, {.canonical = false, .echo = false});
 
     // Clear the screen
-    core::io::OutBuffer init_buffer;
+    io::OutBuffer init_buffer;
     terminal_->hideCursor(init_buffer);
     terminal_->clear(init_buffer);
     co_await console_->write(init_buffer);
@@ -244,7 +244,7 @@ asio::awaitable<void> Application::cleanup() {
 
     {
         auto _ = ctx.push("term_clear");
-        core::io::OutBuffer buffer;
+        io::OutBuffer buffer;
         terminal_->showCursor(buffer);
         terminal_->clear(buffer);
         image_display_->unloadAll(ctx, buffer);
