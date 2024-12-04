@@ -15,7 +15,7 @@
 #include "pdft/media/mupdf/context.h"
 #include "pdft/media/mupdf/loader.h"
 
-#include "pdft/notify/fsw/notify.h"
+#include "pdft/notify/fsw_notify.h"
 #include "pdft/tui/ansi_terminal.h"
 #include "pdft/tui/render.h"
 

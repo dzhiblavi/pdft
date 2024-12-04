@@ -1,4 +1,4 @@
-#include "pdft/notify/fsw/notify.h"
+#include "pdft/notify/fsw_notify.h"
 
 #include "pdft/core/assert.h"
 #include "pdft/core/log/log.h"
