@@ -1,15 +1,15 @@
-#include "pdft/tui/image/fit_image.h"
+#include "pdft/tui/fit_image.h"
 
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/generators/catch_generators.hpp>
 
 #include <iostream>
 
-namespace pdft::tui::image {
+namespace pdft::tui {
 
 using enum Alignment;
 
-inline const IRect Rect = {
+inline const IRect TestRect = {
     .x = 10,
     .y = 20,
     .width = 30,
@@ -41,7 +41,7 @@ TEST_CASE("testFitImageExactlyMatchesProportions", "") {
         .height = 40,
     };
 
-    auto rect = fitImage(3.0f / 4.0f, Rect, pos);
+    auto rect = fitImage(3.0f / 4.0f, TestRect, pos);
     CHECK(rect == expected);
 }
 
@@ -57,7 +57,7 @@ TEST_CASE("testFitImageInsideNarrowMin", "") {
         .height = 40,
     };
 
-    auto rect = fitImage(2.0f / 4.0f, Rect, pos);
+    auto rect = fitImage(2.0f / 4.0f, TestRect, pos);
     CHECK(rect == expected);
 }
 
@@ -73,7 +73,7 @@ TEST_CASE("testFitImageInsideNarrowCenter", "") {
         .height = 40,
     };
 
-    auto rect = fitImage(2.0f / 4.0f, Rect, pos);
+    auto rect = fitImage(2.0f / 4.0f, TestRect, pos);
     CHECK(rect == expected);
 }
 
@@ -89,7 +89,7 @@ TEST_CASE("testFitImageInsideNarrowMax", "") {
         .height = 40,
     };
 
-    auto rect = fitImage(2.0f / 4.0f, Rect, pos);
+    auto rect = fitImage(2.0f / 4.0f, TestRect, pos);
     CHECK(rect == expected);
 }
 
@@ -106,7 +106,7 @@ TEST_CASE("testFitImageInsideWideMin", "") {
         .height = 20,
     };
 
-    auto rect = fitImage(3.0f / 2.0f, Rect, pos);
+    auto rect = fitImage(3.0f / 2.0f, TestRect, pos);
     CHECK(rect == expected);
 }
 
@@ -123,7 +123,7 @@ TEST_CASE("testFitImageInsideWideCenter", "") {
         .height = 20,
     };
 
-    auto rect = fitImage(3.0f / 2.0f, Rect, pos);
+    auto rect = fitImage(3.0f / 2.0f, TestRect, pos);
     CHECK(rect == expected);
 }
 
@@ -140,8 +140,8 @@ TEST_CASE("testFitImageInsideWideMax", "") {
         .height = 20,
     };
 
-    auto rect = fitImage(3.0f / 2.0f, Rect, pos);
+    auto rect = fitImage(3.0f / 2.0f, TestRect, pos);
     CHECK(rect == expected);
 }
 
-}  // namespace pdft::tui::image
+}  // namespace pdft::tui

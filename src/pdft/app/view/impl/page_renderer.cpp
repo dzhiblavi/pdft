@@ -1,11 +1,10 @@
 #include "pdft/app/view/impl/page_renderer.h"
 
-#include "pdft/tui/image/fit_image.h"
-
 #include "pdft/image/operations.h"
 #include "pdft/image/palette.h"
 
 #include "pdft/core/trace/context.h"
+
 #include "pdft/utils/cantor_pair.h"
 
 namespace pdft::app::view::impl {
@@ -127,7 +126,7 @@ void PageRenderer::render(
     const auto& p = state_.getImage(id);
     float sub_rows = p.image_rows * pos.subarea.height;
     float sub_cols = p.image_cols * pos.subarea.width;
-    auto irect = tui::image::fitImage(sub_cols / sub_rows, pos.rect, pos.placement);
+    auto irect = tui::fitImage(sub_cols / sub_rows, pos.rect, pos.placement);
 
     log::debug(ctx, "renderer @ {}", pos.rect);
     log::debug(ctx, "renderer I {}", irect);

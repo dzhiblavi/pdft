@@ -37,7 +37,7 @@ add_test(./pdft/utils/test_visit.cpp)
 
 # TUI
 add_test(./pdft/tui/test_alignment.cpp)
-add_test(./pdft/tui/image/test_fit_image.cpp)
+add_test(./pdft/tui/test_fit_image.cpp)
 add_test(./pdft/tui/test_ansi_terminal.cpp)
 add_test(./pdft/tui/kitty/apc/test_parse_response.cpp)
 add_test(./pdft/tui/kitty/apc/test_apc_executor_base.cpp)

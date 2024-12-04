@@ -1,6 +1,6 @@
-#include "pdft/tui/image/fit_image.h"
+#include "pdft/tui/fit_image.h"
 
-namespace pdft::tui::image {
+namespace pdft::tui {
 
 namespace {
 
@@ -70,4 +70,4 @@ IRect fitImage(float image_wh_cell_ratio, const IRect& rect, const Placement& pl
     return Fitter(image_wh_cell_ratio, rect, place).fit();
 }
 
-}  // namespace pdft::tui::image
+}  // namespace pdft::tui

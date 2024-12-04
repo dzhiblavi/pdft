@@ -61,7 +61,7 @@ target_sources(
 
 target_sources(
   pdft
-  PRIVATE ./tui/image/fit_image.cpp
+  PRIVATE ./tui/fit_image.cpp
           ./tui/terminal.cpp
           ./tui/ansi_terminal.cpp
           ./tui/kitty/apc/parse_response.cpp

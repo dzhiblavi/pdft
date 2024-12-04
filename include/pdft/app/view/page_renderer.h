@@ -2,7 +2,7 @@
 
 #include "pdft/app/state/document_storage.h"
 
-#include "pdft/tui/image/fit_image.h"
+#include "pdft/tui/fit_image.h"
 #include "pdft/tui/rect.h"
 #include "pdft/tui/screen.h"
 
@@ -20,7 +20,7 @@ struct Page {
 struct PagePosition {
     const tui::IRect& rect;
     const tui::FRect& subarea = {0.f, 0.f, 1.f, 1.f};
-    const tui::image::Placement& placement = {};
+    const tui::Placement& placement = {};
 };
 
 struct DisplayProperties {
