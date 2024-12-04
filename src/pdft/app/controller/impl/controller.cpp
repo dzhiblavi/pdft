@@ -198,8 +198,7 @@ Result<Action> Controller::onFilesystemEvent(
     co_return Action::Redraw;
 }
 
-Result<Unit> Controller::reloadCurrentDocument(
-    state::UIState& ui, state::DocumentStorage& documents) {
+Status Controller::reloadCurrentDocument(state::UIState& ui, state::DocumentStorage& documents) {
     using namespace result;
 
     auto id = co_await (
