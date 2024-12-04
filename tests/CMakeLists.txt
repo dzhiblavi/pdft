@@ -38,11 +38,11 @@ add_test(./pdft/utils/test_visit.cpp)
 # TUI
 add_test(./pdft/tui/test_alignment.cpp)
 add_test(./pdft/tui/image/test_fit_image.cpp)
-add_test(./pdft/tui/terminal/ansi/test_terminal.cpp)
-add_test(./pdft/tui/display/kitty/apc/test_parse_response.cpp)
-add_test(./pdft/tui/display/kitty/apc/test_executor_base.cpp)
-add_test(./pdft/tui/display/kitty/apc/tmux/test_executor.cpp)
-add_test(./pdft/tui/display/kitty/apc/regular/test_executor.cpp)
+add_test(./pdft/tui/test_ansi_terminal.cpp)
+add_test(./pdft/tui/kitty/apc/test_parse_response.cpp)
+add_test(./pdft/tui/kitty/apc/test_apc_executor_base.cpp)
+add_test(./pdft/tui/kitty/apc/test_tmux_apc_executor.cpp)
+add_test(./pdft/tui/kitty/apc/test_regular_apc_executor.cpp)
 
 # Application
 add_test(./pdft/app/controller/test_keytree.cpp)

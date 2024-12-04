@@ -2,8 +2,8 @@
 
 #include "pdft/app/view/page_renderer.h"
 
-#include "pdft/tui/display/display.h"
-#include "pdft/tui/terminal/terminal.h"
+#include "pdft/tui/display.h"
+#include "pdft/tui/terminal.h"
 
 namespace pdft::app::view::impl {
 
@@ -20,14 +20,14 @@ class State {
         const image::RGBColor* palette_ptr = nullptr;
     };
 
-    tui::display::ImageId addImage(tui::display::ImageId id, LoadedImage loaded);
-    void removeImage(tui::display::ImageId id);
+    tui::ImageId addImage(tui::ImageId id, LoadedImage loaded);
+    void removeImage(tui::ImageId id);
 
-    bool isLoaded(tui::display::ImageId id) const;
-    const LoadedImage& getImage(tui::display::ImageId id) const;
+    bool isLoaded(tui::ImageId id) const;
+    const LoadedImage& getImage(tui::ImageId id) const;
 
  private:
-    std::unordered_map<tui::display::ImageId, LoadedImage> loaded_;
+    std::unordered_map<tui::ImageId, LoadedImage> loaded_;
 };
 
 class PageRenderer : public view::PageRenderer {
@@ -35,7 +35,7 @@ class PageRenderer : public view::PageRenderer {
     PageRenderer(
         uint32_t image_id_salt,
         Arc<const state::DocumentStorage> documents_,
-        Arc<tui::display::Display> display);
+        Arc<tui::Display> display);
 
     void render(
         Context& ctx,
@@ -49,14 +49,14 @@ class PageRenderer : public view::PageRenderer {
         Context& ctx,
         media::PageSize page_size,
         float scaling_coeff,
-        const tui::terminal::Dimensions& dims);
+        const tui::TerminalDimensions& dims);
 
-    tui::display::ImageId getIdForPage(const Page& page) const;
+    tui::ImageId getIdForPage(const Page& page) const;
 
     const uint32_t image_id_salt_;
     State state_;
     Arc<const state::DocumentStorage> documents_;
-    Arc<tui::display::Display> display_;
+    Arc<tui::Display> display_;
 };
 
 }  // namespace pdft::app::view::impl

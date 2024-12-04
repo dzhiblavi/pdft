@@ -16,8 +16,8 @@
 #include "pdft/media/mupdf/loader.h"
 
 #include "pdft/notify/fsw/notify.h"
+#include "pdft/tui/ansi_terminal.h"
 #include "pdft/tui/render.h"
-#include "pdft/tui/terminal/ansi/terminal.h"
 
 #include "pdft/utils/build_info.h"
 #include "pdft/utils/random.h"
@@ -89,7 +89,7 @@ void Application::setup() {
     media::mupdf::thisThreadContext().registerDocumentHandlers();
 
     term_control_ = std::make_shared<core::io::posix::TermControl>();
-    terminal_ = std::make_shared<tui::terminal::ansi::Terminal>();
+    terminal_ = std::make_shared<tui::AnsiTerminal>();
     console_ = std::make_shared<core::io::posix::Console>(
         context_, ::dup(STDIN_FILENO), ::dup(STDOUT_FILENO));
     image_display_ = resolveDisplay(config_.display, terminal_);
@@ -110,7 +110,7 @@ void Application::setup() {
     controller_ = std::make_shared<Controller>(config_.controller, doc_loader_);
 
     if (config_.system.enable_filesystem_watching) {
-        fs_watcher_ = std::make_shared<pdft::notify::fsw::Notify>(context_.get_executor());
+        fs_watcher_ = std::make_shared<pdft::notify::FswNotify>(context_.get_executor());
     }
 }
 

@@ -2,7 +2,7 @@
 
 #include "pdft/tui/elements.h"
 #include "pdft/tui/screen.h"
-#include "pdft/tui/terminal/terminal.h"
+#include "pdft/tui/terminal.h"
 
 #include "pdft/core/io/buffer.h"
 #include "pdft/core/io/console.h"
@@ -19,7 +19,7 @@ namespace pdft::tui {
 
 class Renderer {
  public:
-    Renderer(Arc<const tui::terminal::Terminal> terminal, Arc<core::io::Console> console)
+    Renderer(Arc<const tui::Terminal> terminal, Arc<core::io::Console> console)
         : terminal_(std::move(terminal))
         , console_(std::move(console)) {
         PDFT_VERIFY(terminal_);
@@ -56,7 +56,7 @@ class Renderer {
     core::io::OutBuffer control_;
     core::io::OutBuffer display_;
 
-    Arc<const tui::terminal::Terminal> terminal_;
+    Arc<const tui::Terminal> terminal_;
     Arc<core::io::Console> console_;
 };
 

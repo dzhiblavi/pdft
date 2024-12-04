@@ -8,9 +8,9 @@
 
 #include <magic_enum.hpp>
 
-namespace pdft::notify::fsw {
+namespace pdft::notify {
 
-Notify::Notify(asio::any_io_executor executor) : channel_(executor, 10) {
+FswNotify::FswNotify(asio::any_io_executor executor) : channel_(executor, 10) {
     [[maybe_unused]] static auto _ = [] {
         PDFT_VERIFY(fsw_init_library() == FSW_OK);
         return 0;
@@ -59,7 +59,7 @@ Notify::Notify(asio::any_io_executor executor) : channel_(executor, 10) {
     fsw_thread_ = std::thread(monitorRunLoop, this);
 }
 
-Notify::~Notify() noexcept {
+FswNotify::~FswNotify() noexcept {
     if (!isStopped()) {
         stop();
     }
@@ -71,25 +71,25 @@ Notify::~Notify() noexcept {
     PDFT_VERIFY(fsw_destroy_session(handle_) == FSW_OK);
 }
 
-void Notify::stop() {
+void FswNotify::stop() {
     should_exit_.store(true, std::memory_order_release);
     fsw_stop_monitor(handle_);
 }
 
-bool Notify::isStopped() const {
+bool FswNotify::isStopped() const {
     return should_exit_.load(std::memory_order_relaxed);
 }
 
-void Notify::add(const std::filesystem::path& path) {
+void FswNotify::add(const std::filesystem::path& path) {
     fsw_stop_monitor(handle_);
     PDFT_VERIFY(fsw_add_path(handle_, path.c_str()) == FSW_OK);
 }
 
-AsyncResult<Event> Notify::nextEvent() {
+AsyncResult<Event> FswNotify::nextEvent() {
     co_return co_await channel_.async_receive(asio_coro);
 }
 
-void Notify::monitorRunLoop(Notify* self) {
+void FswNotify::monitorRunLoop(FswNotify* self) {
     log::debug("start fswatch monitorRunLoop");
 
     while (!self->should_exit_.load(std::memory_order_acquire)) {
@@ -99,8 +99,8 @@ void Notify::monitorRunLoop(Notify* self) {
     log::debug("end fswatch monitorRunLoop");
 }
 
-void Notify::processEvents(const fsw_cevent* const events, unsigned count, void* context) {
-    auto* self = static_cast<Notify*>(context);
+void FswNotify::processEvents(const fsw_cevent* const events, unsigned count, void* context) {
+    auto* self = static_cast<FswNotify*>(context);
     log::trace("received {} filesystem events", count);
 
     for (unsigned i = 0; i < count && !self->isStopped(); ++i) {
@@ -120,4 +120,4 @@ void Notify::processEvents(const fsw_cevent* const events, unsigned count, void*
     }
 }
 
-}  // namespace pdft::notify::fsw
+}  // namespace pdft::notify

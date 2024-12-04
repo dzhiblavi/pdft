@@ -11,12 +11,12 @@
 
 #include <thread>
 
-namespace pdft::notify::fsw {
+namespace pdft::notify {
 
-class Notify : public notify::Notify {
+class FswNotify : public notify::Notify {
  public:
-    explicit Notify(asio::any_io_executor executor);
-    ~Notify() noexcept override;
+    explicit FswNotify(asio::any_io_executor executor);
+    ~FswNotify() noexcept override;
 
     void stop() override;
     bool isStopped() const override;
@@ -27,7 +27,7 @@ class Notify : public notify::Notify {
     using EventChannel = asio::experimental::
         concurrent_channel<asio::any_io_executor, void(asio::error_code, Event)>;
 
-    static void monitorRunLoop(Notify* self);
+    static void monitorRunLoop(FswNotify* self);
     static void processEvents(const fsw_cevent* const events, unsigned count, void* context);
 
     std::atomic<bool> should_exit_ = false;
@@ -36,4 +36,4 @@ class Notify : public notify::Notify {
     std::thread fsw_thread_;
 };
 
-}  // namespace pdft::notify::fsw
+}  // namespace pdft::notify

@@ -10,7 +10,7 @@
 
 namespace pdft::app::view::impl {
 
-using tui::display::ImageId;
+using tui::ImageId;
 
 bool State::isLoaded(ImageId id) const {
     return loaded_.contains(id);
@@ -33,9 +33,7 @@ const State::LoadedImage& State::getImage(ImageId id) const {
 }
 
 PageRenderer::PageRenderer(
-    uint32_t image_id_salt,
-    Arc<const state::DocumentStorage> documents,
-    Arc<tui::display::Display> display)
+    uint32_t image_id_salt, Arc<const state::DocumentStorage> documents, Arc<tui::Display> display)
     : image_id_salt_(image_id_salt)
     , documents_(std::move(documents))
     , display_(std::move(display)) {}
@@ -141,7 +139,7 @@ float PageRenderer::calcFactor(
     Context& ctx,
     media::PageSize page_size,
     float scaling_coeff,
-    const tui::terminal::Dimensions& dims) {
+    const tui::TerminalDimensions& dims) {
     float dw = dims.width_px;
     float dh = dims.height_px;
     auto [pw, ph] = page_size;
@@ -163,7 +161,7 @@ float PageRenderer::calcFactor(
     return scaling_coeff * f;
 }
 
-tui::display::ImageId PageRenderer::getIdForPage(const Page& page) const {
+ImageId PageRenderer::getIdForPage(const Page& page) const {
     auto [doc_id, page_index] = page;
     return image_id_salt_ + utils::cantorPair(doc_id, page_index + 1);
 }

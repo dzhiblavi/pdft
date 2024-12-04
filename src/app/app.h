@@ -6,8 +6,9 @@
 
 #include "pdft/app/view/view.h"
 #include "pdft/media/loader.h"
-#include "pdft/tui/display/display.h"
-#include "pdft/tui/terminal/terminal.h"
+
+#include "pdft/tui/display.h"
+#include "pdft/tui/terminal.h"
 
 #include "pdft/notify/notify.h"
 
@@ -45,10 +46,10 @@ class Application : public pdft::core::log::WithLogger {
     asio::signal_set signals_;
 
     pdft::Arc<pdft::core::io::TermControl> term_control_;
-    pdft::Arc<pdft::tui::terminal::Terminal> terminal_;
+    pdft::Arc<pdft::tui::Terminal> terminal_;
     pdft::Arc<pdft::core::io::Console> console_;
     pdft::Arc<pdft::notify::Notify> fs_watcher_;
-    pdft::Arc<pdft::tui::display::Display> image_display_;
+    pdft::Arc<pdft::tui::Display> image_display_;
     pdft::Arc<pdft::media::Loader> doc_loader_;
     pdft::Arc<pdft::app::loader::Loader> loader_;
     pdft::Arc<pdft::app::state::DocumentStorage> documents_;

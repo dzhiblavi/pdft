@@ -62,15 +62,15 @@ target_sources(
 target_sources(
   pdft
   PRIVATE ./tui/image/fit_image.cpp
-          ./tui/display/kitty/apc/parse_response.cpp
-          ./tui/display/kitty/apc/executor_base.cpp
-          ./tui/display/kitty/apc/regular/executor.cpp
-          ./tui/display/kitty/apc/tmux/executor.cpp
-          ./tui/display/kitty/display_base.cpp
-          ./tui/display/kitty/unicode_display.cpp
-          ./tui/display/kitty/native_display.cpp
-          ./tui/terminal/terminal.cpp
-          ./tui/terminal/ansi/terminal.cpp)
+          ./tui/terminal.cpp
+          ./tui/ansi_terminal.cpp
+          ./tui/kitty/apc/parse_response.cpp
+          ./tui/kitty/apc/apc_executor_base.cpp
+          ./tui/kitty/apc/regular_apc_executor.cpp
+          ./tui/kitty/apc/tmux_apc_executor.cpp
+          ./tui/kitty/display_base.cpp
+          ./tui/kitty/unicode_display.cpp
+          ./tui/kitty/native_display.cpp)
 
 target_sources(
   pdft
