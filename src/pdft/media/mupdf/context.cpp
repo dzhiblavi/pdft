@@ -11,41 +11,41 @@ extern "C" {
 
 #include <utility>
 
-namespace pdft::media::mupdf {
+namespace pdft::media {
 
-Context::Builder& Context::Builder::setStorageSize(int size) {
+MupdfContext::Builder& MupdfContext::Builder::setStorageSize(int size) {
     size_ = size;
     return *this;
 }
 
-Context Context::Builder::build() {
+MupdfContext MupdfContext::Builder::build() {
     auto* ctx = fz_new_context(NULL, NULL, size_);
     PDFT_VERIFY(ctx, "failed to create new fz_context");
 
     PDFT_FZ_VERIFY(fz_enable_icc(ctx));
     PDFT_FZ_VERIFY(fz_set_text_aa_level(ctx, 8));
     PDFT_FZ_VERIFY(fz_set_graphics_aa_level(ctx, 8));
-    return Context{ctx};
+    return MupdfContext{ctx};
 }
 
-Context::Context(Context&& rhs) : context_(std::exchange(rhs.context_, nullptr)) {}
+MupdfContext::MupdfContext(MupdfContext&& rhs) : context_(std::exchange(rhs.context_, nullptr)) {}
 
-Context::~Context() noexcept {
+MupdfContext::~MupdfContext() noexcept {
     fz_drop_context(context_);
 }
 
-fz_context* Context::native() const {
+fz_context* MupdfContext::native() const {
     return context_;
 }
 
-void Context::registerDocumentHandlers() const {
+void MupdfContext::registerDocumentHandlers() const {
     auto ctx = native();
     PDFT_FZ_VERIFY(fz_register_document_handlers(ctx));
 }
 
-Context& thisThreadContext() {
-    thread_local Context context = Context::Builder().build();
+MupdfContext& MupdfContext::thisThreadInstance() {
+    thread_local MupdfContext context = MupdfContext::Builder().build();
     return context;
 }
 
-}  // namespace pdft::media::mupdf
+}  // namespace pdft::media

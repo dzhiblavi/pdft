@@ -7,15 +7,15 @@ extern "C" {
 
 #include <utility>
 
-namespace pdft::media::mupdf {
+namespace pdft::media {
 
-PixmapImage::PixmapImage(PixmapImage&& rhs)
+PixmapMupdfImage::PixmapMupdfImage(PixmapMupdfImage&& rhs)
     : context_(rhs.context_)
     , pixmap_(std::exchange(rhs.pixmap_, nullptr)) {
     PDFT_VERIFY(pixmap_);
 }
 
-PixmapImage::~PixmapImage() noexcept {
+PixmapMupdfImage::~PixmapMupdfImage() noexcept {
     if (pixmap_ == nullptr) {
         return;
     }
@@ -23,7 +23,7 @@ PixmapImage::~PixmapImage() noexcept {
     fz_drop_pixmap(context_.native(), pixmap_);
 }
 
-image::ImageSize PixmapImage::size() const {
+image::ImageSize PixmapMupdfImage::size() const {
     PDFT_VERIFY(pixmap_ != nullptr, "invalid pixmap image");
 
     return {
@@ -32,7 +32,7 @@ image::ImageSize PixmapImage::size() const {
     };
 }
 
-std::span<const uint8_t> PixmapImage::samples() const {
+std::span<const uint8_t> PixmapMupdfImage::samples() const {
     PDFT_VERIFY(pixmap_ != nullptr, "invalid pixmap image");
 
     return {
@@ -41,7 +41,7 @@ std::span<const uint8_t> PixmapImage::samples() const {
     };
 }
 
-std::span<uint8_t> PixmapImage::mutableSamples() {
+std::span<uint8_t> PixmapMupdfImage::mutableSamples() {
     PDFT_VERIFY(pixmap_ != nullptr, "invalid pixmap image");
 
     return {
@@ -50,4 +50,4 @@ std::span<uint8_t> PixmapImage::mutableSamples() {
     };
 }
 
-}  // namespace pdft::media::mupdf
+}  // namespace pdft::media

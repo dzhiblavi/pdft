@@ -7,30 +7,30 @@
 
 struct fz_document;
 
-namespace pdft::media::mupdf {
+namespace pdft::media {
 
-class Document : public media::Document {
+class MupdfDocument : public Document {
  public:
-    Document(Document&& rhs);
-    Document& operator=(Document&&) = delete;
+    MupdfDocument(MupdfDocument&& rhs);
+    MupdfDocument& operator=(MupdfDocument&&) = delete;
 
-    ~Document() noexcept override;
+    ~MupdfDocument() noexcept override;
 
     size_t getPageCount() const override;
     Arc<media::Page> getPage(int index) const override;
     const std::filesystem::path& getPath() const override;
 
-    static Result<Document> open(Context& context, const std::filesystem::path& path);
+    static Result<MupdfDocument> open(MupdfContext& context, const std::filesystem::path& path);
 
  private:
-    Document(Context& context, std::filesystem::path path, fz_document* document)
+    MupdfDocument(MupdfContext& context, std::filesystem::path path, fz_document* document)
         : context_(context)
         , path_(std::move(path))
         , document_(document) {}
 
-    Context& context_;
+    MupdfContext& context_;
     std::filesystem::path path_;
     fz_document* document_ = nullptr;
 };
 
-}  // namespace pdft::media::mupdf
+}  // namespace pdft::media

@@ -6,26 +6,28 @@
 
 struct fz_pixmap;
 
-namespace pdft::media::mupdf {
+namespace pdft::media {
 
-class PixmapImage : public image::Image {
+class PixmapMupdfImage : public image::Image {
  public:
-    PixmapImage(PixmapImage&&);
-    PixmapImage& operator=(PixmapImage&&) = delete;
+    PixmapMupdfImage(PixmapMupdfImage&&);
+    PixmapMupdfImage& operator=(PixmapMupdfImage&&) = delete;
 
-    ~PixmapImage() noexcept override;
+    ~PixmapMupdfImage() noexcept override;
 
     image::ImageSize size() const override;
     std::span<const uint8_t> samples() const override;
     std::span<uint8_t> mutableSamples() override;
 
  private:
-    PixmapImage(Context& context, fz_pixmap* pixmap) : context_(context), pixmap_(pixmap) {}
+    PixmapMupdfImage(MupdfContext& context, fz_pixmap* pixmap)
+        : context_(context)
+        , pixmap_(pixmap) {}
 
-    Context& context_;
+    MupdfContext& context_;
     fz_pixmap* pixmap_;
 
-    friend class Page;
+    friend class MupdfPage;
 };
 
-}  // namespace pdft::media::mupdf
+}  // namespace pdft::media

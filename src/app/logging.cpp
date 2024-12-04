@@ -84,7 +84,7 @@ void errorCallback(void*, const char* message) {
     log::logger("mupdf")->warn(message);
 }
 
-void setupMupdfLogging(const pdft::media::mupdf::Context& context) {
+void setupMupdfLogging(const pdft::media::MupdfContext& context) {
     fz_set_warning_callback(context.native(), warningCallback, nullptr);
     fz_set_error_callback(context.native(), errorCallback, nullptr);
 

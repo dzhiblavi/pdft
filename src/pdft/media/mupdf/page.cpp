@@ -13,18 +13,18 @@ extern "C" {
 
 #include <utility>
 
-namespace pdft::media::mupdf {
+namespace pdft::media {
 
-Page::Page(Page&& rhs)
+MupdfPage::MupdfPage(MupdfPage&& rhs)
     : page_index_(rhs.page_index_)
     , context_(rhs.context_)
     , page_(std::exchange(rhs.page_, nullptr)) {}
 
-Page::~Page() noexcept {
+MupdfPage::~MupdfPage() noexcept {
     fz_drop_page(context_.native(), page_);
 }
 
-Arc<image::Image> Page::getImage(float scaling_factor) const {
+Arc<image::Image> MupdfPage::getImage(float scaling_factor) const {
     PDFT_VERIFY(scaling_factor > 0.f, "scale factor should be positive");
 
     auto ctx = context_.native();
@@ -36,10 +36,10 @@ Arc<image::Image> Page::getImage(float scaling_factor) const {
     PDFT_VERIFY(pix->w > 0 && pix->h > 0, "loaded an image with negative size");
     PDFT_VERIFY(pix, "fz_new_pixmap_from_page is null");
 
-    return Arc<image::Image>(new PixmapImage(context_, pix));
+    return Arc<image::Image>(new PixmapMupdfImage(context_, pix));
 }
 
-PageSize Page::getDefaultSize() const {
+PageSize MupdfPage::getDefaultSize() const {
     auto ctx = context_.native();
     fz_rect rect;
 
@@ -51,8 +51,8 @@ PageSize Page::getDefaultSize() const {
     };
 }
 
-size_t Page::getPageIndex() const {
+size_t MupdfPage::getPageIndex() const {
     return page_index_;
 }
 
-}  // namespace pdft::media::mupdf
+}  // namespace pdft::media

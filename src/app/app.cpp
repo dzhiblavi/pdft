@@ -82,16 +82,16 @@ Application::Application(asio::io_context& context, Config config, pdft::app::St
 }
 
 void Application::setup() {
-    ::app::setupMupdfLogging(media::mupdf::thisThreadContext());
-    media::mupdf::thisThreadContext().registerDocumentHandlers();
+    auto&& mupdf_context = media::MupdfContext::thisThreadInstance();
+    ::app::setupMupdfLogging(mupdf_context);
+    mupdf_context.registerDocumentHandlers();
 
     term_control_ = std::make_shared<io::PosixTermControl>();
     terminal_ = std::make_shared<tui::AnsiTerminal>();
     console_ =
         std::make_shared<io::PosixConsole>(context_, ::dup(STDIN_FILENO), ::dup(STDOUT_FILENO));
     image_display_ = resolveDisplay(config_.display, terminal_);
-    doc_loader_ =
-        std::make_shared<pdft::media::mupdf::Loader>(pdft::media::mupdf::thisThreadContext());
+    doc_loader_ = std::make_shared<pdft::media::MupdfLoader>(mupdf_context);
 
     auto persister = std::make_shared<pdft::app::AppPersister>(doc_loader_);
     loader_ = std::make_shared<pdft::app::AppLoader>(persister, doc_loader_);

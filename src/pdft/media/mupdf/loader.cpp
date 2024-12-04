@@ -1,12 +1,14 @@
 #include "pdft/media/mupdf/loader.h"
 #include "pdft/media/mupdf/document.h"
 
-namespace pdft::media::mupdf {
+#include "pdft/core/result.h"
+#include "pdft/core/result/coro/result.h"
 
-Result<Arc<media::Document>> Loader::load(const std::filesystem::path& path) const {
-    return Document::open(context_, path).transform([](auto document) {
-        return std::make_shared<Document>(std::move(document));
-    });
+namespace pdft::media {
+
+Result<Arc<Document>> MupdfLoader::load(const std::filesystem::path& path) const {
+    auto document = co_await MupdfDocument::open(context_, path);
+    co_return std::make_shared<MupdfDocument>(std::move(document));
 }
 
-}  // namespace pdft::media::mupdf
+}  // namespace pdft::media

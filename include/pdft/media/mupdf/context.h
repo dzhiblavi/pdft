@@ -2,9 +2,9 @@
 
 struct fz_context;
 
-namespace pdft::media::mupdf {
+namespace pdft::media {
 
-class Context {
+class MupdfContext {
  public:
     enum StorageSize : int {
         FZ_STORE_UNLIMITED = 0,
@@ -14,28 +14,28 @@ class Context {
     struct Builder {
         Builder& setStorageSize(int size);
 
-        Context build();
+        MupdfContext build();
 
      private:
         int size_ = FZ_STORE_DEFAULT;
     };
 
-    Context(Context&& rhs);
-    Context& operator=(Context&&) = delete;
-    Context(const Context&) = delete;
-    Context& operator=(const Context&) = delete;
+    MupdfContext(MupdfContext&& rhs);
+    MupdfContext& operator=(MupdfContext&&) = delete;
+    MupdfContext(const MupdfContext&) = delete;
+    MupdfContext& operator=(const MupdfContext&) = delete;
 
-    ~Context() noexcept;
+    ~MupdfContext() noexcept;
 
     fz_context* native() const;
     void registerDocumentHandlers() const;
 
+    static MupdfContext& thisThreadInstance();
+
  private:
-    explicit Context(fz_context* context) : context_(context) {}
+    explicit MupdfContext(fz_context* context) : context_(context) {}
 
     fz_context* context_ = nullptr;
 };
 
-Context& thisThreadContext();
-
-}  // namespace pdft::media::mupdf
+}  // namespace pdft::media

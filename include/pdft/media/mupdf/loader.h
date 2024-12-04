@@ -3,16 +3,16 @@
 #include "pdft/media/loader.h"
 #include "pdft/media/mupdf/context.h"
 
-namespace pdft::media::mupdf {
+namespace pdft::media {
 
-class Loader : public media::Loader {
+class MupdfLoader : public Loader {
  public:
-    explicit Loader(Context& context) : context_(context) {}
+    explicit MupdfLoader(MupdfContext& context) : context_(context) {}
 
     Result<Arc<media::Document>> load(const std::filesystem::path& path) const;
 
  private:
-    Context& context_;
+    MupdfContext& context_;
 };
 
-}  // namespace pdft::media::mupdf
+}  // namespace pdft::media

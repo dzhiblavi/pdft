@@ -9,18 +9,18 @@ extern "C" {
 #include <mupdf/fitz/document.h>
 }
 
-namespace pdft::media::mupdf {
+namespace pdft::media {
 
-Document::~Document() noexcept {
+MupdfDocument::~MupdfDocument() noexcept {
     fz_drop_document(context_.native(), document_);
 }
 
-Document::Document(Document&& rhs)
+MupdfDocument::MupdfDocument(MupdfDocument&& rhs)
     : context_(rhs.context_)
     , path_(std::move(rhs.path_))
     , document_(std::exchange(rhs.document_, nullptr)) {}
 
-size_t Document::getPageCount() const {
+size_t MupdfDocument::getPageCount() const {
     auto ctx = context_.native();
     int page_count = 0;
 
@@ -28,27 +28,28 @@ size_t Document::getPageCount() const {
     return page_count;
 }
 
-Arc<media::Page> Document::getPage(int index) const {
+Arc<media::Page> MupdfDocument::getPage(int index) const {
     PDFT_VERIFY(index >= 0 && index < static_cast<int>(getPageCount()));
     auto ctx = context_.native();
     fz_page* page = nullptr;
 
     PDFT_FZ_VERIFY(page = fz_load_page(ctx, document_, index));
     PDFT_VERIFY(page);
-    return Arc<media::Page>(new Page(index, context_, page));
+    return Arc<media::Page>(new MupdfPage(index, context_, page));
 }
 
-const std::filesystem::path& Document::getPath() const {
+const std::filesystem::path& MupdfDocument::getPath() const {
     return path_;
 }
 
-Result<Document> Document::open(Context& context, const std::filesystem::path& path) {
+Result<MupdfDocument> MupdfDocument::open(
+    MupdfContext& context, const std::filesystem::path& path) {
     auto ctx = context.native();
     fz_document* doc = nullptr;
 
     PDFT_FZ_VERIFY(doc = fz_open_document(ctx, path.c_str()));
     PDFT_VERIFY(doc);
-    return Document(context, path, doc);
+    return MupdfDocument(context, path, doc);
 }
 
-}  // namespace pdft::media::mupdf
+}  // namespace pdft::media

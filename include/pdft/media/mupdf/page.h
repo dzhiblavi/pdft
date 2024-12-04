@@ -7,14 +7,14 @@
 
 struct fz_page;
 
-namespace pdft::media::mupdf {
+namespace pdft::media {
 
-class Page : public media::Page {
+class MupdfPage : public Page {
  public:
-    Page(Page&& rhs);
-    Page& operator=(Page&& rhs) = delete;
+    MupdfPage(MupdfPage&& rhs);
+    MupdfPage& operator=(MupdfPage&& rhs) = delete;
 
-    ~Page() noexcept override;
+    ~MupdfPage() noexcept override;
 
     Arc<image::Image> getImage(float scaling_factor) const override;
 
@@ -22,16 +22,16 @@ class Page : public media::Page {
     size_t getPageIndex() const override;
 
  private:
-    Page(size_t page_index, Context& context, fz_page* page)
+    MupdfPage(size_t page_index, MupdfContext& context, fz_page* page)
         : page_index_(page_index)
         , context_(context)
         , page_(page) {}
 
     size_t page_index_;
-    Context& context_;
+    MupdfContext& context_;
     fz_page* page_ = nullptr;
 
-    friend class Document;
+    friend class MupdfDocument;
 };
 
-}  // namespace pdft::media::mupdf
+}  // namespace pdft::media

@@ -5,6 +5,7 @@
 
 namespace pdft::utils {
 
+// https://en.wikipedia.org/wiki/Pairing_function
 inline uint32_t cantorPair(uint16_t a, uint16_t b) {
     uint32_t aa = a, bb = b;
     return (aa + bb) * (aa + bb + 1) / 2 + bb;

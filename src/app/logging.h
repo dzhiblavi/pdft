@@ -24,6 +24,6 @@ struct LoggingConfig {
 
 void setupLogging(const LoggingConfig& config);
 
-void setupMupdfLogging(const pdft::media::mupdf::Context& context);
+void setupMupdfLogging(const pdft::media::MupdfContext& context);
 
 }  // namespace app
