@@ -1,5 +1,4 @@
 #include "pdft/app/persist/impl/persister.h"
-#include "pdft/core/assert.h"
 #include "pdft/core/log/log.h"
 
 #include <rfl/json.hpp>
@@ -24,9 +23,7 @@ void Persister::save(
 
     for (const auto& doc : ui.states) {
         auto id = doc.document_id;
-        auto maybe_document = documents.getDocument(id);
-        PDFT_VERIFY(maybe_document);
-        auto document = *maybe_document;
+        auto document = documents.getDocument(id) | result::unwrap;
         state.paths.push_back(document->getPath());
     }
 
@@ -51,7 +48,7 @@ Result<void> Persister::restore(
 
         if (!maybe_document) {
             to_be_removed.push_back(i);
-            pdft::log::warn(
+            log::warn(
                 "failed to load file by path while restoring state path={}: {}",
                 path,
                 maybe_document.error());

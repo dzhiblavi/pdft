@@ -3,6 +3,8 @@
 #include "pdft/image/operations.h"
 #include "pdft/image/palette.h"
 
+#include "pdft/core/result/combine/unwrap.h"
+#include "pdft/core/result/syntax/pipe.h"
 #include "pdft/core/trace/context.h"
 
 #include "pdft/utils/cantor_pair.h"
@@ -46,10 +48,7 @@ void PageRenderer::render(
     using core::trace::trace;
     const auto& [doc_id, page_index] = page;
 
-    auto maybe_document = documents_->getDocument(page.document_id);
-    PDFT_VERIFY(maybe_document);
-    auto document = *maybe_document;
-
+    auto document = documents_->getDocument(page.document_id) | result::unwrap;
     auto id = getIdForPage(page);
     auto the_page = trace(ctx, "get_page", [&] { return document->getPage(page_index); });
     float factor =

@@ -1,5 +1,8 @@
 #include "pdft/app/view/impl/view.h"
 
+#include "pdft/core/result/combine/unwrap.h"
+#include "pdft/core/result/syntax/pipe.h"
+
 namespace pdft::app::view::impl {
 
 tui::Element View::render(Context& ctx, const state::UIState& ui, tui::Screen& screen) {
@@ -9,10 +12,7 @@ tui::Element View::render(Context& ctx, const state::UIState& ui, tui::Screen& s
         if (auto doc = ui.getImmutableState()) {
             auto _ = ctx.push("render_doc");
 
-            auto maybe_document = documents_->getDocument(doc->document_id);
-            PDFT_VERIFY(maybe_document);
-            auto document = *maybe_document;
-
+            auto document = documents_->getDocument(doc->document_id) | result::unwrap;
             auto path = document->getPath().filename();
             auto page_str = std::format("{}/{}", doc->page_index + 1, doc->page_count);
 
@@ -51,10 +51,7 @@ tui::Element View::getSidebar(Context& ctx, const state::UIState& ui) {
         bool is_current = i == *ui.idx;
         auto doc_id = st.document_id;
 
-        auto maybe_document = documents_->getDocument(doc_id);
-        PDFT_VERIFY(maybe_document);
-        auto document = *maybe_document;
-
+        auto document = documents_->getDocument(doc_id) | result::unwrap;
         const auto& path = document->getPath();
         auto line = std::format("{}{}", is_current ? "* " : "", path.filename().c_str());
         elements.push_back(tui::text(std::move(line)));
