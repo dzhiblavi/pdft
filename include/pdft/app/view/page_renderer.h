@@ -13,7 +13,7 @@
 namespace pdft::app {
 
 struct Page {
-    state::DocumentId document_id;
+    DocumentId document_id;
     uint32_t page_index;
 };
 

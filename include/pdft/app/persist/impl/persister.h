@@ -8,14 +8,11 @@ namespace pdft::app::persist::impl {
 
 class Persister : public persist::Persister {
  public:
-    explicit Persister(Arc<const media::Loader> doc_loader)
-        : doc_loader_(std::move(doc_loader)) {}
+    explicit Persister(Arc<const media::Loader> doc_loader) : doc_loader_(std::move(doc_loader)) {}
 
-    void save(const state::UIState& ui, const state::DocumentStorage& documents, std::ostream& os)
-        const override;
+    void save(const UIState& ui, const DocumentStorage& documents, std::ostream& os) const override;
 
-    Result<void> restore(
-        state::UIState& ui, state::DocumentStorage& documents, std::istream& is) const override;
+    Result<void> restore(UIState& ui, DocumentStorage& documents, std::istream& is) const override;
 
  private:
     Arc<const media::Loader> doc_loader_;

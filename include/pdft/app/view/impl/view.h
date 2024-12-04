@@ -7,16 +7,16 @@ namespace pdft::app {
 
 class AppView : public View {
  public:
-    AppView(Arc<const state::DocumentStorage> documents, Arc<const DocumentView> view)
+    AppView(Arc<const DocumentStorage> documents, Arc<const DocumentView> view)
         : documents_(std::move(documents))
         , doc_view_(std::move(view)) {}
 
-    tui::Element render(Context& ctx, const state::UIState& ui, tui::Screen& screen) override;
+    tui::Element render(Context& ctx, const UIState& ui, tui::Screen& screen) override;
 
  private:
-    tui::Element getSidebar(Context& ctx, const state::UIState& ui);
+    tui::Element getSidebar(Context& ctx, const UIState& ui);
 
-    Arc<const state::DocumentStorage> documents_;
+    Arc<const DocumentStorage> documents_;
     Arc<const DocumentView> doc_view_;
 };
 

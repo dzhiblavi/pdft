@@ -33,9 +33,7 @@ class State {
 class AppPageRenderer : public PageRenderer {
  public:
     AppPageRenderer(
-        uint32_t image_id_salt,
-        Arc<const state::DocumentStorage> documents_,
-        Arc<tui::Display> display);
+        uint32_t image_id_salt, Arc<const DocumentStorage> documents_, Arc<tui::Display> display);
 
     void render(
         Context& ctx,
@@ -55,7 +53,7 @@ class AppPageRenderer : public PageRenderer {
 
     const uint32_t image_id_salt_;
     State state_;
-    Arc<const state::DocumentStorage> documents_;
+    Arc<const DocumentStorage> documents_;
     Arc<tui::Display> display_;
 };
 

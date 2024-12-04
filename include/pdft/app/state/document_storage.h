@@ -6,7 +6,7 @@
 
 #include <unordered_map>
 
-namespace pdft::app::state {
+namespace pdft::app {
 
 using DocumentId = uint32_t;
 
@@ -25,4 +25,4 @@ class DocumentStorage {
     std::unordered_map<std::string, DocumentId> ids_by_path_;
 };
 
-}  // namespace pdft::app::state
+}  // namespace pdft::app

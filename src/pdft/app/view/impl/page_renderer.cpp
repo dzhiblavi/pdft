@@ -34,7 +34,7 @@ const State::LoadedImage& State::getImage(ImageId id) const {
 }
 
 AppPageRenderer::AppPageRenderer(
-    uint32_t image_id_salt, Arc<const state::DocumentStorage> documents, Arc<tui::Display> display)
+    uint32_t image_id_salt, Arc<const DocumentStorage> documents, Arc<tui::Display> display)
     : image_id_salt_(image_id_salt)
     , documents_(std::move(documents))
     , display_(std::move(display)) {}

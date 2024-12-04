@@ -7,7 +7,7 @@
 
 #include <algorithm>
 
-namespace pdft::app::state {
+namespace pdft::app {
 
 void DocumentState::applyScrollOffset(uint32_t pages_per_height) {
     log::debug(
@@ -214,4 +214,4 @@ Maybe<DocumentId> UIState::getCurrentDocumentId() const {
     return idx.transform([this](auto i) { return states[i].document_id; });
 }
 
-}  // namespace pdft::app::state
+}  // namespace pdft::app

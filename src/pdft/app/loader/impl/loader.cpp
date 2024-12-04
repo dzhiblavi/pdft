@@ -8,10 +8,7 @@ namespace pdft::app::loader::impl {
 
 namespace {
 
-bool isOpened(
-    const std::string& abs_path,
-    const state::UIState& ui,
-    const state::DocumentStorage& documents) {
+bool isOpened(const std::string& abs_path, const UIState& ui, const DocumentStorage& documents) {
     // XXX this does not actually require linear search
 
     for (const auto& state : ui.states) {
@@ -27,16 +24,15 @@ bool isOpened(
 
 }  // namespace
 
-void Loader::save(
-    const state::UIState& ui, const state::DocumentStorage& documents, std::ostream& os) {
+void Loader::save(const UIState& ui, const DocumentStorage& documents, std::ostream& os) {
     persister_->save(ui, documents, os);
     log::info("the state has been successfully saved");
 }
 
 Result<void> Loader::load(
     const std::vector<std::string>& paths,
-    state::UIState& ui,
-    state::DocumentStorage& documents,
+    UIState& ui,
+    DocumentStorage& documents,
     StateMode mode,
     std::istream& is) {
     auto mode_name = magic_enum::enum_name(mode);

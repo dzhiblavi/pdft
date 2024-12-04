@@ -5,7 +5,7 @@
 
 namespace pdft::app {
 
-tui::Element AppView::render(Context& ctx, const state::UIState& ui, tui::Screen& screen) {
+tui::Element AppView::render(Context& ctx, const UIState& ui, tui::Screen& screen) {
     auto _ = ctx.push("state");
 
     auto doc = [&] {
@@ -38,7 +38,7 @@ tui::Element AppView::render(Context& ctx, const state::UIState& ui, tui::Screen
     });
 }
 
-tui::Element AppView::getSidebar(Context& ctx, const state::UIState& ui) {
+tui::Element AppView::getSidebar(Context& ctx, const UIState& ui) {
     if (!ui.show_sidebar) {
         return tui::emptyElement();
     }

@@ -12,29 +12,29 @@ class AppDocumentView : public DocumentView {
 
     tui::Element render(
         Context& ctx,
-        const state::DocumentState& doc,
+        const DocumentState& doc,
         const DisplayProperties& properties,
         tui::Screen& screen) const override;
 
  private:
     tui::Element renderOnePage(
         Context& ctx,
-        const state::DocumentState& doc,
+        const DocumentState& doc,
         const DisplayProperties& properties,
         tui::Screen& screen) const;
     tui::Element renderTwoPages(
         Context& ctx,
-        const state::DocumentState& doc,
+        const DocumentState& doc,
         const DisplayProperties& properties,
         tui::Screen& screen) const;
     tui::Element renderOnePageContinuous(
         Context& ctx,
-        const state::DocumentState& doc,
+        const DocumentState& doc,
         const DisplayProperties& properties,
         tui::Screen& screen) const;
     tui::Element renderTwoPagesContinuous(
         Context& ctx,
-        const state::DocumentState& doc,
+        const DocumentState& doc,
         const DisplayProperties& properties,
         tui::Screen& screen) const;
 

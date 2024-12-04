@@ -31,13 +31,12 @@ class Loader {
  public:
     virtual ~Loader() = default;
 
-    virtual void save(
-        const state::UIState& ui, const state::DocumentStorage& documents, std::ostream& os) = 0;
+    virtual void save(const UIState& ui, const DocumentStorage& documents, std::ostream& os) = 0;
 
     virtual Result<void> load(
         const std::vector<std::string>& paths,
-        state::UIState& ui,
-        state::DocumentStorage& documents,
+        UIState& ui,
+        DocumentStorage& documents,
         StateMode mode,
         std::istream& is) = 0;
 };

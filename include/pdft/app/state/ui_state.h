@@ -1,11 +1,10 @@
 #pragma once
 
 #include "pdft/app/state/document_storage.h"
-#include "pdft/core/result/type/result.h"
 
 #include <vector>
 
-namespace pdft::app::state {
+namespace pdft::app {
 
 enum class ViewMode {
     OnePage = 0,
@@ -65,4 +64,4 @@ struct UIState {
     DocumentState* getState();
 };
 
-}  // namespace pdft::app::state
+}  // namespace pdft::app

@@ -21,11 +21,10 @@ class Controller {
  public:
     virtual ~Controller() = default;
 
-    virtual Result<Action> onKeyEvent(
-        char key, state::UIState& ui, state::DocumentStorage& documents) = 0;
+    virtual Result<Action> onKeyEvent(char key, UIState& ui, DocumentStorage& documents) = 0;
 
     virtual Result<Action> onFilesystemEvent(
-        const notify::Event& event, state::UIState& ui, state::DocumentStorage& documents) = 0;
+        const notify::Event& event, UIState& ui, DocumentStorage& documents) = 0;
 };
 
 }  // namespace pdft::app::controller

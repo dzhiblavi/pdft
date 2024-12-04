@@ -1,6 +1,6 @@
 #include "pdft/app/state/document_storage.h"
 
-namespace pdft::app::state {
+namespace pdft::app {
 
 DocumentId DocumentStorage::addDocument(Arc<media::Document> document) {
     static DocumentId next_id = 0;
@@ -40,4 +40,4 @@ Maybe<DocumentId> DocumentStorage::getIdByPath(const std::filesystem::path& path
     return it->second;
 }
 
-}  // namespace pdft::app::state
+}  // namespace pdft::app

@@ -16,7 +16,7 @@ class DocumentView {
 
     virtual tui::Element render(
         Context& ctx,
-        const state::DocumentState& doc,
+        const DocumentState& doc,
         const DisplayProperties& properties,
         tui::Screen& screen) const = 0;
 };

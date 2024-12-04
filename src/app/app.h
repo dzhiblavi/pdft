@@ -42,7 +42,7 @@ class Application : public pdft::core::log::WithLogger {
     const Config config_;
     asio::io_context& context_;
     pdft::app::loader::StateMode state_mode_;
-    pdft::app::state::UIState ui_;
+    pdft::app::UIState ui_;
     asio::signal_set signals_;
 
     pdft::Arc<pdft::core::io::TermControl> term_control_;
@@ -52,7 +52,7 @@ class Application : public pdft::core::log::WithLogger {
     pdft::Arc<pdft::tui::Display> image_display_;
     pdft::Arc<pdft::media::Loader> doc_loader_;
     pdft::Arc<pdft::app::loader::Loader> loader_;
-    pdft::Arc<pdft::app::state::DocumentStorage> documents_;
+    pdft::Arc<pdft::app::DocumentStorage> documents_;
     pdft::Arc<pdft::app::View> view_;
     pdft::Arc<pdft::app::controller::Controller> controller_;
 };

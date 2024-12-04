@@ -67,8 +67,7 @@ KeyTree::NumberCallbackType Controller::numCommandCallback(Command command) {
     };
 }
 
-Result<Action> Controller::applyPendingCommand(
-    state::UIState& ui, state::DocumentStorage& documents) {
+Result<Action> Controller::applyPendingCommand(UIState& ui, DocumentStorage& documents) {
     using namespace result;
     auto [n, command] = command_;
 
@@ -164,8 +163,7 @@ Result<Action> Controller::applyPendingCommand(
     }
 }
 
-Result<Action> Controller::onKeyEvent(
-    char key, state::UIState& ui, state::DocumentStorage& documents) {
+Result<Action> Controller::onKeyEvent(char key, UIState& ui, DocumentStorage& documents) {
     log::debug("controller: key={}", key);
 
     switch (key_tree_.feed(key)) {
@@ -187,7 +185,7 @@ Result<Action> Controller::onKeyEvent(
 }
 
 Result<Action> Controller::onFilesystemEvent(
-    const notify::Event& event, state::UIState& ui, state::DocumentStorage& documents) {
+    const notify::Event& event, UIState& ui, DocumentStorage& documents) {
     using namespace result;
     log::debug("controller: fs event on path={}", event.path);
 
@@ -198,7 +196,7 @@ Result<Action> Controller::onFilesystemEvent(
     co_return Action::Redraw;
 }
 
-Status Controller::reloadCurrentDocument(state::UIState& ui, state::DocumentStorage& documents) {
+Status Controller::reloadCurrentDocument(UIState& ui, DocumentStorage& documents) {
     using namespace result;
 
     if (auto id = ui.getCurrentDocumentId()) {
@@ -208,10 +206,7 @@ Status Controller::reloadCurrentDocument(state::UIState& ui, state::DocumentStor
 }
 
 Status Controller::reloadDocument(
-    state::DocumentId old_id,
-    std::filesystem::path path,
-    state::UIState& ui,
-    state::DocumentStorage& documents) {
+    DocumentId old_id, std::filesystem::path path, UIState& ui, DocumentStorage& documents) {
     using namespace result;
 
     PDFT_VERIFY(documents.removeDocument(old_id));

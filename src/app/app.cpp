@@ -99,7 +99,7 @@ void Application::setup() {
     auto persister = std::make_shared<pdft::app::persist::impl::Persister>(doc_loader_);
     loader_ = std::make_shared<pdft::app::loader::impl::Loader>(persister, doc_loader_);
 
-    documents_ = std::make_shared<pdft::app::state::DocumentStorage>();
+    documents_ = std::make_shared<pdft::app::DocumentStorage>();
     ui_.scaling_coeff = config_.display.scaling_coeff;
     ui_.invert_colors = config_.display.invert_colors;
 

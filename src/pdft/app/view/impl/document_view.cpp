@@ -4,13 +4,13 @@ namespace pdft::app {
 
 tui::Element AppDocumentView::render(
     Context& ctx,
-    const state::DocumentState& doc,
+    const DocumentState& doc,
     const DisplayProperties& properties,
     tui::Screen& screen) const {
     auto _ = ctx.push("render");
 
     switch (doc.view_mode) {
-        using enum state::ViewMode;
+        using enum ViewMode;
 
         case OnePage:
             return renderOnePage(ctx, doc, properties, screen);
@@ -28,7 +28,7 @@ tui::Element AppDocumentView::render(
 
 tui::Element AppDocumentView::renderOnePage(
     Context& ctx,
-    const state::DocumentState& doc,
+    const DocumentState& doc,
     const DisplayProperties& properties,
     tui::Screen& screen) const {
     auto render = [&, properties](tui::IRect rect) {
@@ -57,7 +57,7 @@ tui::Element AppDocumentView::renderOnePage(
 
 tui::Element AppDocumentView::renderTwoPages(
     Context& ctx,
-    const state::DocumentState& doc,
+    const DocumentState& doc,
     const DisplayProperties& properties,
     tui::Screen& screen) const {
     auto render_left = [&, properties](tui::IRect rect) {
@@ -114,7 +114,7 @@ tui::Element AppDocumentView::renderTwoPages(
 
 tui::Element AppDocumentView::renderOnePageContinuous(
     Context& ctx,
-    const state::DocumentState& doc,
+    const DocumentState& doc,
     const DisplayProperties& properties,
     tui::Screen& screen) const {
     auto render_top = [&, properties](tui::IRect rect) {
@@ -189,7 +189,7 @@ tui::Element AppDocumentView::renderOnePageContinuous(
 
 tui::Element AppDocumentView::renderTwoPagesContinuous(
     Context& ctx,
-    const state::DocumentState& doc,
+    const DocumentState& doc,
     const DisplayProperties& properties,
     tui::Screen& screen) const {
     auto render_top_left = [&, properties](tui::IRect rect) {

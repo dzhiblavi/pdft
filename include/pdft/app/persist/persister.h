@@ -18,12 +18,10 @@ class Persister {
     virtual ~Persister() = default;
 
     virtual void save(
-        const state::UIState& ui,
-        const state::DocumentStorage& documents,
-        std::ostream& os) const = 0;
+        const UIState& ui, const DocumentStorage& documents, std::ostream& os) const = 0;
 
     virtual Result<void> restore(
-        state::UIState& ui, state::DocumentStorage& documents, std::istream& is) const = 0;
+        UIState& ui, DocumentStorage& documents, std::istream& is) const = 0;
 };
 
 }  // namespace pdft::app::persist

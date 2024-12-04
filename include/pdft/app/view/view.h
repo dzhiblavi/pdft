@@ -13,7 +13,7 @@ class View {
  public:
     virtual ~View() = default;
 
-    virtual tui::Element render(Context& ctx, const state::UIState& ui, tui::Screen& screen) = 0;
+    virtual tui::Element render(Context& ctx, const UIState& ui, tui::Screen& screen) = 0;
 };
 
 }  // namespace pdft::app

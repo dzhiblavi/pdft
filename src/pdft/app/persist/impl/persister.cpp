@@ -10,14 +10,13 @@ namespace pdft::app::persist::impl {
 namespace {
 
 struct State {
-    state::UIState ui;
+    UIState ui;
     std::vector<std::string> paths;
 };
 
 }  // namespace
 
-void Persister::save(
-    const state::UIState& ui, const state::DocumentStorage& documents, std::ostream& os) const {
+void Persister::save(const UIState& ui, const DocumentStorage& documents, std::ostream& os) const {
     State state;
     state.ui = ui;
 
@@ -30,8 +29,7 @@ void Persister::save(
     rfl::json::write(state, os);
 }
 
-Result<void> Persister::restore(
-    state::UIState& ui, state::DocumentStorage& documents, std::istream& is) const {
+Result<void> Persister::restore(UIState& ui, DocumentStorage& documents, std::istream& is) const {
     auto maybe_state = rfl::json::read<State>(is);
 
     if (!maybe_state) {
