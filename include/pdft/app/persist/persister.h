@@ -9,6 +9,10 @@
 
 namespace pdft::app::persist {
 
+enum class PersisterError {
+    FailedToReadState,
+};
+
 class Persister {
  public:
     virtual ~Persister() = default;

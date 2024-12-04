@@ -35,7 +35,7 @@ Result<void> Persister::restore(
     auto maybe_state = rfl::json::read<State>(is);
 
     if (!maybe_state) {
-        return result::err(std::make_error_code(std::errc::io_error));  // XXX
+        return result::err(makeErrorCode(PersisterError::FailedToReadState));
     }
 
     auto&& state = maybe_state.value();
