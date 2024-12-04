@@ -2,7 +2,7 @@
 
 #include "pdft/core/trace/time_traits.h"
 
-namespace pdft::core::trace {
+namespace pdft::trace {
 
 template <std::invocable<DurationType> Callback>
 class ScopeTracer {

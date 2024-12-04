@@ -5,11 +5,11 @@
 #include "pdft/core/trace/stack_scope_tracer.h"
 
 #include "pdft/core/io/buffer.h"
-#include "pdft/core/log/log.h"
+#include "pdft/core/log.h"
 
 #include <filesystem>
 
-namespace pdft::core::trace {
+namespace pdft::trace {
 
 struct AutomaticDuration {};
 
@@ -29,7 +29,7 @@ std::string getPrettyDuration(const DurationType& duration) {
 }
 
 template <typename Duration>
-void logStackTrace(const StackScopeTracerBase& info, io::OutBuffer& out) {
+void logStackTrace(const StackScopeTracerBase& info, core::io::OutBuffer& out) {
     const auto& loc = info.loc;
 
     core::io::write(out, '\n');
@@ -53,9 +53,9 @@ void logStackTrace(const StackScopeTracerBase& info, io::OutBuffer& out) {
 
 template <typename Duration = AutomaticDuration>
 auto logStackTrace(const StackScopeTracerBase& info, log::LoggerPtr logger = trace::logger()) {
-    io::OutBuffer out;
+    core::io::OutBuffer out;
     detail::logStackTrace<Duration>(info, out);
     logger->trace(out.view());
 }
 
-}  // namespace pdft::core::trace
+}  // namespace pdft::trace

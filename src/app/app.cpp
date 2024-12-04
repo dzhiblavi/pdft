@@ -26,7 +26,7 @@
 #include "pdft/core/awaitable.h"
 #include "pdft/core/io/posix/console.h"
 #include "pdft/core/io/posix/termctl.h"
-#include "pdft/core/log/log.h"
+#include "pdft/core/log.h"
 #include "pdft/core/trace/log_stack_trace.h"
 #include "pdft/core/trace/stack_scope_tracer.h"
 
@@ -238,8 +238,8 @@ asio::awaitable<bool> Application::waitForNextRender() {
 }
 
 asio::awaitable<void> Application::cleanup() {
-    auto tracer = core::trace::getGlobalPool().getTracer("cleanup");
-    core::Context ctx;
+    auto tracer = trace::getGlobalPool().getTracer("cleanup");
+    Context ctx;
     ctx.setTracer(tracer);
 
     {
@@ -256,11 +256,10 @@ asio::awaitable<void> Application::cleanup() {
         fs_watcher_->stop();
     }
 
-    log::debug(
-        this, "total stack tracer allocations: {}", core::trace::getGlobalPool().numAllocations());
+    log::debug(this, "total stack tracer allocations: {}", trace::getGlobalPool().numAllocations());
 
     tracer.finalize();
-    core::trace::logStackTrace(tracer.getInfo());
+    trace::logStackTrace(tracer.getInfo());
 }
 
 }  // namespace app

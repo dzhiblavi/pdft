@@ -3,7 +3,7 @@
 #include "pdft/core/log/with_logger.h"
 #include "pdft/core/trace/stack_scope_tracer.h"
 
-namespace pdft::core {
+namespace pdft {
 
 class Context;
 
@@ -16,12 +16,12 @@ class PushHandle {
     PushHandle() = default;
 
     PushHandle(
-        core::trace::StackScopeTracerOwner tracer,
-        core::trace::StackScopeTraceHandle previous,
+        trace::StackScopeTracerOwner tracer,
+        trace::StackScopeTraceHandle previous,
         Context* context);
 
-    core::trace::StackScopeTracerOwner tracer;
-    core::trace::StackScopeTraceHandle previous;
+    trace::StackScopeTracerOwner tracer;
+    trace::StackScopeTraceHandle previous;
     Context* context = nullptr;
 
     friend class Context;
@@ -44,10 +44,4 @@ class Context : public log::WithLogger {
     friend class PushHandle;
 };
 
-}  // namespace pdft::core
-
-namespace pdft {
-
-using core::Context;
-
-};  // namespace pdft
+}  // namespace pdft

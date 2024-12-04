@@ -1,7 +1,7 @@
 #include "pdft/notify/fsw_notify.h"
 
 #include "pdft/core/assert.h"
-#include "pdft/core/log/log.h"
+#include "pdft/core/log.h"
 #include "pdft/utils/build_info.h"
 
 #include <libfswatch/c/libfswatch.h>

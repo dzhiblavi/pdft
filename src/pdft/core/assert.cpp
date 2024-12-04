@@ -3,7 +3,7 @@
 #include <cpptrace/cpptrace.hpp>
 #include <iostream>
 
-namespace pdft::core::detail {
+namespace pdft::detail {
 
 void panic(std::string_view message, std::source_location location) {
     std::cerr << "PANIC\n"
@@ -13,4 +13,4 @@ void panic(std::string_view message, std::source_location location) {
     std::terminate();
 }
 
-}  // namespace pdft::core::detail
+}  // namespace pdft::detail

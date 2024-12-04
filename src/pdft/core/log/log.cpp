@@ -1,10 +1,8 @@
-#include "pdft/core/log/log.h"
-#include "pdft/core/assert.h"
-#include "pdft/core/log/load.h"
+#include "pdft/core/log.h"
 
 #include <spdlog/spdlog.h>
 
-namespace pdft::core::log {
+namespace pdft::log {
 
 namespace {
 
@@ -49,4 +47,4 @@ LoggerPtr global() {
 
 }  // namespace impl
 
-}  // namespace pdft::core::log
+}  // namespace pdft::log

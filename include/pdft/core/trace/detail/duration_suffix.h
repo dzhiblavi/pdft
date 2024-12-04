@@ -2,7 +2,7 @@
 
 #include <chrono>
 
-namespace pdft::core::trace::detail {
+namespace pdft::trace::detail {
 
 template <typename Duration>
 inline constexpr const char* durationSuffix = "";
@@ -22,4 +22,4 @@ inline constexpr const char* durationSuffix<std::chrono::seconds> = "s";
 template <>
 inline constexpr const char* durationSuffix<std::chrono::minutes> = "m";
 
-}  // namespace pdft::core::trace::detail
+}  // namespace pdft::trace::detail

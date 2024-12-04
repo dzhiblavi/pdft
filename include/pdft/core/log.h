@@ -1,10 +1,9 @@
 #pragma once
 
-#include "./impl/log.h"
-
 #include "pdft/core/log/common_adapters.h"
+#include "pdft/core/log/impl/log.h"
 
-namespace pdft::core::log {
+namespace pdft::log {
 
 using impl::Level;
 using impl::LoggerPtr;
@@ -26,11 +25,5 @@ using impl::info;
 using impl::log;
 using impl::trace;
 using impl::warn;
-
-}  // namespace pdft::core::log
-
-namespace pdft::log {
-
-using namespace core::log;
 
 }  // namespace pdft::log

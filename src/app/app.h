@@ -22,7 +22,7 @@
 
 namespace app {
 
-class Application : public pdft::core::log::WithLogger {
+class Application : public pdft::log::WithLogger {
  public:
     Application(asio::io_context& context, Config config, pdft::app::StateMode state_mode);
 

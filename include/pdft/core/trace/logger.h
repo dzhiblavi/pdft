@@ -1,8 +1,8 @@
 #pragma once
 
-#include "pdft/core/log/log.h"
+#include "pdft/core/log.h"
 
-namespace pdft::core::trace {
+namespace pdft::trace {
 
 inline log::LoggerPtr logger() {
     if (auto logger = log::logger("trace")) {

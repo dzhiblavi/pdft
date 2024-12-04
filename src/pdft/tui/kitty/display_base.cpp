@@ -1,7 +1,7 @@
 #include "pdft/tui/kitty/display_base.h"
 
 #include "pdft/core/assert.h"
-#include "pdft/core/log/log.h"
+#include "pdft/core/log.h"
 
 namespace pdft::tui {
 

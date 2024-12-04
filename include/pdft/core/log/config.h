@@ -7,7 +7,7 @@
 #include <string>
 #include <variant>
 
-namespace pdft::core::log {
+namespace pdft::log {
 
 struct StdoutSink {
     bool cerr = false;

@@ -1,7 +1,7 @@
 #include "pdft/tui/kitty/unicode_display.h"
 
 #include "pdft/core/assert.h"
-#include "pdft/core/log/log.h"
+#include "pdft/core/log.h"
 
 #include "./detail/rowcolumn_diacritics.h"
 

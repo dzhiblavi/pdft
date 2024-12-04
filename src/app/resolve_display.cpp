@@ -5,7 +5,7 @@
 #include "pdft/tui/kitty/native_display.h"
 #include "pdft/tui/kitty/unicode_display.h"
 
-#include "pdft/core/log/log.h"
+#include "pdft/core/log.h"
 
 namespace app {
 

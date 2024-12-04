@@ -1,6 +1,6 @@
 #include "pdft/core/trace/stack_scope_tracer.h"
 
-namespace pdft::core::trace {
+namespace pdft::trace {
 
 void StackScopeTracerBase::finalize() {
     duration = ClockType::now() - started_at;
@@ -125,4 +125,4 @@ StackScopeTracerPool& getGlobalPool() {
     return pool;
 }
 
-}  // namespace pdft::core::trace
+}  // namespace pdft::trace

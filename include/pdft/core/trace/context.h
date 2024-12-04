@@ -3,7 +3,7 @@
 #include "pdft/core/context.h"
 #include "pdft/utils/is_awaitable.h"
 
-namespace pdft::core::trace {
+namespace pdft::trace {
 
 template <std::invocable<> F>
 requires(!utils::isAwaitable<std::invoke_result_t<F>>)
@@ -37,4 +37,4 @@ asio::awaitable<T> trace(
     co_return co_await std::move(value);
 }
 
-}  // namespace pdft::core::trace
+}  // namespace pdft::trace

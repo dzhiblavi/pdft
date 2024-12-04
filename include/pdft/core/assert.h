@@ -2,12 +2,11 @@
 
 #include <fmt/core.h>
 
-#include <algorithm>
 #include <exception>
 #include <source_location>
 #include <string_view>
 
-namespace pdft::core {
+namespace pdft {
 
 namespace detail {
 
@@ -40,16 +39,6 @@ panic(fmt::format_string<const Args&...>, const Args&...) -> panic<Args...>;
 
 template <typename Msg>
 panic(const Msg&) -> panic<Msg>;
-
-constexpr bool containsFormatPlaceholder(std::string_view str) {
-    return std::ranges::any_of(str, [](char c) { return c == '{' || c == '}'; });
-}
-
-}  // namespace pdft::core
-
-namespace pdft {
-
-using core::panic;
 
 }  // namespace pdft
 

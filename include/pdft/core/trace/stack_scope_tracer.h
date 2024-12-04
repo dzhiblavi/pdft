@@ -5,7 +5,7 @@
 
 #include <source_location>
 
-namespace pdft::core::trace {
+namespace pdft::trace {
 
 class StackScopeTracerPool;
 

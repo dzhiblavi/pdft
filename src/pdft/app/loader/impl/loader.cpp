@@ -1,6 +1,6 @@
 #include "pdft/app/loader/impl/loader.h"
 
-#include "pdft/core/log/log.h"
+#include "pdft/core/log.h"
 
 #include <magic_enum.hpp>
 

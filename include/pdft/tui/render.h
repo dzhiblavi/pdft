@@ -26,12 +26,12 @@ class Renderer {
         PDFT_VERIFY(console_);
     }
 
-    template <std::invocable<core::Context&, Screen&> Renderer>
+    template <std::invocable<Context&, Screen&> Renderer>
     asio::awaitable<void> renderOne(Renderer renderer) {
-        using core::trace::trace;
+        using trace::trace;
 
-        auto tracer = core::trace::getGlobalPool().getTracer("renderOne");
-        auto ctx = core::Context();
+        auto tracer = trace::getGlobalPool().getTracer("renderOne");
+        auto ctx = Context();
         ctx.setTracer(tracer);
         auto screen = Screen{terminal_->getDimensions(), {control_, display_}};
 
@@ -49,7 +49,7 @@ class Renderer {
         core::io::clear(display_);
 
         tracer.finalize();
-        core::trace::logStackTrace(tracer.getInfo());
+        trace::logStackTrace(tracer.getInfo());
     }
 
  private:

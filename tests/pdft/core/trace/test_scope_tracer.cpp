@@ -2,18 +2,16 @@
 
 #include <catch2/catch_test_macros.hpp>
 
-namespace pdft::core::trace {
+namespace pdft::trace {
 
 TEST_CASE("testScopeTracerCallsCallback", "") {
     bool called = false;
 
     {
-        auto _ = ScopeTracer([&](auto...) {
-            called = true;
-        });
+        auto _ = ScopeTracer([&](auto...) { called = true; });
     }
 
     CHECK(called);
 }
 
-}  // namespace pdft::core::trace
+}  // namespace pdft::trace

@@ -45,7 +45,7 @@ void AppPageRenderer::render(
     const PagePosition& pos,
     const DisplayProperties& properties,
     tui::Screen& screen) {
-    using core::trace::trace;
+    using trace::trace;
     const auto& [doc_id, page_index] = page;
 
     auto document = documents_->getDocument(page.document_id) | result::unwrap;

@@ -2,7 +2,7 @@
 
 #include "pdft/core/log/config.h"
 
-namespace pdft::core::log {
+namespace pdft::log {
 
 void loadLogger(const std::string& name, const LoggerConfig& config);
 

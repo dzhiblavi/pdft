@@ -1,8 +1,8 @@
 #include "logging.h"
 
+#include "pdft/core/log.h"
 #include "pdft/core/log/config.h"
 #include "pdft/core/log/load.h"
-#include "pdft/core/log/log.h"
 
 extern "C" {
 #include <mupdf/fitz/context.h>
@@ -29,7 +29,7 @@ void setupLogging(const LoggingConfig& config) {
         std::filesystem::create_directories(directory);
     }
 
-    core::log::LogConfig log_config{
+    log::LogConfig log_config{
         .loggers =
             {
                 {
@@ -39,7 +39,7 @@ void setupLogging(const LoggingConfig& config) {
                         .format = "%Y-%m-%dT%T %z %^%s:%#%$ %L %v",
                         .sinks =
                             {
-                                core::log::SimpleFileSink{
+                                log::SimpleFileSink{
                                     .path = directory / "app.log",
                                 },
                             },
@@ -51,7 +51,7 @@ void setupLogging(const LoggingConfig& config) {
                         .level = toSpdlogLevel(config.level),
                         .sinks =
                             {
-                                core::log::SimpleFileSink{
+                                log::SimpleFileSink{
                                     .path = directory / "mupdf.log",
                                 },
                             },
@@ -64,7 +64,7 @@ void setupLogging(const LoggingConfig& config) {
                         .level = spdlog::level::level_enum::trace,
                         .sinks =
                             {
-                                core::log::SimpleFileSink{
+                                log::SimpleFileSink{
                                     .path = directory / "trace.log",
                                 },
                             },
@@ -73,15 +73,15 @@ void setupLogging(const LoggingConfig& config) {
             },
     };
 
-    core::log::loadConfig(log_config);
+    log::loadConfig(log_config);
 }
 
 void warningCallback(void*, const char* message) {
-    core::log::logger("mupdf")->warn(message);
+    log::logger("mupdf")->warn(message);
 }
 
 void errorCallback(void*, const char* message) {
-    core::log::logger("mupdf")->warn(message);
+    log::logger("mupdf")->warn(message);
 }
 
 void setupMupdfLogging(const pdft::media::mupdf::Context& context) {

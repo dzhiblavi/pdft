@@ -1,9 +1,9 @@
 #pragma once
 
 #include "pdft/core/assert.h"
-#include "pdft/core/log/log.h"
+#include "pdft/core/log.h"
 
-namespace pdft::core::log {
+namespace pdft::log {
 
 class WithLogger {
  public:
@@ -20,4 +20,4 @@ class WithLogger {
     LoggerPtr logger_ = global();
 };
 
-}  // namespace pdft::core::log
+}  // namespace pdft::log

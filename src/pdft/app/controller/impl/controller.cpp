@@ -1,7 +1,7 @@
 #include "pdft/app/controller/impl/controller.h"
 
 #include "pdft/core/assert.h"
-#include "pdft/core/log/log.h"
+#include "pdft/core/log.h"
 
 #include "pdft/core/result/coro/maybe.h"
 #include "pdft/core/result/coro/result.h"

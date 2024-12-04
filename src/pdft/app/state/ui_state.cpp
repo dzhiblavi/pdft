@@ -1,7 +1,7 @@
 #include "pdft/app/state/ui_state.h"
 
 #include "pdft/core/assert.h"
-#include "pdft/core/log/log.h"
+#include "pdft/core/log.h"
 
 #include <magic_enum.hpp>
 

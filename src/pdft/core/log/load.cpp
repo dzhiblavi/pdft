@@ -1,5 +1,5 @@
 #include "pdft/core/log/load.h"
-#include "pdft/core/log/log.h"
+#include "pdft/core/log.h"
 
 #include "pdft/utils/visit.h"
 
@@ -12,7 +12,7 @@
 #include <spdlog/sinks/stdout_color_sinks.h>
 #include <spdlog/sinks/stdout_sinks.h>
 
-namespace pdft::core::log {
+namespace pdft::log {
 
 namespace {
 
@@ -97,4 +97,4 @@ void loadConfig(const LogConfig& config) {
     }
 }
 
-}  // namespace pdft::core::log
+}  // namespace pdft::log

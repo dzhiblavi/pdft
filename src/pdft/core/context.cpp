@@ -1,11 +1,9 @@
 #include "pdft/core/context.h"
 
-namespace pdft::core {
+namespace pdft {
 
 PushHandle::PushHandle(
-    core::trace::StackScopeTracerOwner tracer,
-    core::trace::StackScopeTraceHandle previous,
-    Context* context)
+    trace::StackScopeTracerOwner tracer, trace::StackScopeTraceHandle previous, Context* context)
     : tracer(std::move(tracer))
     , previous(previous)
     , context(context) {}
@@ -39,4 +37,4 @@ PushHandle Context::push(const char* label, std::source_location loc) {
     return handle;
 }
 
-}  // namespace pdft::core
+}  // namespace pdft

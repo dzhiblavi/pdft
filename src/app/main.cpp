@@ -15,7 +15,7 @@ asio::awaitable<void> main(asio::io_context& context, Config config, const CliAr
     setupLogging(config.logging);
 
     auto app = Application(context, std::move(config), args.state_mode);
-    app.setLogger(pdft::core::log::global());
+    app.setLogger(pdft::log::global());
     co_await app.run(args.paths);
 }
 

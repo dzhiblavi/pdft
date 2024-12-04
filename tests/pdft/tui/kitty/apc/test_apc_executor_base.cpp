@@ -22,7 +22,7 @@ struct TestExecutor : APCExecutorBase {
 }  // namespace
 
 TEST_CASE("testExecuteNoControlDataNoPayload", "") {
-    core::Context ctx;
+    Context ctx;
     core::io::OutBuffer buffer;
     auto executor = TestExecutor();
 
@@ -38,7 +38,7 @@ TEST_CASE("testExecuteNoControlDataNoPayload", "") {
 }
 
 TEST_CASE("testExecuteWithControlDataNoPayload", "") {
-    core::Context ctx;
+    Context ctx;
     core::io::OutBuffer buffer;
     auto executor = TestExecutor();
 
@@ -59,7 +59,7 @@ TEST_CASE("testExecuteWithControlDataNoPayload", "") {
 }
 
 TEST_CASE("testExecuteNoControlDataWithPayloadOneChunk", "") {
-    core::Context ctx;
+    Context ctx;
     core::io::OutBuffer buffer;
     auto executor = TestExecutor();
 
@@ -76,7 +76,7 @@ TEST_CASE("testExecuteNoControlDataWithPayloadOneChunk", "") {
 }
 
 TEST_CASE("testExecuteWithControlDataWithPayloadOneChunk", "") {
-    core::Context ctx;
+    Context ctx;
     core::io::OutBuffer buffer;
     auto executor = TestExecutor();
 
@@ -98,7 +98,7 @@ TEST_CASE("testExecuteWithControlDataWithPayloadOneChunk", "") {
 }
 
 TEST_CASE("testExecuteWithControlDataWithPayloadMultipleChunks", "") {
-    core::Context ctx;
+    Context ctx;
     core::io::OutBuffer buffer;
     auto executor = TestExecutor();
 
@@ -120,7 +120,7 @@ TEST_CASE("testExecuteWithControlDataWithPayloadMultipleChunks", "") {
 }
 
 TEST_CASE("testExecuteBase64EncodeSingleChunk", "") {
-    core::Context ctx;
+    Context ctx;
     core::io::OutBuffer buffer;
     auto executor = TestExecutor();
 
@@ -143,7 +143,7 @@ TEST_CASE("testExecuteBase64EncodeSingleChunk", "") {
 }
 
 TEST_CASE("testExecuteBase64EncodeMultipleChunks", "") {
-    core::Context ctx;
+    Context ctx;
     core::io::OutBuffer buffer;
     auto executor = TestExecutor();
 

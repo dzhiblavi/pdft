@@ -1,5 +1,5 @@
 #include "pdft/app/persist/impl/persister.h"
-#include "pdft/core/log/log.h"
+#include "pdft/core/log.h"
 
 #include <rfl/json.hpp>
 

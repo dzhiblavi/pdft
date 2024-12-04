@@ -1,6 +1,6 @@
 #include "pdft/core/trace/log_stack_trace.h"
 
-namespace pdft::core::trace::detail {
+namespace pdft::trace::detail {
 
 std::string getAutomaticPrettyDuration(const DurationType& duration) {
     static constexpr std::array<uint64_t, 4> ratios{
@@ -26,4 +26,4 @@ std::string getAutomaticPrettyDuration(const DurationType& duration) {
     return std::format("{:.2f}{}", float(ns) / ratios[index], names[index]);
 }
 
-}  // namespace pdft::core::trace::detail
+}  // namespace pdft::trace::detail

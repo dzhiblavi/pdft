@@ -2,7 +2,7 @@
 
 #include <catch2/catch_test_macros.hpp>
 
-namespace pdft::core::trace {
+namespace pdft::trace {
 
 TEST_CASE("testStackScopeTracerOneAllocation", "") {
     StackScopeTracerPool pool;
@@ -72,4 +72,4 @@ TEST_CASE("testStackScopeTracerChlidrenNotYetRecycled", "") {
     CHECK(pool.numAllocations() == 11);
 }
 
-}  // namespace pdft::core::trace
+}  // namespace pdft::trace

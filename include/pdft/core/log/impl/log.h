@@ -8,7 +8,7 @@
 #include <memory>
 #include <source_location>
 
-namespace pdft::core::log::impl {
+namespace pdft::log::impl {
 
 using LoggerPtr = Arc<spdlog::logger>;
 
@@ -119,4 +119,4 @@ PDFT_DEFINE_LOG_FOR_LEVEL(err);
 PDFT_DEFINE_LOG_FOR_LEVEL(critical);
 #undef PDFT_DEFINE_LOG_FOR_LEVEL
 
-}  // namespace pdft::core::log::impl
+}  // namespace pdft::log::impl
