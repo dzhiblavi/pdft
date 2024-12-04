@@ -45,10 +45,10 @@ class Application : public pdft::log::WithLogger {
     pdft::app::UIState ui_;
     asio::signal_set signals_;
 
-    pdft::Arc<pdft::io::TermControl> term_control_;
-    pdft::Arc<pdft::tui::Terminal> terminal_;
-    pdft::Arc<pdft::io::Console> console_;
     pdft::Arc<pdft::notify::Notify> fs_watcher_;
+    pdft::Arc<pdft::io::TermControl> term_control_;
+    pdft::Arc<pdft::io::Console> console_;
+    pdft::Arc<pdft::tui::Terminal> terminal_;
     pdft::Arc<pdft::tui::Display> image_display_;
     pdft::Arc<pdft::media::Loader> doc_loader_;
     pdft::Arc<pdft::app::Loader> loader_;

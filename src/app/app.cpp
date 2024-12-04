@@ -43,12 +43,11 @@ namespace app {
 using namespace pdft;
 using namespace asio::experimental::awaitable_operators;
 
-using pdft::app::ControllerAction;
-
 using pdft::app::AppController;
 using pdft::app::AppDocumentView;
 using pdft::app::AppPageRenderer;
 using pdft::app::AppView;
+using pdft::app::ControllerAction;
 
 namespace {
 
