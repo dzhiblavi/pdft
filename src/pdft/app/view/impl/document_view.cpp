@@ -1,8 +1,8 @@
 #include "pdft/app/view/impl/document_view.h"
 
-namespace pdft::app::view::impl {
+namespace pdft::app {
 
-tui::Element DocumentView::render(
+tui::Element AppDocumentView::render(
     Context& ctx,
     const state::DocumentState& doc,
     const DisplayProperties& properties,
@@ -26,7 +26,7 @@ tui::Element DocumentView::render(
     }
 }
 
-tui::Element DocumentView::renderOnePage(
+tui::Element AppDocumentView::renderOnePage(
     Context& ctx,
     const state::DocumentState& doc,
     const DisplayProperties& properties,
@@ -55,7 +55,7 @@ tui::Element DocumentView::renderOnePage(
     return tui::withSize(render);
 }
 
-tui::Element DocumentView::renderTwoPages(
+tui::Element AppDocumentView::renderTwoPages(
     Context& ctx,
     const state::DocumentState& doc,
     const DisplayProperties& properties,
@@ -112,7 +112,7 @@ tui::Element DocumentView::renderTwoPages(
     });
 }
 
-tui::Element DocumentView::renderOnePageContinuous(
+tui::Element AppDocumentView::renderOnePageContinuous(
     Context& ctx,
     const state::DocumentState& doc,
     const DisplayProperties& properties,
@@ -187,7 +187,7 @@ tui::Element DocumentView::renderOnePageContinuous(
            tui::reflect(rect_);
 }
 
-tui::Element DocumentView::renderTwoPagesContinuous(
+tui::Element AppDocumentView::renderTwoPagesContinuous(
     Context& ctx,
     const state::DocumentState& doc,
     const DisplayProperties& properties,
@@ -337,4 +337,4 @@ tui::Element DocumentView::renderTwoPagesContinuous(
            tui::reflect(rect_);
 }
 
-}  // namespace pdft::app::view::impl
+}  // namespace pdft::app

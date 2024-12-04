@@ -9,7 +9,7 @@
 
 #include "pdft/utils/cantor_pair.h"
 
-namespace pdft::app::view::impl {
+namespace pdft::app {
 
 using tui::ImageId;
 
@@ -33,13 +33,13 @@ const State::LoadedImage& State::getImage(ImageId id) const {
     return loaded_.find(id)->second;
 }
 
-PageRenderer::PageRenderer(
+AppPageRenderer::AppPageRenderer(
     uint32_t image_id_salt, Arc<const state::DocumentStorage> documents, Arc<tui::Display> display)
     : image_id_salt_(image_id_salt)
     , documents_(std::move(documents))
     , display_(std::move(display)) {}
 
-void PageRenderer::render(
+void AppPageRenderer::render(
     Context& ctx,
     const Page& page,
     const PagePosition& pos,
@@ -133,7 +133,7 @@ void PageRenderer::render(
     display_->displayImage(ctx, id, irect, pos.subarea, screen.buffers);
 }
 
-float PageRenderer::calcFactor(
+float AppPageRenderer::calcFactor(
     Context& ctx,
     media::PageSize page_size,
     float scaling_coeff,
@@ -159,9 +159,9 @@ float PageRenderer::calcFactor(
     return scaling_coeff * f;
 }
 
-ImageId PageRenderer::getIdForPage(const Page& page) const {
+ImageId AppPageRenderer::getIdForPage(const Page& page) const {
     auto [doc_id, page_index] = page;
     return image_id_salt_ + utils::cantorPair(doc_id, page_index + 1);
 }
 
-}  // namespace pdft::app::view::impl
+}  // namespace pdft::app

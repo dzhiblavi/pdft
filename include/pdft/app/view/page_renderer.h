@@ -10,7 +10,7 @@
 
 #include "pdft/core/context.h"
 
-namespace pdft::app::view {
+namespace pdft::app {
 
 struct Page {
     state::DocumentId document_id;
@@ -41,6 +41,6 @@ class PageRenderer {
         tui::Screen& screen) = 0;
 };
 
-}  // namespace pdft::app::view
+}  // namespace pdft::app
 
-PDFT_LOG_ADAPT_TYPE_JSON(pdft::app::view, Page);
+PDFT_LOG_ADAPT_TYPE_JSON(pdft::app, Page);

@@ -53,7 +53,7 @@ class Application : public pdft::core::log::WithLogger {
     pdft::Arc<pdft::media::Loader> doc_loader_;
     pdft::Arc<pdft::app::loader::Loader> loader_;
     pdft::Arc<pdft::app::state::DocumentStorage> documents_;
-    pdft::Arc<pdft::app::view::View> view_;
+    pdft::Arc<pdft::app::View> view_;
     pdft::Arc<pdft::app::controller::Controller> controller_;
 };
 

@@ -45,9 +45,9 @@ using namespace asio::experimental::awaitable_operators;
 
 using pdft::app::controller::Action;
 
-using pdft::app::view::impl::DocumentView;
-using pdft::app::view::impl::PageRenderer;
-using pdft::app::view::impl::View;
+using pdft::app::AppDocumentView;
+using pdft::app::AppPageRenderer;
+using pdft::app::AppView;
 
 using pdft::app::controller::impl::Controller;
 
@@ -104,9 +104,9 @@ void Application::setup() {
     ui_.invert_colors = config_.display.invert_colors;
 
     auto renderer =
-        std::make_shared<PageRenderer>(utils::random<uint32_t>(), documents_, image_display_);
-    auto document_view = std::make_shared<DocumentView>(std::move(renderer));
-    view_ = std::make_shared<View>(documents_, std::move(document_view));
+        std::make_shared<AppPageRenderer>(utils::random<uint32_t>(), documents_, image_display_);
+    auto document_view = std::make_shared<AppDocumentView>(std::move(renderer));
+    view_ = std::make_shared<AppView>(documents_, std::move(document_view));
     controller_ = std::make_shared<Controller>(config_.controller, doc_loader_);
 
     if (config_.system.enable_filesystem_watching) {

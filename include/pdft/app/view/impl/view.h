@@ -3,13 +3,11 @@
 #include "pdft/app/view/document_view.h"
 #include "pdft/app/view/view.h"
 
-namespace pdft::app::view::impl {
+namespace pdft::app {
 
-class View : public view::View {
+class AppView : public View {
  public:
-    View(
-        Arc<const state::DocumentStorage> documents,
-        Arc<const view::DocumentView> view)
+    AppView(Arc<const state::DocumentStorage> documents, Arc<const DocumentView> view)
         : documents_(std::move(documents))
         , doc_view_(std::move(view)) {}
 
@@ -19,7 +17,7 @@ class View : public view::View {
     tui::Element getSidebar(Context& ctx, const state::UIState& ui);
 
     Arc<const state::DocumentStorage> documents_;
-    Arc<const view::DocumentView> doc_view_;
+    Arc<const DocumentView> doc_view_;
 };
 
-}  // namespace pdft::app::view::impl
+}  // namespace pdft::app

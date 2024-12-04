@@ -7,7 +7,7 @@
 
 #include "pdft/core/context.h"
 
-namespace pdft::app::view {
+namespace pdft::app {
 
 class View {
  public:
@@ -16,4 +16,4 @@ class View {
     virtual tui::Element render(Context& ctx, const state::UIState& ui, tui::Screen& screen) = 0;
 };
 
-}  // namespace pdft::app::view
+}  // namespace pdft::app

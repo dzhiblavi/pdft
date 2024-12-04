@@ -8,7 +8,7 @@
 
 #include "pdft/core/context.h"
 
-namespace pdft::app::view {
+namespace pdft::app {
 
 class DocumentView {
  public:
@@ -21,4 +21,4 @@ class DocumentView {
         tui::Screen& screen) const = 0;
 };
 
-}  // namespace pdft::app::view
+}  // namespace pdft::app

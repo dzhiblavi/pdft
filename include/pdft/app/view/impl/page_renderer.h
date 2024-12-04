@@ -5,7 +5,7 @@
 #include "pdft/tui/display.h"
 #include "pdft/tui/terminal.h"
 
-namespace pdft::app::view::impl {
+namespace pdft::app {
 
 class State {
  public:
@@ -30,9 +30,9 @@ class State {
     std::unordered_map<tui::ImageId, LoadedImage> loaded_;
 };
 
-class PageRenderer : public view::PageRenderer {
+class AppPageRenderer : public PageRenderer {
  public:
-    PageRenderer(
+    AppPageRenderer(
         uint32_t image_id_salt,
         Arc<const state::DocumentStorage> documents_,
         Arc<tui::Display> display);
@@ -59,4 +59,4 @@ class PageRenderer : public view::PageRenderer {
     Arc<tui::Display> display_;
 };
 
-}  // namespace pdft::app::view::impl
+}  // namespace pdft::app

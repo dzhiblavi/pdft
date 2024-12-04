@@ -4,12 +4,11 @@
 #include "pdft/app/view/page_renderer.h"
 #include "pdft/core/context.h"
 
-namespace pdft::app::view::impl {
+namespace pdft::app {
 
-class DocumentView : public view::DocumentView {
+class AppDocumentView : public DocumentView {
  public:
-    explicit DocumentView(Arc<view::PageRenderer> renderer)
-        : renderer_(std::move(renderer)) {}
+    explicit AppDocumentView(Arc<PageRenderer> renderer) : renderer_(std::move(renderer)) {}
 
     tui::Element render(
         Context& ctx,
@@ -39,8 +38,8 @@ class DocumentView : public view::DocumentView {
         const DisplayProperties& properties,
         tui::Screen& screen) const;
 
-    Arc<view::PageRenderer> renderer_;
+    Arc<PageRenderer> renderer_;
     mutable tui::IRect rect_;
 };
 
-}  // namespace pdft::app::view::impl
+}  // namespace pdft::app

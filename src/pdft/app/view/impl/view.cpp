@@ -3,9 +3,9 @@
 #include "pdft/core/result/combine/unwrap.h"
 #include "pdft/core/result/syntax/pipe.h"
 
-namespace pdft::app::view::impl {
+namespace pdft::app {
 
-tui::Element View::render(Context& ctx, const state::UIState& ui, tui::Screen& screen) {
+tui::Element AppView::render(Context& ctx, const state::UIState& ui, tui::Screen& screen) {
     auto _ = ctx.push("state");
 
     auto doc = [&] {
@@ -38,7 +38,7 @@ tui::Element View::render(Context& ctx, const state::UIState& ui, tui::Screen& s
     });
 }
 
-tui::Element View::getSidebar(Context& ctx, const state::UIState& ui) {
+tui::Element AppView::getSidebar(Context& ctx, const state::UIState& ui) {
     if (!ui.show_sidebar) {
         return tui::emptyElement();
     }
@@ -62,4 +62,4 @@ tui::Element View::getSidebar(Context& ctx, const state::UIState& ui) {
            | tui::size(tui::WIDTH, tui::EQUAL, 20);
 }
 
-}  // namespace pdft::app::view::impl
+}  // namespace pdft::app
