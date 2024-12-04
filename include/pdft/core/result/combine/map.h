@@ -1,7 +1,8 @@
 #pragma once
 
-#include "pdft/core/result/type/result.h"
 #include "pdft/core/result/type/maybe.h"
+#include "pdft/core/result/type/result.h"
+#include "pdft/core/result/type/unit.h"
 
 namespace pdft::result {
 
@@ -18,15 +19,18 @@ struct [[nodiscard]] Map {
     Map& operator=(const Map&) = delete;
 
     template <typename T>
-    using U = std::invoke_result_t<F, T>;
-
-    template <typename T>
-    Result<U<T>> pipe(Result<T> r) && {
+    requires(!std::same_as<T, Unit>)
+    auto pipe(Result<T> r) && {
         return std::move(r).transform(std::move(user));
     }
 
+    template <std::same_as<Unit> T>
+    auto pipe(Result<T> r) && {
+        return std::move(r).transform([&](Unit) { return std::move(user)(); });
+    }
+
     template <typename T>
-    Maybe<U<T>> pipe(Maybe<T> r) && {
+    auto pipe(Maybe<T> r) && {
         return std::move(r).transform(std::move(user));
     }
 };

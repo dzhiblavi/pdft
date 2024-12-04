@@ -2,6 +2,7 @@
 
 #include "pdft/core/result/type/maybe.h"
 #include "pdft/core/result/type/result.h"
+#include "pdft/core/result/type/unit.h"
 
 namespace pdft::result {
 
@@ -18,8 +19,14 @@ struct [[nodiscard]] OrElse {
     OrElse& operator=(const OrElse&) = delete;
 
     template <typename T>
+    requires(!std::same_as<T, Unit>)
     Result<T> pipe(Result<T> r) && {
         return std::move(r).or_else(std::move(user));
+    }
+
+    template <std::same_as<Unit> T>
+    Result<T> pipe(Result<T> r) && {
+        return std::move(r).or_else([&](Unit) { return std::move(user)(); });
     }
 
     template <typename T>

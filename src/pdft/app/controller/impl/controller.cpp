@@ -79,7 +79,7 @@ Result<Action> Controller::applyPendingCommand(
             return Action::Quit;
 
         case Reload:
-            return reloadCurrentDocument(ui, documents) | map([](Unit) { return Action::Redraw; });
+            return reloadCurrentDocument(ui, documents) | map([] { return Action::Redraw; });
 
         case CloseDocument:
             if (auto id = ui.getCurrentDocumentId()) {
@@ -205,7 +205,7 @@ Status Controller::reloadCurrentDocument(state::UIState& ui, state::DocumentStor
         ui.getCurrentDocumentId() | lift(makeErrorCode(ControllerError::NoDocumentIsOpened)));
     auto document = documents.getDocument(id) | unwrap;
 
-    co_return co_await reloadDocument(id, document->getPath(), ui, documents);
+    co_await reloadDocument(id, document->getPath(), ui, documents);
 }
 
 Status Controller::reloadDocument(
@@ -230,7 +230,6 @@ Status Controller::reloadDocument(
     ui.onDocumentChanged(old_id, new_id, page_count);
 
     log::info("replaced document with path={} old_id={}, new_id={}", path, old_id, new_id);
-    co_return unit;
 }
 
 }  // namespace pdft::app::controller::impl

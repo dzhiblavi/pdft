@@ -1,6 +1,7 @@
 #pragma once
 
 #include "pdft/core/result/type/result.h"
+#include "pdft/core/result/type/unit.h"
 
 namespace pdft::result {
 
@@ -17,8 +18,14 @@ struct [[nodiscard]] MapErr {
     MapErr& operator=(const MapErr&) = delete;
 
     template <typename T>
+    requires(!std::same_as<T, Unit>)
     Result<T> pipe(Result<T> r) && {
         return std::move(r).transform_error(std::move(user));
+    }
+
+    template <std::same_as<Unit> T>
+    Result<T> pipe(Result<T> r) && {
+        return std::move(r).transform_error([&](Unit) { return std::move(user)(); });
     }
 };
 

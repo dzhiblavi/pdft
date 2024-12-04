@@ -124,7 +124,7 @@ Maybe<int> get_int() {
 }
 
 Result<Unit> aunit() {
-    co_return unit;
+    co_return;
 }
 
 TEST_CASE("testCoroResultConvertUnit") {
@@ -133,7 +133,7 @@ TEST_CASE("testCoroResultConvertUnit") {
     auto x = [&] -> Result<Unit> {
         z = co_await (get_int() | result::lift(std::make_error_code(std::errc::io_error)));
         co_await aunit();
-        co_return unit;
+        co_return;
     }();
 
     CHECK(x.has_value());

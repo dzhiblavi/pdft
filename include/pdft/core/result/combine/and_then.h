@@ -1,8 +1,9 @@
 #pragma once
 
 #include "pdft/core/result/trait/value_of.h"
-#include "pdft/core/result/type/result.h"
 #include "pdft/core/result/type/maybe.h"
+#include "pdft/core/result/type/result.h"
+#include "pdft/core/result/type/unit.h"
 
 #include <type_traits>
 
@@ -21,15 +22,18 @@ struct [[nodiscard]] AndThen {
     AndThen& operator=(const AndThen&) = delete;
 
     template <typename T>
-    using U = result::trait::ValueOf<std::invoke_result_t<F, T>>;
-
-    template <typename T>
-    Result<U<T>> pipe(Result<T> r) && {
+    requires(!std::same_as<T, Unit>)
+    auto pipe(Result<T> r) && {
         return std::move(r).and_then(std::move(user));
     }
 
+    template <std::same_as<Unit> T>
+    auto pipe(Result<T> r) && {
+        return std::move(r).and_then([&](Unit) { return std::move(user)(); });
+    }
+
     template <typename T>
-    Maybe<U<T>> pipe(Maybe<T> opt) && {
+    auto pipe(Maybe<T> opt) && {
         return std::move(opt).and_then(std::move(user));
     }
 };

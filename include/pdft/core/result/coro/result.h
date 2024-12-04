@@ -1,17 +1,19 @@
 #pragma once
 
 #include "pdft/core/result/coro/return_object_holder.h"
+#include "pdft/core/result/make/ok.h"
 #include "pdft/core/result/type/result.h"
 
 #include "pdft/core/assert.h"
+#include "pdft/core/result/type/unit.h"
 
 #include <coroutine>
 
 namespace pdft::result {
 
 template <typename T>
-struct ResultPromise {
-    ResultPromise() = default;
+struct ResultPromiseBase {
+    ResultPromiseBase() = default;
 
     auto get_return_object() noexcept {
         return ReturnedObjectHolder{&owner};
@@ -25,17 +27,32 @@ struct ResultPromise {
         return std::suspend_never{};
     }
 
-    void return_value(T x) {
-        PDFT_VERIFY_DBG(owner);
-        owner->assign(ok(std::move(x)));
-    }
-
     [[noreturn]] void unhandled_exception() noexcept {
         panic("unhandled promise exception");
         std::unreachable();
     }
 
     ReturnedObjectHolder<Result<T>>* owner = nullptr;
+};
+
+template <typename T>
+struct ResultPromise : ResultPromiseBase<T> {
+    ResultPromise() = default;
+
+    void return_value(T x) {
+        PDFT_VERIFY_DBG(this->owner);
+        this->owner->assign(ok(std::move(x)));
+    }
+};
+
+template <>
+struct ResultPromise<Unit> : ResultPromiseBase<Unit> {
+    ResultPromise() = default;
+
+    void return_void() {
+        PDFT_VERIFY_DBG(this->owner);
+        this->owner->assign(ok(unit));
+    }
 };
 
 template <typename T>
