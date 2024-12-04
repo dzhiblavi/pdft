@@ -29,7 +29,7 @@ std::expected<CliArgs, std::string> parseCliArgs(std::span<const char*> args) {
         }
 
         auto&& state_mode_str = state_mode_param.getValue();
-        auto state_mode = magic_enum::enum_cast<pdft::app::loader::StateMode>(state_mode_str);
+        auto state_mode = magic_enum::enum_cast<pdft::app::StateMode>(state_mode_str);
 
         if (!state_mode) {
             return std::unexpected(std::format("Invalid state mode: '{}'", state_mode_str));

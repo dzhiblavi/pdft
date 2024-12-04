@@ -5,11 +5,11 @@
 
 #include "pdft/media/loader.h"
 
-namespace pdft::app::loader::impl {
+namespace pdft::app {
 
-class Loader : public loader::Loader {
+class AppLoader : public Loader {
  public:
-    Loader(Arc<const Persister> persister, Arc<const media::Loader> doc_loader)
+    AppLoader(Arc<const Persister> persister, Arc<const media::Loader> doc_loader)
         : persister_(std::move(persister))
         , doc_loader_(std::move(doc_loader)) {}
 
@@ -27,4 +27,4 @@ class Loader : public loader::Loader {
     Arc<const media::Loader> doc_loader_;
 };
 
-}  // namespace pdft::app::loader::impl
+}  // namespace pdft::app

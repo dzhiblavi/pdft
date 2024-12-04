@@ -75,8 +75,7 @@ Result<Action> handleSignal(int signal) {
 
 }  // namespace
 
-Application::Application(
-    asio::io_context& context, Config config, pdft::app::loader::StateMode state_mode)
+Application::Application(asio::io_context& context, Config config, pdft::app::StateMode state_mode)
     : config_(config)
     , context_(context)
     , state_mode_(state_mode)
@@ -97,7 +96,7 @@ void Application::setup() {
         std::make_shared<pdft::media::mupdf::Loader>(pdft::media::mupdf::thisThreadContext());
 
     auto persister = std::make_shared<pdft::app::AppPersister>(doc_loader_);
-    loader_ = std::make_shared<pdft::app::loader::impl::Loader>(persister, doc_loader_);
+    loader_ = std::make_shared<pdft::app::AppLoader>(persister, doc_loader_);
 
     documents_ = std::make_shared<pdft::app::DocumentStorage>();
     ui_.scaling_coeff = config_.display.scaling_coeff;
@@ -184,7 +183,7 @@ void Application::saveState() {
         return;
     }
 
-    if (pdft::app::loader::shouldSave(state_mode_)) {
+    if (pdft::app::shouldSave(state_mode_)) {
         auto state_path = std::filesystem::absolute(utils::expandHome(*config_.state_path));
         std::ofstream ofs(state_path);
         loader_->save(ui_, *documents_, ofs);

@@ -7,7 +7,7 @@
 
 #include <ostream>
 
-namespace pdft::app::loader {
+namespace pdft::app {
 
 enum class StateMode {
     Standalone,  // Ignore the state completely
@@ -41,4 +41,4 @@ class Loader {
         std::istream& is) = 0;
 };
 
-}  // namespace pdft::app::loader
+}  // namespace pdft::app

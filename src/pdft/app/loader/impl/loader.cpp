@@ -4,7 +4,7 @@
 
 #include <magic_enum.hpp>
 
-namespace pdft::app::loader::impl {
+namespace pdft::app {
 
 namespace {
 
@@ -24,12 +24,12 @@ bool isOpened(const std::string& abs_path, const UIState& ui, const DocumentStor
 
 }  // namespace
 
-void Loader::save(const UIState& ui, const DocumentStorage& documents, std::ostream& os) {
+void AppLoader::save(const UIState& ui, const DocumentStorage& documents, std::ostream& os) {
     persister_->save(ui, documents, os);
     log::info("the state has been successfully saved");
 }
 
-Result<void> Loader::load(
+Result<void> AppLoader::load(
     const std::vector<std::string>& paths,
     UIState& ui,
     DocumentStorage& documents,
@@ -71,4 +71,4 @@ Result<void> Loader::load(
     return {};
 }
 
-}  // namespace pdft::app::loader::impl
+}  // namespace pdft::app

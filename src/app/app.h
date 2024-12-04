@@ -24,7 +24,7 @@ namespace app {
 
 class Application : public pdft::core::log::WithLogger {
  public:
-    Application(asio::io_context& context, Config config, pdft::app::loader::StateMode state_mode);
+    Application(asio::io_context& context, Config config, pdft::app::StateMode state_mode);
 
     asio::awaitable<void> run(const std::vector<std::string>& paths);
 
@@ -41,7 +41,7 @@ class Application : public pdft::core::log::WithLogger {
 
     const Config config_;
     asio::io_context& context_;
-    pdft::app::loader::StateMode state_mode_;
+    pdft::app::StateMode state_mode_;
     pdft::app::UIState ui_;
     asio::signal_set signals_;
 
@@ -51,7 +51,7 @@ class Application : public pdft::core::log::WithLogger {
     pdft::Arc<pdft::notify::Notify> fs_watcher_;
     pdft::Arc<pdft::tui::Display> image_display_;
     pdft::Arc<pdft::media::Loader> doc_loader_;
-    pdft::Arc<pdft::app::loader::Loader> loader_;
+    pdft::Arc<pdft::app::Loader> loader_;
     pdft::Arc<pdft::app::DocumentStorage> documents_;
     pdft::Arc<pdft::app::View> view_;
     pdft::Arc<pdft::app::controller::Controller> controller_;
