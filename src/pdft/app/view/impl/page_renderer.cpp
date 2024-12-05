@@ -73,9 +73,7 @@ void AppPageRenderer::render(
     float sub_cols = p.image_cols * pos.subarea.width;
     auto irect = tui::fitImage(sub_cols / sub_rows, pos.rect, pos.placement);
 
-    log::debug(ctx, "renderer @ {}", pos.rect);
-    log::debug(ctx, "renderer I {}", irect);
-
+    log::debug(ctx, "renderer @{} I{}", pos.rect, irect);
     auto _ = ctx.push("display_image");
     display_->displayImage(ctx, id, irect, pos.subarea, screen.buffers);
 }
