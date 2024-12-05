@@ -1,8 +1,10 @@
 #include "pdft/app/view/impl/page_renderer.h"
 
+#include "pdft/core/result/combine/or_else.h"
 #include "pdft/image/operations.h"
 #include "pdft/image/palette.h"
 
+#include "pdft/core/result/combine/and_then.h"
 #include "pdft/core/result/combine/unwrap.h"
 #include "pdft/core/result/syntax/pipe.h"
 #include "pdft/core/trace/context.h"
@@ -12,6 +14,7 @@
 namespace pdft::app {
 
 using tui::ImageId;
+using namespace result;
 
 bool AppPageRenderer::State::isLoaded(ImageId id) const {
     return loaded_.contains(id);
@@ -52,7 +55,7 @@ void AppPageRenderer::render(
     using trace::trace;
     const auto& [doc_id, page_index] = page;
 
-    auto document = documents_->getDocument(page.document_id) | result::unwrap;
+    auto document = documents_->getDocument(page.document_id) | unwrap;
     auto id = getIdForPage(page);
     auto the_page = trace(ctx, "get_page", [&] { return document->getPage(page_index); });
     float base_factor = calcFactor(ctx, the_page->getDefaultSize(), screen.size);
@@ -119,8 +122,15 @@ void AppPageRenderer::loadImage(
     if (prop.palette.has_value()) {
         auto _ = ctx.push("apply_palette");
 
-        // XXX do not crash when the palette can't be found
-        image::applyPalette(image.mutableSamples(), palettes_->get(*prop.palette) | result::unwrap);
+        palettes_->get(*prop.palette)  //
+            | andThen([&](image::PaletteRef palette) -> Maybe<Unit> {
+                  image::applyPalette(image.mutableSamples(), palette);
+                  return some();
+              })  //
+            | orElse([&]() -> Maybe<Unit> {
+                  log::warn("failed to find a palette with name {}", *prop.palette);
+                  return none;
+              });
     }
 
     trace::trace(ctx, "load_image", [&] {
