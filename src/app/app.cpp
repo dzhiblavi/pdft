@@ -168,6 +168,7 @@ void Application::load(const std::vector<std::string>& paths) {
 
     if (!config_.system.enable_filesystem_watching) {
         log::info("filesystem watching is disabled");
+        return;
     }
 
     for (auto&& doc : ui_.states) {
