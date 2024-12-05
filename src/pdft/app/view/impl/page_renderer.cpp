@@ -13,22 +13,22 @@ namespace pdft::app {
 
 using tui::ImageId;
 
-bool State::isLoaded(ImageId id) const {
+bool AppPageRenderer::State::isLoaded(ImageId id) const {
     return loaded_.contains(id);
 }
 
-ImageId State::addImage(ImageId id, LoadedImage loaded) {
+ImageId AppPageRenderer::State::addImage(ImageId id, LoadedImage loaded) {
     PDFT_VERIFY(!isLoaded(id));
     loaded_.emplace(id, loaded);
     return id;
 }
 
-void State::removeImage(ImageId id) {
+void AppPageRenderer::State::removeImage(ImageId id) {
     PDFT_VERIFY(isLoaded(id));
     loaded_.erase(id);
 }
 
-const State::LoadedImage& State::getImage(ImageId id) const {
+const AppPageRenderer::LoadedImage& AppPageRenderer::State::getImage(ImageId id) const {
     PDFT_VERIFY(isLoaded(id));
     return loaded_.find(id)->second;
 }
