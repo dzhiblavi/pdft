@@ -261,12 +261,12 @@ asio::awaitable<void> Application::cleanup() {
     Context ctx;
     ctx.setTracer(tracer);
 
-    ctx.push("term_clear") | co_await [&] {
+    ctx.push("term_clear") | co_await [&]() -> AsyncStatus {
         io::OutBuffer buffer;
         terminal_->showCursor(buffer);
         terminal_->clear(buffer);
         image_display_->unloadAll(ctx, buffer);
-        return console_->write(buffer.view());
+        co_return co_await console_->write(buffer.view());
     }();
 
     if (config_.system.enable_filesystem_watching) {
