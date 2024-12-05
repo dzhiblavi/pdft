@@ -50,6 +50,16 @@ class AppPageRenderer : public PageRenderer {
         float scaling_coeff,
         const tui::TerminalDimensions& dims);
 
+    bool shouldReload(tui::ImageId id, float factor, const DisplayProperties& prop);
+
+    void loadImage(
+        Context& ctx,
+        tui::ImageId id,
+        image::Image& image,
+        float factor,
+        const DisplayProperties& prop,
+        tui::Screen& screen);
+
     tui::ImageId getIdForPage(const Page& page) const;
 
     const uint32_t image_id_salt_;

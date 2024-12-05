@@ -56,82 +56,17 @@ void AppPageRenderer::render(
 
     log::debug(ctx, "rendering a page: {}, image_id={}", page, id);
 
-    if (state_.isLoaded(id)) {
-        const auto& info = state_.getImage(id);
-        bool should_reload = false;
-
-        if (factor != info.factor) {
-            log::debug("loaded image factor has changed, unloading id={}", id);
-            should_reload = true;
-        }
-
-        if (properties.invert_colors != info.invert_colors) {
-            log::debug("loaded image color inversion has changed, unloading id={}", id);
-            should_reload = true;
-        }
-
-        if (properties.make_bolder != info.make_bolder) {
-            log::debug("loaded image make_bolder has changed, unloading id={}", id);
-            should_reload = true;
-        }
-
-        if ((properties.palette.has_value() && properties.palette->data() != info.palette_ptr) ||
-            (!properties.palette.has_value() && info.palette_ptr != nullptr)) {
-            log::debug("loaded image palette pointer has changed, unloading id={}", id);
-            should_reload = true;
-        }
-
-        if (should_reload) {
-            auto _ = ctx.push("unload_image");
-            display_->unload(ctx, id, screen.buffers.control_buffer);
-            state_.removeImage(id);
-        }
+    if (state_.isLoaded(id) && shouldReload(id, factor, properties)) {
+        auto _ = ctx.push("unload_image");
+        display_->unload(ctx, id, screen.buffers.control_buffer);
+        state_.removeImage(id);
     }
 
     if (!state_.isLoaded(id)) {
+        auto image = trace::trace(ctx, "get_image", [&] { return the_page->getImage(factor); });
         auto _ = ctx.push("load_image");
-        log::debug(ctx, "loading page to display: {}, image_id={}, factor={}", page, id, factor);
-
-        auto image = trace(ctx, "get_image", [&] { return the_page->getImage(factor); });
-
-        if (properties.invert_colors) {
-            auto _ = ctx.push("invert_colors");
-            image::invertColors(image->mutableSamples());
-        }
-
-        if (properties.make_bolder) {
-            auto _ = ctx.push("make_bolder");
-            image::makeBolder(*image);
-        }
-
-        if (properties.palette.has_value()) {
-            auto _ = ctx.push("apply_palette");
-            image::applyPalette(image->mutableSamples(), *properties.palette);
-        }
-
-        trace(ctx, "load_image", [&] {
-            display_->loadImage(ctx, id, *image, screen.buffers.control_buffer);
-        });
-
-        auto image_size = image->size();
-        float image_cols = float(image_size.width_px) / screen.size.cell_width_px;
-        float image_rows = float(image_size.height_px) / screen.size.cell_height_px;
-
-        state_.addImage(
-            id,
-            {
-                .image_rows = image_rows,
-                .image_cols = image_cols,
-                .factor = factor,
-                .invert_colors = properties.invert_colors,
-                .make_bolder = properties.make_bolder,
-                .palette_ptr =
-                    properties.palette.transform([](auto&& palette) { return palette.data(); })
-                        .value_or(nullptr),
-            });
+        loadImage(ctx, id, *image, factor, properties, screen);
     }
-
-    auto _ = ctx.push("display_image");
 
     const auto& p = state_.getImage(id);
     float sub_rows = p.image_rows * pos.subarea.height;
@@ -141,7 +76,78 @@ void AppPageRenderer::render(
     log::debug(ctx, "renderer @ {}", pos.rect);
     log::debug(ctx, "renderer I {}", irect);
 
+    auto _ = ctx.push("display_image");
     display_->displayImage(ctx, id, irect, pos.subarea, screen.buffers);
+}
+
+bool AppPageRenderer::shouldReload(tui::ImageId id, float factor, const DisplayProperties& prop) {
+    const auto& info = state_.getImage(id);
+
+    if (factor != info.factor) {
+        log::debug("loaded image factor has changed, unloading id={}", id);
+        return true;
+    }
+
+    if (prop.invert_colors != info.invert_colors) {
+        log::debug("loaded image color inversion has changed, unloading id={}", id);
+        return true;
+    }
+
+    if (prop.make_bolder != info.make_bolder) {
+        log::debug("loaded image make_bolder has changed, unloading id={}", id);
+        return true;
+    }
+
+    if ((prop.palette.has_value() && prop.palette->data() != info.palette_ptr) ||
+        (!prop.palette.has_value() && info.palette_ptr != nullptr)) {
+        log::debug("loaded image palette pointer has changed, unloading id={}", id);
+        return true;
+    }
+
+    return false;
+}
+
+void AppPageRenderer::loadImage(
+    Context& ctx,
+    tui::ImageId id,
+    image::Image& image,
+    float factor,
+    const DisplayProperties& prop,
+    tui::Screen& screen) {
+    if (prop.invert_colors) {
+        auto _ = ctx.push("invert_colors");
+        image::invertColors(image.mutableSamples());
+    }
+
+    if (prop.make_bolder) {
+        auto _ = ctx.push("make_bolder");
+        image::makeBolder(image);
+    }
+
+    if (prop.palette.has_value()) {
+        auto _ = ctx.push("apply_palette");
+        image::applyPalette(image.mutableSamples(), *prop.palette);
+    }
+
+    trace::trace(ctx, "load_image", [&] {
+        display_->loadImage(ctx, id, image, screen.buffers.control_buffer);
+    });
+
+    auto image_size = image.size();
+    float image_cols = float(image_size.width_px) / screen.size.cell_width_px;
+    float image_rows = float(image_size.height_px) / screen.size.cell_height_px;
+
+    state_.addImage(
+        id,
+        {
+            .image_rows = image_rows,
+            .image_cols = image_cols,
+            .factor = factor,
+            .invert_colors = prop.invert_colors,
+            .make_bolder = prop.make_bolder,
+            .palette_ptr = prop.palette.transform([](auto&& palette) { return palette.data(); })
+                               .value_or(nullptr),
+        });
 }
 
 float AppPageRenderer::calcFactor(
