@@ -54,6 +54,6 @@ template <>
 struct std::hash<pdft::image::RGBColor> {
     std::size_t operator()(const pdft::image::RGBColor& c) const {
         return std::hash<uint32_t>{}(
-            (uint32_t(c.r) << 4) + (uint32_t(c.g) << 2) + (uint32_t(c.b) << 0));
+            (uint32_t(c.r) << 16) + (uint32_t(c.g) << 8) + (uint32_t(c.b) << 0));
     }
 };
