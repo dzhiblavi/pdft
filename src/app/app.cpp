@@ -260,14 +260,13 @@ asio::awaitable<void> Application::cleanup() {
     Context ctx;
     ctx.setTracer(tracer);
 
-    {
-        auto _ = ctx.push("term_clear");
+    ctx.push("term_clear") | co_await [&] {
         io::OutBuffer buffer;
         terminal_->showCursor(buffer);
         terminal_->clear(buffer);
         image_display_->unloadAll(ctx, buffer);
-        co_await console_->write(buffer.view());
-    }
+        return console_->write(buffer.view());
+    }();
 
     if (config_.system.enable_filesystem_watching) {
         auto _ = ctx.push("notify_stop");

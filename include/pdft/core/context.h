@@ -12,6 +12,11 @@ class PushHandle {
     PushHandle(PushHandle&& rhs);
     ~PushHandle();
 
+    template <typename T>
+    decltype(auto) operator|(T&& t) && {
+        return std::forward<T>(t);
+    }
+
  private:
     PushHandle() = default;
 

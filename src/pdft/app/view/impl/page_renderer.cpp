@@ -7,7 +7,6 @@
 #include "pdft/core/result/combine/and_then.h"
 #include "pdft/core/result/combine/unwrap.h"
 #include "pdft/core/result/syntax/pipe.h"
-#include "pdft/core/trace/context.h"
 
 #include "pdft/utils/cantor_pair.h"
 
@@ -52,12 +51,11 @@ void AppPageRenderer::render(
     const PagePosition& pos,
     const DisplayProperties& display,
     tui::Screen& screen) {
-    using trace::trace;
     const auto& [doc_id, page_index] = page;
 
     auto document = documents_->getDocument(page.document_id) | unwrap;
     auto id = getIdForPage(page);
-    auto the_page = trace(ctx, "get_page", [&] { return document->getPage(page_index); });
+    auto the_page = ctx.push("get_page") | document->getPage(page_index);
     float base_factor = calcFactor(ctx, the_page->getDefaultSize(), screen.size);
 
     log::debug(ctx, "page: {}, image_id={}", page, id);
@@ -70,9 +68,8 @@ void AppPageRenderer::render(
 
     if (!state_.isLoaded(id)) {
         float factor = base_factor * display.scaling_coeff;
-        auto image = trace::trace(ctx, "get_image", [&] { return the_page->getImage(factor); });
-        auto _ = ctx.push("load_image");
-        loadImage(ctx, id, *image, base_factor, display, screen);
+        auto image = ctx.push("get_image") | the_page->getImage(factor);
+        ctx.push("load_image") | loadImage(ctx, id, *image, base_factor, display, screen);
     }
 
     const auto& p = state_.getImage(id);
@@ -102,7 +99,7 @@ bool AppPageRenderer::shouldReload(
     return false;
 }
 
-void AppPageRenderer::loadImage(
+Unit AppPageRenderer::loadImage(
     Context& ctx,
     tui::ImageId id,
     image::Image& image,
@@ -133,9 +130,8 @@ void AppPageRenderer::loadImage(
               });
     }
 
-    trace::trace(ctx, "load_image", [&] {
-        display_->loadImage(ctx, id, image, screen.buffers.control_buffer);
-    });
+    ctx.push("load_image") |
+        (display_->loadImage(ctx, id, image, screen.buffers.control_buffer), unit);
 
     auto image_size = image.size();
     float image_cols = float(image_size.width_px) / screen.size.cell_width_px;
@@ -149,6 +145,8 @@ void AppPageRenderer::loadImage(
             .base_factor = base_factor,
             .display = prop,
         });
+
+    return unit;
 }
 
 float AppPageRenderer::calcFactor(

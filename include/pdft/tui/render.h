@@ -4,10 +4,10 @@
 #include "pdft/tui/screen.h"
 #include "pdft/tui/terminal.h"
 
+#include "pdft/core/context.h"
 #include "pdft/core/io/buffer.h"
 #include "pdft/core/io/console.h"
 #include "pdft/core/rc.h"
-#include "pdft/core/trace/context.h"
 #include "pdft/core/trace/log_stack_trace.h"
 #include "pdft/core/trace/stack_scope_tracer.h"
 
@@ -28,22 +28,20 @@ class Renderer {
 
     template <std::invocable<Context&, Screen&> Renderer>
     asio::awaitable<void> renderOne(Renderer renderer) {
-        using trace::trace;
-
         auto tracer = trace::getGlobalPool().getTracer("renderOne");
         auto ctx = Context();
         ctx.setTracer(tracer);
         auto screen = Screen{terminal_->getDimensions(), {control_, display_}};
 
-        auto dom = trace(ctx, "renderUser", [&] { return renderer(ctx, screen); });
-        auto tui = trace(ctx, "renderTUI", [&] {
+        auto dom = ctx.push("renderUser") | renderer(ctx, screen);
+        auto tui = ctx.push("renderTUI") | [&] {
             auto screen = ftxui::Screen::Create(ftxui::Dimension::Full());
             tui::Render(screen, dom);
             return screen.ToString();
-        });
+        }();
 
         terminal_->clear(control_);
-        co_await trace(ctx, "renderFlush", console_->writeMany(control_, tui, display_));
+        ctx.push("renderFlush") | co_await console_->writeMany(control_, tui, display_);
 
         io::clear(control_);
         io::clear(display_);

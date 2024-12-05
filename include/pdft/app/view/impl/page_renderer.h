@@ -46,7 +46,7 @@ class AppPageRenderer : public PageRenderer {
     float calcFactor(Context& ctx, media::PageSize page_size, const tui::TerminalDimensions& dims);
     bool shouldReload(tui::ImageId id, float base_factor, const DisplayProperties& prop);
 
-    void loadImage(
+    Unit loadImage(
         Context& ctx,
         tui::ImageId id,
         image::Image& image,
