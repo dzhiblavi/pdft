@@ -96,7 +96,7 @@ void AppPageRenderer::render(
 
         if (properties.invert_colors) {
             auto _ = ctx.push("invert_colors");
-            image::invertColors(*image);
+            image::invertColors(image->mutableSamples());
         }
 
         if (properties.make_bolder) {

@@ -4,7 +4,7 @@
 
 namespace pdft::image {
 
-void invertColors(Image& image);
+void invertColors(std::span<RGBColor> pixels);
 
 void makeBolder(Image& image);
 

@@ -4,8 +4,8 @@
 
 namespace pdft::image {
 
-void invertColors(Image& image) {
-    for (RGBColor& pixel : image.mutableSamples()) {
+void invertColors(std::span<RGBColor> pixels) {
+    for (RGBColor& pixel : pixels) {
         pixel = RGBColor::gray(255) - pixel;
     }
 }
