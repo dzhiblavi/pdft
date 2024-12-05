@@ -206,12 +206,8 @@ void UIState::toggleBold() {
     make_bolder = !make_bolder;
 }
 
-void UIState::togglePalette() {
-    if (palette_name) {
-        palette_name = std::nullopt;
-    } else {
-        palette_name = "skim";
-    }
+void UIState::setPalette(const std::optional<std::string>& name) {
+    palette = name;
 }
 
 Maybe<DocumentId> UIState::getCurrentDocumentId() const {

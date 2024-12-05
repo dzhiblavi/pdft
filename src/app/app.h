@@ -3,19 +3,19 @@
 #include "config.h"
 
 #include "pdft/app/loader/loader.h"
-
+#include "pdft/app/state/palette_storage.h"
 #include "pdft/app/view/view.h"
+
 #include "pdft/media/loader.h"
 
 #include "pdft/tui/display.h"
 #include "pdft/tui/terminal.h"
 
-#include "pdft/notify/notify.h"
-
 #include "pdft/core/io/console.h"
 #include "pdft/core/io/termctl.h"
 #include "pdft/core/log/with_logger.h"
 #include "pdft/core/rc.h"
+#include "pdft/notify/notify.h"
 
 #include <asio/awaitable.hpp>
 #include <asio/signal_set.hpp>
@@ -54,6 +54,7 @@ class Application : public pdft::log::WithLogger {
     pdft::Arc<pdft::media::Loader> doc_loader_;
     pdft::Arc<pdft::app::Loader> loader_;
     pdft::Arc<pdft::app::DocumentStorage> documents_;
+    pdft::Arc<pdft::app::PaletteStorage> palettes_;
     pdft::Arc<pdft::app::View> view_;
     pdft::Arc<pdft::app::Controller> controller_;
 };

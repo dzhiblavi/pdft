@@ -34,16 +34,20 @@ const AppPageRenderer::LoadedImage& AppPageRenderer::State::getImage(ImageId id)
 }
 
 AppPageRenderer::AppPageRenderer(
-    uint32_t image_id_salt, Arc<const DocumentStorage> documents, Arc<tui::Display> display)
+    uint32_t image_id_salt,
+    Arc<const DocumentStorage> documents,
+    Arc<const PaletteStorage> palettes,
+    Arc<tui::Display> display)
     : image_id_salt_(image_id_salt)
     , documents_(std::move(documents))
+    , palettes_(std::move(palettes))
     , display_(std::move(display)) {}
 
 void AppPageRenderer::render(
     Context& ctx,
     const Page& page,
     const PagePosition& pos,
-    const DisplayProperties& properties,
+    const DisplayProperties& display,
     tui::Screen& screen) {
     using trace::trace;
     const auto& [doc_id, page_index] = page;
@@ -51,21 +55,21 @@ void AppPageRenderer::render(
     auto document = documents_->getDocument(page.document_id) | result::unwrap;
     auto id = getIdForPage(page);
     auto the_page = trace(ctx, "get_page", [&] { return document->getPage(page_index); });
-    float factor =
-        calcFactor(ctx, the_page->getDefaultSize(), properties.scaling_coeff, screen.size);
+    float base_factor = calcFactor(ctx, the_page->getDefaultSize(), screen.size);
 
-    log::debug(ctx, "rendering a page: {}, image_id={}", page, id);
+    log::debug(ctx, "page: {}, image_id={}", page, id);
 
-    if (state_.isLoaded(id) && shouldReload(id, factor, properties)) {
+    if (state_.isLoaded(id) && shouldReload(id, base_factor, display)) {
         auto _ = ctx.push("unload_image");
         display_->unload(ctx, id, screen.buffers.control_buffer);
         state_.removeImage(id);
     }
 
     if (!state_.isLoaded(id)) {
+        float factor = base_factor * display.scaling_coeff;
         auto image = trace::trace(ctx, "get_image", [&] { return the_page->getImage(factor); });
         auto _ = ctx.push("load_image");
-        loadImage(ctx, id, *image, factor, properties, screen);
+        loadImage(ctx, id, *image, base_factor, display, screen);
     }
 
     const auto& p = state_.getImage(id);
@@ -73,32 +77,22 @@ void AppPageRenderer::render(
     float sub_cols = p.image_cols * pos.subarea.width;
     auto irect = tui::fitImage(sub_cols / sub_rows, pos.rect, pos.placement);
 
-    log::debug(ctx, "renderer @{} I{}", pos.rect, irect);
+    log::debug(ctx, "@={} I={}", pos.rect, irect);
     auto _ = ctx.push("display_image");
     display_->displayImage(ctx, id, irect, pos.subarea, screen.buffers);
 }
 
-bool AppPageRenderer::shouldReload(tui::ImageId id, float factor, const DisplayProperties& prop) {
+bool AppPageRenderer::shouldReload(
+    tui::ImageId id, float base_factor, const DisplayProperties& display) {
     const auto& info = state_.getImage(id);
 
-    if (factor != info.factor) {
-        log::debug("loaded image factor has changed, unloading id={}", id);
+    if (base_factor != info.base_factor) {
+        log::debug("loaded image base scaling factor has changed, unloading id={}", id);
         return true;
     }
 
-    if (prop.invert_colors != info.invert_colors) {
-        log::debug("loaded image color inversion has changed, unloading id={}", id);
-        return true;
-    }
-
-    if (prop.make_bolder != info.make_bolder) {
-        log::debug("loaded image make_bolder has changed, unloading id={}", id);
-        return true;
-    }
-
-    if ((prop.palette.has_value() && prop.palette->data() != info.palette_ptr) ||
-        (!prop.palette.has_value() && info.palette_ptr != nullptr)) {
-        log::debug("loaded image palette pointer has changed, unloading id={}", id);
+    if (display != info.display) {
+        log::debug("loaded image display settings have changed, unloading id={}", id);
         return true;
     }
 
@@ -109,7 +103,7 @@ void AppPageRenderer::loadImage(
     Context& ctx,
     tui::ImageId id,
     image::Image& image,
-    float factor,
+    float base_factor,
     const DisplayProperties& prop,
     tui::Screen& screen) {
     if (prop.invert_colors) {
@@ -124,7 +118,9 @@ void AppPageRenderer::loadImage(
 
     if (prop.palette.has_value()) {
         auto _ = ctx.push("apply_palette");
-        image::applyPalette(image.mutableSamples(), *prop.palette);
+
+        // XXX do not crash when the palette can't be found
+        image::applyPalette(image.mutableSamples(), palettes_->get(*prop.palette) | result::unwrap);
     }
 
     trace::trace(ctx, "load_image", [&] {
@@ -140,19 +136,13 @@ void AppPageRenderer::loadImage(
         {
             .image_rows = image_rows,
             .image_cols = image_cols,
-            .factor = factor,
-            .invert_colors = prop.invert_colors,
-            .make_bolder = prop.make_bolder,
-            .palette_ptr = prop.palette.transform([](auto&& palette) { return palette.data(); })
-                               .value_or(nullptr),
+            .base_factor = base_factor,
+            .display = prop,
         });
 }
 
 float AppPageRenderer::calcFactor(
-    Context& ctx,
-    media::PageSize page_size,
-    float scaling_coeff,
-    const tui::TerminalDimensions& dims) {
+    Context& ctx, media::PageSize page_size, const tui::TerminalDimensions& dims) {
     float dw = dims.width_px;
     float dh = dims.height_px;
     auto [pw, ph] = page_size;
@@ -163,15 +153,14 @@ float AppPageRenderer::calcFactor(
 
     log::debug(
         ctx,
-        "calc factor for page {}x{}, term {}x{}, factor={}, scale_by={}",
+        "base factor for page {}x{}, term {}x{}, factor={}",
         page_size.width_px,
         page_size.height_px,
         dims.width_px,
         dims.height_px,
-        f,
-        scaling_coeff);
+        f);
 
-    return scaling_coeff * f;
+    return f;
 }
 
 ImageId AppPageRenderer::getIdForPage(const Page& page) const {

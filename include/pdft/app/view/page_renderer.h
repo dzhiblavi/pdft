@@ -6,8 +6,6 @@
 #include "pdft/tui/rect.h"
 #include "pdft/tui/screen.h"
 
-#include "pdft/image/palette.h"
-
 #include "pdft/core/context.h"
 
 namespace pdft::app {
@@ -27,7 +25,9 @@ struct DisplayProperties {
     float scaling_coeff = 1.f;
     bool invert_colors = false;
     bool make_bolder = false;
-    std::optional<image::PaletteRef> palette = std::nullopt;
+    std::optional<std::string> palette = std::nullopt;
+
+    bool operator==(const DisplayProperties&) const = default;
 };
 
 class PageRenderer {

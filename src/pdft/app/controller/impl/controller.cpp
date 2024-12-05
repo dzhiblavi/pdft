@@ -165,7 +165,12 @@ Result<ControllerAction> AppController::applyPendingCommand(
             return ControllerAction::Redraw;
 
         case TogglePalette:
-            ui.togglePalette();
+            if (ui.palette.has_value()) {
+                ui.setPalette(std::nullopt);
+            } else {
+                ui.setPalette("skim");
+            }
+
             return ControllerAction::Redraw;
     }
 }

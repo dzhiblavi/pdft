@@ -7,6 +7,7 @@ add_executable(
   ./logging.cpp
   ./cli_args.cpp
   ./resolve_display.cpp
-  ./version.cpp)
+  ./version.cpp
+  ./palettes.cpp)
 
 target_link_libraries(app pdft tclap::tclap reflectcpp)

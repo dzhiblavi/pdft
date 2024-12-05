@@ -48,7 +48,7 @@ struct UIState {
     void updateScalingFactor(float coeff);
     void toggleSidebar();
     void toggleBold();
-    void togglePalette();
+    void setPalette(const std::optional<std::string>& name);
 
     Maybe<DocumentId> getCurrentDocumentId() const;
     const DocumentState* getImmutableState() const;
@@ -60,7 +60,7 @@ struct UIState {
     bool invert_colors = false;
     bool make_bolder = false;
     float scaling_coeff = 1.f;
-    std::optional<std::string> palette_name = std::nullopt;
+    std::optional<std::string> palette = std::nullopt;
 
  private:
     DocumentState* getState();

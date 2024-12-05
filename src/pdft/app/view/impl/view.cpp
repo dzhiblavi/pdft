@@ -20,9 +20,7 @@ tui::Element AppView::render(Context& ctx, const UIState& ui, tui::Screen& scree
                 .scaling_coeff = ui.scaling_coeff,
                 .invert_colors = ui.invert_colors,
                 .make_bolder = ui.make_bolder,
-                .palette = ui.palette_name.transform([&](auto&& name) {
-                    return image::getBuiltinPalettes().at(name);
-                }),
+                .palette = ui.palette,
             };
 
             return tui::window(

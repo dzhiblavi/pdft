@@ -9,7 +9,6 @@ namespace pdft::tui {
 
 void UnicodeKittyDisplay::displayImage(
     Context& ctx, ImageId id, const IRect& rect, const FRect& image_subarea, BufPair& buffers) {
-    log::debug(ctx, "display @ {}", rect);
     PDFT_VERIFY(isLoaded(id));
 
     const auto& [x, y, w, h] = rect;
@@ -21,17 +20,16 @@ void UnicodeKittyDisplay::displayImage(
     }
 
     const auto& [rix, riy, riw, rih] = image_subarea;
-    log::debug(ctx, "display I {}", image_subarea);
+    log::debug(ctx, "@={} SA={}", rect, image_subarea);
     PDFT_VERIFY(rix >= 0 && riy >= 0, "image offset must not be negative: x={},y={}", rix, riy);
     PDFT_VERIFY(riw > 0 && rih > 0, "image dimensions must be positive: w={},h={}", riw, rih);
 
     const uint32_t image_cols = std::roundf(w / riw);
     const uint32_t image_rows = std::roundf(h / rih);
-    log::debug(ctx, "display ISZ wc={},hc={}", image_cols, image_rows);
-
     const uint32_t offset_cols = image_cols * rix;
     const uint32_t offset_rows = image_rows * riy;
-    log::debug(ctx, "display IOF c={},r={}", offset_cols, offset_rows);
+
+    log::debug(ctx, "oc={},or={},wc={},hr={}", offset_cols, offset_rows, image_cols, image_rows);
 
     std::pair<std::string_view, std::string> control_data[] = {
         {"q", "2"},

@@ -1,5 +1,6 @@
 #pragma once
 
+#include "pdft/app/state/palette_storage.h"
 #include "pdft/app/view/page_renderer.h"
 
 #include "pdft/tui/display.h"
@@ -10,7 +11,10 @@ namespace pdft::app {
 class AppPageRenderer : public PageRenderer {
  public:
     AppPageRenderer(
-        uint32_t image_id_salt, Arc<const DocumentStorage> documents_, Arc<tui::Display> display);
+        uint32_t image_id_salt,
+        Arc<const DocumentStorage> documents_,
+        Arc<const PaletteStorage> palettes,
+        Arc<tui::Display> display);
 
     void render(
         Context& ctx,
@@ -23,13 +27,8 @@ class AppPageRenderer : public PageRenderer {
     struct LoadedImage {
         float image_rows;
         float image_cols;
-        float factor;
-        bool invert_colors;
-        bool make_bolder;
-
-        // XXX Do not read from this pointer;
-        // It should be used to determine whether the palette has been changed
-        const image::RGBColor* palette_ptr = nullptr;
+        float base_factor;
+        DisplayProperties display;
     };
 
     class State {
@@ -44,19 +43,14 @@ class AppPageRenderer : public PageRenderer {
         std::unordered_map<tui::ImageId, LoadedImage> loaded_;
     };
 
-    float calcFactor(
-        Context& ctx,
-        media::PageSize page_size,
-        float scaling_coeff,
-        const tui::TerminalDimensions& dims);
-
-    bool shouldReload(tui::ImageId id, float factor, const DisplayProperties& prop);
+    float calcFactor(Context& ctx, media::PageSize page_size, const tui::TerminalDimensions& dims);
+    bool shouldReload(tui::ImageId id, float base_factor, const DisplayProperties& prop);
 
     void loadImage(
         Context& ctx,
         tui::ImageId id,
         image::Image& image,
-        float factor,
+        float base_factor,
         const DisplayProperties& prop,
         tui::Screen& screen);
 
@@ -65,6 +59,7 @@ class AppPageRenderer : public PageRenderer {
     const uint32_t image_id_salt_;
     State state_;
     Arc<const DocumentStorage> documents_;
+    Arc<const PaletteStorage> palettes_;
     Arc<tui::Display> display_;
 };
 

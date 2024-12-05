@@ -1,5 +1,6 @@
 #include "app.h"
 #include "logging.h"
+#include "palettes.h"
 #include "resolve_display.h"
 #include "version.h"
 
@@ -97,11 +98,14 @@ void Application::setup() {
     loader_ = std::make_shared<pdft::app::AppLoader>(persister, doc_loader_);
 
     documents_ = std::make_shared<pdft::app::DocumentStorage>();
+    palettes_ = std::make_shared<pdft::app::PaletteStorage>();
+    palettes_->add("skim", getSkimPalette());
+
     ui_.scaling_coeff = config_.display.scaling_coeff;
     ui_.invert_colors = config_.display.invert_colors;
 
-    auto renderer =
-        std::make_shared<AppPageRenderer>(utils::random<uint32_t>(), documents_, image_display_);
+    auto renderer = std::make_shared<AppPageRenderer>(
+        utils::random<uint32_t>(), documents_, palettes_, image_display_);
     auto document_view = std::make_shared<AppDocumentView>(std::move(renderer));
     view_ = std::make_shared<AppView>(documents_, std::move(document_view));
     controller_ = std::make_shared<AppController>(config_.controller, doc_loader_);
