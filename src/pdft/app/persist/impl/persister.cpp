@@ -68,7 +68,7 @@ Status AppPersister::restore(UIState& ui, DocumentStorage& documents, std::istre
         ui.states.erase(ui.states.begin() + i);
     }
 
-    return {};
+    return result::ok();
 }
 
 }  // namespace pdft::app

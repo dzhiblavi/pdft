@@ -68,7 +68,7 @@ Status AppLoader::load(
         log::info("loaded path {}", path);
     }
 
-    return {};
+    return result::ok();
 }
 
 }  // namespace pdft::app
