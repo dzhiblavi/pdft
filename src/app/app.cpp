@@ -37,8 +37,6 @@
 #include <ftxui/screen/screen.hpp>
 #include <magic_enum.hpp>
 
-#include <fstream>
-
 namespace app {
 
 using namespace pdft;
