@@ -24,8 +24,15 @@ bool isOpened(const std::string& abs_path, const UIState& ui, const DocumentStor
 
 }  // namespace
 
-void AppLoader::save(const UIState& ui, const DocumentStorage& documents, std::ostream& os) {
-    persister_->save(ui, documents, os);
+void AppLoader::save(
+    const UIState& ui, const DocumentStorage& documents, const std::filesystem::path& state_path) {
+    if (mode_ == StateMode::Standalone) {
+        log::info("not saving the state in Standalone mode");
+        return;
+    }
+
+    std::ofstream ofs(state_path);
+    persister_->save(ui, documents, ofs);
     log::info("the state has been successfully saved");
 }
 
@@ -33,24 +40,26 @@ Status AppLoader::load(
     const std::vector<std::string>& paths,
     UIState& ui,
     DocumentStorage& documents,
-    StateMode mode,
-    std::istream& is) {
-    auto mode_name = magic_enum::enum_name(mode);
+    const std::filesystem::path& state_path) {
+    auto mode_name = magic_enum::enum_name(mode_);
 
-    if (mode != StateMode::Standalone && mode != StateMode::Clean) {
+    if (mode_ != StateMode::Standalone && mode_ != StateMode::Clean) {
         log::info("loading the state because mode is {}", mode_name);
+        std::ifstream ifs(state_path);
 
-        if (auto result = persister_->restore(ui, documents, is); !result) {
+        if (auto result = persister_->restore(ui, documents, ifs); !result) {
             log::warn("failed to restore the state: {}; ignoring", result.error());
         } else {
             log::info("the state has been successfully restored");
         }
+    } else {
+        log::info("not loading the state because mode is {}", mode_name);
     }
 
     for (auto path : paths) {
         path = std::filesystem::absolute(path);
 
-        if (isOpened(path, ui, documents) && mode == StateMode::AddOnly) {
+        if (isOpened(path, ui, documents) && mode_ == StateMode::AddOnly) {
             log::info("ignoring the new path {} because state mode is AddOnly", path);
             continue;
         }

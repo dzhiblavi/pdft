@@ -1,5 +1,6 @@
 #pragma once
 
+#include "cli_args.h"
 #include "logging.h"
 
 #include "pdft/app/controller/impl/controller.h"
@@ -13,6 +14,7 @@ namespace app {
 struct SystemConfig {
     uint32_t max_event_queue_size = 10;
     bool enable_filesystem_watching = true;
+    pdft::app::StateMode state_mode = pdft::app::StateMode::AddOnly;
 };
 
 struct DisplayConfig {
@@ -28,5 +30,11 @@ struct Config {
     pdft::app::AppController::Config controller = {};
     DisplayConfig display = {};
 };
+
+inline void applyCliArgsOverrides(const CliArgs& args, Config& config) {
+    if (args.state_mode.has_value()) {
+        config.system.state_mode = *args.state_mode;
+    }
+}
 
 }  // namespace app

@@ -11,12 +11,13 @@
 
 namespace app {
 
-asio::awaitable<void> main(asio::io_context& context, Config config, const CliArgs& args) {
+asio::awaitable<void> main(
+    asio::io_context& context, Config config, const std::vector<std::string>& paths) {
     setupLogging(config.logging);
 
-    auto app = Application(context, std::move(config), args.state_mode);
+    auto app = Application(context, std::move(config));
     app.setLogger(pdft::log::global());
-    co_await app.run(args.paths);
+    co_await app.run(paths);
 }
 
 }  // namespace app
@@ -38,8 +39,10 @@ int main(int argc, const char** argv) {
         return 1;
     }
 
+    app::applyCliArgsOverrides(*cli_args, *config);
+
     asio::io_context context(1);
-    asio::co_spawn(context, app::main(context, *config, *cli_args), asio::detached);
+    asio::co_spawn(context, app::main(context, *config, cli_args->paths), asio::detached);
 
     try {
         context.run();

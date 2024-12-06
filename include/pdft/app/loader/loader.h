@@ -5,40 +5,24 @@
 
 #include "pdft/core/result.h"
 
-#include <ostream>
+#include <filesystem>
 
 namespace pdft::app {
-
-enum class StateMode {
-    Standalone,  // Ignore the state completely
-    Clean,       // Clear the state and save the new one
-    AddOnly,     // Add paths that are not currently opened in the state
-    AddAll,      // Use the state and append all paths to it (duplicates can be created)
-};
-
-inline bool shouldSave(StateMode mode) {
-    switch (mode) {
-        case StateMode::Standalone:
-            return false;
-        case StateMode::Clean:
-        case StateMode::AddOnly:
-        case StateMode::AddAll:
-            return true;
-    }
-}
 
 class Loader {
  public:
     virtual ~Loader() = default;
 
-    virtual void save(const UIState& ui, const DocumentStorage& documents, std::ostream& os) = 0;
+    virtual void save(
+        const UIState& ui,
+        const DocumentStorage& documents,
+        const std::filesystem::path& state_path) = 0;
 
     virtual Status load(
         const std::vector<std::string>& paths,
         UIState& ui,
         DocumentStorage& documents,
-        StateMode mode,
-        std::istream& is) = 0;
+        const std::filesystem::path& state_path) = 0;
 };
 
 }  // namespace pdft::app

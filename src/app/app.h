@@ -2,7 +2,6 @@
 
 #include "config.h"
 
-#include "pdft/app/loader/loader.h"
 #include "pdft/app/state/palette_storage.h"
 #include "pdft/app/view/view.h"
 
@@ -24,7 +23,7 @@ namespace app {
 
 class Application : public pdft::log::WithLogger {
  public:
-    Application(asio::io_context& context, Config config, pdft::app::StateMode state_mode);
+    Application(asio::io_context& context, Config config);
 
     asio::awaitable<void> run(const std::vector<std::string>& paths);
 
@@ -42,7 +41,6 @@ class Application : public pdft::log::WithLogger {
 
     const Config config_;
     asio::io_context& context_;
-    pdft::app::StateMode state_mode_;
     pdft::app::UIState ui_;
     asio::signal_set signals_;
 

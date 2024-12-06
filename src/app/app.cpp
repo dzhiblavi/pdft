@@ -74,10 +74,9 @@ Result<ControllerAction> handleSignal(int signal) {
 
 }  // namespace
 
-Application::Application(asio::io_context& context, Config config, pdft::app::StateMode state_mode)
+Application::Application(asio::io_context& context, Config config)
     : config_(config)
     , context_(context)
-    , state_mode_(state_mode)
     , signals_(context, SIGWINCH, SIGINT, SIGSEGV) {
     setup();
 }
@@ -95,7 +94,8 @@ void Application::setup() {
     doc_loader_ = std::make_shared<pdft::media::MupdfLoader>(mupdf_context);
 
     auto persister = std::make_shared<pdft::app::AppPersister>(doc_loader_);
-    loader_ = std::make_shared<pdft::app::AppLoader>(persister, doc_loader_);
+    loader_ =
+        std::make_shared<pdft::app::AppLoader>(config_.system.state_mode, persister, doc_loader_);
 
     documents_ = std::make_shared<pdft::app::DocumentStorage>();
     palettes_ = std::make_shared<pdft::app::PaletteStorage>();
@@ -156,11 +156,9 @@ void Application::load(const std::vector<std::string>& paths) {
         return;
     }
 
-    log::info("restoring the state from {}", *config_.state_path);
     auto state_path = std::filesystem::absolute(utils::expandHome(*config_.state_path));
-    std::ifstream ifs(state_path);
 
-    auto err = loader_->load(paths, ui_, *documents_, state_mode_, ifs);
+    auto err = loader_->load(paths, ui_, *documents_, state_path);
     if (!err.has_value()) {
         log::err("failed to load state_path={}, error={}", *config_.state_path, err.error());
         return;
@@ -186,11 +184,8 @@ void Application::saveState() {
         return;
     }
 
-    if (pdft::app::shouldSave(state_mode_)) {
-        auto state_path = std::filesystem::absolute(utils::expandHome(*config_.state_path));
-        std::ofstream ofs(state_path);
-        loader_->save(ui_, *documents_, ofs);
-    }
+    auto state_path = std::filesystem::absolute(utils::expandHome(*config_.state_path));
+    loader_->save(ui_, *documents_, state_path);
 }
 
 asio::awaitable<void> Application::runEventLoop() {
