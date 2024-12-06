@@ -1,5 +1,6 @@
 #pragma once
 
+#include "pdft/core/assert.h"
 #include "pdft/core/trace/time_traits.h"
 
 namespace pdft::trace {
@@ -15,7 +16,7 @@ class ScopeTracer {
         try {
             std::move(callback_)(ClockType::now() - scope_enter_);
         } catch (...) {
-            // ignore
+            panic("unhandled ScopeTracer callback exception");
         }
     }
 
