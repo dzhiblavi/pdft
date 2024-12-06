@@ -10,9 +10,12 @@ logging:
   level: Trace
 
 display:
-  scaling_coeff: 1.1
-  invert_colors: true
   force_unicode_kitty_display: false
+  properties:
+    scaling_coeff: 1.1
+    invert_colors: true
+    make_bolder: true
+    palette: skim
 
 controller:
   rows_per_scroll: 10
