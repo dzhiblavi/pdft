@@ -16,16 +16,9 @@ tui::Element AppView::render(Context& ctx, const UIState& ui, tui::Screen& scree
             auto path = document->getPath().filename();
             auto page_str = std::format("{}/{}", doc->page_index + 1, doc->page_count);
 
-            auto display_properties = DisplayProperties{
-                .scaling_coeff = ui.scaling_coeff,
-                .invert_colors = ui.invert_colors,
-                .make_bolder = ui.make_bolder,
-                .palette = ui.palette,
-            };
-
             return tui::window(
                 tui::text(std::format("{} page {}", path.c_str(), page_str)),
-                doc_view_->render(ctx, *doc, display_properties, screen));
+                doc_view_->render(ctx, *doc, ui.display, screen));
         }
 
         return tui::emptyElement();

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "pdft/app/state/document_storage.h"
+#include "pdft/app/view/page_renderer.h"
 
 #include <vector>
 
@@ -57,10 +58,7 @@ struct UIState {
     std::vector<DocumentState> states;
     std::string current_input;
     bool show_sidebar = false;
-    bool invert_colors = false;
-    bool make_bolder = false;
-    float scaling_coeff = 1.f;
-    std::optional<std::string> palette = std::nullopt;
+    DisplayProperties display;
 
  private:
     DocumentState* getState();

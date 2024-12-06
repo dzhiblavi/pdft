@@ -99,8 +99,7 @@ void Application::setup() {
     palettes_ = std::make_shared<pdft::app::PaletteStorage>();
     palettes_->add("skim", getSkimPalette());
 
-    ui_.scaling_coeff = config_.display.scaling_coeff;
-    ui_.invert_colors = config_.display.invert_colors;
+    ui_.display = config_.display.properties;
 
     auto renderer = std::make_shared<AppPageRenderer>(
         utils::random<uint32_t>(), documents_, palettes_, image_display_);

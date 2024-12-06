@@ -18,8 +18,7 @@ struct SystemConfig {
 };
 
 struct DisplayConfig {
-    float scaling_coeff = 1.f;
-    bool invert_colors = false;
+    pdft::app::DisplayProperties properties = {};
     bool force_unicode_kitty_display = false;
 };
 

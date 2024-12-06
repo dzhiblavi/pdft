@@ -191,11 +191,11 @@ const DocumentState* UIState::getImmutableState() const {
 }
 
 void UIState::invertColors() {
-    invert_colors = !invert_colors;
+    display.invert_colors = !display.invert_colors;
 }
 
 void UIState::updateScalingFactor(float coeff) {
-    scaling_coeff *= coeff;
+    display.scaling_coeff *= coeff;
 }
 
 void UIState::toggleSidebar() {
@@ -203,11 +203,11 @@ void UIState::toggleSidebar() {
 }
 
 void UIState::toggleBold() {
-    make_bolder = !make_bolder;
+    display.make_bolder = !display.make_bolder;
 }
 
 void UIState::setPalette(const std::optional<std::string>& name) {
-    palette = name;
+    display.palette = name;
 }
 
 Maybe<DocumentId> UIState::getCurrentDocumentId() const {
