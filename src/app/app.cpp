@@ -216,35 +216,41 @@ pdft::AsyncResult<int> Application::awaitSignal() {
 }
 
 asio::awaitable<bool> Application::waitForNextRender() {
+    auto tracer = trace::getGlobalPool().getTracer("controller");
+
     for (;;) {
         using enum ControllerAction;
 
         // XXX Debouncing?
-        auto event = co_await (console_->read(1) || fs_watcher_->nextEvent() || awaitSignal());
+        auto event = tracer.addChild("wait_input") |
+                     co_await (console_->read(1) || fs_watcher_->nextEvent() || awaitSignal());
 
         // XXX Handle errors!
-        auto action = utils::visitUnpack(
-            event,
-            [&](Result<std::string> r) {
-                char c = (r | result::unwrap)[0];
-                return controller_->onKeyEvent(c, ui_, *documents_);
-            },
-            [&](Result<notify::Event> r) {
-                auto&& event = r | result::unwrap;
-                return controller_->onFilesystemEvent(event, ui_, *documents_);
-            },
-            [&](Result<int> r) {
-                int signal = r | result::unwrap;
-                return handleSignal(signal);
-            });
+        auto action =
+            tracer.addChild("handle_event") |
+            utils::visitUnpack(
+                event,
+                [&](Result<std::string> r) {
+                    char c = (r | result::unwrap)[0];
+                    return controller_->onKeyEvent(c, ui_, *documents_);
+                },
+                [&](Result<notify::Event> r) {
+                    auto&& event = r | result::unwrap;
+                    return controller_->onFilesystemEvent(event, ui_, *documents_);
+                },
+                [&](Result<int> r) {
+                    int signal = r | result::unwrap;
+                    return handleSignal(signal);
+                });
 
         if (action.has_value()) {
-            if (action == Quit) {
-                co_return true;
+            if (action == None) {
+                continue;
             }
-            if (action == Redraw) {
-                co_return false;
-            }
+
+            tracer.finalize();
+            trace::logStackTrace(tracer.getInfo());
+            co_return action == Quit;
         } else {
             log::err("error in controller loop: {}", action.error());
         }
