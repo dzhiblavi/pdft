@@ -76,14 +76,8 @@ StackScopeTracerBase* StackScopeTracerPool::getTracerBase() {
 }
 
 StackScopeTracerPool::~StackScopeTracerPool() {
-    size_t total_freed = 0;
-
-    free_list_.forEachUnordered([&](auto& item) {
-        ++total_freed;
-        delete &item;
-    });
-
-    PDFT_VERIFY(total_freed == numAllocations());
+    PDFT_VERIFY(free_list_.size() == numAllocations());
+    free_list_.forEachUnordered([](auto&& item) { delete &item; });
 }
 
 StackScopeTracerOwner StackScopeTracerPool::getTracer(const char* label, std::source_location loc) {
