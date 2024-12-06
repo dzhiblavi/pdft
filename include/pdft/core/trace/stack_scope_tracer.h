@@ -24,7 +24,6 @@ struct StackScopeTracerBase : utils::IntrusiveForwardListItem<StackScopeTracerBa
     StackScopeTracerBase* parent = nullptr;
     utils::IntrusiveForwardList<StackScopeTracerBase> children;
 
-    // Reference count before returning to the pool
     uint32_t refcount = 0;
     StackScopeTracerPool* pool = nullptr;
 };
