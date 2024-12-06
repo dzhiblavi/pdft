@@ -115,7 +115,7 @@ void StackScopeTracerPool::release(StackScopeTracerBase* item) {
 }
 
 StackScopeTracerPool& getGlobalPool() {
-    static StackScopeTracerPool pool;
+    thread_local StackScopeTracerPool pool;
     return pool;
 }
 

@@ -1,7 +1,6 @@
 #pragma once
 
 #include "pdft/core/trace/detail/duration_suffix.h"
-#include "pdft/core/trace/logger.h"
 #include "pdft/core/trace/stack_scope_tracer.h"
 
 #include "pdft/core/io/buffer.h"
@@ -52,14 +51,16 @@ void logStackTrace(const StackScopeTracerBase& info, io::OutBuffer& out) {
 }  // namespace detail
 
 template <typename Duration = AutomaticDuration>
-auto logStackTrace(const StackScopeTracerBase& info, log::LoggerPtr logger = trace::logger()) {
+auto logStackTrace(
+    const StackScopeTracerBase& info, log::LoggerPtr logger = log::loggerOrGlobal("trace")) {
     io::OutBuffer out;
     detail::logStackTrace<Duration>(info, out);
     logger->trace(out.view());
 }
 
 template <typename Duration = AutomaticDuration>
-auto logStackTrace(StackScopeTracerOwner owner, log::LoggerPtr logger = trace::logger()) {
+auto logStackTrace(
+    StackScopeTracerOwner owner, log::LoggerPtr logger = log::loggerOrGlobal("trace")) {
     owner.finalize();
     logStackTrace<Duration>(owner.getInfo(), logger);
 }

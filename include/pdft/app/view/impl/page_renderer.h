@@ -1,19 +1,24 @@
 #pragma once
 
-#include "pdft/app/state/palette_storage.h"
+#include "pdft/app/view/impl/page_loader.h"
 #include "pdft/app/view/page_renderer.h"
-
 #include "pdft/tui/display.h"
-#include "pdft/tui/terminal.h"
+
+#include "pdft/utils/background_pool.h"
 
 namespace pdft::app {
 
 class AppPageRenderer : public PageRenderer {
  public:
+    struct Config {
+        uint32_t num_preload_forward = 4;
+        uint32_t image_id_salt;
+    };
+
     AppPageRenderer(
-        uint32_t image_id_salt,
+        Config config,
         Arc<const DocumentStorage> documents_,
-        Arc<const PaletteStorage> palettes,
+        Arc<const PageLoader> loader,
         Arc<tui::Display> display);
 
     void render(
@@ -27,8 +32,11 @@ class AppPageRenderer : public PageRenderer {
     struct LoadedImage {
         float image_rows;
         float image_cols;
-        float base_factor;
-        DisplayProperties display;
+    };
+
+    struct CompressedImage {
+        image::ImageSize size;
+        std::string compressed_samples;
     };
 
     class State {
@@ -43,24 +51,17 @@ class AppPageRenderer : public PageRenderer {
         std::unordered_map<tui::ImageId, LoadedImage> loaded_;
     };
 
-    float calcFactor(Context& ctx, media::PageSize page_size, const tui::TerminalDimensions& dims);
-    bool shouldReload(tui::ImageId id, float base_factor, const DisplayProperties& prop);
+    void postPrepareImages(
+        Arc<const media::Document> document, const DisplayProperties& display, const Page& page);
 
-    Unit loadImage(
-        Context& ctx,
-        tui::ImageId id,
-        image::Image& image,
-        float base_factor,
-        const DisplayProperties& prop,
-        tui::Screen& screen);
+    void loadImage(Context& ctx, tui::ImageId id, tui::Screen& screen);
 
-    tui::ImageId getIdForPage(const Page& page) const;
-
-    const uint32_t image_id_salt_;
+    const Config config_;
     State state_;
     Arc<const DocumentStorage> documents_;
-    Arc<const PaletteStorage> palettes_;
+    Arc<const PageLoader> loader_;
     Arc<tui::Display> display_;
+    utils::BackgroundPool<tui::ImageId, CompressedImage> pool_;
 };
 
 }  // namespace pdft::app

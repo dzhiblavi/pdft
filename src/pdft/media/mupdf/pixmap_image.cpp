@@ -1,4 +1,6 @@
 #include "pdft/media/mupdf/pixmap_image.h"
+#include "pdft/media/mupdf/context.h"
+
 #include "pdft/core/assert.h"
 
 extern "C" {
@@ -10,8 +12,7 @@ extern "C" {
 namespace pdft::media {
 
 PixmapMupdfImage::PixmapMupdfImage(PixmapMupdfImage&& rhs)
-    : context_(rhs.context_)
-    , pixmap_(std::exchange(rhs.pixmap_, nullptr)) {
+    : pixmap_(std::exchange(rhs.pixmap_, nullptr)) {
     PDFT_VERIFY(pixmap_);
 }
 
@@ -20,7 +21,7 @@ PixmapMupdfImage::~PixmapMupdfImage() noexcept {
         return;
     }
 
-    fz_drop_pixmap(context_.native(), pixmap_);
+    fz_drop_pixmap(MupdfContext::thisThreadInstance().native(), pixmap_);
 }
 
 image::ImageSize PixmapMupdfImage::size() const {

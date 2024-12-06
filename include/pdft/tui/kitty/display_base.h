@@ -12,9 +12,13 @@ class KittyDisplayBase : public Display {
     KittyDisplayBase(Arc<APCExecutor> executor) : executor_(std::move(executor)) {}
 
     void loadImage(
+        Context& ctx, ImageId id, const pdft::image::Image& image, io::OutBuffer& buffer) override;
+
+    void loadCompressedImage(
         Context& ctx,
         ImageId id,
-        const pdft::image::Image& image,
+        image::ImageSize size,
+        std::string_view compressed_data,
         io::OutBuffer& buffer) override;
 
     void clear(Context& ctx, io::OutBuffer& buffer) override;

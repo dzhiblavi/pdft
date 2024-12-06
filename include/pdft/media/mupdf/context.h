@@ -1,5 +1,7 @@
 #pragma once
 
+#include "pdft/core/log.h"
+
 struct fz_context;
 
 namespace pdft::media {
@@ -13,11 +15,13 @@ class MupdfContext {
 
     struct Builder {
         Builder& setStorageSize(int size);
+        Builder& setLogger(log::LoggerPtr logger);
 
         MupdfContext build();
 
      private:
         int size_ = FZ_STORE_DEFAULT;
+        log::LoggerPtr logger_ = log::loggerOrGlobal("mupdf");
     };
 
     MupdfContext(MupdfContext&& rhs);
@@ -28,7 +32,6 @@ class MupdfContext {
     ~MupdfContext() noexcept;
 
     fz_context* native() const;
-    void registerDocumentHandlers() const;
 
     static MupdfContext& thisThreadInstance();
 

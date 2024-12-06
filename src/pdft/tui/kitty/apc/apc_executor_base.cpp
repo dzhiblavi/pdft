@@ -46,7 +46,7 @@ void writeControlData(const Command& apc, io::OutBuffer& buffer) {
 std::string_view preparePayload(Context& ctx, const Command& apc, std::string& encoded_payload) {
     std::string_view payload = apc.payload;
 
-    if (apc.compress) {
+    if (apc.compress == Compress::Compress) {
         auto _ = ctx.push("compress");
         encoded_payload = utils::zlibCompress(payload);
         payload = encoded_payload;
@@ -72,7 +72,7 @@ void APCExecutorBase::execute(Context& ctx, const Command& apc, io::OutBuffer& b
     writePrefix(buffer);
     buffer << apc.command;
     writeControlData(apc, buffer);
-    if (apc.compress) {
+    if (apc.compress != Compress::NoCompression) {
         buffer << ',';
         writeControlData(buffer, std::make_pair("o", "z"));
     }

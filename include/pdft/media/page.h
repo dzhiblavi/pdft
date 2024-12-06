@@ -20,4 +20,14 @@ class Page {
     virtual size_t getPageIndex() const = 0;
 };
 
+inline float getBaseScalingFactor(
+    media::PageSize page_size, float display_width_px, float display_height_px) {
+    float dw = display_width_px;
+    float dh = display_height_px;
+    auto [pw, ph] = page_size;
+    float fw = dw / pw;
+    float fh = dh / ph;
+    return std::fmin(fw, fh);
+}
+
 }  // namespace pdft::media

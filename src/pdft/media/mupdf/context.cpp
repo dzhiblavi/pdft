@@ -13,8 +13,36 @@ extern "C" {
 
 namespace pdft::media {
 
+namespace {
+
+void warningCallback(void* raw, const char* message) {
+    auto* logger = static_cast<spdlog::logger*>(raw);
+    logger->warn(message);
+}
+
+void errorCallback(void* raw, const char* message) {
+    auto* logger = static_cast<spdlog::logger*>(raw);
+    logger->error(message);
+}
+
+void setupMupdfLogging(fz_context* ctx, log::LoggerPtr logger) {
+    fz_set_warning_callback(ctx, warningCallback, logger.get());
+    fz_set_error_callback(ctx, errorCallback, logger.get());
+}
+
+void registerDocumentHandlers(fz_context* ctx) {
+    PDFT_FZ_VERIFY(fz_register_document_handlers(ctx));
+}
+
+}  // namespace
+
 MupdfContext::Builder& MupdfContext::Builder::setStorageSize(int size) {
     size_ = size;
+    return *this;
+}
+
+MupdfContext::Builder& MupdfContext::Builder::setLogger(log::LoggerPtr logger) {
+    logger_ = std::move(logger);
     return *this;
 }
 
@@ -25,6 +53,10 @@ MupdfContext MupdfContext::Builder::build() {
     PDFT_FZ_VERIFY(fz_enable_icc(ctx));
     PDFT_FZ_VERIFY(fz_set_text_aa_level(ctx, 8));
     PDFT_FZ_VERIFY(fz_set_graphics_aa_level(ctx, 8));
+
+    setupMupdfLogging(ctx, logger_);
+    registerDocumentHandlers(ctx);
+
     return MupdfContext{ctx};
 }
 
@@ -36,11 +68,6 @@ MupdfContext::~MupdfContext() noexcept {
 
 fz_context* MupdfContext::native() const {
     return context_;
-}
-
-void MupdfContext::registerDocumentHandlers() const {
-    auto ctx = native();
-    PDFT_FZ_VERIFY(fz_register_document_handlers(ctx));
 }
 
 MupdfContext& MupdfContext::thisThreadInstance() {

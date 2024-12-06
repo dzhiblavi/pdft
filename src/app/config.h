@@ -4,6 +4,7 @@
 #include "logging.h"
 
 #include "pdft/app/controller/impl/controller.h"
+#include "pdft/utils/random.h"
 
 #include <spdlog/common.h>
 
@@ -15,6 +16,8 @@ struct SystemConfig {
     uint32_t max_event_queue_size = 10;
     bool enable_filesystem_watching = true;
     pdft::app::StateMode state_mode = pdft::app::StateMode::AddOnly;
+    uint32_t num_preload_forward = 4;
+    uint32_t image_id_salt = pdft::utils::random<uint32_t>();
 };
 
 struct DisplayConfig {

@@ -1,7 +1,6 @@
 #pragma once
 
 #include "pdft/app/state/ui_state.h"
-#include "pdft/app/view/page_renderer.h"
 
 #include "pdft/tui/elements.h"
 #include "pdft/tui/screen.h"

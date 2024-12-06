@@ -80,20 +80,17 @@ Application::Application(asio::io_context& context, Config config)
 }
 
 void Application::setup() {
-    auto&& mupdf_context = media::MupdfContext::thisThreadInstance();
-    ::app::setupMupdfLogging(mupdf_context);
-    mupdf_context.registerDocumentHandlers();
-
     term_control_ = std::make_shared<io::PosixTermControl>();
     terminal_ = std::make_shared<tui::AnsiTerminal>();
     console_ =
         std::make_shared<io::PosixConsole>(context_, ::dup(STDIN_FILENO), ::dup(STDOUT_FILENO));
     image_display_ = resolveDisplay(config_.display, terminal_);
-    doc_loader_ = std::make_shared<pdft::media::MupdfLoader>(mupdf_context);
+    doc_loader_ = std::make_shared<pdft::media::MupdfLoader>();
 
-    auto persister = std::make_shared<pdft::app::AppPersister>(doc_loader_);
-    loader_ =
-        std::make_shared<pdft::app::AppLoader>(config_.system.state_mode, persister, doc_loader_);
+    loader_ = std::make_shared<pdft::app::AppLoader>(
+        config_.system.state_mode,
+        std::make_shared<pdft::app::AppPersister>(doc_loader_),
+        doc_loader_);
 
     documents_ = std::make_shared<pdft::app::DocumentStorage>();
     palettes_ = std::make_shared<pdft::app::PaletteStorage>();
@@ -102,9 +99,16 @@ void Application::setup() {
     ui_.display = config_.display.properties;
 
     auto renderer = std::make_shared<AppPageRenderer>(
-        utils::random<uint32_t>(), documents_, palettes_, image_display_);
-    auto document_view = std::make_shared<AppDocumentView>(std::move(renderer));
-    view_ = std::make_shared<AppView>(documents_, std::move(document_view));
+        AppPageRenderer::Config{
+            .num_preload_forward = config_.system.num_preload_forward,
+            .image_id_salt = config_.system.image_id_salt,
+        },
+        documents_,
+        std::make_shared<pdft::app::PageLoader>(palettes_),
+        image_display_);
+
+    view_ = std::make_shared<AppView>(
+        documents_, std::make_shared<AppDocumentView>(std::move(renderer)));
     controller_ = std::make_shared<AppController>(config_.controller, doc_loader_);
 
     if (config_.system.enable_filesystem_watching) {

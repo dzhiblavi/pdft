@@ -16,7 +16,14 @@ class Display {
     virtual ~Display() = default;
 
     virtual void loadImage(
-        Context& ctx, ImageId id, const pdft::image::Image& image, io::OutBuffer& buffer) = 0;
+        Context& ctx, ImageId id, const image::Image& image, io::OutBuffer& buffer) = 0;
+
+    virtual void loadCompressedImage(
+        Context& ctx,
+        ImageId id,
+        image::ImageSize size,
+        std::string_view compressed_data,
+        io::OutBuffer& buffer) = 0;
 
     virtual void displayImage(
         Context& ctx, ImageId id, const IRect& rect, const FRect& subarea, BufPair& buffers) = 0;

@@ -7,6 +7,12 @@
 
 namespace pdft::tui {
 
+enum class Compress {
+    NoCompression,
+    Compress,
+    UseCompressed,
+};
+
 struct Command {
     std::string_view command;
     std::string_view payload = "";
@@ -16,7 +22,7 @@ struct Command {
     bool b64_encode = false;
 
     // Whether to compress payload
-    bool compress = false;
+    Compress compress = Compress::NoCompression;
 };
 
 struct Response {

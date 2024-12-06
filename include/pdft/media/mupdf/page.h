@@ -1,7 +1,5 @@
 #pragma once
 
-#include "pdft/media/mupdf/context.h"
-
 #include "pdft/image/image.h"
 #include "pdft/media/page.h"
 
@@ -22,13 +20,9 @@ class MupdfPage : public Page {
     size_t getPageIndex() const override;
 
  private:
-    MupdfPage(size_t page_index, MupdfContext& context, fz_page* page)
-        : page_index_(page_index)
-        , context_(context)
-        , page_(page) {}
+    MupdfPage(size_t page_index, fz_page* page) : page_index_(page_index), page_(page) {}
 
     size_t page_index_;
-    MupdfContext& context_;
     fz_page* page_ = nullptr;
 
     friend class MupdfDocument;

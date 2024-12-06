@@ -62,10 +62,38 @@ void setupLogging(const LoggingConfig& config) {
                     {
                         // Trace logger always has the trace logging level
                         .level = spdlog::level::level_enum::trace,
+                        .format = "%Y-%m-%dT%T %z %v",
                         .sinks =
                             {
                                 log::SimpleFileSink{
                                     .path = directory / "trace.log",
+                                },
+                            },
+                    },
+                },
+                {
+                    "bg",
+                    {
+                        .level = toSpdlogLevel(config.level),
+                        .format = "%Y-%m-%dT%T %z %^%s:%#%$ %L %v",
+                        .sinks =
+                            {
+                                log::SimpleFileSink{
+                                    .path = directory / "bg.log",
+                                },
+                            },
+                    },
+                },
+                {
+                    "bg-trace",
+                    {
+                        // Trace logger always has the trace logging level
+                        .level = spdlog::level::level_enum::trace,
+                        .format = "%Y-%m-%dT%T %z %v",
+                        .sinks =
+                            {
+                                log::SimpleFileSink{
+                                    .path = directory / "bg-trace.log",
                                 },
                             },
                     },

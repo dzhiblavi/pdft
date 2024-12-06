@@ -7,7 +7,7 @@
 namespace pdft::media {
 
 Result<Arc<Document>> MupdfLoader::load(const std::filesystem::path& path) const {
-    auto document = co_await MupdfDocument::open(context_, path);
+    auto document = co_await MupdfDocument::open(path);
     co_return std::make_shared<MupdfDocument>(std::move(document));
 }
 

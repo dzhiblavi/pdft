@@ -1,7 +1,6 @@
 #pragma once
 
 #include "pdft/media/document.h"
-#include "pdft/media/mupdf/context.h"
 
 #include "pdft/core/result.h"
 
@@ -20,15 +19,13 @@ class MupdfDocument : public Document {
     Arc<media::Page> getPage(int index) const override;
     const std::filesystem::path& getPath() const override;
 
-    static Result<MupdfDocument> open(MupdfContext& context, const std::filesystem::path& path);
+    static Result<MupdfDocument> open(const std::filesystem::path& path);
 
  private:
-    MupdfDocument(MupdfContext& context, std::filesystem::path path, fz_document* document)
-        : context_(context)
-        , path_(std::move(path))
+    MupdfDocument(std::filesystem::path path, fz_document* document)
+        : path_(std::move(path))
         , document_(document) {}
 
-    MupdfContext& context_;
     std::filesystem::path path_;
     fz_document* document_ = nullptr;
 };

@@ -35,6 +35,14 @@ LoggerPtr logger(const std::string& name) {
     return nullptr;
 }
 
+LoggerPtr loggerOrGlobal(const std::string& name) {
+    if (auto logger = spdlog::get(name)) {
+        return logger;
+    }
+
+    return global();
+}
+
 void setGlobalLogger(Arc<spdlog::logger> logger) {
     GlobalLogger::instance().set(std::move(logger));
 }

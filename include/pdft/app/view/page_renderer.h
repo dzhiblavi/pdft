@@ -1,6 +1,6 @@
 #pragma once
 
-#include "pdft/app/state/document_storage.h"
+#include "pdft/app/view/display_properties.h"
 
 #include "pdft/tui/fit_image.h"
 #include "pdft/tui/rect.h"
@@ -10,24 +10,10 @@
 
 namespace pdft::app {
 
-struct Page {
-    DocumentId document_id;
-    uint32_t page_index;
-};
-
 struct PagePosition {
     const tui::IRect& rect;
     const tui::FRect& subarea = {0.f, 0.f, 1.f, 1.f};
     const tui::Placement& placement = {};
-};
-
-struct DisplayProperties {
-    float scaling_coeff = 1.f;
-    bool invert_colors = false;
-    bool make_bolder = false;
-    std::optional<std::string> palette = std::nullopt;
-
-    bool operator==(const DisplayProperties&) const = default;
 };
 
 class PageRenderer {

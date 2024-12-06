@@ -1,4 +1,5 @@
 #include "pdft/media/mupdf/page.h"
+#include "pdft/media/mupdf/context.h"
 #include "pdft/media/mupdf/pixmap_image.h"
 
 #include "fz_assert.h"
@@ -17,17 +18,16 @@ namespace pdft::media {
 
 MupdfPage::MupdfPage(MupdfPage&& rhs)
     : page_index_(rhs.page_index_)
-    , context_(rhs.context_)
     , page_(std::exchange(rhs.page_, nullptr)) {}
 
 MupdfPage::~MupdfPage() noexcept {
-    fz_drop_page(context_.native(), page_);
+    fz_drop_page(MupdfContext::thisThreadInstance().native(), page_);
 }
 
 Arc<image::Image> MupdfPage::getImage(float scaling_factor) const {
     PDFT_VERIFY(scaling_factor > 0.f, "scale factor should be positive");
 
-    auto ctx = context_.native();
+    auto ctx = MupdfContext::thisThreadInstance().native();
     fz_pixmap* pix = nullptr;
     fz_matrix ctm = fz_scale(scaling_factor, scaling_factor);
 
@@ -36,11 +36,11 @@ Arc<image::Image> MupdfPage::getImage(float scaling_factor) const {
     PDFT_VERIFY(pix->w > 0 && pix->h > 0, "loaded an image with negative size");
     PDFT_VERIFY(pix, "fz_new_pixmap_from_page is null");
 
-    return Arc<image::Image>(new PixmapMupdfImage(context_, pix));
+    return Arc<image::Image>(new PixmapMupdfImage(pix));
 }
 
 PageSize MupdfPage::getDefaultSize() const {
-    auto ctx = context_.native();
+    auto ctx = MupdfContext::thisThreadInstance().native();
     fz_rect rect;
 
     PDFT_FZ_VERIFY(rect = fz_bound_page(ctx, page_));

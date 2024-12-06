@@ -16,4 +16,13 @@ class Image {
     virtual std::span<RGBColor> mutableSamples() = 0;
 };
 
+inline std::string_view pixelsToSamples(std::span<const RGBColor> pixels) {
+    static_assert(sizeof(RGBColor) == 3);
+
+    return {
+        (const char*)pixels.data(),
+        sizeof(RGBColor) * pixels.size(),
+    };
+}
+
 }  // namespace pdft::image

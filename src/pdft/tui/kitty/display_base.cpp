@@ -9,6 +9,39 @@ bool KittyDisplayBase::isLoaded(ImageId id) const {
     return loaded_.contains(id);
 }
 
+void KittyDisplayBase::loadCompressedImage(
+    Context& ctx,
+    ImageId id,
+    image::ImageSize size,
+    std::string_view compressed_data,
+    io::OutBuffer& buffer) {
+    log::debug(ctx, "loading a compressed image with id={} to the display", id);
+    PDFT_VERIFY(!isLoaded(id), "image with id={} is already loaded", id);
+
+    loaded_.emplace(id, size);
+
+    std::pair<std::string_view, std::string> control_data[] = {
+        {"q", "2"},
+        {"a", "t"},
+        {"t", "d"},
+        {"s", std::to_string(size.width_px)},
+        {"v", std::to_string(size.height_px)},
+        {"f", "24"},
+        {"i", std::to_string(id)},
+    };
+
+    executor_->execute(
+        ctx,
+        {
+            .command = "_G",
+            .payload = compressed_data,
+            .control_data = control_data,
+            .b64_encode = true,
+            .compress = Compress::UseCompressed,
+        },
+        buffer);
+}
+
 void KittyDisplayBase::loadImage(
     Context& ctx, ImageId id, const image::Image& image, io::OutBuffer& buffer) {
     log::debug(ctx, "loading an image with id={} to the display", id);
@@ -36,7 +69,7 @@ void KittyDisplayBase::loadImage(
             .payload = {(const char*)samples.data(), 3 * samples.size()},
             .control_data = control_data,
             .b64_encode = true,
-            .compress = true,
+            .compress = Compress::Compress,
         },
         buffer);
 }

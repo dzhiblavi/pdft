@@ -1,7 +1,5 @@
 #pragma once
 
-#include "pdft/media/mupdf/context.h"
-
 #include "pdft/image/image.h"
 
 struct fz_pixmap;
@@ -20,11 +18,8 @@ class PixmapMupdfImage : public image::Image {
     std::span<image::RGBColor> mutableSamples() override;
 
  private:
-    PixmapMupdfImage(MupdfContext& context, fz_pixmap* pixmap)
-        : context_(context)
-        , pixmap_(pixmap) {}
+    explicit PixmapMupdfImage(fz_pixmap* pixmap) : pixmap_(pixmap) {}
 
-    MupdfContext& context_;
     fz_pixmap* pixmap_;
 
     friend class MupdfPage;

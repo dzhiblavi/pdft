@@ -14,6 +14,9 @@ using impl::global;
 // Get logger by name
 LoggerPtr logger(const std::string& name);
 
+// Get logger by name or global
+LoggerPtr loggerOrGlobal(const std::string& name);
+
 // Set logger by name
 void setGlobalLogger(LoggerPtr logger);
 
