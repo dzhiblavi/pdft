@@ -1,14 +1,16 @@
 state_path: ../../../../assets/state.json
 
 system:
+  max_event_queue_size: 10
   enable_filesystem_watching: true
+  state_mode: AddOnly
 
 logging:
   directory: ../../../../logs/
   level: Trace
 
 display:
-  scaling_factor: 1.1
+  scaling_coeff: 1.1
   invert_colors: true
   force_unicode_kitty_display: false
 
