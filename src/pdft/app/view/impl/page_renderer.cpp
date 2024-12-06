@@ -86,8 +86,9 @@ void AppPageRenderer::postPrepareImages(
         auto image_id = getImageId(config_.image_id_salt, {doc_id, page_index + i}, display);
 
         pool_.post(image_id, [=, this](auto& ctx) {
-            auto image = loader_->renderPage(ctx, display, *page);
-            auto compressed = utils::zlibCompress(image::pixelsToSamples(image->samples()));
+            auto image = ctx.push("render_page") | loader_->renderPage(ctx, display, *page);
+            auto compressed = ctx.push("compress") |
+                              utils::zlibCompress(image::pixelsToSamples(image->samples()));
 
             return CompressedImage{
                 .size = image->size(),
@@ -101,7 +102,7 @@ void AppPageRenderer::loadImage(Context& ctx, tui::ImageId id, tui::Screen& scre
     auto&& [size, compressed_data] = ctx.push("await_task") | pool_.get(id);
 
     {
-        ctx.push("load_image");
+        auto _ = ctx.push("load_image");
         display_->loadCompressedImage(
             ctx, id, size, compressed_data, screen.buffers.control_buffer);
     }
