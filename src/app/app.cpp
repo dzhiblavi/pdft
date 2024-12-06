@@ -248,8 +248,7 @@ asio::awaitable<bool> Application::waitForNextRender() {
                 continue;
             }
 
-            tracer.finalize();
-            trace::logStackTrace(tracer.getInfo());
+            trace::logStackTrace(std::move(tracer));
             co_return action == Quit;
         } else {
             log::err("error in controller loop: {}", action.error());
@@ -276,9 +275,7 @@ asio::awaitable<void> Application::cleanup() {
     }
 
     log::debug(this, "total stack tracer allocations: {}", trace::getGlobalPool().numAllocations());
-
-    tracer.finalize();
-    trace::logStackTrace(tracer.getInfo());
+    trace::logStackTrace(std::move(tracer));
 }
 
 }  // namespace app

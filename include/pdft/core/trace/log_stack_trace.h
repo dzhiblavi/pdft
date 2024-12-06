@@ -58,4 +58,10 @@ auto logStackTrace(const StackScopeTracerBase& info, log::LoggerPtr logger = tra
     logger->trace(out.view());
 }
 
+template <typename Duration = AutomaticDuration>
+auto logStackTrace(StackScopeTracerOwner owner, log::LoggerPtr logger = trace::logger()) {
+    owner.finalize();
+    logStackTrace<Duration>(owner.getInfo(), logger);
+}
+
 }  // namespace pdft::trace

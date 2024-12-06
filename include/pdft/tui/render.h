@@ -46,8 +46,7 @@ class Renderer {
         io::clear(control_);
         io::clear(display_);
 
-        tracer.finalize();
-        trace::logStackTrace(tracer.getInfo());
+        trace::logStackTrace(std::move(tracer));
     }
 
  private:
