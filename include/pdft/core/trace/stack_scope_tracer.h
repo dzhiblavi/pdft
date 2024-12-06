@@ -66,6 +66,11 @@ class StackScopeTracerOwner {
 
     const StackScopeTracerBase& getInfo() const;
 
+    template <typename T>
+    decltype(auto) operator|(T&& t) && {
+        return std::forward<T>(t);
+    }
+
     void finalize();
 
  private:
