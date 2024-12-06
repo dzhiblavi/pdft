@@ -23,11 +23,11 @@ std::ostream& operator<<(std::ostream& os, const T& value) {
     return os << magic_enum::enum_name(value);
 }
 
-// Format std::error_code by default
 template <typename T>
 requires std::is_enum_v<T>
 struct fmt::formatter<T> : fmt::ostream_formatter {};
 
+// Format std::error_code by default
 template <>
 struct fmt::formatter<std::error_code> {
     constexpr decltype(auto) parse(format_parse_context& ctx) {
