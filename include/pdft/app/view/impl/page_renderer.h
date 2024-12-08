@@ -6,6 +6,8 @@
 
 #include "pdft/utils/background_pool.h"
 
+#include <asio/io_context.hpp>
+
 namespace pdft::app {
 
 class AppPageRenderer : public PageRenderer {
@@ -16,6 +18,7 @@ class AppPageRenderer : public PageRenderer {
     };
 
     AppPageRenderer(
+        asio::io_context& io,
         Config config,
         Arc<const DocumentStorage> documents_,
         Arc<const PageLoader> loader,
@@ -56,6 +59,7 @@ class AppPageRenderer : public PageRenderer {
 
     void loadImage(Context& ctx, tui::ImageId id, tui::Screen& screen);
 
+    asio::io_context& io_;
     const Config config_;
     State state_;
     Arc<const DocumentStorage> documents_;

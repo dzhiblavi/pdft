@@ -73,7 +73,8 @@ Result<ControllerAction> handleSignal(int signal) {
 }  // namespace
 
 Application::Application(asio::io_context& context, Config config)
-    : config_(config)
+    : io_(context)
+    , config_(config)
     , context_(context)
     , signals_(context, SIGWINCH, SIGINT, SIGSEGV) {
     setup();
@@ -99,6 +100,7 @@ void Application::setup() {
     ui_.display = config_.display.properties;
 
     auto renderer = std::make_shared<AppPageRenderer>(
+        io_,
         AppPageRenderer::Config{
             .num_preload_forward = config_.system.num_preload_forward,
             .image_id_salt = config_.system.image_id_salt,

@@ -1,17 +1,18 @@
 #pragma once
 
 #include "pdft/core/assert.h"
+#include "pdft/core/awaitable.h"
 #include "pdft/core/context.h"
+#include "pdft/core/future.h"
 #include "pdft/core/log.h"
 #include "pdft/core/trace/log_stack_trace.h"
 #include "pdft/core/trace/stack_scope_tracer.h"
-#include "pdft/utils/visit.h"
 
+#include <asio/detached.hpp>
 #include <asio/post.hpp>
 #include <asio/thread_pool.hpp>
 #include <asio/use_future.hpp>
 
-#include <future>
 #include <unordered_map>
 
 namespace pdft::utils {
@@ -30,24 +31,26 @@ class BackgroundPool {
         pool_.stop();
     }
 
-    const R& get(TaskId id) {
+    const R* get(TaskId id) {
         auto it = futures_.find(id);
         PDFT_VERIFY(it != futures_.end(), "unknown task id={}", id);
         return it->second.get();
     }
 
-    template <typename Producer>
+    template <typename Executor, typename Producer>
     requires std::is_invocable_r_v<R, Producer, Context&>
-    bool post(TaskId id, Producer producer) {
+    bool post(Executor /*executor*/, TaskId id, Producer producer) {
         if (futures_.contains(id)) {
             return false;
         }
 
-        auto future = asio::post(  //
-            pool_,
-            asio::use_future([this, p = std::move(producer)] {
-                return processRequest(std::move(p));
-            }));
+        // Promise<R> promise{executor};
+        Promise<R> promise;
+        auto future = promise.get_future();
+
+        asio::post(pool_, [this, prom = std::move(promise), prod = std::move(producer)]() mutable {
+            std::move(prom).set_value(processRequest(std::move(prod)));
+        });
 
         futures_.emplace(id, std::move(future));
         return true;
@@ -56,18 +59,20 @@ class BackgroundPool {
  private:
     template <typename T>
     struct FutureValue {
-        explicit FutureValue(std::future<T> future) : value_(std::move(future)) {}
+        explicit FutureValue(Future<T> future) : value_(std::move(future)) {}
 
-        const T& get() {
-            if (std::holds_alternative<std::future<T>>(value_)) {
-                value_ = std::get<std::future<T>>(value_).get();
+        const T* get() {
+            if (std::holds_alternative<Future<T>>(value_)) {
+                Future<T> future = std::get<Future<T>>(std::move(value_));
+                // value_ = co_await std::move(future).async_extract(asio::use_awaitable);
+                value_ = std::move(future).get();
             }
 
-            return std::get<T>(value_);
+            return &std::get<T>(value_);
         }
 
      private:
-        std::variant<std::future<T>, T> value_;
+        std::variant<Future<T>, T> value_;
     };
 
     template <typename Producer>
@@ -85,7 +90,6 @@ class BackgroundPool {
 
     log::LoggerPtr log_ = log::loggerOrGlobal("bg");
     log::LoggerPtr tracelog_ = log::loggerOrGlobal("bg-trace");
-    std::mutex m_;
     asio::thread_pool pool_;
     std::unordered_map<TaskId, FutureValue<R>> futures_;
 };

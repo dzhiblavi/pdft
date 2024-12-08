@@ -14,6 +14,7 @@ include(./cmake/Development.cmake)
 include(./cmake/Sanitizers.cmake)
 
 # Third-party libraries
+include(./cmake/thirdparty/saf.cmake)
 include(./cmake/thirdparty/MuPDF.cmake)
 include(./cmake/thirdparty/fswatch.cmake)
 include(./cmake/thirdparty/reflect-cpp.cmake)

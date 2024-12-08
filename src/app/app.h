@@ -39,6 +39,7 @@ class Application : public pdft::log::WithLogger {
     asio::awaitable<bool> waitForNextRender();
     asio::awaitable<void> cleanup();
 
+    asio::io_context& io_;
     const Config config_;
     asio::io_context& context_;
     pdft::app::UIState ui_;

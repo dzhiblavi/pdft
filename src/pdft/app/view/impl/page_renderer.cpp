@@ -31,11 +31,13 @@ const AppPageRenderer::LoadedImage& AppPageRenderer::State::getImage(ImageId id)
 }
 
 AppPageRenderer::AppPageRenderer(
+    asio::io_context& io,
     Config config,
     Arc<const DocumentStorage> documents,
     Arc<const PageLoader> loader,
     Arc<tui::Display> display)
-    : config_(std::move(config))
+    : io_(io)
+    , config_(std::move(config))
     , documents_(std::move(documents))
     , loader_(std::move(loader))
     , display_(std::move(display))
@@ -85,7 +87,7 @@ void AppPageRenderer::postPrepareImages(
         auto page = document->getPage(page_index + i);
         auto image_id = getImageId(config_.image_id_salt, {doc_id, page_index + i}, display);
 
-        pool_.post(image_id, [=, this](auto& ctx) {
+        pool_.post(io_.get_executor(), image_id, [=, this](auto& ctx) {
             auto image = ctx.push("render_page") | loader_->renderPage(ctx, display, *page);
             auto compressed = ctx.push("compress") |
                               utils::zlibCompress(image::pixelsToSamples(image->samples()));
@@ -99,7 +101,7 @@ void AppPageRenderer::postPrepareImages(
 }
 
 void AppPageRenderer::loadImage(Context& ctx, tui::ImageId id, tui::Screen& screen) {
-    auto&& [size, compressed_data] = ctx.push("await_task") | pool_.get(id);
+    auto&& [size, compressed_data] = ctx.push("await_task") | *pool_.get(id);
 
     {
         auto _ = ctx.push("load_image");

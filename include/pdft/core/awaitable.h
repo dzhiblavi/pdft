@@ -13,10 +13,11 @@ namespace pdft {
 inline constexpr auto asio_coro_as_tuple = asio::as_tuple(asio::use_awaitable);
 
 template <typename T>
-using AsyncResult = std::conditional_t<
-    std::is_same_v<void, T>,
-    asio::awaitable<Result<Unit>>,
-    asio::awaitable<Result<T>>>;
+using Async = asio::awaitable<T>;
+
+template <typename T>
+using AsyncResult =
+    std::conditional_t<std::is_same_v<void, T>, Async<Result<Unit>>, Async<Result<T>>>;
 
 using AsyncStatus = AsyncResult<void>;
 
