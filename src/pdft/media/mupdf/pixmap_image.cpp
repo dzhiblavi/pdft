@@ -12,9 +12,7 @@ extern "C" {
 namespace pdft::media {
 
 PixmapMupdfImage::PixmapMupdfImage(PixmapMupdfImage&& rhs)
-    : pixmap_(std::exchange(rhs.pixmap_, nullptr)) {
-    PDFT_VERIFY(pixmap_);
-}
+    : pixmap_(PDFT_VERIFY(std::exchange(rhs.pixmap_, nullptr))) {}
 
 PixmapMupdfImage::~PixmapMupdfImage() noexcept {
     if (pixmap_ == nullptr) {
@@ -25,8 +23,6 @@ PixmapMupdfImage::~PixmapMupdfImage() noexcept {
 }
 
 image::ImageSize PixmapMupdfImage::size() const {
-    PDFT_VERIFY(pixmap_ != nullptr, "invalid pixmap image");
-
     return {
         .width_px = static_cast<uint32_t>(pixmap_->w),
         .height_px = static_cast<uint32_t>(pixmap_->h),
@@ -34,8 +30,6 @@ image::ImageSize PixmapMupdfImage::size() const {
 }
 
 std::span<const image::RGBColor> PixmapMupdfImage::samples() const {
-    PDFT_VERIFY(pixmap_ != nullptr, "invalid pixmap image");
-
     return {
         (const image::RGBColor*)pixmap_->samples,
         size_t(pixmap_->w * pixmap_->h),
@@ -43,8 +37,6 @@ std::span<const image::RGBColor> PixmapMupdfImage::samples() const {
 }
 
 std::span<image::RGBColor> PixmapMupdfImage::mutableSamples() {
-    PDFT_VERIFY(pixmap_ != nullptr, "invalid pixmap image");
-
     return {
         (image::RGBColor*)pixmap_->samples,
         size_t(pixmap_->w * pixmap_->h),

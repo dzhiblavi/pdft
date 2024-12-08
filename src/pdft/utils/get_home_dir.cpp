@@ -4,12 +4,7 @@
 namespace pdft::utils {
 
 std::filesystem::path getHomeDirectory() {
-    auto path = ::getenv("HOME");
-
-    PDFT_VERIFY(
-        path != nullptr, "failed to get HOME environment variable, received {}", (void*)path);
-
-    return path;
+    return PDFT_VERIFY(::getenv("HOME"), "failed to get HOME environment variable");
 }
 
 std::filesystem::path expandHome(const std::filesystem::path& path) {

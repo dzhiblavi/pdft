@@ -40,13 +40,11 @@ StackScopeTracerOwner::StackScopeTracerOwner(StackScopeTracerOwner&& rhs)
     : base_(std::exchange(rhs.base_, nullptr)) {}
 
 StackScopeTracerOwner StackScopeTracerOwner::addChild(const char* label, std::source_location loc) {
-    PDFT_VERIFY(base_);
-    return StackScopeTraceHandle{base_}.addChild(label, loc);
+    return StackScopeTraceHandle{PDFT_VERIFY(base_)}.addChild(label, loc);
 }
 
 const StackScopeTracerBase& StackScopeTracerOwner::getInfo() const {
-    PDFT_VERIFY(base_);
-    return *base_;
+    return *PDFT_VERIFY(base_);
 }
 
 void StackScopeTracerOwner::finalize() {

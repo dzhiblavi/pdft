@@ -43,14 +43,16 @@ panic(const Msg&) -> panic<Msg>;
 }  // namespace pdft
 
 #define PDFT_VERIFY(expr, ...)                                                          \
-    do {                                                                                \
-        if (!static_cast<bool>(expr)) [[unlikely]] {                                    \
+    [&] {                                                                               \
+        auto&& value = expr;                                                            \
+        if (!static_cast<bool>(value)) [[unlikely]] {                                   \
             ::pdft::panic("PDFT_VERIFY failed: '" #expr "' is not true: " __VA_ARGS__); \
         }                                                                               \
-    } while (0)
+        return std::forward<decltype(value)>(value);                                    \
+    }()
 
 #ifndef NDEBUG
-#define PDFT_VERIFY_DBG PDFT_VERIFY
+#define PDFT_VERIFY_DBG(...) (void)PDFT_VERIFY(__VA_ARGS__)
 #else
 #define PDFT_VERIFY_DBG(...)
 #endif

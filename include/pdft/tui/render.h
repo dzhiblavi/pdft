@@ -20,11 +20,8 @@ namespace pdft::tui {
 class Renderer {
  public:
     Renderer(Arc<const tui::Terminal> terminal, Arc<io::Console> console)
-        : terminal_(std::move(terminal))
-        , console_(std::move(console)) {
-        PDFT_VERIFY(terminal_);
-        PDFT_VERIFY(console_);
-    }
+        : terminal_(PDFT_VERIFY(std::move(terminal)))
+        , console_(PDFT_VERIFY(std::move(console))) {}
 
     template <std::invocable<Context&, Screen&> Renderer>
     asio::awaitable<void> renderOne(Renderer renderer) {
