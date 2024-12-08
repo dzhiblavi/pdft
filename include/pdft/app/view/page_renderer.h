@@ -29,5 +29,3 @@ class PageRenderer {
 };
 
 }  // namespace pdft::app
-
-PDFT_LOG_ADAPT_TYPE_JSON(pdft::app, Page);

@@ -262,7 +262,7 @@ asio::awaitable<void> Application::cleanup() {
     Context ctx;
     ctx.setTracer(tracer);
 
-    ctx.push("term_clear") | co_await [&]() -> AsyncStatus {
+    ctx.push("term:clear") | co_await [&]() -> AsyncStatus {
         io::OutBuffer buffer;
         terminal_->showCursor(buffer);
         terminal_->clear(buffer);
@@ -271,7 +271,7 @@ asio::awaitable<void> Application::cleanup() {
     }();
 
     if (config_.system.enable_filesystem_watching) {
-        auto _ = ctx.push("notify_stop");
+        auto _ = ctx.push("fsw:stop");
         fs_watcher_->stop();
     }
 

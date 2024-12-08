@@ -42,4 +42,5 @@ inline tui::ImageId getImageId(uint32_t salt, const Page& page, const DisplayPro
 
 }  // namespace pdft::app
 
+PDFT_LOG_ADAPT_TYPE_JSON(pdft::app, Page);
 PDFT_LOG_ADAPT_TYPE_JSON(pdft::app, DisplayProperties);

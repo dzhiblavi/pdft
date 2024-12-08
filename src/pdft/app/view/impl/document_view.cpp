@@ -7,7 +7,7 @@ tui::Element AppDocumentView::render(
     const DocumentState& doc,
     const DisplayProperties& properties,
     tui::Screen& screen) const {
-    auto _ = ctx.push("render");
+    auto _ = ctx.push("docview:render");
 
     switch (doc.view_mode) {
         using enum ViewMode;
@@ -32,7 +32,7 @@ tui::Element AppDocumentView::renderOnePage(
     const DisplayProperties& properties,
     tui::Screen& screen) const {
     auto render = [&, properties](tui::IRect rect) {
-        auto _ = ctx.push("only_page");
+        auto _ = ctx.push("docview:page");
 
         renderer_->render(
             ctx,
@@ -61,7 +61,7 @@ tui::Element AppDocumentView::renderTwoPages(
     const DisplayProperties& properties,
     tui::Screen& screen) const {
     auto render_left = [&, properties](tui::IRect rect) {
-        auto _ = ctx.push("left_page");
+        auto _ = ctx.push("docview:left");
 
         renderer_->render(
             ctx,
@@ -86,7 +86,7 @@ tui::Element AppDocumentView::renderTwoPages(
             return;
         }
 
-        auto _ = ctx.push("right_page");
+        auto _ = ctx.push("docview:right");
 
         renderer_->render(
             ctx,
@@ -118,7 +118,7 @@ tui::Element AppDocumentView::renderOnePageContinuous(
     const DisplayProperties& properties,
     tui::Screen& screen) const {
     auto render_top = [&, properties](tui::IRect rect) {
-        auto _ = ctx.push("top_page");
+        auto _ = ctx.push("docview:top");
         float this_ratio = float(rect.height) / rect_.height;
 
         renderer_->render(
@@ -150,7 +150,7 @@ tui::Element AppDocumentView::renderOnePageContinuous(
         if (doc.page_index + 1 >= doc.page_count) {
             return;
         }
-        auto _ = ctx.push("bottom_page");
+        auto _ = ctx.push("docview:bottom");
         float this_ratio = float(rect.height) / rect_.height;
 
         renderer_->render(
@@ -193,7 +193,7 @@ tui::Element AppDocumentView::renderTwoPagesContinuous(
     const DisplayProperties& properties,
     tui::Screen& screen) const {
     auto render_top_left = [&, properties](tui::IRect rect) {
-        auto _ = ctx.push("top_left_page");
+        auto _ = ctx.push("docview:top_left");
         float this_ratio = float(rect.height) / rect_.height;
 
         renderer_->render(
@@ -226,7 +226,7 @@ tui::Element AppDocumentView::renderTwoPagesContinuous(
             return;
         }
 
-        auto _ = ctx.push("top_right_page");
+        auto _ = ctx.push("docview:top_right");
         float this_ratio = float(rect.height) / rect_.height;
 
         renderer_->render(
@@ -259,7 +259,7 @@ tui::Element AppDocumentView::renderTwoPagesContinuous(
             return;
         }
 
-        auto _ = ctx.push("bottom_left_page");
+        auto _ = ctx.push("docview:bottom_left");
         float this_ratio = float(rect.height) / rect_.height;
 
         renderer_->render(
@@ -292,7 +292,7 @@ tui::Element AppDocumentView::renderTwoPagesContinuous(
             return;
         }
 
-        auto _ = ctx.push("bottom_right_page");
+        auto _ = ctx.push("docview:bottom_right");
         float this_ratio = float(rect.height) / rect_.height;
 
         renderer_->render(

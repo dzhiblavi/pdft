@@ -28,20 +28,20 @@ class Renderer {
 
     template <std::invocable<Context&, Screen&> Renderer>
     asio::awaitable<void> renderOne(Renderer renderer) {
-        auto tracer = trace::getGlobalPool().getTracer("renderOne");
+        auto tracer = trace::getGlobalPool().getTracer("render:one");
         auto ctx = Context();
         ctx.setTracer(tracer);
         auto screen = Screen{terminal_->getDimensions(), {control_, display_}};
 
-        auto dom = ctx.push("renderUser") | renderer(ctx, screen);
-        auto tui = ctx.push("renderTUI") | [&] {
+        auto dom = ctx.push("render:user") | renderer(ctx, screen);
+        auto tui = ctx.push("render:tui") | [&] {
             auto screen = ftxui::Screen::Create(ftxui::Dimension::Full());
             tui::Render(screen, dom);
             return screen.ToString();
         }();
 
         terminal_->clear(control_);
-        ctx.push("renderFlush") | co_await console_->writeMany(control_, tui, display_);
+        ctx.push("render:flush") | co_await console_->writeMany(control_, tui, display_);
 
         io::clear(control_);
         io::clear(display_);

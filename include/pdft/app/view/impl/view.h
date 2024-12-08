@@ -14,7 +14,8 @@ class AppView : public View {
     tui::Element render(Context& ctx, const UIState& ui, tui::Screen& screen) override;
 
  private:
-    tui::Element getSidebar(Context& ctx, const UIState& ui);
+    tui::Element getSidebar(const UIState& ui);
+    Maybe<tui::Element> getDocument(Context& ctx, const UIState& ui, tui::Screen& screen);
 
     Arc<const DocumentStorage> documents_;
     Arc<const DocumentView> doc_view_;
