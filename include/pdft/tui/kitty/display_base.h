@@ -11,9 +11,6 @@ class KittyDisplayBase : public Display {
  public:
     KittyDisplayBase(Arc<APCExecutor> executor) : executor_(std::move(executor)) {}
 
-    void loadImage(
-        Context& ctx, ImageId id, const pdft::image::Image& image, io::OutBuffer& buffer) override;
-
     void loadCompressedImage(
         Context& ctx,
         ImageId id,
@@ -28,7 +25,7 @@ class KittyDisplayBase : public Display {
 
  protected:
     Arc<APCExecutor> executor_;
-    std::unordered_map<ImageId, pdft::image::ImageSize> loaded_;
+    std::unordered_map<ImageId, image::ImageSize> loaded_;
 };
 
 }  // namespace pdft::tui

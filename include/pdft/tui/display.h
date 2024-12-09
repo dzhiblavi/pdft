@@ -1,9 +1,8 @@
 #pragma once
 
+#include "pdft/image/size.h"
 #include "pdft/tui/bufpair.h"
 #include "pdft/tui/rect.h"
-
-#include "pdft/image/image.h"
 
 #include "pdft/core/context.h"
 
@@ -14,9 +13,6 @@ using ImageId = uint32_t;
 class Display {
  public:
     virtual ~Display() = default;
-
-    virtual void loadImage(
-        Context& ctx, ImageId id, const image::Image& image, io::OutBuffer& buffer) = 0;
 
     virtual void loadCompressedImage(
         Context& ctx,

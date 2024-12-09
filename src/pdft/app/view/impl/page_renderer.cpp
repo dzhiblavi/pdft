@@ -10,24 +10,35 @@ namespace pdft::app {
 using tui::ImageId;
 using namespace result;
 
-bool AppPageRenderer::State::isLoaded(ImageId id) const {
-    return loaded_.contains(id);
+void AppPageRenderer::Images::add(tui::ImageId id, RenderingImage image) {
+    PDFT_VERIFY(!contains(id));
+    images_.emplace(id, std::move(image));
 }
 
-ImageId AppPageRenderer::State::addImage(ImageId id, LoadedImage loaded) {
-    PDFT_VERIFY(!isLoaded(id));
-    loaded_.emplace(id, loaded);
-    return id;
+void AppPageRenderer::Images::remove(tui::ImageId id) {
+    PDFT_VERIFY(contains(id));
+    images_.erase(id);
 }
 
-void AppPageRenderer::State::removeImage(ImageId id) {
-    PDFT_VERIFY(isLoaded(id));
-    loaded_.erase(id);
+bool AppPageRenderer::Images::contains(ImageId id) const {
+    return images_.contains(id);
 }
 
-const AppPageRenderer::LoadedImage& AppPageRenderer::State::getImage(ImageId id) const {
-    PDFT_VERIFY(isLoaded(id));
-    return loaded_.find(id)->second;
+AppPageRenderer::ImageState& AppPageRenderer::Images::get(ImageId id) {
+    PDFT_VERIFY(contains(id));
+    return images_[id];
+}
+
+bool AppPageRenderer::Images::isLoaded(ImageId id) {
+    return contains(id) && std::holds_alternative<LoadedImage>(get(id));
+}
+
+const AppPageRenderer::LoadedImage& AppPageRenderer::Images::getLoadedImage(tui::ImageId id) {
+    return std::get<LoadedImage>(get(id));
+}
+
+AppPageRenderer::RenderingImage& AppPageRenderer::Images::getRenderingImage(tui::ImageId id) {
+    return std::get<RenderingImage>(get(id));
 }
 
 AppPageRenderer::AppPageRenderer(
@@ -65,7 +76,7 @@ Async<Unit> AppPageRenderer::render(
         co_await loadImage(ctx, id, screen);
     }
 
-    const auto& p = state_.getImage(id);
+    const auto& p = state_.getLoadedImage(id);
     float sub_rows = p.image_rows * pos.subarea.height;
     float sub_cols = p.image_cols * pos.subarea.width;
     auto irect = tui::fitImage(sub_cols / sub_rows, pos.rect, pos.placement);
@@ -86,24 +97,39 @@ void AppPageRenderer::postPrepareImages(
             return;
         }
 
-        auto page = document->getPage(page_index + i);
         auto image_id = getImageId(config_.image_id_salt, {doc_id, page_index + i}, display);
 
-        pool_.post(io_.get_executor(), image_id, [=, this](auto& ctx) {
+        if (state_.contains(image_id)) {
+            log::info("skip image id {} because it is already rendered or loaded", image_id);
+            continue;
+        }
+
+        auto page = document->getPage(page_index + i);
+
+        auto future = pool_.post(io_.get_executor(), [=, this](auto& ctx) {
             auto image = ctx.push("render_page") | loader_->renderPage(ctx, display, *page);
             auto compressed = ctx.push("compress") |
                               utils::zlibCompress(image::pixelsToSamples(image->samples()));
 
-            return CompressedImage{
+            return RenderedImage{
                 .size = image->size(),
                 .compressed_samples = std::move(compressed),
             };
         });
+
+        state_.add(image_id, std::move(future));
     }
 }
 
 Async<void> AppPageRenderer::loadImage(Context& ctx, tui::ImageId id, tui::Screen& screen) {
-    auto&& [size, compressed_data] = ctx.push("await_task") | *(co_await pool_.get(id));
+    auto&& image = state_.get(id);
+
+    if (!std::holds_alternative<RenderingImage>(image)) {
+        co_return;
+    }
+
+    auto&& rendering = std::get<RenderingImage>(image);
+    auto&& [size, compressed_data] = ctx.push("await_task") | *(co_await rendering.get());
 
     {
         auto _ = ctx.push("load_image");
@@ -113,7 +139,8 @@ Async<void> AppPageRenderer::loadImage(Context& ctx, tui::ImageId id, tui::Scree
 
     float image_cols = float(size.width_px) / screen.dimensions().cell_width_px;
     float image_rows = float(size.height_px) / screen.dimensions().cell_height_px;
-    state_.addImage(id, {.image_rows = image_rows, .image_cols = image_cols});
+
+    image = LoadedImage{.image_rows = image_rows, .image_cols = image_cols};
 }
 
 }  // namespace pdft::app

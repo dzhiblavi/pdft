@@ -37,21 +37,29 @@ class AppPageRenderer : public PageRenderer {
         float image_cols;
     };
 
-    struct CompressedImage {
+    struct RenderedImage {
         image::ImageSize size;
         std::string compressed_samples;
     };
 
-    class State {
-     public:
-        tui::ImageId addImage(tui::ImageId id, LoadedImage loaded);
-        void removeImage(tui::ImageId id);
+    using RenderingImage = utils::FutureValue<RenderedImage>;
 
-        bool isLoaded(tui::ImageId id) const;
-        const LoadedImage& getImage(tui::ImageId id) const;
+    using ImageState = std::variant<LoadedImage, RenderingImage>;
+
+    class Images {
+     public:
+        void add(tui::ImageId id, RenderingImage image);
+        void remove(tui::ImageId id);
+
+        bool contains(tui::ImageId id) const;
+        ImageState& get(tui::ImageId id);
+
+        bool isLoaded(tui::ImageId id);
+        const LoadedImage& getLoadedImage(tui::ImageId id);
+        RenderingImage& getRenderingImage(tui::ImageId id);
 
      private:
-        std::unordered_map<tui::ImageId, LoadedImage> loaded_;
+        std::unordered_map<tui::ImageId, ImageState> images_;
     };
 
     void postPrepareImages(
@@ -61,11 +69,11 @@ class AppPageRenderer : public PageRenderer {
 
     asio::io_context& io_;
     const Config config_;
-    State state_;
+    Images state_;
     Arc<const DocumentStorage> documents_;
     Arc<const PageLoader> loader_;
     Arc<tui::Display> display_;
-    utils::BackgroundPool<tui::ImageId, CompressedImage> pool_;
+    utils::BackgroundPool pool_;
 };
 
 }  // namespace pdft::app

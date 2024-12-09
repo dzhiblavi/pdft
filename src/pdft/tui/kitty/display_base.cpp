@@ -42,38 +42,6 @@ void KittyDisplayBase::loadCompressedImage(
         buffer);
 }
 
-void KittyDisplayBase::loadImage(
-    Context& ctx, ImageId id, const image::Image& image, io::OutBuffer& buffer) {
-    log::debug(ctx, "loading an image with id={} to the display", id);
-    PDFT_VERIFY(!isLoaded(id), "image with id={} is already loaded", id);
-
-    auto image_size = image.size();
-    loaded_.emplace(id, image_size);
-
-    std::pair<std::string_view, std::string> control_data[] = {
-        {"q", "2"},
-        {"a", "t"},
-        {"t", "d"},
-        {"s", std::to_string(image_size.width_px)},
-        {"v", std::to_string(image_size.height_px)},
-        {"f", "24"},
-        {"i", std::to_string(id)},
-    };
-
-    auto samples = image.samples();
-
-    executor_->execute(
-        ctx,
-        {
-            .command = "_G",
-            .payload = {(const char*)samples.data(), 3 * samples.size()},
-            .control_data = control_data,
-            .b64_encode = true,
-            .compress = Compress::Compress,
-        },
-        buffer);
-}
-
 void KittyDisplayBase::clear(Context& ctx, io::OutBuffer& buffer) {
     log::debug(ctx, "clearing all placements from the display");
 
