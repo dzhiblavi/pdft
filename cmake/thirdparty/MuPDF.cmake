@@ -2,7 +2,7 @@ include(ExternalProject)
 include(FetchContent)
 
 if(PDFT_MUPDF_LOCAL_SOURCE_DIR)
-  message(STATUS "Using local MUPDF at: ${CMAKE_CXX_COMPILER}")
+  message(STATUS "Using local MUPDF at: ${PDFT_MUPDF_LOCAL_SOURCE_DIR}")
   set(MUPDF_SRC_DIR ${PDFT_MUPDF_LOCAL_SOURCE_DIR})
 else()
   message(STATUS "Downloading MUPDF from github")

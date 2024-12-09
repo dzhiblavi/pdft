@@ -195,10 +195,13 @@ asio::awaitable<void> Application::runEventLoop() {
     pdft::tui::Renderer renderer(terminal_, console_);
 
     for (;;) {
-        co_await renderer.renderOne([this](auto& ctx, auto& screen) {
-            image_display_->clear(ctx, screen.buffers.control_buffer);
-            return view_->render(ctx, ui_, screen);
-        });
+        co_await renderer.renderOne(
+            [this](auto& ctx) { return view_->getLayout(ctx, ui_); },
+            [this](auto& ctx, auto& screen) -> Async<Unit> {
+                image_display_->clear(ctx, screen.buffers.control_buffer);
+                co_await view_->render(ctx, ui_, screen);
+                co_return unit;
+            });
 
         bool should_quit = co_await waitForNextRender();
 

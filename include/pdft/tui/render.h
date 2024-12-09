@@ -23,19 +23,22 @@ class Renderer {
         : terminal_(PDFT_VERIFY(std::move(terminal)))
         , console_(PDFT_VERIFY(std::move(console))) {}
 
-    template <std::invocable<Context&, Screen&> Renderer>
-    asio::awaitable<void> renderOne(Renderer renderer) {
+    template <typename DomBuilder, typename Renderer>
+    asio::awaitable<void> renderOne(DomBuilder builder, Renderer renderer) {
         auto tracer = trace::getGlobalPool().getTracer("render:one");
         auto ctx = Context();
         ctx.setTracer(tracer);
         auto screen = Screen{terminal_->getDimensions(), {control_, display_}};
 
-        auto dom = ctx.push("render:user") | renderer(ctx, screen);
+        auto dom = ctx.push("render:build") | builder(ctx);
+
         auto tui = ctx.push("render:tui") | [&] {
             auto screen = ftxui::Screen::Create(ftxui::Dimension::Full());
             tui::Render(screen, dom);
             return screen.ToString();
         }();
+
+        ctx.push("render:render") | co_await renderer(ctx, screen);
 
         terminal_->clear(control_);
         ctx.push("render:flush") | co_await console_->writeMany(control_, tui, display_);

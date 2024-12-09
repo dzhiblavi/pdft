@@ -31,7 +31,7 @@ class BackgroundPool {
         pool_.stop();
     }
 
-    const R* get(TaskId id) {
+    Async<const R*> get(TaskId id) {
         auto it = futures_.find(id);
         PDFT_VERIFY(it != futures_.end(), "unknown task id={}", id);
         return it->second.get();
@@ -39,13 +39,12 @@ class BackgroundPool {
 
     template <typename Executor, typename Producer>
     requires std::is_invocable_r_v<R, Producer, Context&>
-    bool post(Executor /*executor*/, TaskId id, Producer producer) {
+    bool post(Executor executor, TaskId id, Producer producer) {
         if (futures_.contains(id)) {
             return false;
         }
 
-        // Promise<R> promise{executor};
-        Promise<R> promise;
+        Promise<R> promise{executor};
         auto future = promise.get_future();
 
         asio::post(pool_, [this, prom = std::move(promise), prod = std::move(producer)]() mutable {
@@ -61,14 +60,13 @@ class BackgroundPool {
     struct FutureValue {
         explicit FutureValue(Future<T> future) : value_(std::move(future)) {}
 
-        const T* get() {
+        Async<const T*> get() {
             if (std::holds_alternative<Future<T>>(value_)) {
                 Future<T> future = std::get<Future<T>>(std::move(value_));
-                // value_ = co_await std::move(future).async_extract(asio::use_awaitable);
-                value_ = std::move(future).get();
+                value_ = co_await std::move(future).async_extract(asio::use_awaitable);
             }
 
-            return &std::get<T>(value_);
+            co_return &std::get<T>(value_);
         }
 
      private:

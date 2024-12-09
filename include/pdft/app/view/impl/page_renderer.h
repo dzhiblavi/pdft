@@ -24,7 +24,7 @@ class AppPageRenderer : public PageRenderer {
         Arc<const PageLoader> loader,
         Arc<tui::Display> display);
 
-    void render(
+    Async<Unit> render(
         Context& ctx,
         const Page& page,
         const PagePosition& pos,
@@ -57,7 +57,7 @@ class AppPageRenderer : public PageRenderer {
     void postPrepareImages(
         Arc<const media::Document> document, const DisplayProperties& display, const Page& page);
 
-    void loadImage(Context& ctx, tui::ImageId id, tui::Screen& screen);
+    Async<void> loadImage(Context& ctx, tui::ImageId id, tui::Screen& screen);
 
     asio::io_context& io_;
     const Config config_;

@@ -2,7 +2,45 @@
 
 namespace pdft::app {
 
-tui::Element AppDocumentView::render(
+tui::Element AppDocumentView::getLayout(Context& /*ctx*/, const DocumentState& doc) {
+    switch (doc.view_mode) {
+        using enum ViewMode;
+
+        case OnePage:
+            return tui::empty(tl);
+
+        case TwoPages:
+            return tui::hbox(tui::empty(tl) | tui::flex, tui::empty(tr) | tui::flex);
+
+        case OnePageContinuous:
+            return tui::vbox({
+                       tui::empty(tl) | tui::flex |
+                           tui::size(tui::HEIGHT, tui::EQUAL, 100 - doc.scroll_offset),
+                       tui::empty(bl) | tui::flex |
+                           tui::size(tui::HEIGHT, tui::EQUAL, doc.scroll_offset),
+                   }) |
+                   tui::reflect(rect);
+
+        case TwoPagesContinuous:
+            return tui::vbox({
+                       tui::hbox({
+                           tui::empty(tl) | tui::flex |
+                               tui::size(tui::HEIGHT, tui::EQUAL, 100 - doc.scroll_offset),
+                           tui::empty(tr) | tui::flex |
+                               tui::size(tui::HEIGHT, tui::EQUAL, 100 - doc.scroll_offset),
+                       }) | tui::flex,
+                       tui::hbox({
+                           tui::empty(bl) | tui::flex |
+                               tui::size(tui::HEIGHT, tui::EQUAL, doc.scroll_offset),
+                           tui::empty(br) | tui::flex |
+                               tui::size(tui::HEIGHT, tui::EQUAL, doc.scroll_offset),
+                       }) | tui::flex,
+                   }) |
+                   tui::reflect(rect);
+    }
+}
+
+Async<void> AppDocumentView::render(
     Context& ctx,
     const DocumentState& doc,
     const DisplayProperties& properties,
@@ -13,64 +51,58 @@ tui::Element AppDocumentView::render(
         using enum ViewMode;
 
         case OnePage:
-            return renderOnePage(ctx, doc, properties, screen);
+            co_return co_await renderOnePage(ctx, doc, properties, screen);
 
         case TwoPages:
-            return renderTwoPages(ctx, doc, properties, screen);
+            co_return co_await renderTwoPages(ctx, doc, properties, screen);
 
         case OnePageContinuous:
-            return renderOnePageContinuous(ctx, doc, properties, screen);
+            co_return co_await renderOnePageContinuous(ctx, doc, properties, screen);
 
         case TwoPagesContinuous:
-            return renderTwoPagesContinuous(ctx, doc, properties, screen);
+            co_return co_await renderTwoPagesContinuous(ctx, doc, properties, screen);
     }
 }
 
-tui::Element AppDocumentView::renderOnePage(
+Async<void> AppDocumentView::renderOnePage(
     Context& ctx,
     const DocumentState& doc,
     const DisplayProperties& properties,
     tui::Screen& screen) const {
-    auto render = [&, properties](tui::IRect rect) {
-        auto _ = ctx.push("docview:page");
+    auto _ = ctx.push("docview:page");
 
-        renderer_->render(
-            ctx,
-            {
-                .document_id = doc.document_id,
-                .page_index = doc.page_index,
-            },
-            {
-                .rect = rect,
-                .placement =
-                    {
-                        .hor = tui::Alignment::Center,
-                        .vert = tui::Alignment::Center,
-                    },
-            },
-            properties,
-            screen);
-    };
-
-    return tui::withSize(render);
+    co_await renderer_->render(
+        ctx,
+        {
+            .document_id = doc.document_id,
+            .page_index = doc.page_index,
+        },
+        {
+            .rect = tl,
+            .placement =
+                {
+                    .hor = tui::Alignment::Center,
+                    .vert = tui::Alignment::Center,
+                },
+        },
+        properties,
+        screen);
 }
 
-tui::Element AppDocumentView::renderTwoPages(
+Async<void> AppDocumentView::renderTwoPages(
     Context& ctx,
     const DocumentState& doc,
     const DisplayProperties& properties,
     tui::Screen& screen) const {
-    auto render_left = [&, properties](tui::IRect rect) {
-        auto _ = ctx.push("docview:left");
-
-        renderer_->render(
+    ctx.push("docview:left") |
+        co_await renderer_->render(
             ctx,
             {
                 .document_id = doc.document_id,
                 .page_index = doc.page_index,
             },
             {
-                .rect = rect,
+                .rect = tl,
                 .placement =
                     {
                         .hor = tui::Alignment::Max,
@@ -79,23 +111,20 @@ tui::Element AppDocumentView::renderTwoPages(
             },
             properties,
             screen);
-    };
 
-    auto render_right = [&, properties](tui::IRect rect) {
-        if (doc.page_index + 1 >= doc.page_count) {
-            return;
-        }
+    if (doc.page_index + 1 >= doc.page_count) {
+        co_return;
+    }
 
-        auto _ = ctx.push("docview:right");
-
-        renderer_->render(
+    ctx.push("docview:right") |
+        co_await renderer_->render(
             ctx,
             {
                 .document_id = doc.document_id,
                 .page_index = doc.page_index + 1,
             },
             {
-                .rect = rect,
+                .rect = tr,
                 .placement =
                     {
                         .hor = tui::Alignment::Min,
@@ -104,37 +133,30 @@ tui::Element AppDocumentView::renderTwoPages(
             },
             properties,
             screen);
-    };
-
-    return tui::hbox({
-        tui::withSize(render_left) | tui::flex,
-        tui::withSize(render_right) | tui::flex,
-    });
 }
 
-tui::Element AppDocumentView::renderOnePageContinuous(
+Async<void> AppDocumentView::renderOnePageContinuous(
     Context& ctx,
     const DocumentState& doc,
     const DisplayProperties& properties,
     tui::Screen& screen) const {
-    auto render_top = [&, properties](tui::IRect rect) {
-        auto _ = ctx.push("docview:top");
-        float this_ratio = float(rect.height) / rect_.height;
+    float tl_ratio = float(tl.height) / rect.height;
 
-        renderer_->render(
+    ctx.push("docview:top") |
+        co_await renderer_->render(
             ctx,
             {
                 .document_id = doc.document_id,
                 .page_index = doc.page_index,
             },
             {
-                .rect = rect,
+                .rect = tl,
                 .subarea =
                     {
                         .x = 0.f,
-                        .y = 1.f - this_ratio,
+                        .y = 1.f - tl_ratio,
                         .width = 1.f,
-                        .height = this_ratio,
+                        .height = tl_ratio,
                     },
                 .placement =
                     {
@@ -144,29 +166,28 @@ tui::Element AppDocumentView::renderOnePageContinuous(
             },
             properties,
             screen);
-    };
 
-    auto render_bottom = [&, properties](tui::IRect rect) {
-        if (doc.page_index + 1 >= doc.page_count) {
-            return;
-        }
-        auto _ = ctx.push("docview:bottom");
-        float this_ratio = float(rect.height) / rect_.height;
+    if (doc.page_index + 1 >= doc.page_count) {
+        co_return;
+    }
 
-        renderer_->render(
+    float bl_ratio = float(bl.height) / rect.height;
+
+    ctx.push("docview:bottom") |
+        co_await renderer_->render(
             ctx,
             {
                 .document_id = doc.document_id,
                 .page_index = doc.page_index + 1,
             },
             {
-                .rect = rect,
+                .rect = bl,
                 .subarea =
                     {
                         .x = 0.f,
                         .y = 0.f,
                         .width = 1.f,
-                        .height = this_ratio,
+                        .height = bl_ratio,
                     },
                 .placement =
                     {
@@ -176,40 +197,30 @@ tui::Element AppDocumentView::renderOnePageContinuous(
             },
             properties,
             screen);
-    };
-
-    return tui::vbox({
-               tui::withSize(render_top) | tui::flex |
-                   tui::size(tui::HEIGHT, tui::EQUAL, 100 - doc.scroll_offset),
-               tui::withSize(render_bottom) | tui::flex |
-                   tui::size(tui::HEIGHT, tui::EQUAL, doc.scroll_offset),
-           }) |
-           tui::reflect(rect_);
 }
 
-tui::Element AppDocumentView::renderTwoPagesContinuous(
+Async<void> AppDocumentView::renderTwoPagesContinuous(
     Context& ctx,
     const DocumentState& doc,
     const DisplayProperties& properties,
     tui::Screen& screen) const {
-    auto render_top_left = [&, properties](tui::IRect rect) {
-        auto _ = ctx.push("docview:top_left");
-        float this_ratio = float(rect.height) / rect_.height;
+    float tl_ratio = float(tl.height) / rect.height;
 
-        renderer_->render(
+    ctx.push("docview:top_left") |
+        co_await renderer_->render(
             ctx,
             {
                 .document_id = doc.document_id,
                 .page_index = doc.page_index,
             },
             {
-                .rect = rect,
+                .rect = tl,
                 .subarea =
                     {
                         .x = 0.f,
-                        .y = 1.f - this_ratio,
+                        .y = 1.f - tl_ratio,
                         .width = 1.f,
-                        .height = this_ratio,
+                        .height = tl_ratio,
                     },
                 .placement =
                     {
@@ -219,30 +230,28 @@ tui::Element AppDocumentView::renderTwoPagesContinuous(
             },
             properties,
             screen);
-    };
 
-    auto render_top_right = [&, properties](tui::IRect rect) {
-        if (doc.page_index + 1 >= doc.page_count) {
-            return;
-        }
+    if (doc.page_index + 1 >= doc.page_count) {
+        co_return;
+    }
 
-        auto _ = ctx.push("docview:top_right");
-        float this_ratio = float(rect.height) / rect_.height;
+    float tr_ratio = float(tr.height) / rect.height;
 
-        renderer_->render(
+    ctx.push("docview:top_right") |
+        co_await renderer_->render(
             ctx,
             {
                 .document_id = doc.document_id,
                 .page_index = doc.page_index + 1,
             },
             {
-                .rect = rect,
+                .rect = tr,
                 .subarea =
                     {
                         .x = 0.f,
-                        .y = 1.f - this_ratio,
+                        .y = 1.f - tr_ratio,
                         .width = 1.f,
-                        .height = this_ratio,
+                        .height = tr_ratio,
                     },
                 .placement =
                     {
@@ -252,30 +261,28 @@ tui::Element AppDocumentView::renderTwoPagesContinuous(
             },
             properties,
             screen);
-    };
 
-    auto render_bottom_left = [&, properties](tui::IRect rect) {
-        if (doc.page_index + 2 >= doc.page_count) {
-            return;
-        }
+    if (doc.page_index + 2 >= doc.page_count) {
+        co_return;
+    }
 
-        auto _ = ctx.push("docview:bottom_left");
-        float this_ratio = float(rect.height) / rect_.height;
+    float bl_ratio = float(bl.height) / rect.height;
 
-        renderer_->render(
+    ctx.push("docview:bottom_left") |
+        co_await renderer_->render(
             ctx,
             {
                 .document_id = doc.document_id,
                 .page_index = doc.page_index + 2,
             },
             {
-                .rect = rect,
+                .rect = bl,
                 .subarea =
                     {
                         .x = 0.f,
                         .y = 0.f,
                         .width = 1.f,
-                        .height = this_ratio,
+                        .height = bl_ratio,
                     },
                 .placement =
                     {
@@ -285,30 +292,28 @@ tui::Element AppDocumentView::renderTwoPagesContinuous(
             },
             properties,
             screen);
-    };
 
-    auto render_bottom_right = [&, properties](tui::IRect rect) {
-        if (doc.page_index + 3 >= doc.page_count) {
-            return;
-        }
+    if (doc.page_index + 3 >= doc.page_count) {
+        co_return;
+    }
 
-        auto _ = ctx.push("docview:bottom_right");
-        float this_ratio = float(rect.height) / rect_.height;
+    float br_ratio = float(br.height) / rect.height;
 
-        renderer_->render(
+    ctx.push("docview:bottom_right") |
+        co_await renderer_->render(
             ctx,
             {
                 .document_id = doc.document_id,
                 .page_index = doc.page_index + 3,
             },
             {
-                .rect = rect,
+                .rect = br,
                 .subarea =
                     {
                         .x = 0.f,
                         .y = 0.f,
                         .width = 1.f,
-                        .height = this_ratio,
+                        .height = br_ratio,
                     },
                 .placement =
                     {
@@ -318,23 +323,6 @@ tui::Element AppDocumentView::renderTwoPagesContinuous(
             },
             properties,
             screen);
-    };
-
-    return tui::vbox({
-               tui::hbox({
-                   tui::withSize(render_top_left) | tui::flex |
-                       tui::size(tui::HEIGHT, tui::EQUAL, 100 - doc.scroll_offset),
-                   tui::withSize(render_top_right) | tui::flex |
-                       tui::size(tui::HEIGHT, tui::EQUAL, 100 - doc.scroll_offset),
-               }) | tui::flex,
-               tui::hbox({
-                   tui::withSize(render_bottom_left) | tui::flex |
-                       tui::size(tui::HEIGHT, tui::EQUAL, doc.scroll_offset),
-                   tui::withSize(render_bottom_right) | tui::flex |
-                       tui::size(tui::HEIGHT, tui::EQUAL, doc.scroll_offset),
-               }) | tui::flex,
-           }) |
-           tui::reflect(rect_);
 }
 
 }  // namespace pdft::app

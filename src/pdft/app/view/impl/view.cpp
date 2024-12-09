@@ -9,8 +9,8 @@ namespace pdft::app {
 
 using namespace result;
 
-tui::Element AppView::render(Context& ctx, const UIState& ui, tui::Screen& screen) {
-    auto doc = getDocument(ctx, ui, screen).value_or(tui::emptyElement());
+tui::Element AppView::getLayout(Context& ctx, const UIState& ui) {
+    auto doc = getDocumentLayout(ctx, ui).value_or(tui::emptyElement());
 
     if (!ui.show_sidebar) {
         return doc;
@@ -22,7 +22,13 @@ tui::Element AppView::render(Context& ctx, const UIState& ui, tui::Screen& scree
     });
 }
 
-Maybe<tui::Element> AppView::getDocument(Context& ctx, const UIState& ui, tui::Screen& screen) {
+Async<void> AppView::render(Context& ctx, const UIState& ui, tui::Screen& screen) {
+    if (auto state = ui.getImmutableState()) {
+        co_await doc_view_->render(ctx, *state, ui.display, screen);
+    }
+}
+
+Maybe<tui::Element> AppView::getDocumentLayout(Context& ctx, const UIState& ui) {
     auto state = co_await fromPtr(ui.getImmutableState());
     auto document = documents_->getDocument(state->document_id) | unwrap;
     auto path = document->getPath().filename();
@@ -30,7 +36,7 @@ Maybe<tui::Element> AppView::getDocument(Context& ctx, const UIState& ui, tui::S
 
     co_return tui::window(
         tui::text(std::format("{} page {}", path.c_str(), page_str)),
-        ctx.push("appview:document") | doc_view_->render(ctx, *state, ui.display, screen));
+        ctx.push("appview:document") | doc_view_->getLayout(ctx, *state));
 }
 
 tui::Element AppView::getSidebar(const UIState& ui) {

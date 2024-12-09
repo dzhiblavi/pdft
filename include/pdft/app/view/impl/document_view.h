@@ -2,6 +2,7 @@
 
 #include "pdft/app/view/document_view.h"
 #include "pdft/app/view/page_renderer.h"
+
 #include "pdft/core/context.h"
 
 namespace pdft::app {
@@ -10,36 +11,38 @@ class AppDocumentView : public DocumentView {
  public:
     explicit AppDocumentView(Arc<PageRenderer> renderer) : renderer_(std::move(renderer)) {}
 
-    tui::Element render(
+    tui::Element getLayout(Context& ctx, const DocumentState& doc) override;
+
+    Async<void> render(
         Context& ctx,
         const DocumentState& doc,
         const DisplayProperties& properties,
         tui::Screen& screen) const override;
 
  private:
-    tui::Element renderOnePage(
+    Async<void> renderOnePage(
         Context& ctx,
         const DocumentState& doc,
         const DisplayProperties& properties,
         tui::Screen& screen) const;
-    tui::Element renderTwoPages(
+    Async<void> renderTwoPages(
         Context& ctx,
         const DocumentState& doc,
         const DisplayProperties& properties,
         tui::Screen& screen) const;
-    tui::Element renderOnePageContinuous(
+    Async<void> renderOnePageContinuous(
         Context& ctx,
         const DocumentState& doc,
         const DisplayProperties& properties,
         tui::Screen& screen) const;
-    tui::Element renderTwoPagesContinuous(
+    Async<void> renderTwoPagesContinuous(
         Context& ctx,
         const DocumentState& doc,
         const DisplayProperties& properties,
         tui::Screen& screen) const;
 
+    tui::IRect tl, tr, bl, br, rect;
     Arc<PageRenderer> renderer_;
-    mutable tui::IRect rect_;
 };
 
 }  // namespace pdft::app

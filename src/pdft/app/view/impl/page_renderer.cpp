@@ -43,7 +43,7 @@ AppPageRenderer::AppPageRenderer(
     , display_(std::move(display))
     , pool_(1) {}
 
-void AppPageRenderer::render(
+Async<Unit> AppPageRenderer::render(
     Context& ctx,
     const Page& page,
     const PagePosition& pos,
@@ -62,7 +62,7 @@ void AppPageRenderer::render(
     if (!state_.isLoaded(id)) {
         postPrepareImages(document, display, page);
         auto _ = ctx.push("load_image");
-        loadImage(ctx, id, screen);
+        co_await loadImage(ctx, id, screen);
     }
 
     const auto& p = state_.getImage(id);
@@ -73,6 +73,8 @@ void AppPageRenderer::render(
     log::debug(ctx, "@={} I={}", pos.rect, irect);
     auto _ = ctx.push("display_image");
     display_->displayImage(ctx, id, irect, pos.subarea, screen.buffers);
+
+    co_return unit;
 }
 
 void AppPageRenderer::postPrepareImages(
@@ -100,8 +102,8 @@ void AppPageRenderer::postPrepareImages(
     }
 }
 
-void AppPageRenderer::loadImage(Context& ctx, tui::ImageId id, tui::Screen& screen) {
-    auto&& [size, compressed_data] = ctx.push("await_task") | *pool_.get(id);
+Async<void> AppPageRenderer::loadImage(Context& ctx, tui::ImageId id, tui::Screen& screen) {
+    auto&& [size, compressed_data] = ctx.push("await_task") | *(co_await pool_.get(id));
 
     {
         auto _ = ctx.push("load_image");
