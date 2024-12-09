@@ -6,7 +6,7 @@
 
 #include "pdft/core/context.h"
 #include "pdft/core/io/buffer.h"
-#include "pdft/core/io/console.h"
+#include "pdft/core/io/console_writer.h"
 #include "pdft/core/rc.h"
 #include "pdft/core/trace/log_stack_trace.h"
 #include "pdft/core/trace/stack_scope_tracer.h"
@@ -19,7 +19,7 @@ namespace pdft::tui {
 
 class Renderer {
  public:
-    Renderer(Arc<const tui::Terminal> terminal, Arc<io::Console> console)
+    Renderer(Arc<const tui::Terminal> terminal, Arc<io::ConsoleWriter> console)
         : terminal_(PDFT_VERIFY(std::move(terminal)))
         , console_(PDFT_VERIFY(std::move(console))) {}
 
@@ -28,7 +28,7 @@ class Renderer {
         auto tracer = trace::getGlobalPool().getTracer("render:one");
         auto ctx = Context();
         ctx.setTracer(tracer);
-        auto screen = Screen{terminal_->getDimensions(), {control_, display_}};
+        auto screen = Screen{terminal_->getDimensions(), control_, display_};
 
         auto dom = ctx.push("render:build") | builder(ctx);
 
@@ -54,7 +54,7 @@ class Renderer {
     io::OutBuffer display_;
 
     Arc<const tui::Terminal> terminal_;
-    Arc<io::Console> console_;
+    Arc<io::ConsoleWriter> console_;
 };
 
 }  // namespace pdft::tui

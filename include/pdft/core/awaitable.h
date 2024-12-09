@@ -19,6 +19,6 @@ template <typename T>
 using AsyncResult =
     std::conditional_t<std::is_same_v<void, T>, Async<Result<Unit>>, Async<Result<T>>>;
 
-using AsyncStatus = AsyncResult<void>;
+using AsyncStatus = AsyncResult<Unit>;
 
 }  // namespace pdft

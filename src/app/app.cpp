@@ -1,5 +1,4 @@
 #include "app.h"
-#include "logging.h"
 #include "palettes.h"
 #include "resolve_display.h"
 #include "version.h"
@@ -13,7 +12,6 @@
 #include "pdft/app/view/impl/page_renderer.h"
 #include "pdft/app/view/impl/view.h"
 
-#include "pdft/media/mupdf/context.h"
 #include "pdft/media/mupdf/loader.h"
 
 #include "pdft/notify/fsw_notify.h"
@@ -21,11 +19,11 @@
 #include "pdft/tui/render.h"
 
 #include "pdft/utils/build_info.h"
-#include "pdft/utils/random.h"
 #include "pdft/utils/visit.h"
 
 #include "pdft/core/awaitable.h"
-#include "pdft/core/io/posix_console.h"
+#include "pdft/core/io/posix_console_reader.h"
+#include "pdft/core/io/posix_console_writer.h"
 #include "pdft/core/io/posix_termctl.h"
 #include "pdft/core/log.h"
 #include "pdft/core/trace/log_stack_trace.h"
@@ -83,8 +81,8 @@ Application::Application(asio::io_context& context, Config config)
 void Application::setup() {
     term_control_ = std::make_shared<io::PosixTermControl>();
     terminal_ = std::make_shared<tui::AnsiTerminal>();
-    console_ =
-        std::make_shared<io::PosixConsole>(context_, ::dup(STDIN_FILENO), ::dup(STDOUT_FILENO));
+    console_writer_ = std::make_shared<io::PosixConsoleWriter>(context_, ::dup(STDOUT_FILENO));
+    console_reader_ = std::make_shared<io::PosixConsoleReader>(context_, ::dup(STDIN_FILENO));
     image_display_ = resolveDisplay(config_.display, terminal_);
     doc_loader_ = std::make_shared<pdft::media::MupdfLoader>();
 
@@ -150,7 +148,7 @@ asio::awaitable<void> Application::prepareTerminal() {
     io::OutBuffer init_buffer;
     terminal_->hideCursor(init_buffer);
     terminal_->clear(init_buffer);
-    co_await console_->write(init_buffer);
+    co_await console_writer_->write(init_buffer);
 }
 
 void Application::load(const std::vector<std::string>& paths) {
@@ -192,13 +190,13 @@ void Application::saveState() {
 }
 
 asio::awaitable<void> Application::runEventLoop() {
-    pdft::tui::Renderer renderer(terminal_, console_);
+    pdft::tui::Renderer renderer(terminal_, console_writer_);
 
     for (;;) {
         co_await renderer.renderOne(
             [this](auto& ctx) { return view_->getLayout(ctx, ui_); },
             [this](auto& ctx, auto& screen) -> Async<Unit> {
-                image_display_->clear(ctx, screen.buffers.control_buffer);
+                image_display_->clear(ctx, screen.bufpair().control_buffer);
                 co_await view_->render(ctx, ui_, screen);
                 co_return unit;
             });
@@ -228,8 +226,9 @@ asio::awaitable<bool> Application::waitForNextRender() {
         using enum ControllerAction;
 
         // XXX Debouncing?
-        auto event = tracer.addChild("wait_input") |
-                     co_await (console_->read(1) || fs_watcher_->nextEvent() || awaitSignal());
+        auto event =
+            tracer.addChild("wait_input") |
+            co_await (console_reader_->read(1) || fs_watcher_->nextEvent() || awaitSignal());
 
         // XXX Handle errors!
         auto action =
@@ -272,7 +271,7 @@ asio::awaitable<void> Application::cleanup() {
         terminal_->showCursor(buffer);
         terminal_->clear(buffer);
         image_display_->unloadAll(ctx, buffer);
-        co_return co_await console_->write(buffer.view());
+        co_return co_await console_writer_->write(buffer.view());
     }();
 
     if (config_.system.enable_filesystem_watching) {

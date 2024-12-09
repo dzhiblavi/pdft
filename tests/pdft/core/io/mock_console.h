@@ -1,4 +1,5 @@
-#include "pdft/core/io/console.h"
+#include "pdft/core/io/console_reader.h"
+#include "pdft/core/io/console_writer.h"
 #include "pdft/core/rc.h"
 
 #include <format>
@@ -6,9 +7,9 @@
 
 namespace pdft::io::test {
 
-struct MockConsole : Console {
-    using Console::read;
-    using Console::write;
+struct MockConsole : ConsoleWriter, ConsoleReader {
+    using ConsoleReader::read;
+    using ConsoleWriter::write;
 
     AsyncStatus write(std::string_view bytes) override {
         std::cerr << std::format("write '{}' to console", bytes) << std::endl;

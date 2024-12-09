@@ -10,7 +10,8 @@
 #include "pdft/tui/display.h"
 #include "pdft/tui/terminal.h"
 
-#include "pdft/core/io/console.h"
+#include "pdft/core/io/console_reader.h"
+#include "pdft/core/io/console_writer.h"
 #include "pdft/core/io/termctl.h"
 #include "pdft/core/log/with_logger.h"
 #include "pdft/core/rc.h"
@@ -47,7 +48,8 @@ class Application : public pdft::log::WithLogger {
 
     pdft::Arc<pdft::notify::Notify> fs_watcher_;
     pdft::Arc<pdft::io::TermControl> term_control_;
-    pdft::Arc<pdft::io::Console> console_;
+    pdft::Arc<pdft::io::ConsoleWriter> console_writer_;
+    pdft::Arc<pdft::io::ConsoleReader> console_reader_;
     pdft::Arc<pdft::tui::Terminal> terminal_;
     pdft::Arc<pdft::tui::Display> image_display_;
     pdft::Arc<pdft::media::Loader> doc_loader_;

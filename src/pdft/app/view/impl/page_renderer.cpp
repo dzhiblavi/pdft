@@ -53,7 +53,7 @@ Async<Unit> AppPageRenderer::render(
     auto document = documents_->getDocument(page.document_id) | unwrap;
     auto the_page = ctx.push("get_page") | document->getPage(page_index);
     float base_factor = media::getBaseScalingFactor(
-        the_page->getDefaultSize(), screen.size.width_px, screen.size.height_px);
+        the_page->getDefaultSize(), screen.dimensions().width_px, screen.dimensions().height_px);
 
     auto display = orig_display;
     display.scaling_coeff *= base_factor;
@@ -72,7 +72,7 @@ Async<Unit> AppPageRenderer::render(
 
     log::debug(ctx, "@={} I={}", pos.rect, irect);
     auto _ = ctx.push("display_image");
-    display_->displayImage(ctx, id, irect, pos.subarea, screen.buffers);
+    display_->displayImage(ctx, id, irect, pos.subarea, screen.bufpair());
 
     co_return unit;
 }
@@ -108,11 +108,11 @@ Async<void> AppPageRenderer::loadImage(Context& ctx, tui::ImageId id, tui::Scree
     {
         auto _ = ctx.push("load_image");
         display_->loadCompressedImage(
-            ctx, id, size, compressed_data, screen.buffers.control_buffer);
+            ctx, id, size, compressed_data, screen.bufpair().control_buffer);
     }
 
-    float image_cols = float(size.width_px) / screen.size.cell_width_px;
-    float image_rows = float(size.height_px) / screen.size.cell_height_px;
+    float image_cols = float(size.width_px) / screen.dimensions().cell_width_px;
+    float image_rows = float(size.height_px) / screen.dimensions().cell_height_px;
     state_.addImage(id, {.image_rows = image_rows, .image_cols = image_cols});
 }
 

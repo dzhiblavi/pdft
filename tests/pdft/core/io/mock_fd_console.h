@@ -1,4 +1,5 @@
-#include "pdft/core/io/console.h"
+#include "pdft/core/io/console_reader.h"
+#include "pdft/core/io/console_writer.h"
 #include "pdft/core/rc.h"
 
 #include <asio/co_spawn.hpp>
@@ -48,15 +49,15 @@ struct FileDescriptor {
 
 }  // namespace detail
 
-struct MockConsole : Console {
+struct MockConsole : ConsoleWriter, ConsoleReader {
     MockConsole(int in_fd[2], int out_fd[2])
         : in_fd_r(in_fd[0])
         , in_fd_w(in_fd[1])
         , out_fd_r(out_fd[0])
         , out_fd_w(out_fd[1]) {}
 
-    using Console::read;
-    using Console::write;
+    using ConsoleReader::read;
+    using ConsoleWriter::write;
 
     AsyncStatus write(std::string_view bytes) override {
         out_fd_w.write(bytes);
