@@ -34,6 +34,7 @@ class AppPageRenderer : public PageRenderer {
  public:
     struct Config {
         uint32_t render_pool_size = 4;
+        uint32_t num_preload_backward = 2;
         uint32_t num_preload_forward = 4;
         uint32_t image_id_salt;
     };

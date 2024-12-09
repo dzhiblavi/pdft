@@ -103,19 +103,26 @@ void AppPageRenderer::postPrepareImages(
     Arc<const media::Document> document, const DisplayProperties& display, const Page& page) {
     const auto& [doc_id, page_index] = page;
 
-    for (uint32_t i = 0; i < config_.num_preload_forward; ++i) {
-        if (page_index + i >= document->getPageCount()) {
-            return;
+    int forward = config_.num_preload_forward;
+    int backward = config_.num_preload_backward;
+    int page_count = document->getPageCount();
+
+    for (int i = -backward; i < forward; ++i) {
+        int index = i + static_cast<int>(page_index);
+
+        if (index < 0 || index >= page_count) {
+            continue;
         }
 
-        auto image_id = getImageId(config_.image_id_salt, {doc_id, page_index + i}, display);
+        uint32_t page_index = static_cast<uint32_t>(index);
+        auto image_id = getImageId(config_.image_id_salt, {doc_id, page_index}, display);
 
         if (state_.contains(image_id)) {
             log::info("skip image id {} because it is already rendered or loaded", image_id);
             continue;
         }
 
-        auto page = document->getPage(page_index + i);
+        auto page = document->getPage(page_index);
         auto [future, promise] = makeContract<RenderedImage>(io_.get_executor());
 
         asio::co_spawn(

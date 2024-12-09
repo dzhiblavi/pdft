@@ -101,6 +101,7 @@ void Application::setup() {
         io_,
         AppPageRenderer::Config{
             .render_pool_size = config_.system.render_pool_size,
+            .num_preload_backward = config_.system.num_preload_backward,
             .num_preload_forward = config_.system.num_preload_forward,
             .image_id_salt = config_.system.image_id_salt,
         },
