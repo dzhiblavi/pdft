@@ -49,11 +49,3 @@ inline RGBColor rgbFromHex(std::string_view hex) {
 }  // namespace pdft::image
 
 PDFT_LOG_ADAPT_TYPE_JSON(pdft::image, RGBColor);
-
-template <>
-struct std::hash<pdft::image::RGBColor> {
-    std::size_t operator()(const pdft::image::RGBColor& c) const {
-        return std::hash<uint32_t>{}(
-            (uint32_t(c.r) << 16) + (uint32_t(c.g) << 8) + (uint32_t(c.b) << 0));
-    }
-};
