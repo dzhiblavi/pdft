@@ -100,11 +100,12 @@ void Application::setup() {
     auto renderer = std::make_shared<AppPageRenderer>(
         io_,
         AppPageRenderer::Config{
+            .render_pool_size = config_.system.render_pool_size,
             .num_preload_forward = config_.system.num_preload_forward,
             .image_id_salt = config_.system.image_id_salt,
         },
         documents_,
-        std::make_shared<pdft::app::PageLoader>(palettes_),
+        std::make_shared<pdft::app::ImageRenderer>(palettes_),
         image_display_);
 
     view_ = std::make_shared<AppView>(

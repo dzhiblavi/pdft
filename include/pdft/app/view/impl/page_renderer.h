@@ -1,18 +1,39 @@
 #pragma once
 
-#include "pdft/app/view/impl/page_loader.h"
+#include "pdft/app/view/impl/image_renderer.h"
 #include "pdft/app/view/page_renderer.h"
 #include "pdft/tui/display.h"
 
-#include "pdft/utils/background_pool.h"
+#include "pdft/core/future.h"
 
 #include <asio/io_context.hpp>
+#include <asio/strand.hpp>
 
 namespace pdft::app {
+
+template <typename T>
+struct FutureValue {
+    explicit FutureValue(Future<T> future) : value_(std::move(future)) {}
+
+    Async<const T*> get() {
+        if (std::holds_alternative<Future<T>>(value_)) {
+            Future<T> future = std::get<Future<T>>(std::move(value_));
+            value_ = co_await std::move(future).async_extract(asio::use_awaitable);
+        }
+
+        co_return &std::get<T>(value_);
+    }
+
+ private:
+    friend class BackgroundPool;
+
+    std::variant<Future<T>, T> value_;
+};
 
 class AppPageRenderer : public PageRenderer {
  public:
     struct Config {
+        uint32_t render_pool_size = 4;
         uint32_t num_preload_forward = 4;
         uint32_t image_id_salt;
     };
@@ -21,8 +42,10 @@ class AppPageRenderer : public PageRenderer {
         asio::io_context& io,
         Config config,
         Arc<const DocumentStorage> documents_,
-        Arc<const PageLoader> loader,
+        Arc<const ImageRenderer> renderer,
         Arc<tui::Display> display);
+
+    ~AppPageRenderer();
 
     Async<Unit> render(
         Context& ctx,
@@ -42,7 +65,7 @@ class AppPageRenderer : public PageRenderer {
         std::string compressed_samples;
     };
 
-    using RenderingImage = utils::FutureValue<RenderedImage>;
+    using RenderingImage = FutureValue<RenderedImage>;
 
     using ImageState = std::variant<LoadedImage, RenderingImage>;
 
@@ -71,9 +94,10 @@ class AppPageRenderer : public PageRenderer {
     const Config config_;
     Images state_;
     Arc<const DocumentStorage> documents_;
-    Arc<const PageLoader> loader_;
+    Arc<const ImageRenderer> renderer_;
     Arc<tui::Display> display_;
-    utils::BackgroundPool pool_;
+    asio::thread_pool pool_;
+    asio::strand<asio::thread_pool::executor_type> media_strand_;
 };
 
 }  // namespace pdft::app

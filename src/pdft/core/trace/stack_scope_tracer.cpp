@@ -24,7 +24,8 @@ bool StackScopeTraceHandle::isValid() const {
 
 StackScopeTracerOwner StackScopeTraceHandle::addChild(const char* label, std::source_location loc) {
     PDFT_VERIFY(isValid());
-    auto c = base_->pool->getTracer(label, loc);
+    // Acquire new tracer from thread local pool
+    auto c = getGlobalPool().getTracer(label, loc);
     c.base_->depth = base_->depth + 1;
     c.base_->parent = base_;
     base_->addChild(c.base_);

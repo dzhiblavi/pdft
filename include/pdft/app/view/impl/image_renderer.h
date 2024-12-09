@@ -3,8 +3,8 @@
 #include "pdft/app/state/palette_storage.h"
 #include "pdft/app/view/display_properties.h"
 
+#include "pdft/image/image.h"
 #include "pdft/image/operations.h"
-#include "pdft/media/page.h"
 
 #include "pdft/core/log.h"
 #include "pdft/core/result/combine/and_then.h"
@@ -17,22 +17,19 @@
 
 namespace pdft::app {
 
-class PageLoader {
+class ImageRenderer {
  public:
-    explicit PageLoader(Arc<const PaletteStorage> palettes) : palettes_(std::move(palettes)) {}
+    explicit ImageRenderer(Arc<const PaletteStorage> palettes) : palettes_(std::move(palettes)) {}
 
-    Arc<image::Image> renderPage(
-        Context& ctx, const DisplayProperties& display, const media::Page& page) const {
-        auto image = ctx.push("get_image") | page.getImage(display.scaling_coeff);
-
+    void renderImage(Context& ctx, const DisplayProperties& display, image::Image& image) const {
         if (display.invert_colors) {
             auto _ = ctx.push("invert_colors");
-            image::invertColors(image->mutableSamples());
+            image::invertColors(image.mutableSamples());
         }
 
         if (display.make_bolder) {
             auto _ = ctx.push("make_bolder");
-            image::makeBolder(*image);
+            image::makeBolder(image);
         }
 
         if (display.palette.has_value()) {
@@ -40,7 +37,7 @@ class PageLoader {
 
             palettes_->get(*display.palette)  //
                 | result::andThen([&](image::PaletteRef palette) -> Maybe<Unit> {
-                      image::applyPalette(image->mutableSamples(), palette);
+                      image::applyPalette(image.mutableSamples(), palette);
                       return result::some();
                   })  //
                 | result::orElse([&]() -> Maybe<Unit> {
@@ -48,8 +45,6 @@ class PageLoader {
                       return result::none;
                   });
         }
-
-        return image;
     }
 
  private:

@@ -2,8 +2,13 @@
 
 #include "pdft/core/result/combine/unwrap.h"
 #include "pdft/core/result/syntax/pipe.h"
+#include "pdft/core/trace/log_stack_trace.h"
 
 #include "pdft/utils/zlib.h"
+
+#include <asio/bind_executor.hpp>
+#include <asio/co_spawn.hpp>
+#include <asio/detached.hpp>
 
 namespace pdft::app {
 
@@ -45,14 +50,20 @@ AppPageRenderer::AppPageRenderer(
     asio::io_context& io,
     Config config,
     Arc<const DocumentStorage> documents,
-    Arc<const PageLoader> loader,
+    Arc<const ImageRenderer> renderer,
     Arc<tui::Display> display)
     : io_(io)
     , config_(std::move(config))
     , documents_(std::move(documents))
-    , loader_(std::move(loader))
+    , renderer_(std::move(renderer))
     , display_(std::move(display))
-    , pool_(1) {}
+    , pool_(config_.render_pool_size)
+    , media_strand_(pool_.get_executor()) {}
+
+AppPageRenderer::~AppPageRenderer() {
+    pool_.stop();
+    pool_.join();
+}
 
 Async<Unit> AppPageRenderer::render(
     Context& ctx,
@@ -105,19 +116,40 @@ void AppPageRenderer::postPrepareImages(
         }
 
         auto page = document->getPage(page_index + i);
+        auto [future, promise] = makeContract<RenderedImage>(io_.get_executor());
 
-        auto future = pool_.post(io_.get_executor(), [=, this](auto& ctx) {
-            auto image = ctx.push("render_page") | loader_->renderPage(ctx, display, *page);
-            auto compressed = ctx.push("compress") |
-                              utils::zlibCompress(image::pixelsToSamples(image->samples()));
+        asio::co_spawn(
+            media_strand_,
+            [=, this, p = std::move(promise)]() mutable -> asio::awaitable<void> {
+                Context ctx;
+                auto tracer = trace::getGlobalPool().getTracer("bg_task");
+                ctx.setTracer(tracer);
 
-            return RenderedImage{
-                .size = image->size(),
-                .compressed_samples = std::move(compressed),
-            };
-        });
+                auto image = ctx.push("get_image") | page->getImage(display.scaling_coeff);
 
-        state_.add(image_id, std::move(future));
+                {
+                    auto _ = ctx.push("jump_to_pool");
+                    co_await asio::post(asio::bind_executor(pool_, asio::use_awaitable));
+                }
+
+                {
+                    auto _ = ctx.push("render_image");
+                    renderer_->renderImage(ctx, display, *image);
+                }
+
+                auto compressed = ctx.push("compress") |
+                                  utils::zlibCompress(image::pixelsToSamples(image->samples()));
+
+                trace::logStackTrace(std::move(tracer), log::loggerOrGlobal("bg-trace"));
+
+                std::move(p).set_value(RenderedImage{
+                    .size = image->size(),
+                    .compressed_samples = std::move(compressed),
+                });
+            },
+            asio::detached);
+
+        state_.add(image_id, FutureValue{std::move(future)});
     }
 }
 

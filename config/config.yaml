@@ -4,6 +4,7 @@ system:
   max_event_queue_size: 10
   enable_filesystem_watching: true
   state_mode: AddOnly
+  render_pool_size: 4
   num_preload_forward: 4
 
 logging:

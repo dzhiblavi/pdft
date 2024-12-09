@@ -38,7 +38,7 @@ target_link_libraries(
 target_sources(
   pdft
   PRIVATE ./utils/base64.cpp ./utils/zlib.cpp ./utils/get_home_dir.cpp
-          ./utils/random.cpp ./utils/base64.cpp ./utils/background_pool.cpp)
+          ./utils/random.cpp ./utils/base64.cpp)
 
 target_sources(
   pdft

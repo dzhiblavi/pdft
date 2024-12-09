@@ -36,7 +36,10 @@ class MupdfContext {
     static MupdfContext& thisThreadInstance();
 
  private:
-    explicit MupdfContext(fz_context* context) : context_(context) {}
+    explicit MupdfContext(fz_context* ctx) : context_(ctx) {}
+
+    static MupdfContext& globalInstance();
+    static MupdfContext clone(const MupdfContext& context);
 
     fz_context* context_ = nullptr;
 };
