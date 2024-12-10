@@ -19,7 +19,7 @@ const ModuleConfig& ModuleLoader::getConfig(const std::string& name) {
     return context_.modules[name];
 }
 
-ModulePtr ModuleLoader::addNewModule(const std::string& name, Arc<Module> module) {
+Arc<Module> ModuleLoader::addNewModule(const std::string& name, Arc<Module> module) {
     PDFT_VERIFY(!isLoaded(name), "duplicate loaded module {}", name);
     context_.loaded[name] = module;
     log::info("successfully loaded a module: name={}", name);

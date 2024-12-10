@@ -24,8 +24,6 @@ class Module : public log::WithLogger {
     std::string module_name;
 };
 
-using ModulePtr = Arc<Module>;
-
 template <typename T>
 concept IsModule = std::derived_from<T, Module>;
 
