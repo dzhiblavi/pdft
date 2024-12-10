@@ -6,7 +6,7 @@
 #include <string>
 #include <vector>
 
-namespace app {
+namespace pdft::app {
 
 struct CliArgs {
     std::optional<std::string> config_path;
@@ -15,4 +15,4 @@ struct CliArgs {
 
 std::expected<CliArgs, std::string> parseCliArgs(std::span<const char*> args);
 
-}  // namespace app
+}  // namespace pdft::app

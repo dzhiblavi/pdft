@@ -1,13 +1,12 @@
-#include "cli_args.h"
-
-#include "version.h"
+#include "pdft/app/cli_args.h"
+#include "pdft/app/version.h"
 
 #include <magic_enum.hpp>
 #include <tclap/CmdLine.h>
 
 #include <format>
 
-namespace app {
+namespace pdft::app {
 
 std::expected<CliArgs, std::string> parseCliArgs(std::span<const char*> args) {
     try {
@@ -49,4 +48,4 @@ std::expected<CliArgs, std::string> parseCliArgs(std::span<const char*> args) {
     }
 }
 
-}  // namespace app
+}  // namespace pdft::app

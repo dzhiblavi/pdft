@@ -1,24 +1,21 @@
 #pragma once
 
-#include "app.h"
-
+#include "pdft/app/app.h"
 #include "pdft/app/state/palette_storage.h"
 
 #include "pdft/core/module/module.h"
 
 #include <span>
 
-namespace app {
+namespace pdft::app {
 
-using pdft::inject;
-
-class Entrypoint : public pdft::Module {
+class Entrypoint : public Module {
  public:
     Entrypoint(
         asio::io_context& io,
         std::span<const char*> argv,
-        inject<pdft::app::PaletteStorage, "palettes"> palettes,
-        inject<app::Application, "app"> app);
+        inject<PaletteStorage, "palettes"> palettes,
+        inject<Application, "app"> app);
 
     void start();
 
@@ -27,7 +24,7 @@ class Entrypoint : public pdft::Module {
 
     asio::io_context& io_;
     std::vector<std::string> paths_;
-    pdft::Arc<app::Application> app_;
+    Arc<Application> app_;
 };
 
-}  // namespace app
+}  // namespace pdft::app

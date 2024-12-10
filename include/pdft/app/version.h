@@ -2,8 +2,8 @@
 
 #include <string>
 
-namespace app {
+namespace pdft::app {
 
 std::string getFullVersionString();
 
-}  // namespace app
+}  // namespace pdft::app

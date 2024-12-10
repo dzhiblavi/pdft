@@ -1,4 +1,4 @@
-#include "app.h"
+#include "pdft/app/app.h"
 
 #include "pdft/tui/render.h"
 
@@ -17,12 +17,9 @@
 #include <ftxui/screen/screen.hpp>
 #include <magic_enum.hpp>
 
-namespace app {
+namespace pdft::app {
 
-using namespace pdft;
 using namespace asio::experimental::awaitable_operators;
-
-using pdft::app::ControllerAction;
 
 Application::Application(
     asio::io_context& context,
@@ -216,6 +213,6 @@ asio::awaitable<void> Application::cleanup() {
     trace::logStackTrace(std::move(tracer));
 }
 
-}  // namespace app
+}  // namespace pdft::app
 
-PDFT_REGISTER_MODULE(app::Application);
+PDFT_REGISTER_MODULE(pdft::app::Application);

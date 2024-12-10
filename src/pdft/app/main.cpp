@@ -1,9 +1,10 @@
-#include "cli_args.h"
-#include "config.h"
+#include "pdft/app/cli_args.h"
+#include "pdft/app/config.h"
 
 #include "pdft/core/log/load.h"
 #include "pdft/core/module/factory_storage.h"
 #include "pdft/core/module/loader.h"
+
 #include "pdft/utils/get_home_dir.h"
 
 #include <asio/co_spawn.hpp>
@@ -15,9 +16,7 @@
 
 #include <iostream>
 
-namespace app {
-
-using namespace pdft;
+namespace pdft::app {
 
 void main(Config config, std::span<const char*> argv) {
     log::loadConfig(config.logging);
@@ -45,23 +44,23 @@ void main(Config config, std::span<const char*> argv) {
     try {
         context.run();
     } catch (...) {
-        pdft::panic("an unexpected exception");
+        panic("an unexpected exception");
     }
 }
 
-}  // namespace app
+}  // namespace pdft::app
 
 int main(int argc, const char** argv) {
     auto args = std::span(argv, argc);
 
-    auto cli_args = app::parseCliArgs(args);
+    auto cli_args = pdft::app::parseCliArgs(args);
     if (!cli_args.has_value()) {
         std::cerr << std::format("Error while parsing CLI arguments: {}", cli_args.error())
                   << std::endl;
         return 1;
     }
 
-    auto config = rfl::json::load<app::Config, rfl::DefaultIfMissing>(
+    auto config = rfl::json::load<pdft::app::Config, rfl::DefaultIfMissing>(
         cli_args->config_path.value_or(pdft::utils::expandHome("~/.config/pdft/config.json")));
 
     if (!config) {
@@ -70,6 +69,6 @@ int main(int argc, const char** argv) {
         return 1;
     }
 
-    app::main(*config, args);
+    pdft::app::main(*config, args);
     return 0;
 }

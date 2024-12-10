@@ -90,3 +90,11 @@ target_sources(
           ./app/controller/impl/controller.cpp
           ./app/loader/impl/loader.cpp
           ./app/persist/impl/persister.cpp)
+
+# PDFT executable
+find_package(tclap REQUIRED)
+
+add_executable(app ./app/main.cpp ./app/app.cpp ./app/cli_args.cpp
+                   ./app/version.cpp ./app/palettes.cpp ./app/entrypoint.cpp)
+
+target_link_libraries(app pdft tclap::tclap reflectcpp)

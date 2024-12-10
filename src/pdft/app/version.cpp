@@ -1,4 +1,4 @@
-#include "version.h"
+#include "pdft/app/version.h"
 
 #include "pdft/utils/build_info.h"
 
@@ -6,10 +6,10 @@
 
 #include <format>
 
-namespace app {
+namespace pdft::app {
 
 std::string getFullVersionString() {
-    using namespace pdft::utils;
+    using namespace utils;
     using magic_enum::enum_name;
 
     auto [major, minor, patch] = getProjectVersion();
@@ -24,4 +24,4 @@ std::string getFullVersionString() {
         getBuildTimestamp());
 }
 
-}  // namespace app
+}  // namespace pdft::app

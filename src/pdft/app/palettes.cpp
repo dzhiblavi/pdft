@@ -1,8 +1,6 @@
-#include "palettes.h"
+#include "pdft/app/palettes.h"
 
-namespace app {
-
-using namespace pdft;
+namespace pdft::app {
 
 image::PaletteRef getSkimPalette() {
     using image::RGBColor;
@@ -21,4 +19,4 @@ image::PaletteRef getSkimPalette() {
     return palette;
 }
 
-}  // namespace app
+}  // namespace pdft::app
