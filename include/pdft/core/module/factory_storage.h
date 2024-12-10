@@ -4,7 +4,7 @@
 
 #include <unordered_map>
 
-namespace pdft {
+namespace pdft::module {
 
 struct ModuleTraits {
     virtual void start(Module* module) const = 0;

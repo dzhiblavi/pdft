@@ -24,13 +24,13 @@ void main(Config config, std::span<const char*> argv) {
 
     asio::io_context context(1);
 
-    LoadContext ctx{
+    module::LoadContext ctx{
         .argv = argv,
         .io = context,
         .modules = config.modules,
     };
 
-    ModuleLoader loader(ctx);
+    module::ModuleLoader loader(ctx);
 
     for (const auto& [name, conf] : ctx.modules) {
         if (loader.isLoaded(name)) {
@@ -38,7 +38,7 @@ void main(Config config, std::span<const char*> argv) {
         }
 
         auto mod = loader.getOrLoadModule(name);
-        auto traits = FactoryStorage::globalInstance().getTraits(conf.factory);
+        auto traits = module::FactoryStorage::globalInstance().getTraits(conf.factory);
         traits->start(mod.get());
     }
 

@@ -1,7 +1,7 @@
 #include "pdft/core/module/loader.h"
 #include "pdft/core/module/factory_storage.h"
 
-namespace pdft {
+namespace pdft::module {
 
 Arc<Module> ModuleLoader::getOrLoadModule(const std::string& name) {
     if (auto it = context_.loaded.find(name); it != context_.loaded.end()) {
@@ -30,4 +30,4 @@ bool ModuleLoader::isLoaded(const std::string& name) {
     return context_.loaded.contains(name);
 }
 
-}  // namespace pdft
+}  // namespace pdft::module

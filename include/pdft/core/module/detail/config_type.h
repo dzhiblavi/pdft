@@ -2,7 +2,7 @@
 
 #include "pdft/core/result/type/unit.h"
 
-namespace pdft::detail {
+namespace pdft::module::detail {
 
 template <typename T, typename = void>
 struct MaybeConfigTypeImpl {

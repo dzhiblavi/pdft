@@ -13,7 +13,7 @@
 
 #include <span>
 
-namespace pdft {
+namespace pdft::module {
 
 using LoadedModules = std::unordered_map<std::string, Arc<Module>>;
 
@@ -140,4 +140,4 @@ Arc<T> ModuleLoader::makeModule(std::string name) {
     return module;
 }
 
-}  // namespace pdft
+}  // namespace pdft::module

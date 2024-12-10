@@ -6,7 +6,7 @@
 #include <tuple>
 #include <type_traits>
 
-namespace pdft::detail {
+namespace pdft::module::detail {
 
 namespace impl {
 
@@ -75,4 +75,4 @@ static constexpr size_t MaxConstructorArguments = impl::maxNumConstructorArgumen
 template <typename T, size_t N = MaxConstructorArguments<T>>
 using Constructor = impl::Constructor<T, N>;
 
-}  // namespace pdft::detail
+}  // namespace pdft::module::detail

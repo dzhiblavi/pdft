@@ -4,7 +4,7 @@
 
 #include <unordered_map>
 
-namespace pdft {
+namespace pdft::module {
 
 struct ModuleConfig {
     std::string factory;
@@ -14,4 +14,4 @@ struct ModuleConfig {
 
 using ModulesConfig = std::unordered_map<std::string, ModuleConfig>;
 
-}  // namespace pdft
+}  // namespace pdft::module

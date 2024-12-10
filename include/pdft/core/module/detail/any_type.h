@@ -2,7 +2,7 @@
 
 #include <type_traits>
 
-namespace pdft::detail {
+namespace pdft::module::detail {
 
 struct AnyType : std::false_type {
     template <typename T>

@@ -7,7 +7,7 @@ namespace app {
 
 struct Config {
     pdft::log::LogConfig logging;
-    pdft::ModulesConfig modules;
+    pdft::module::ModulesConfig modules;
 };
 
 }  // namespace app
