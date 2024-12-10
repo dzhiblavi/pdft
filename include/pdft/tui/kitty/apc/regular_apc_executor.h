@@ -2,10 +2,13 @@
 
 #include "pdft/tui/kitty/apc/apc_executor_base.h"
 
+#include "pdft/core/module/module.h"
+
 namespace pdft::tui {
 
-class RegularAPCExecutor : public APCExecutorBase {
+class RegularAPCExecutor : public APCExecutorBase, public Module {
  public:
+    using Config = APCExecutorConfig;
     using APCExecutorBase::APCExecutorBase;
 
  private:

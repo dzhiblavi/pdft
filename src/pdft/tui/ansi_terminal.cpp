@@ -1,5 +1,7 @@
 #include "pdft/tui/ansi_terminal.h"
 
+#include "pdft/core/module/register.h"
+
 namespace pdft::tui {
 
 void AnsiTerminal::clear(io::OutBuffer& buffer) const {
@@ -45,3 +47,5 @@ void AnsiTerminal::showCursor(io::OutBuffer& buffer) const {
 }
 
 }  // namespace pdft::tui
+
+PDFT_REGISTER_MODULE(pdft::tui::AnsiTerminal);

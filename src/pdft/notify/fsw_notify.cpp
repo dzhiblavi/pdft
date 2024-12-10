@@ -2,6 +2,7 @@
 
 #include "pdft/core/assert.h"
 #include "pdft/core/log.h"
+#include "pdft/core/module/register.h"
 #include "pdft/core/result/make/err.h"
 #include "pdft/core/result/make/ok.h"
 
@@ -130,3 +131,5 @@ void FswNotify::processEvents(const fsw_cevent* const events, unsigned count, vo
 }
 
 }  // namespace pdft::notify
+
+PDFT_REGISTER_MODULE(pdft::notify::FswNotify);

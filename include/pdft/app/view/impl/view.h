@@ -3,11 +3,14 @@
 #include "pdft/app/view/document_view.h"
 #include "pdft/app/view/view.h"
 
+#include "pdft/core/module/inject.h"
+#include "pdft/core/module/module.h"
+
 namespace pdft::app {
 
-class AppView : public View {
+class AppView : public View, public Module {
  public:
-    AppView(Arc<const DocumentStorage> documents, Arc<DocumentView> view)
+    AppView(inject<const DocumentStorage, "docs"> documents, inject<DocumentView, "doc_view"> view)
         : documents_(std::move(documents))
         , doc_view_(std::move(view)) {}
 

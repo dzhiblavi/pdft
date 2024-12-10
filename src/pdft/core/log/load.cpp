@@ -1,7 +1,9 @@
 #include "pdft/core/log/load.h"
 #include "pdft/core/log.h"
 
-#include "pdft/utils/visit.h"
+#include "pdft/utils/overloaded.h"
+
+#include <rfl/visit.hpp>
 
 #include <spdlog/async.h>
 #include <spdlog/async_logger.h>
@@ -19,31 +21,37 @@ namespace {
 constexpr auto GLOBAL_LOGGER_NAME = "global";
 
 spdlog::sink_ptr loadSink(const SinkConfig& config) {
-    return utils::visit(
-        config,
-        [](const StdoutSink& sink) -> spdlog::sink_ptr {
-            if (sink.cerr) {
-                if (sink.colors) {
-                    return std::make_shared<spdlog::sinks::stderr_color_sink_mt>();
+    return rfl::visit(
+        utils::Overloaded{
+            [](const rfl::Field<"stdout", StdoutSink>& v) -> spdlog::sink_ptr {
+                auto&& sink = v.value();
+                if (sink.cerr) {
+                    if (sink.colors) {
+                        return std::make_shared<spdlog::sinks::stderr_color_sink_mt>();
+                    }
+                    return std::make_shared<spdlog::sinks::stderr_sink_mt>();
                 }
-                return std::make_shared<spdlog::sinks::stderr_sink_mt>();
-            }
-            if (sink.colors) {
-                return std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
-            }
-            return std::make_shared<spdlog::sinks::stdout_sink_mt>();
+                if (sink.colors) {
+                    return std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
+                }
+                return std::make_shared<spdlog::sinks::stdout_sink_mt>();
+            },
+            [](const rfl::Field<"file", SimpleFileSink>& v) -> spdlog::sink_ptr {
+                auto&& sink = v.value();
+                return std::make_shared<spdlog::sinks::basic_file_sink_mt>(sink.path);
+            },
+            [](const rfl::Field<"rot_file", RotatingFileSink>& v) -> spdlog::sink_ptr {
+                auto&& sink = v.value();
+                return std::make_shared<spdlog::sinks::rotating_file_sink_mt>(
+                    sink.path, sink.max_size, sink.max_num_files);
+            },
+            [](const rfl::Field<"daily_file", DailyFileSink>& v) -> spdlog::sink_ptr {
+                auto&& sink = v.value();
+                return std::make_shared<spdlog::sinks::daily_file_sink_mt>(
+                    sink.path, sink.hour, sink.minute);
+            },
         },
-        [](const SimpleFileSink& sink) -> spdlog::sink_ptr {
-            return std::make_shared<spdlog::sinks::basic_file_sink_mt>(sink.path);
-        },
-        [](const RotatingFileSink& sink) -> spdlog::sink_ptr {
-            return std::make_shared<spdlog::sinks::rotating_file_sink_mt>(
-                sink.path, sink.max_size, sink.max_num_files);
-        },
-        [](const DailyFileSink& sink) -> spdlog::sink_ptr {
-            return std::make_shared<spdlog::sinks::daily_file_sink_mt>(
-                sink.path, sink.hour, sink.minute);
-        });
+        config);
 }
 
 }  // namespace
@@ -73,11 +81,12 @@ void loadLogger(const std::string& name, const LoggerConfig& config) {
         return {};
     }();
 
-    logger->set_level(config.level);
+    logger->set_level(static_cast<spdlog::level::level_enum>(config.level));
 
     if (!config.format.empty()) {
         logger->set_pattern(config.format);
     }
+
     if (config.force_flush) {
         logger->flush_on(spdlog::level::trace);
     }

@@ -4,12 +4,15 @@
 #include "pdft/app/view/page_renderer.h"
 
 #include "pdft/core/context.h"
+#include "pdft/core/module/inject.h"
+#include "pdft/core/module/module.h"
 
 namespace pdft::app {
 
-class AppDocumentView : public DocumentView {
+class AppDocumentView : public DocumentView, public Module {
  public:
-    explicit AppDocumentView(Arc<PageRenderer> renderer) : renderer_(std::move(renderer)) {}
+    explicit AppDocumentView(inject<PageRenderer, "page_renderer"> renderer)
+        : renderer_(std::move(renderer)) {}
 
     tui::Element getLayout(Context& ctx, const DocumentState& doc) override;
 

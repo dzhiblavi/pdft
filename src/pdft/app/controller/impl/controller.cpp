@@ -2,13 +2,14 @@
 
 #include "pdft/core/assert.h"
 #include "pdft/core/log.h"
+#include "pdft/core/module/register.h"
 
 #include "pdft/core/result/coro/maybe.h"
 #include "pdft/core/result/coro/result.h"
 
 namespace pdft::app {
 
-AppController::AppController(const Config& config, Arc<const media::Loader> doc_loader)
+AppController::AppController(Config config, inject<const media::Loader, "media_loader"> doc_loader)
     : config_(config)
     , doc_loader_(std::move(doc_loader)) {
     for (const auto& [command, keys] : config.key_mappings) {
@@ -240,3 +241,5 @@ Status AppController::reloadDocument(
 }
 
 }  // namespace pdft::app
+
+PDFT_REGISTER_MODULE(pdft::app::AppController);

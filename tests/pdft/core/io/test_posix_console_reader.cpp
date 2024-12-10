@@ -20,7 +20,7 @@ using namespace asio::experimental::awaitable_operators;
 TEST_CASE("testPosixConsoleRead", "") {
     tests::runCoroutine([](auto& context) -> asio::awaitable<void> {
         auto mock = test::makeMockConsole();
-        auto console = PosixConsoleReader(context, mock->inFd());
+        auto console = PosixConsoleReader(context, {.fd = mock->inFd()});
 
         mock->put("abacaba");
         auto out = co_await console.read(3) | result::unwrap;

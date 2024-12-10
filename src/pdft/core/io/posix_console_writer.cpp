@@ -1,4 +1,5 @@
 #include "pdft/core/io/posix_console_writer.h"
+#include "pdft/core/module/register.h"
 #include "pdft/core/result/make/err.h"
 #include "pdft/core/result/make/ok.h"
 
@@ -9,8 +10,8 @@
 
 namespace pdft::io {
 
-PosixConsoleWriter::PosixConsoleWriter(asio::io_context& context, int out_fd)
-    : stdout_(context, out_fd) {}
+PosixConsoleWriter::PosixConsoleWriter(asio::io_context& context, Config config)
+    : stdout_(context, config.fd) {}
 
 AsyncStatus PosixConsoleWriter::write(std::string_view bytes) {
     auto [ec, _] = co_await asio::async_write(stdout_, asio::buffer(bytes), asio_coro_as_tuple);
@@ -33,3 +34,5 @@ AsyncStatus PosixConsoleWriter::writeMany(std::vector<asio::const_buffer> buffer
 }
 
 }  // namespace pdft::io
+
+PDFT_REGISTER_MODULE(pdft::io::PosixConsoleWriter);

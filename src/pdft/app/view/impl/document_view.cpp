@@ -1,5 +1,7 @@
 #include "pdft/app/view/impl/document_view.h"
 
+#include "pdft/core/module/register.h"
+
 namespace pdft::app {
 
 tui::Element AppDocumentView::getLayout(Context& /*ctx*/, const DocumentState& doc) {
@@ -326,3 +328,5 @@ Async<void> AppDocumentView::renderTwoPagesContinuous(
 }
 
 }  // namespace pdft::app
+
+PDFT_REGISTER_MODULE(pdft::app::AppDocumentView);

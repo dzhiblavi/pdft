@@ -1,5 +1,7 @@
 #include "pdft/app/persist/impl/persister.h"
+
 #include "pdft/core/log.h"
+#include "pdft/core/module/register.h"
 
 #include <rfl/json.hpp>
 
@@ -72,3 +74,5 @@ Status AppPersister::restore(UIState& ui, DocumentStorage& documents, std::istre
 }
 
 }  // namespace pdft::app
+
+PDFT_REGISTER_MODULE(pdft::app::AppPersister);

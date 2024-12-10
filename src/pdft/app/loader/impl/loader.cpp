@@ -1,6 +1,7 @@
 #include "pdft/app/loader/impl/loader.h"
 
 #include "pdft/core/log.h"
+#include "pdft/core/module/register.h"
 
 #include <magic_enum.hpp>
 
@@ -81,3 +82,5 @@ Status AppLoader::load(
 }
 
 }  // namespace pdft::app
+
+PDFT_REGISTER_MODULE(pdft::app::AppLoader);

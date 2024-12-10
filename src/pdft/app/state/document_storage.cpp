@@ -1,4 +1,5 @@
 #include "pdft/app/state/document_storage.h"
+#include "pdft/core/module/register.h"
 
 namespace pdft::app {
 
@@ -41,3 +42,5 @@ Maybe<DocumentId> DocumentStorage::getIdByPath(const std::filesystem::path& path
 }
 
 }  // namespace pdft::app
+
+PDFT_REGISTER_MODULE(pdft::app::DocumentStorage);

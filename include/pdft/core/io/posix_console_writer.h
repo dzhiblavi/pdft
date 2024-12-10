@@ -1,15 +1,20 @@
 #pragma once
 
 #include "pdft/core/io/console_writer.h"
+#include "pdft/core/module/module.h"
 
 #include <asio/io_context.hpp>
 #include <asio/posix/stream_descriptor.hpp>
 
 namespace pdft::io {
 
-class PosixConsoleWriter : public ConsoleWriter {
+class PosixConsoleWriter : public ConsoleWriter, public Module {
  public:
-    PosixConsoleWriter(asio::io_context& context, int out_fd);
+    struct Config {
+        int fd = STDOUT_FILENO;
+    };
+
+    PosixConsoleWriter(asio::io_context& context, Config config);
 
     using ConsoleWriter::write;
 

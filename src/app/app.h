@@ -1,36 +1,53 @@
 #pragma once
 
-#include "config.h"
-
-#include "pdft/app/state/palette_storage.h"
+#include "pdft/app/controller/controller.h"
+#include "pdft/app/loader/loader.h"
 #include "pdft/app/view/view.h"
-
-#include "pdft/media/loader.h"
 
 #include "pdft/tui/display.h"
 #include "pdft/tui/terminal.h"
 
+#include "pdft/notify/notify.h"
+
 #include "pdft/core/io/console_reader.h"
 #include "pdft/core/io/console_writer.h"
 #include "pdft/core/io/termctl.h"
-#include "pdft/core/log/with_logger.h"
+#include "pdft/core/module/inject.h"
+#include "pdft/core/module/module.h"
 #include "pdft/core/rc.h"
-#include "pdft/notify/notify.h"
 
 #include <asio/awaitable.hpp>
+#include <asio/co_spawn.hpp>
+#include <asio/detached.hpp>
 #include <asio/signal_set.hpp>
 
 namespace app {
 
-class Application : public pdft::log::WithLogger {
+using pdft::inject;
+
+class Application : public pdft::Module {
  public:
-    Application(asio::io_context& context, Config config);
+    struct Config {
+        std::optional<std::string> state_path;
+    };
+
+    Application(
+        asio::io_context& context,
+        Config config,
+        inject<pdft::notify::Notify, "fswatcher"> fswatcher,
+        inject<pdft::io::ConsoleWriter, "writer"> writer,
+        inject<pdft::io::ConsoleReader, "reader"> reader,
+        inject<pdft::io::TermControl, "term_ctrl"> term_control,
+        inject<pdft::tui::Terminal, "terminal"> terminal,
+        inject<pdft::app::DocumentStorage, "docs"> documents,
+        inject<pdft::app::Loader, "loader"> loader,
+        inject<pdft::tui::Display, "display"> display,
+        inject<pdft::app::Controller, "controller"> controller,
+        inject<pdft::app::View, "view"> view);
 
     asio::awaitable<void> run(const std::vector<std::string>& paths);
 
  private:
-    void printAppInfo() const;
-    void setup();
     void load(const std::vector<std::string>& paths);
     void saveState();
 
@@ -40,9 +57,7 @@ class Application : public pdft::log::WithLogger {
     asio::awaitable<bool> waitForNextRender();
     asio::awaitable<void> cleanup();
 
-    asio::io_context& io_;
     const Config config_;
-    asio::io_context& context_;
     pdft::app::UIState ui_;
     asio::signal_set signals_;
 
@@ -52,10 +67,8 @@ class Application : public pdft::log::WithLogger {
     pdft::Arc<pdft::io::ConsoleReader> console_reader_;
     pdft::Arc<pdft::tui::Terminal> terminal_;
     pdft::Arc<pdft::tui::Display> image_display_;
-    pdft::Arc<pdft::media::Loader> doc_loader_;
     pdft::Arc<pdft::app::Loader> loader_;
     pdft::Arc<pdft::app::DocumentStorage> documents_;
-    pdft::Arc<pdft::app::PaletteStorage> palettes_;
     pdft::Arc<pdft::app::View> view_;
     pdft::Arc<pdft::app::Controller> controller_;
 };

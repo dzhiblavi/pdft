@@ -2,8 +2,10 @@
 
 #include "pdft/app/loader/loader.h"
 #include "pdft/app/persist/persister.h"
-
 #include "pdft/media/loader.h"
+
+#include "pdft/core/module/inject.h"
+#include "pdft/core/module/module.h"
 
 namespace pdft::app {
 
@@ -14,10 +16,17 @@ enum class StateMode {
     AddAll,      // Use the state and append all paths to it (duplicates can be created)
 };
 
-class AppLoader : public Loader {
+class AppLoader : public Loader, public Module {
  public:
-    AppLoader(StateMode mode, Arc<const Persister> persister, Arc<const media::Loader> doc_loader)
-        : mode_(mode)
+    struct Config {
+        StateMode mode;
+    };
+
+    AppLoader(
+        Config config,
+        inject<const Persister, "persister"> persister,
+        inject<const media::Loader, "media_loader"> doc_loader)
+        : mode_(config.mode)
         , persister_(std::move(persister))
         , doc_loader_(std::move(doc_loader)) {}
 

@@ -1,92 +1,145 @@
-state_path: ../../../../assets/state.json
-
-system:
-  max_event_queue_size: 10
-  enable_filesystem_watching: true
-  state_mode: AddOnly
-  render_pool_size: 4
-  num_preload_backward: 2
-  num_preload_forward: 4
-
 logging:
-  directory: ../../../../logs/
-  level: Trace
+  loggers:
+    global:
+      level: Debug
+      format: "%Y-%m-%dT%T %z %^%s:%#%$ %L %v"
+      sinks:
+        - file:
+            path: /Users/dzhiblavi/personal/projects/pdft-cxx/logs/app.log
+    mupdf:
+      level: Debug
+      format: "%Y-%m-%dT%T %z %^%s:%#%$ %L %v"
+      sinks:
+        - file:
+            path: /Users/dzhiblavi/personal/projects/pdft-cxx/logs/mupdf.log
+    bg:
+      level: Debug
+      format: "%Y-%m-%dT%T %z %^%s:%#%$ %L %v"
+      sinks:
+        - file:
+            path: /Users/dzhiblavi/personal/projects/pdft-cxx/logs/bg.log
+    trace:
+      level: Trace
+      format: "%Y-%m-%dT%T %z %v"
+      sinks:
+        - file:
+            path: /Users/dzhiblavi/personal/projects/pdft-cxx/logs/trace.log
+    bg-trace:
+      level: Trace
+      format: "%Y-%m-%dT%T %z %v"
+      sinks:
+        - file:
+            path: /Users/dzhiblavi/personal/projects/pdft-cxx/logs/bg-trace.log
 
-display:
-  force_unicode_kitty_display: false
-  properties:
-    scaling_coeff: 1.1
-    invert_colors: true
-    make_bolder: true
-    palette: skim
+modules:
+  entrypoint:
+    factory: app::Entrypoint
 
-controller:
-  rows_per_scroll: 10
-  zoom_multipler: 1.5
+  fswatcher:
+    factory: pdft::notify::FswNotify
 
-  key_mappings:
-    - command: Quit
-      keys: q
+  app:
+    factory: app::Application
+    config:
+      state_path: /Users/dzhiblavi/personal/projects/pdft-cxx/assets/state.json
 
-    - command: Reload
-      keys: r
+  writer:
+    factory: pdft::io::PosixConsoleWriter
 
-    - command: CloseDocument
-      keys: x
+  reader:
+    factory: pdft::io::PosixConsoleReader
 
-    - command: ScrollNext
-      keys: j
+  term_ctrl:
+    factory: pdft::io::PosixTermControl
 
-    - command: ScrollPrev
-      keys: k
+  terminal:
+    factory: pdft::tui::AnsiTerminal
 
-    - command: NumNextPage
-      keys: j
+  persister:
+    factory: pdft::app::AppPersister
 
-    - command: NumPrevPage
-      keys: k
+  media_loader:
+    factory: pdft::media::MupdfLoader
 
-    - command: GoToFirstPage
-      keys: gg
+  loader:
+    factory: pdft::app::AppLoader
+    config:
+      mode: AddOnly
 
-    - command: GoToLastPage
-      keys: G
+  docs:
+    factory: pdft::app::DocumentStorage
 
-    - command: NumGoToPage
-      keys: G
+  img_renderer:
+    factory: pdft::app::ImageRenderer
 
-    - command: NextDocument
-      keys: l
+  palettes:
+    factory: pdft::app::PaletteStorage
 
-    - command: PrevDocument
-      keys: h
+  apc:
+    factory: pdft::tui::TmuxAPCExecutor
 
-    - command: NumNextDocument
-      keys: l
+  display:
+    factory: pdft::tui::UnicodeKittyDisplay
 
-    - command: NumPrevDocument
-      keys: h
+  doc_view:
+    factory: pdft::app::AppDocumentView
 
-    - command: NextLayout
-      keys: s
+  view:
+    factory: pdft::app::AppView
 
-    - command: PrevLayout
-      keys: S
+  page_renderer:
+    factory: pdft::app::AppPageRenderer
+    config:
+      render_pool_size: 4
+      num_preload_backward: 2
+      num_preload_forward: 4
 
-    - command: InvertColors
-      keys: i
-
-    - command: IncreaseScalingFactor
-      keys: z=
-
-    - command: DecreaseScalingFactor
-      keys: z-
-
-    - command: ToggleSidebar
-      keys: t
-
-    - command: ToggleBold
-      keys: b
-
-    - command: TogglePalette
-      keys: p
+  controller:
+    factory: pdft::app::AppController
+    config:
+      rows_per_scroll: 30
+      key_mappings:
+        - command: Quit
+          keys: q
+        - command: Reload
+          keys: r
+        - command: CloseDocument
+          keys: x
+        - command: ScrollNext
+          keys: j
+        - command: ScrollPrev
+          keys: k
+        - command: NumNextPage
+          keys: j
+        - command: NumPrevPage
+          keys: k
+        - command: GoToFirstPage
+          keys: gg
+        - command: GoToLastPage
+          keys: G
+        - command: NumGoToPage
+          keys: G
+        - command: NextDocument
+          keys: l
+        - command: PrevDocument
+          keys: h
+        - command: NumNextDocument
+          keys: l
+        - command: NumPrevDocument
+          keys: h
+        - command: NextLayout
+          keys: s
+        - command: PrevLayout
+          keys: S
+        - command: InvertColors
+          keys: i
+        - command: IncreaseScalingFactor
+          keys: z=
+        - command: DecreaseScalingFactor
+          keys: z-
+        - command: ToggleSidebar
+          keys: t
+        - command: ToggleBold
+          keys: b
+        - command: TogglePalette
+          keys: p

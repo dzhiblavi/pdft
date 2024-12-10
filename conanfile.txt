@@ -8,7 +8,6 @@ cpptrace/0.7.2
 magic_enum/0.9.6
 gtest/1.15.0
 andreasbuhr-cppcoro/cci.20230629
-yaml-cpp/0.8.0
 tclap/1.2.5
 
 [generators]

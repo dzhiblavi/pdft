@@ -1,15 +1,20 @@
 #pragma once
 
 #include "pdft/core/io/console_reader.h"
+#include "pdft/core/module/module.h"
 
 #include <asio/io_context.hpp>
 #include <asio/posix/stream_descriptor.hpp>
 
 namespace pdft::io {
 
-class PosixConsoleReader : public ConsoleReader {
+class PosixConsoleReader : public ConsoleReader, public Module {
  public:
-    PosixConsoleReader(asio::io_context& context, int in_fd);
+    struct Config {
+        int fd = STDIN_FILENO;
+    };
+
+    PosixConsoleReader(asio::io_context& context, Config config);
 
     using ConsoleReader::read;
 

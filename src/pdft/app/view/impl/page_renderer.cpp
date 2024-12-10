@@ -1,5 +1,6 @@
 #include "pdft/app/view/impl/page_renderer.h"
 
+#include "pdft/core/module/register.h"
 #include "pdft/core/result/combine/unwrap.h"
 #include "pdft/core/result/syntax/pipe.h"
 #include "pdft/core/trace/log_stack_trace.h"
@@ -49,9 +50,9 @@ AppPageRenderer::RenderingImage& AppPageRenderer::Images::getRenderingImage(tui:
 AppPageRenderer::AppPageRenderer(
     asio::io_context& io,
     Config config,
-    Arc<const DocumentStorage> documents,
-    Arc<const ImageRenderer> renderer,
-    Arc<tui::Display> display)
+    inject<const DocumentStorage, "docs"> documents,
+    inject<const ImageRenderer, "img_renderer"> renderer,
+    inject<tui::Display, "display"> display)
     : io_(io)
     , config_(std::move(config))
     , documents_(std::move(documents))
@@ -183,3 +184,5 @@ Async<void> AppPageRenderer::loadImage(Context& ctx, tui::ImageId id, tui::Scree
 }
 
 }  // namespace pdft::app
+
+PDFT_REGISTER_MODULE(pdft::app::AppPageRenderer);

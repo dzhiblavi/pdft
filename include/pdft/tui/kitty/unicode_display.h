@@ -3,11 +3,15 @@
 #include "pdft/tui/kitty/display_base.h"
 #include "pdft/tui/terminal.h"
 
+#include "pdft/core/module/inject.h"
+#include "pdft/core/module/module.h"
+
 namespace pdft::tui {
 
-class UnicodeKittyDisplay : public KittyDisplayBase {
+class UnicodeKittyDisplay : public KittyDisplayBase, public Module {
  public:
-    UnicodeKittyDisplay(Arc<APCExecutor> executor, Arc<const Terminal> terminal)
+    UnicodeKittyDisplay(
+        inject<APCExecutor, "apc"> executor, inject<const Terminal, "terminal"> terminal)
         : KittyDisplayBase(std::move(executor))
         , terminal_(std::move(terminal)) {}
 

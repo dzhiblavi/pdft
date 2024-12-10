@@ -1,5 +1,3 @@
-find_package(yaml-cpp REQUIRED)
-
 include(FetchContent)
 
 set(REFLECTCPP_BSON OFF)
@@ -14,7 +12,7 @@ set(REFLECTCPP_YAML ON)
 FetchContent_Declare(
   reflect_cpp
   GIT_REPOSITORY https://github.com/getml/reflect-cpp.git
-  GIT_TAG v0.15.0
+  GIT_TAG v0.16.0
   GIT_PROGRESS TRUE
   INSTALL_COMMAND "")
 

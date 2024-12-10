@@ -2,6 +2,7 @@
 
 #include "pdft/core/assert.h"
 #include "pdft/core/log.h"
+#include "pdft/core/module/register.h"
 
 namespace pdft::tui {
 
@@ -67,3 +68,5 @@ void NativeKittyDisplay::displayImage(
 }
 
 }  // namespace pdft::tui
+
+PDFT_REGISTER_MODULE(pdft::tui::NativeKittyDisplay);

@@ -1,5 +1,6 @@
 #include "pdft/app/view/impl/view.h"
 
+#include "pdft/core/module/register.h"
 #include "pdft/core/result/combine/unwrap.h"
 #include "pdft/core/result/coro/maybe.h"
 #include "pdft/core/result/make/from_ptr.h"
@@ -60,3 +61,5 @@ tui::Element AppView::getSidebar(const UIState& ui) {
 }
 
 }  // namespace pdft::app
+
+PDFT_REGISTER_MODULE(pdft::app::AppView);

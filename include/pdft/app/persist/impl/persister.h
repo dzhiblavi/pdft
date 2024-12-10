@@ -1,14 +1,16 @@
 #pragma once
 
 #include "pdft/app/persist/persister.h"
-
 #include "pdft/media/loader.h"
+
+#include "pdft/core/module/inject.h"
+#include "pdft/core/module/module.h"
 
 namespace pdft::app {
 
-class AppPersister : public Persister {
+class AppPersister : public Persister, public Module {
  public:
-    explicit AppPersister(Arc<const media::Loader> doc_loader)
+    explicit AppPersister(inject<const media::Loader, "media_loader"> doc_loader)
         : doc_loader_(std::move(doc_loader)) {}
 
     void save(const UIState& ui, const DocumentStorage& documents, std::ostream& os) const override;

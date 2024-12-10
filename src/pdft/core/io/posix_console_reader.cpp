@@ -1,4 +1,5 @@
 #include "pdft/core/io/posix_console_reader.h"
+#include "pdft/core/module/register.h"
 #include "pdft/core/result/make/err.h"
 #include "pdft/core/result/make/ok.h"
 
@@ -9,8 +10,8 @@
 
 namespace pdft::io {
 
-PosixConsoleReader::PosixConsoleReader(asio::io_context& context, int in_fd)
-    : stdin_(context, in_fd) {}
+PosixConsoleReader::PosixConsoleReader(asio::io_context& context, Config config)
+    : stdin_(context, config.fd) {}
 
 AsyncStatus PosixConsoleReader::read(size_t num_bytes, std::string& out) {
     out.resize(num_bytes);
@@ -24,3 +25,5 @@ AsyncStatus PosixConsoleReader::read(size_t num_bytes, std::string& out) {
 }
 
 }  // namespace pdft::io
+
+PDFT_REGISTER_MODULE(pdft::io::PosixConsoleReader);

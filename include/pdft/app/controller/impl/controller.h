@@ -3,14 +3,16 @@
 #include "pdft/app/controller/controller.h"
 #include "pdft/app/controller/impl/keytree.h"
 #include "pdft/app/state/document_storage.h"
-
+#include "pdft/core/module/module.h"
 #include "pdft/media/loader.h"
+
+#include "pdft/core/module/inject.h"
 
 #include <vector>
 
 namespace pdft::app {
 
-class AppController : public Controller {
+class AppController : public Controller, public Module {
  public:
     enum class Command {
         Quit,
@@ -47,7 +49,7 @@ class AppController : public Controller {
         int32_t rows_per_scroll = 10;
     };
 
-    AppController(const Config& config, Arc<const media::Loader> doc_loader);
+    AppController(Config config, inject<const media::Loader, "media_loader"> doc_loader);
 
     Result<ControllerAction> onKeyEvent(char key, UIState& ui, DocumentStorage& documents) override;
 

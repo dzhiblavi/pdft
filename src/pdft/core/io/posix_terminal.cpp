@@ -1,4 +1,5 @@
 #include "pdft/core/io/posix_termctl.h"
+#include "pdft/core/module/register.h"
 
 #include <termios.h>
 #include <unistd.h>
@@ -31,3 +32,5 @@ void PosixTermControl::ioControl(ControlType type, const IoControl& control) {
 }
 
 }  // namespace pdft::io
+
+PDFT_REGISTER_MODULE(pdft::io::PosixTermControl);

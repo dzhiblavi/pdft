@@ -2,6 +2,8 @@
 
 #include "pdft/notify/notify.h"
 
+#include "pdft/core/module/module.h"
+
 #include <asio/experimental/concurrent_channel.hpp>
 #include <asio/use_awaitable.hpp>
 #include <asio/use_future.hpp>
@@ -13,7 +15,7 @@
 
 namespace pdft::notify {
 
-class FswNotify : public notify::Notify {
+class FswNotify : public notify::Notify, public Module {
  public:
     explicit FswNotify(asio::any_io_executor executor);
     ~FswNotify() noexcept override;

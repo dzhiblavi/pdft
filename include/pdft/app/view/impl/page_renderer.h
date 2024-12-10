@@ -5,9 +5,14 @@
 #include "pdft/tui/display.h"
 
 #include "pdft/core/future.h"
+#include "pdft/core/module/inject.h"
+#include "pdft/core/module/module.h"
+
+#include "pdft/utils/random.h"
 
 #include <asio/io_context.hpp>
 #include <asio/strand.hpp>
+#include <asio/thread_pool.hpp>
 
 namespace pdft::app {
 
@@ -30,21 +35,21 @@ struct FutureValue {
     std::variant<Future<T>, T> value_;
 };
 
-class AppPageRenderer : public PageRenderer {
+class AppPageRenderer : public PageRenderer, public Module {
  public:
     struct Config {
         uint32_t render_pool_size = 4;
         uint32_t num_preload_backward = 2;
         uint32_t num_preload_forward = 4;
-        uint32_t image_id_salt;
+        uint32_t image_id_salt = utils::random<uint32_t>();
     };
 
     AppPageRenderer(
         asio::io_context& io,
         Config config,
-        Arc<const DocumentStorage> documents_,
-        Arc<const ImageRenderer> renderer,
-        Arc<tui::Display> display);
+        inject<const DocumentStorage, "docs"> documents_,
+        inject<const ImageRenderer, "img_renderer"> renderer,
+        inject<tui::Display, "display"> display);
 
     ~AppPageRenderer();
 

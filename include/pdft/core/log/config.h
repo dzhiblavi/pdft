@@ -1,13 +1,31 @@
 #pragma once
 
+#include <rfl/Field.hpp>
+#include <rfl/Variant.hpp>
+
 #include <spdlog/common.h>
 #include <spdlog/spdlog.h>
 
 #include <map>
 #include <string>
-#include <variant>
 
 namespace pdft::log {
+
+enum class LogLevel {
+    Trace = spdlog::level::trace,
+    Debug = spdlog::level::debug,
+    Info = spdlog::level::info,
+    Warn = spdlog::level::warn,
+    Err = spdlog::level::err,
+    Critical = spdlog::level::critical,
+    Off = spdlog::level::off,
+};
+
+enum class SyncMode {
+    Sync,
+    AsyncBlocking,
+    AsyncOverflow,
+};
 
 struct StdoutSink {
     bool cerr = false;
@@ -30,16 +48,14 @@ struct DailyFileSink {
     size_t minute = 0;
 };
 
-using SinkConfig = std::variant<StdoutSink, SimpleFileSink, RotatingFileSink, DailyFileSink>;
-
-enum SyncMode {
-    Sync,
-    AsyncBlocking,
-    AsyncOverflow,
-};
+using SinkConfig = rfl::Variant<
+    rfl::Field<"stdout", StdoutSink>,
+    rfl::Field<"file", SimpleFileSink>,
+    rfl::Field<"rot_file", RotatingFileSink>,
+    rfl::Field<"daily_file", DailyFileSink> >;
 
 struct LoggerConfig {
-    spdlog::level::level_enum level = spdlog::level::level_enum::info;
+    LogLevel level = LogLevel::Info;
     std::string format = "";
     SyncMode sync_mode = SyncMode::Sync;
     bool force_flush = true;

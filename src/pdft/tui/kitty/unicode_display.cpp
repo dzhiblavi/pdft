@@ -2,6 +2,7 @@
 
 #include "pdft/core/assert.h"
 #include "pdft/core/log.h"
+#include "pdft/core/module/register.h"
 
 #include "./detail/rowcolumn_diacritics.h"
 
@@ -88,3 +89,5 @@ void UnicodeKittyDisplay::displayImage(
 }
 
 }  // namespace pdft::tui
+
+PDFT_REGISTER_MODULE(pdft::tui::UnicodeKittyDisplay);

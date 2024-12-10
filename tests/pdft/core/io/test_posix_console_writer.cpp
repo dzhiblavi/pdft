@@ -18,7 +18,7 @@ using namespace asio::experimental::awaitable_operators;
 TEST_CASE("testPosixConsoleWrite", "") {
     tests::runCoroutine([](auto& context) -> asio::awaitable<void> {
         auto mock = test::makeMockConsole();
-        auto console = PosixConsoleWriter(context, mock->outFd());
+        auto console = PosixConsoleWriter(context, {.fd = mock->outFd()});
 
         co_await console.write("hello, world!");
         CHECK(mock->written() == "hello, world!");

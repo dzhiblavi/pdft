@@ -10,7 +10,7 @@ struct APCExecutorConfig {
 
 class APCExecutorBase : public APCExecutor {
  public:
-    APCExecutorBase(const APCExecutorConfig& config = {})
+    explicit APCExecutorBase(APCExecutorConfig config = {})
         : max_chunk_size_(config.max_chunk_size_bytes) {}
 
     void execute(Context& ctx, const Command& cmd, io::OutBuffer& buffer) override;

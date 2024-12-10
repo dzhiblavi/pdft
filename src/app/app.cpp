@@ -1,33 +1,15 @@
 #include "app.h"
-#include "palettes.h"
-#include "resolve_display.h"
-#include "version.h"
 
-#include "pdft/app/controller/impl/controller.h"
-#include "pdft/app/loader/impl/loader.h"
-#include "pdft/app/persist/impl/persister.h"
-#include "pdft/app/state/document_storage.h"
-#include "pdft/app/state/ui_state.h"
-#include "pdft/app/view/impl/document_view.h"
-#include "pdft/app/view/impl/page_renderer.h"
-#include "pdft/app/view/impl/view.h"
-
-#include "pdft/media/mupdf/loader.h"
-
-#include "pdft/notify/fsw_notify.h"
-#include "pdft/tui/ansi_terminal.h"
 #include "pdft/tui/render.h"
 
-#include "pdft/utils/build_info.h"
-#include "pdft/utils/visit.h"
-
 #include "pdft/core/awaitable.h"
-#include "pdft/core/io/posix_console_reader.h"
-#include "pdft/core/io/posix_console_writer.h"
-#include "pdft/core/io/posix_termctl.h"
 #include "pdft/core/log.h"
+#include "pdft/core/module/register.h"
 #include "pdft/core/trace/log_stack_trace.h"
 #include "pdft/core/trace/stack_scope_tracer.h"
+
+#include "pdft/utils/get_home_dir.h"
+#include "pdft/utils/visit.h"
 
 #include <asio/experimental/awaitable_operators.hpp>
 #include <asio/io_context.hpp>
@@ -40,10 +22,6 @@ namespace app {
 using namespace pdft;
 using namespace asio::experimental::awaitable_operators;
 
-using pdft::app::AppController;
-using pdft::app::AppDocumentView;
-using pdft::app::AppPageRenderer;
-using pdft::app::AppView;
 using pdft::app::ControllerAction;
 
 namespace {
@@ -70,71 +48,33 @@ Result<ControllerAction> handleSignal(int signal) {
 
 }  // namespace
 
-Application::Application(asio::io_context& context, Config config)
-    : io_(context)
-    , config_(config)
-    , context_(context)
-    , signals_(context, SIGWINCH, SIGINT, SIGSEGV) {
-    setup();
-}
-
-void Application::setup() {
-    term_control_ = std::make_shared<io::PosixTermControl>();
-    terminal_ = std::make_shared<tui::AnsiTerminal>();
-    console_writer_ = std::make_shared<io::PosixConsoleWriter>(context_, ::dup(STDOUT_FILENO));
-    console_reader_ = std::make_shared<io::PosixConsoleReader>(context_, ::dup(STDIN_FILENO));
-    image_display_ = resolveDisplay(config_.display, terminal_);
-    doc_loader_ = std::make_shared<pdft::media::MupdfLoader>();
-
-    loader_ = std::make_shared<pdft::app::AppLoader>(
-        config_.system.state_mode,
-        std::make_shared<pdft::app::AppPersister>(doc_loader_),
-        doc_loader_);
-
-    documents_ = std::make_shared<pdft::app::DocumentStorage>();
-    palettes_ = std::make_shared<pdft::app::PaletteStorage>();
-    palettes_->add("skim", getSkimPalette());
-
-    ui_.display = config_.display.properties;
-
-    auto renderer = std::make_shared<AppPageRenderer>(
-        io_,
-        AppPageRenderer::Config{
-            .render_pool_size = config_.system.render_pool_size,
-            .num_preload_backward = config_.system.num_preload_backward,
-            .num_preload_forward = config_.system.num_preload_forward,
-            .image_id_salt = config_.system.image_id_salt,
-        },
-        documents_,
-        std::make_shared<pdft::app::ImageRenderer>(palettes_),
-        image_display_);
-
-    view_ = std::make_shared<AppView>(
-        documents_, std::make_shared<AppDocumentView>(std::move(renderer)));
-    controller_ = std::make_shared<AppController>(config_.controller, doc_loader_);
-
-    if (config_.system.enable_filesystem_watching) {
-        fs_watcher_ = std::make_shared<pdft::notify::FswNotify>(context_.get_executor());
-    }
-}
-
-void Application::printAppInfo() const {
-    using namespace utils;
-    using magic_enum::enum_name;
-
-    log::info(this, "PDFT {}", getFullVersionString());
-
-    log::info(
-        this,
-        "Platform={}, ASAN={}, TSAN={}, UBSAN={}",
-        enum_name(getCurrentPlatform()),
-        enum_name(isBuiltWithASAN()),
-        enum_name(isBuiltWithTSAN()),
-        enum_name(isBuiltWithUBSAN()));
-}
+Application::Application(
+    asio::io_context& context,
+    Config config,
+    inject<pdft::notify::Notify, "fswatcher"> fswatcher,
+    inject<pdft::io::ConsoleWriter, "writer"> writer,
+    inject<pdft::io::ConsoleReader, "reader"> reader,
+    inject<pdft::io::TermControl, "term_ctrl"> term_control,
+    inject<pdft::tui::Terminal, "terminal"> terminal,
+    inject<pdft::app::DocumentStorage, "docs"> documents,
+    inject<pdft::app::Loader, "loader"> loader,
+    inject<pdft::tui::Display, "display"> display,
+    inject<pdft::app::Controller, "controller"> controller,
+    inject<pdft::app::View, "view"> view)
+    : config_(config)
+    , signals_(context, SIGWINCH, SIGINT, SIGSEGV)
+    , fs_watcher_(std::move(fswatcher))
+    , term_control_(std::move(term_control))
+    , console_writer_(std::move(writer))
+    , console_reader_(std::move(reader))
+    , terminal_(std::move(terminal))
+    , image_display_(std::move(display))
+    , loader_(std::move(loader))
+    , documents_(std::move(documents))
+    , view_(std::move(view))
+    , controller_(std::move(controller)) {}
 
 asio::awaitable<void> Application::run(const std::vector<std::string>& paths) {
-    printAppInfo();
     co_await prepareTerminal();
     load(paths);
     co_await runEventLoop();
@@ -161,14 +101,9 @@ void Application::load(const std::vector<std::string>& paths) {
 
     auto state_path = std::filesystem::absolute(utils::expandHome(*config_.state_path));
 
-    auto err = loader_->load(paths, ui_, *documents_, state_path);
+    auto err = loader_->load(paths, ui_, *documents_, *config_.state_path);
     if (!err.has_value()) {
         log::err("failed to load state_path={}, error={}", *config_.state_path, err.error());
-        return;
-    }
-
-    if (!config_.system.enable_filesystem_watching) {
-        log::info("filesystem watching is disabled");
         return;
     }
 
@@ -276,7 +211,7 @@ asio::awaitable<void> Application::cleanup() {
         co_return co_await console_writer_->write(buffer.view());
     }();
 
-    if (config_.system.enable_filesystem_watching) {
+    {
         auto _ = ctx.push("fsw:stop");
         fs_watcher_->stop();
     }
@@ -286,3 +221,5 @@ asio::awaitable<void> Application::cleanup() {
 }
 
 }  // namespace app
+
+PDFT_REGISTER_MODULE(app::Application);

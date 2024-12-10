@@ -1,4 +1,5 @@
 #include "pdft/tui/kitty/apc/regular_apc_executor.h"
+#include "pdft/core/module/register.h"
 
 namespace pdft::tui {
 
@@ -11,3 +12,5 @@ void RegularAPCExecutor::writeSuffix(io::OutBuffer& buffer) const {
 }
 
 }  // namespace pdft::tui
+
+PDFT_REGISTER_MODULE(pdft::tui::RegularAPCExecutor);
