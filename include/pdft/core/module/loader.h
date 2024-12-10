@@ -142,8 +142,14 @@ Arc<T> ModuleLoader::makeModule(std::string name) {
         Parameters{});
 
     const auto& config = getConfig(name);
+
+    module->setLogger(PDFT_VERIFY(
+        log::logger(config.logger),
+        "missing logger {} required by module {}",
+        config.logger,
+        name));
+
     module->setName(std::move(name));
-    module->setLogger(PDFT_VERIFY(log::logger(config.logger)));
     return module;
 }
 
