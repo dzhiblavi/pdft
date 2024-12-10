@@ -29,9 +29,9 @@ Application::Application(
     inject<pdft::io::ConsoleReader, "reader"> reader,
     inject<pdft::io::TermControl, "term_ctrl"> term_control,
     inject<pdft::tui::Terminal, "terminal"> terminal,
+    inject<pdft::tui::Display, "display"> display,
     inject<pdft::app::DocumentStorage, "docs"> documents,
     inject<pdft::app::Loader, "loader"> loader,
-    inject<pdft::tui::Display, "display"> display,
     inject<pdft::app::Controller, "controller"> controller,
     inject<pdft::app::View, "view"> view)
     : config_(config)

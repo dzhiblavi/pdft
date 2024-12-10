@@ -34,9 +34,9 @@ class Application : public Module {
         inject<io::ConsoleReader, "reader"> reader,
         inject<io::TermControl, "term_ctrl"> term_control,
         inject<tui::Terminal, "terminal"> terminal,
+        inject<tui::Display, "display"> display,
         inject<DocumentStorage, "docs"> documents,
         inject<Loader, "loader"> loader,
-        inject<tui::Display, "display"> display,
         inject<Controller, "controller"> controller,
         inject<View, "view"> view);
 
