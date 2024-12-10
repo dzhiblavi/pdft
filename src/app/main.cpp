@@ -4,6 +4,7 @@
 #include "pdft/core/log/load.h"
 #include "pdft/core/module/factory_storage.h"
 #include "pdft/core/module/loader.h"
+#include "pdft/utils/get_home_dir.h"
 
 #include <asio/co_spawn.hpp>
 #include <asio/detached.hpp>
@@ -61,7 +62,7 @@ int main(int argc, const char** argv) {
     }
 
     auto config = rfl::json::load<app::Config, rfl::DefaultIfMissing>(
-        "/Users/dzhiblavi/personal/projects/pdft-cxx/config/config.json");
+        cli_args->config_path.value_or(pdft::utils::expandHome("~/.config/pdft/config.json")));
 
     if (!config) {
         std::cerr << std::format("Error while parsing configuration: {}", config.error()->what())

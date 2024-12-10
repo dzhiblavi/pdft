@@ -1,6 +1,7 @@
 #include "pdft/core/log/load.h"
 #include "pdft/core/log.h"
 
+#include "pdft/utils/get_home_dir.h"
 #include "pdft/utils/overloaded.h"
 
 #include <rfl/visit.hpp>
@@ -17,6 +18,10 @@
 namespace pdft::log {
 
 namespace {
+
+std::string absolute(const std::string& path) {
+    return utils::expandHome(path);
+}
 
 constexpr auto GLOBAL_LOGGER_NAME = "global";
 
@@ -38,17 +43,17 @@ spdlog::sink_ptr loadSink(const SinkConfig& config) {
             },
             [](const rfl::Field<"file", SimpleFileSink>& v) -> spdlog::sink_ptr {
                 auto&& sink = v.value();
-                return std::make_shared<spdlog::sinks::basic_file_sink_mt>(sink.path);
+                return std::make_shared<spdlog::sinks::basic_file_sink_mt>(absolute(sink.path));
             },
             [](const rfl::Field<"rot_file", RotatingFileSink>& v) -> spdlog::sink_ptr {
                 auto&& sink = v.value();
                 return std::make_shared<spdlog::sinks::rotating_file_sink_mt>(
-                    sink.path, sink.max_size, sink.max_num_files);
+                    absolute(sink.path), sink.max_size, sink.max_num_files);
             },
             [](const rfl::Field<"daily_file", DailyFileSink>& v) -> spdlog::sink_ptr {
                 auto&& sink = v.value();
                 return std::make_shared<spdlog::sinks::daily_file_sink_mt>(
-                    sink.path, sink.hour, sink.minute);
+                    absolute(sink.path), sink.hour, sink.minute);
             },
         },
         config);

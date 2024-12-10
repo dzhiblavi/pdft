@@ -7,7 +7,7 @@
         "sinks": [
           {
             "file": {
-              "path": "/Users/dzhiblavi/personal/projects/pdft-cxx/logs/app.log"
+              "path": "../../../../logs/app.log"
             }
           }
         ]
@@ -18,7 +18,7 @@
         "sinks": [
           {
             "file": {
-              "path": "/Users/dzhiblavi/personal/projects/pdft-cxx/logs/mupdf.log"
+              "path": "../../../../logs/mupdf.log"
             }
           }
         ]
@@ -29,7 +29,7 @@
         "sinks": [
           {
             "file": {
-              "path": "/Users/dzhiblavi/personal/projects/pdft-cxx/logs/bg.log"
+              "path": "../../../../logs/bg.log"
             }
           }
         ]
@@ -40,7 +40,7 @@
         "sinks": [
           {
             "file": {
-              "path": "/Users/dzhiblavi/personal/projects/pdft-cxx/logs/trace.log"
+              "path": "../../../../logs/trace.log"
             }
           }
         ]
@@ -51,7 +51,7 @@
         "sinks": [
           {
             "file": {
-              "path": "/Users/dzhiblavi/personal/projects/pdft-cxx/logs/bg-trace.log"
+              "path": "../../../../logs/bg-trace.log"
             }
           }
         ]
@@ -68,7 +68,7 @@
     "app": {
       "factory": "app::Application",
       "config": {
-        "state_path": "/Users/dzhiblavi/personal/projects/pdft-cxx/assets/state.json"
+        "state_path": "../../../../assets/state.json"
       }
     },
     "writer": {

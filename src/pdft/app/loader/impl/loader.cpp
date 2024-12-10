@@ -34,7 +34,7 @@ void AppLoader::save(
 
     std::ofstream ofs(state_path);
     persister_->save(ui, documents, ofs);
-    log::info("the state has been successfully saved");
+    log::info("the state has been successfully saved to {}", state_path);
 }
 
 Status AppLoader::load(
@@ -78,6 +78,7 @@ Status AppLoader::load(
         log::info("loaded path {}", path);
     }
 
+    log::info("the state has been successfully restored from {}", state_path);
     return result::ok();
 }
 

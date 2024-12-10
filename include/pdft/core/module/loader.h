@@ -1,10 +1,10 @@
 #pragma once
 
 #include "pdft/core/module/config.h"
+#include "pdft/core/module/detail/config_type.h"
 #include "pdft/core/module/detail/constructor.h"
 #include "pdft/core/module/inject.h"
 #include "pdft/core/module/module.h"
-#include "pdft/core/result/type/unit.h"
 
 #include <rfl/Generic.hpp>
 #include <rfl/from_generic.hpp>
@@ -23,19 +23,6 @@ struct LoadContext {
     ModulesConfig modules;
     LoadedModules loaded = {};
 };
-
-template <typename T, typename = void>
-struct MaybeConfigTypeImpl {
-    using type = Unit;
-};
-
-template <typename T>
-struct MaybeConfigTypeImpl<T, std::void_t<typename T::Config>> {
-    using type = typename T::Config;
-};
-
-template <typename T>
-using MaybeConfigType = typename MaybeConfigTypeImpl<T>::type;
 
 class ModuleLoader {
  public:
@@ -77,14 +64,14 @@ class ModuleLoader {
 
  private:
     const ModuleConfig& getConfig(const std::string& name);
-    Arc<Module> addNewModule(const std::string& name, ModulePtr module);
+    Arc<Module> addNewModule(const std::string& name, Arc<Module> module);
 
     LoadContext& context_;
 };
 
 template <IsModule ModuleType>
 struct ValueArgumentInjector {
-    using ConfigType = MaybeConfigType<ModuleType>;
+    using ConfigType = detail::MaybeConfigType<ModuleType>;
 
     ValueArgumentInjector(ModuleLoader* ctx, const std::string& name) : ctx(ctx), name(name) {}
 
@@ -100,7 +87,7 @@ struct ValueArgumentInjector {
 
 template <IsModule ModuleType>
 struct RefArgumentInjector {
-    using ConfigType = MaybeConfigType<ModuleType>;
+    using ConfigType = detail::MaybeConfigType<ModuleType>;
 
     RefArgumentInjector(ModuleLoader* ctx, const std::string& name) : ctx(ctx), name(name) {}
 

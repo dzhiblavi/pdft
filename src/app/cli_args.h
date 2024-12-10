@@ -1,6 +1,7 @@
 #pragma once
 
 #include <expected>
+#include <optional>
 #include <span>
 #include <string>
 #include <vector>
@@ -8,6 +9,7 @@
 namespace app {
 
 struct CliArgs {
+    std::optional<std::string> config_path;
     std::vector<std::string> paths;
 };
 

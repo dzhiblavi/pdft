@@ -29,6 +29,7 @@ void Entrypoint::start() {
     printAppInfo();
     asio::co_spawn(io_, app_->run(paths_), asio::detached);
 }
+
 void Entrypoint::printAppInfo() const {
     using namespace pdft::utils;
     using magic_enum::enum_name;

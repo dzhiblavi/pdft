@@ -101,7 +101,7 @@ void Application::load(const std::vector<std::string>& paths) {
 
     auto state_path = std::filesystem::absolute(utils::expandHome(*config_.state_path));
 
-    auto err = loader_->load(paths, ui_, *documents_, *config_.state_path);
+    auto err = loader_->load(paths, ui_, *documents_, state_path);
     if (!err.has_value()) {
         log::err("failed to load state_path={}, error={}", *config_.state_path, err.error());
         return;

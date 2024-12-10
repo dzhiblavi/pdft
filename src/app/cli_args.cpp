@@ -15,8 +15,8 @@ std::expected<CliArgs, std::string> parseCliArgs(std::span<const char*> args) {
 
         TCLAP::CmdLine cmd("pdft: A terminal PDF viewer", ' ', getFullVersionString());
 
-        // TCLAP::ValueArg<std::string> config_param(
-        //"c", "config-file", "Path to a configuration file", false, "", "path", cmd);
+        TCLAP::ValueArg<std::string> config_param(
+            "c", "config-file", "Path to a configuration file", false, "", "path", cmd);
 
         TCLAP::UnlabeledMultiArg<std::string> paths_param(
             "paths", "Paths to PDF files", false, "path", cmd);
@@ -26,9 +26,9 @@ std::expected<CliArgs, std::string> parseCliArgs(std::span<const char*> args) {
 
         cmd.parse(args.size(), args.data());
 
-        // if (config_param.isSet()) {
-        // result.config_path = config_param.getValue();
-        //}
+        if (config_param.isSet()) {
+            result.config_path = config_param.getValue();
+        }
 
         // auto&& state_mode_str = state_mode_param.getValue();
 
