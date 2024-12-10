@@ -7,11 +7,8 @@
 namespace pdft {
 
 struct ModuleTraits {
-    using LoadVia = Arc<Module> (*)(ModuleLoader& loader, std::string name);
-    using Start = void (*)(Module* module);
-
-    LoadVia loadVia;
-    Start start;
+    virtual void start(Module* module) const = 0;
+    virtual Arc<Module> load(ModuleLoader& loader, std::string name) const = 0;
 };
 
 template <typename T>
@@ -19,30 +16,22 @@ concept Startable = requires(T& value) {
     { value.start() } -> std::convertible_to<void>;
 };
 
-template <Startable T>
-ModuleTraits::Start makeStart() {
-    return +[](Module* module) {
-        auto ptr = dynamic_cast<T*>(module);
-        ptr->start();
-    };
-}
-
 template <typename T>
-ModuleTraits::Start makeStart() {
-    return +[](Module*) {};
-}
+ModuleTraits* getModuleTraits() {
+    struct ModuleTraitsImpl : ModuleTraits {
+        Arc<Module> load(ModuleLoader& loader, std::string name) const override {
+            return loader.template makeModule<T>(std::move(name));
+        }
 
-template <typename T>
-ModuleTraits makeModuleTraits() {
-    ModuleTraits traits;
-
-    traits.loadVia = +[](ModuleLoader& loader, std::string name) {
-        return loader.template loadModule<T>(std::move(name));
+        void start(Module* module) const override {
+            if constexpr (Startable<T>) {
+                PDFT_VERIFY(dynamic_cast<T*>(module))->start();
+            }
+        }
     };
 
-    traits.start = makeStart<T>();
-
-    return traits;
+    static ModuleTraitsImpl traits;
+    return &traits;
 }
 
 class FactoryStorage {
@@ -50,14 +39,14 @@ class FactoryStorage {
     using ModuleFactory = Arc<Module> (*)(ModuleLoader& loader, std::string name);
 
     template <IsModule T>
-    void registerModule(const std::string& module_name) {
-        PDFT_VERIFY(!factories_.contains(module_name), "duplicate module {}", module_name);
-        factories_.emplace(module_name, makeModuleTraits<T>());
+    void registerModule(const std::string& factory) {
+        PDFT_VERIFY(!factories_.contains(factory), "duplicate factory {}", factory);
+        factories_.emplace(factory, getModuleTraits<T>());
     }
 
-    ModuleTraits getTraits(const std::string& module_name) {
-        PDFT_VERIFY(factories_.contains(module_name), "unknown module {}", module_name);
-        return factories_[module_name];
+    ModuleTraits* getTraits(const std::string& factory) {
+        PDFT_VERIFY(factories_.contains(factory), "unknown factory {}", factory);
+        return factories_[factory];
     }
 
     static FactoryStorage& globalInstance() {
@@ -68,7 +57,7 @@ class FactoryStorage {
  private:
     FactoryStorage() = default;
 
-    std::unordered_map<std::string, ModuleTraits> factories_;
+    std::unordered_map<std::string, ModuleTraits*> factories_;
 };
 
 }  // namespace pdft

@@ -6,10 +6,10 @@
 #include "pdft/core/module/module.h"
 #include "pdft/core/result/type/unit.h"
 
-#include <asio/io_context.hpp>
 #include <rfl/Generic.hpp>
 #include <rfl/from_generic.hpp>
-#include <yaml-cpp/node/node.h>
+
+#include <asio/io_context.hpp>
 
 #include <span>
 
@@ -60,7 +60,7 @@ class ModuleLoader {
             return *PDFT_VERIFY(
                 result, "failed to parse config for {}: {}", for_module, result.error()->what());
         } else if constexpr (std::convertible_to<ArgType&, DependsOnModuleTag&>) {
-            return ArgType{loadModule(ArgType::Name.c_str())};
+            return ArgType{getOrLoadModule(ArgType::Name.c_str())};
         } else {
             []<bool flag = false>() {
                 static_assert(flag, "I don't know how to get you this constructor argument");
@@ -68,10 +68,12 @@ class ModuleLoader {
         }
     }
 
-    template <typename T>
-    Arc<Module> loadModule(std::string name);
+    template <IsModule T>
+    Arc<T> makeModule(std::string name);
 
-    Arc<Module> loadModule(const std::string& name);
+    Arc<Module> getOrLoadModule(const std::string& name);
+
+    bool isLoaded(const std::string& name);
 
  private:
     const ModuleConfig& getConfig(const std::string& name);
@@ -127,20 +129,22 @@ struct RefArgumentInjector {
     std::string name;
 };
 
-template <typename T>
-Arc<Module> ModuleLoader::loadModule(std::string name) {
+template <IsModule T>
+Arc<T> ModuleLoader::makeModule(std::string name) {
     using Parameters = typename detail::Constructor<T>::type;
 
-    return addNewModule(
-        name,
-        std::apply(
-            [this, name]<typename... Types>(Types...) {
-                return std::make_shared<T>(std::conditional_t<
-                                           Types::value,
-                                           RefArgumentInjector<T>,
-                                           ValueArgumentInjector<T>>(this, name)...);
-            },
-            Parameters{}));
+    Arc<T> module = std::apply(
+        [this, name]<typename... Types>(Types...) {
+            return std::make_shared<T>(
+                std::conditional_t<Types::value, RefArgumentInjector<T>, ValueArgumentInjector<T>>(
+                    this, name)...);
+        },
+        Parameters{});
+
+    const auto& config = getConfig(name);
+    module->setName(std::move(name));
+    module->setLogger(PDFT_VERIFY(log::logger(config.logger)));
+    return module;
 }
 
 }  // namespace pdft

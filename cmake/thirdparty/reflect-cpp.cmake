@@ -7,7 +7,7 @@ set(REFLECTCPP_MSGPACK OFF)
 set(REFLECTCPP_TOML OFF)
 set(REFLECTCPP_UBJSON OFF)
 set(REFLECTCPP_XML OFF)
-set(REFLECTCPP_YAML ON)
+set(REFLECTCPP_YAML OFF)
 
 FetchContent_Declare(
   reflect_cpp
@@ -18,9 +18,6 @@ FetchContent_Declare(
 
 FetchContent_GetProperties(reflect_cpp)
 FetchContent_MakeAvailable(reflect_cpp)
-
-# Link reflectcpp to yaml-cpp to it finds the library
-target_link_libraries(reflectcpp PUBLIC yaml-cpp::yaml-cpp)
 
 # Set library's include directory as SYSTEM so it does not raise unneeded
 # warnings

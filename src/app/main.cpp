@@ -32,10 +32,13 @@ void main(Config config, std::span<const char*> argv) {
     ModuleLoader loader(ctx);
 
     for (const auto& [name, conf] : ctx.modules) {
-        auto mod = loader.loadModule(name);
+        if (loader.isLoaded(name)) {
+            continue;
+        }
 
+        auto mod = loader.getOrLoadModule(name);
         auto traits = FactoryStorage::globalInstance().getTraits(conf.factory);
-        traits.start(mod.get());
+        traits->start(mod.get());
     }
 
     try {

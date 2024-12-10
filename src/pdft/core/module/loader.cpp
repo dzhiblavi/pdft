@@ -3,14 +3,15 @@
 
 namespace pdft {
 
-Arc<Module> ModuleLoader::loadModule(const std::string& name) {
+Arc<Module> ModuleLoader::getOrLoadModule(const std::string& name) {
     if (auto it = context_.loaded.find(name); it != context_.loaded.end()) {
         return it->second;
     }
 
     const auto& config = getConfig(name);
-    auto factory = FactoryStorage::globalInstance().getTraits(config.factory).loadVia;
-    return factory(*this, name);
+    auto* traits = FactoryStorage::globalInstance().getTraits(config.factory);
+
+    return addNewModule(name, traits->load(*this, name));
 }
 
 const ModuleConfig& ModuleLoader::getConfig(const std::string& name) {
@@ -19,12 +20,14 @@ const ModuleConfig& ModuleLoader::getConfig(const std::string& name) {
 }
 
 ModulePtr ModuleLoader::addNewModule(const std::string& name, Arc<Module> module) {
-    const auto& config = getConfig(name);
-    module->setName(name);
-    module->setLogger(PDFT_VERIFY(log::logger(config.logger)));
+    PDFT_VERIFY(!isLoaded(name), "duplicate loaded module {}", name);
     context_.loaded[name] = module;
-    log::info("Loaded a module: name={}", name);
+    log::info("successfully loaded a module: name={}", name);
     return module;
+}
+
+bool ModuleLoader::isLoaded(const std::string& name) {
+    return context_.loaded.contains(name);
 }
 
 }  // namespace pdft
