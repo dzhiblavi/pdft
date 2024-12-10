@@ -24,30 +24,6 @@ using namespace asio::experimental::awaitable_operators;
 
 using pdft::app::ControllerAction;
 
-namespace {
-
-Result<ControllerAction> handleSignal(int signal) {
-    switch (signal) {
-        using enum ControllerAction;
-
-        case SIGWINCH:
-            log::info("received SIGWINCH: terminal resized, redrawing");
-            return Redraw;
-
-        case SIGINT:
-            log::info("received SIGINT: exiting");
-            return Quit;
-
-        case SIGSEGV:
-            return panic("received SIGSEGV");
-
-        default:
-            return panic("received unknown signal ({})", signal);
-    }
-}
-
-}  // namespace
-
 Application::Application(
     asio::io_context& context,
     Config config,
@@ -74,6 +50,26 @@ Application::Application(
     , view_(std::move(view))
     , controller_(std::move(controller)) {}
 
+Result<ControllerAction> Application::handleSignal(int signal) {
+    switch (signal) {
+        using enum ControllerAction;
+
+        case SIGWINCH:
+            log::info(this, "received SIGWINCH: terminal resized, redrawing");
+            return Redraw;
+
+        case SIGINT:
+            log::info(this, "received SIGINT: exiting");
+            return Quit;
+
+        case SIGSEGV:
+            return panic("received SIGSEGV");
+
+        default:
+            return panic("received unknown signal ({})", signal);
+    }
+}
+
 asio::awaitable<void> Application::run(const std::vector<std::string>& paths) {
     co_await prepareTerminal();
     load(paths);
@@ -95,7 +91,7 @@ asio::awaitable<void> Application::prepareTerminal() {
 
 void Application::load(const std::vector<std::string>& paths) {
     if (!config_.state_path.has_value()) {
-        log::info("not restoring the state");
+        log::info(this, "not restoring the state");
         return;
     }
 
@@ -103,7 +99,7 @@ void Application::load(const std::vector<std::string>& paths) {
 
     auto err = loader_->load(paths, ui_, *documents_, state_path);
     if (!err.has_value()) {
-        log::err("failed to load state_path={}, error={}", *config_.state_path, err.error());
+        log::err(this, "failed to load state_path={}, error={}", *config_.state_path, err.error());
         return;
     }
 
@@ -111,14 +107,14 @@ void Application::load(const std::vector<std::string>& paths) {
         auto document = documents_->getDocument(doc.document_id) | result::unwrap;
         const auto& path = document->getPath();
 
-        log::info("adding path {} to filesystem watching", path);
+        log::info(this, "adding path {} to filesystem watching", path);
         fs_watcher_->add(path);
     }
 }
 
 void Application::saveState() {
     if (!config_.state_path.has_value()) {
-        log::info("not saving the state");
+        log::info(this, "not saving the state");
         return;
     }
 
@@ -193,7 +189,7 @@ asio::awaitable<bool> Application::waitForNextRender() {
             trace::logStackTrace(std::move(tracer));
             co_return action == Quit;
         } else {
-            log::err("error in controller loop: {}", action.error());
+            log::err(this, "error in controller loop: {}", action.error());
         }
     }
 }

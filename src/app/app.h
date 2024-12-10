@@ -56,6 +56,7 @@ class Application : public pdft::Module {
     asio::awaitable<void> runEventLoop();
     asio::awaitable<bool> waitForNextRender();
     asio::awaitable<void> cleanup();
+    pdft::Result<pdft::app::ControllerAction> handleSignal(int signal);
 
     const Config config_;
     pdft::app::UIState ui_;
