@@ -1,4 +1,4 @@
-#include "pdft/app/loader/impl/loader.h"
+#include "pdft/app/state_loader/impl/app_state_loader.h"
 
 #include "pdft/core/log.h"
 #include "pdft/core/module/register.h"
@@ -33,7 +33,7 @@ struct CliArgs {
 
 }  // namespace
 
-AppLoader::AppLoader(
+AppStateLoader::AppStateLoader(
     Config config,
     std::span<const char*> argv,
     inject<const Persister, "persister"> persister,
@@ -43,10 +43,10 @@ AppLoader::AppLoader(
     , doc_loader_(std::move(doc_loader)) {
     auto cli = utils::parseFromCliArgs<CliArgs>(argv) | result::unwrap;
     mode_ = cli.state_mode.value_or(mode_);
-    log::info(this, "AppLoader state mode is {}", magic_enum::enum_name(mode_));
+    log::info(this, "AppStateLoader state mode is {}", magic_enum::enum_name(mode_));
 }
 
-void AppLoader::save(
+void AppStateLoader::save(
     const UIState& ui, const DocumentStorage& documents, const std::filesystem::path& state_path) {
     if (mode_ == StateMode::Standalone) {
         log::info("not saving the state in Standalone mode");
@@ -58,7 +58,7 @@ void AppLoader::save(
     log::info("the state has been successfully saved to {}", state_path);
 }
 
-Status AppLoader::load(
+Status AppStateLoader::load(
     const std::vector<std::string>& paths,
     UIState& ui,
     DocumentStorage& documents,
@@ -105,4 +105,4 @@ Status AppLoader::load(
 
 }  // namespace pdft::app
 
-PDFT_REGISTER_MODULE(pdft::app::AppLoader);
+PDFT_REGISTER_MODULE(pdft::app::AppStateLoader);

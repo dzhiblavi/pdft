@@ -1,6 +1,6 @@
 #pragma once
 
-#include "pdft/app/loader/loader.h"
+#include "pdft/app/state_loader/state_loader.h"
 #include "pdft/app/persist/persister.h"
 #include "pdft/media/loader.h"
 
@@ -16,13 +16,13 @@ enum class StateMode {
     AddAll,      // Use the state and append all paths to it (duplicates can be created)
 };
 
-class AppLoader : public Loader, public Module {
+class AppStateLoader : public StateLoader, public Module {
  public:
     struct Config {
         StateMode mode;
     };
 
-    AppLoader(
+    AppStateLoader(
         Config config,
         std::span<const char*> argv,
         inject<const Persister, "persister"> persister,

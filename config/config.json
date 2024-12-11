@@ -65,6 +65,9 @@
     "fswatcher": {
       "factory": "pdft::notify::FswNotify"
     },
+    "listener": {
+      "factory": "pdft::app::AppEventListener"
+    },
     "app": {
       "factory": "pdft::app::Application",
       "config": {
@@ -90,7 +93,7 @@
       "factory": "pdft::media::MupdfLoader"
     },
     "loader": {
-      "factory": "pdft::app::AppLoader",
+      "factory": "pdft::app::AppStateLoader",
       "config": {
         "mode": "AddOnly"
       }

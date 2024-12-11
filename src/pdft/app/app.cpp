@@ -22,24 +22,22 @@ namespace pdft::app {
 using namespace asio::experimental::awaitable_operators;
 
 Application::Application(
-    asio::io_context& context,
     Config config,
-    inject<pdft::notify::Notify, "fswatcher"> fswatcher,
-    inject<pdft::io::ConsoleWriter, "writer"> writer,
-    inject<pdft::io::ConsoleReader, "reader"> reader,
-    inject<pdft::io::TermControl, "term_ctrl"> term_control,
-    inject<pdft::tui::Terminal, "terminal"> terminal,
-    inject<pdft::tui::Display, "display"> display,
-    inject<pdft::app::DocumentStorage, "docs"> documents,
-    inject<pdft::app::Loader, "loader"> loader,
-    inject<pdft::app::Controller, "controller"> controller,
-    inject<pdft::app::View, "view"> view)
+    inject<EventListener, "listener"> listener,
+    inject<notify::Notify, "fswatcher"> fswatcher,
+    inject<io::ConsoleWriter, "writer"> writer,
+    inject<io::TermControl, "term_ctrl"> term_control,
+    inject<tui::Terminal, "terminal"> terminal,
+    inject<tui::Display, "display"> display,
+    inject<DocumentStorage, "docs"> documents,
+    inject<StateLoader, "loader"> loader,
+    inject<Controller, "controller"> controller,
+    inject<View, "view"> view)
     : config_(config)
-    , signals_(context, SIGWINCH, SIGINT, SIGSEGV)
+    , listener_(std::move(listener))
     , fs_watcher_(std::move(fswatcher))
     , term_control_(std::move(term_control))
     , console_writer_(std::move(writer))
-    , console_reader_(std::move(reader))
     , terminal_(std::move(terminal))
     , image_display_(std::move(display))
     , loader_(std::move(loader))
@@ -139,16 +137,6 @@ asio::awaitable<void> Application::runEventLoop() {
     }
 }
 
-pdft::AsyncResult<int> Application::awaitSignal() {
-    auto [ec, signal] = co_await signals_.async_wait(asio_coro_as_tuple);
-
-    if (ec) {
-        co_return result::err(ec);
-    }
-
-    co_return result::ok(signal);
-}
-
 asio::awaitable<bool> Application::waitForNextRender() {
     auto tracer = trace::getGlobalPool().getTracer("controller");
 
@@ -156,27 +144,22 @@ asio::awaitable<bool> Application::waitForNextRender() {
         using enum ControllerAction;
 
         // XXX Debouncing?
-        auto event =
-            tracer.addChild("wait_input") |
-            co_await (console_reader_->read(1) || fs_watcher_->nextEvent() || awaitSignal());
+        auto event = tracer.addChild("wait_input") | co_await listener_->nextEvent();
 
-        // XXX Handle errors!
+        if (!event) {
+            log::err(this, "error event received: {}", event.error());
+            continue;
+        }
+
         auto action =
             tracer.addChild("handle_event") |
-            utils::visitUnpack(
-                event,
-                [&](Result<std::string> r) {
-                    char c = (r | result::unwrap)[0];
-                    return controller_->onKeyEvent(c, ui_, *documents_);
+            utils::visit(
+                *event,
+                [&](char c) { return controller_->onKeyEvent(c, ui_, *documents_); },
+                [&](const notify::Event& r) {
+                    return controller_->onFilesystemEvent(r, ui_, *documents_);
                 },
-                [&](Result<notify::Event> r) {
-                    auto&& event = r | result::unwrap;
-                    return controller_->onFilesystemEvent(event, ui_, *documents_);
-                },
-                [&](Result<int> r) {
-                    int signal = r | result::unwrap;
-                    return handleSignal(signal);
-                });
+                [&](int signal) { return handleSignal(signal); });
 
         if (action.has_value()) {
             if (action == None) {
@@ -186,7 +169,7 @@ asio::awaitable<bool> Application::waitForNextRender() {
             trace::logStackTrace(std::move(tracer));
             co_return action == Quit;
         } else {
-            log::err(this, "error in controller loop: {}", action.error());
+            log::err(this, "error fron controller: {}", action.error());
         }
     }
 }

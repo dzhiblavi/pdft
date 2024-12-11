@@ -9,9 +9,9 @@
 
 namespace pdft::app {
 
-class Loader {
+class StateLoader {
  public:
-    virtual ~Loader() = default;
+    virtual ~StateLoader() = default;
 
     virtual void save(
         const UIState& ui,
