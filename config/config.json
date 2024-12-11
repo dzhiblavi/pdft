@@ -60,13 +60,13 @@
   },
   "modules": {
     "entrypoint": {
-      "factory": "app::Entrypoint"
+      "factory": "pdft::app::Entrypoint"
     },
     "fswatcher": {
       "factory": "pdft::notify::FswNotify"
     },
     "app": {
-      "factory": "app::Application",
+      "factory": "pdft::app::Application",
       "config": {
         "state_path": "../../../../assets/state.json"
       }

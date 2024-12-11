@@ -24,11 +24,9 @@ class AppLoader : public Loader, public Module {
 
     AppLoader(
         Config config,
+        std::span<const char*> argv,
         inject<const Persister, "persister"> persister,
-        inject<const media::Loader, "media_loader"> doc_loader)
-        : mode_(config.mode)
-        , persister_(std::move(persister))
-        , doc_loader_(std::move(doc_loader)) {}
+        inject<const media::Loader, "media_loader"> doc_loader);
 
     void save(
         const UIState& ui,
@@ -42,7 +40,7 @@ class AppLoader : public Loader, public Module {
         const std::filesystem::path& state_path) override;
 
  private:
-    const StateMode mode_;
+    StateMode mode_;
     Arc<const Persister> persister_;
     Arc<const media::Loader> doc_loader_;
 };

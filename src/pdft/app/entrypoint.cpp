@@ -1,15 +1,20 @@
 #include "pdft/app/entrypoint.h"
-#include "pdft/app/cli_args.h"
 #include "pdft/app/palettes.h"
 #include "pdft/app/version.h"
 
 #include "pdft/core/module/register.h"
+
 #include "pdft/utils/build_info.h"
+#include "pdft/utils/cli_args/cli_args.h"
 
 #include <asio/co_spawn.hpp>
 #include <asio/detached.hpp>
 
 namespace pdft::app {
+
+struct EntrypointCliArgs {
+    std::vector<std::string> p;
+};
 
 Entrypoint::Entrypoint(
     asio::io_context& io,
@@ -18,13 +23,13 @@ Entrypoint::Entrypoint(
     inject<app::Application, "app"> app)
     : io_(io)
     , app_(std::move(app)) {
-    auto args = parseCliArgs(argv);
+    auto args = utils::parseFromCliArgs<EntrypointCliArgs>(argv);
 
     if (!args) {
         panic("failed to parse CLI args: {}", args.error());
     }
 
-    paths_ = args->paths;
+    paths_ = std::move(args->p);
     palettes->add("skim", getSkimPalette());
 }
 

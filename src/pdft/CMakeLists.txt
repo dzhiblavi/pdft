@@ -5,6 +5,7 @@ find_package(cpptrace REQUIRED)
 find_package(ZLIB REQUIRED)
 find_package(magic_enum REQUIRED)
 find_package(cppcoro REQUIRED)
+find_package(tclap REQUIRED)
 
 add_library(pdft-buildinfo)
 target_include_directories(
@@ -32,6 +33,7 @@ target_link_libraries(
          cppcoro::cppcoro
          saf
          reflectcpp
+         tclap::tclap
          ftxui::screen
          ftxui::dom)
 

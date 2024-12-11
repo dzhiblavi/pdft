@@ -3,6 +3,9 @@
 #include "pdft/core/log.h"
 #include "pdft/core/module/register.h"
 
+#include "pdft/utils/cli_args/cli_args.h"
+#include "pdft/utils/get_home_dir.h"
+
 #include <magic_enum.hpp>
 
 namespace pdft::app {
@@ -23,7 +26,32 @@ bool isOpened(const std::string& abs_path, const UIState& ui, const DocumentStor
     return false;
 }
 
+struct CliArgs {
+    std::optional<StateMode> state_mode;
+};
+
 }  // namespace
+
+AppLoader::AppLoader(
+    Config config,
+    std::span<const char*> argv,
+    inject<const Persister, "persister"> persister,
+    inject<const media::Loader, "media_loader"> doc_loader)
+    : mode_(config.mode)
+    , persister_(std::move(persister))
+    , doc_loader_(std::move(doc_loader)) {
+    auto cli = utils::parseFromCliArgs<CliArgs>(argv);
+
+    if (!cli) {
+        panic("bad cli arguments: {}", cli.error());
+    }
+
+    if (cli->state_mode.has_value()) {
+        mode_ = *cli->state_mode;
+    }
+
+    log::info(this, "AppLoader state mode is {}", magic_enum::enum_name(mode_));
+}
 
 void AppLoader::save(
     const UIState& ui, const DocumentStorage& documents, const std::filesystem::path& state_path) {
@@ -58,7 +86,7 @@ Status AppLoader::load(
     }
 
     for (auto path : paths) {
-        path = std::filesystem::absolute(path);
+        path = std::filesystem::absolute(utils::expandHome(path));
 
         if (isOpened(path, ui, documents) && mode_ == StateMode::AddOnly) {
             log::info("ignoring the new path {} because state mode is AddOnly", path);

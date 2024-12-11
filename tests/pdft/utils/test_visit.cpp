@@ -4,7 +4,7 @@
 
 namespace pdft::utils {
 
-TEST_CASE("testVisitPlain", "") {
+TEST_CASE("testVisitPlain") {
     std::variant<int, std::tuple<int, int>> v = std::make_tuple(10, 20);
 
     bool good = false;
@@ -12,7 +12,7 @@ TEST_CASE("testVisitPlain", "") {
     CHECK(good);
 }
 
-TEST_CASE("testVisitUnpack", "") {
+TEST_CASE("testVisitUnpack") {
     std::variant<int, std::tuple<int, int>> v = std::make_tuple(10, 20);
 
     bool good = false;

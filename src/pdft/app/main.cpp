@@ -1,10 +1,10 @@
-#include "pdft/app/cli_args.h"
 #include "pdft/app/config.h"
 
 #include "pdft/core/log/load.h"
 #include "pdft/core/module/factory_storage.h"
 #include "pdft/core/module/loader.h"
 
+#include "pdft/utils/cli_args/cli_args.h"
 #include "pdft/utils/get_home_dir.h"
 
 #include <asio/co_spawn.hpp>
@@ -50,10 +50,14 @@ void main(Config config, std::span<const char*> argv) {
 
 }  // namespace pdft::app
 
+struct CliArgs {
+    std::optional<std::string> config_path;
+};
+
 int main(int argc, const char** argv) {
     auto args = std::span(argv, argc);
 
-    auto cli_args = pdft::app::parseCliArgs(args);
+    auto cli_args = pdft::utils::parseFromCliArgs<CliArgs>(args);
     if (!cli_args.has_value()) {
         std::cerr << std::format("Error while parsing CLI arguments: {}", cli_args.error())
                   << std::endl;

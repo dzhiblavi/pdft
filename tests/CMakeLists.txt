@@ -1,6 +1,7 @@
 include(Catch)
 find_package(Catch2 REQUIRED)
 find_package(GTest REQUIRED)
+find_package(tclap REQUIRED)
 
 function(add_test path)
   string(REPLACE ".cpp" "" name ${path})
@@ -35,6 +36,7 @@ add_test(./pdft/image/color.cpp)
 # Utils
 add_test(./pdft/utils/test_intrusive_forward_list.cpp)
 add_test(./pdft/utils/test_visit.cpp)
+add_test(./pdft/utils/test_cli_args.cpp)
 
 # TUI
 add_test(./pdft/tui/test_alignment.cpp)

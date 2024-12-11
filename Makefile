@@ -57,19 +57,19 @@ test: build
 	cd $(BUILD_DIR) && ctest --output-on-failure
 
 run-lldb: build
-	cd $(BUILD_DIR) && lldb -- ./src/app/app $(path)
+	cd $(BUILD_DIR) && lldb -- ./src/pdft/app $(path)
 
 run-gdb: build
-	cd $(BUILD_DIR) && gdb --args ./src/app/app $(path)
+	cd $(BUILD_DIR) && gdb --args ./src/pdft/app $(path)
 
 run: build
-	cd $(BUILD_DIR) && ./src/app/app $(path)
+	cd $(BUILD_DIR) && ./src/pdft/app $(path)
 
 install-dev: build
-	cd $(BUILD_DIR) && cp ./src/app/app ~/.bin/pdft-dev
+	cd $(BUILD_DIR) && cp ./src/pdft/app ~/.bin/pdft-dev
 
 install-local: build
-	cd $(BUILD_DIR) && cp ./src/app/app ~/.bin/pdft
+	cd $(BUILD_DIR) && cp ./src/pdft/app ~/.bin/pdft
 
 docker-build:
 	docker build                           \
