@@ -85,21 +85,19 @@ target_sources(
           ./app/state/document_storage.cpp
           ./app/state/palette_storage.cpp
           ./app/event/app_event_listener.cpp
-          ./app/view/impl/page_renderer.cpp
-          ./app/view/impl/view.cpp
-          ./app/view/impl/document_view.cpp
-          ./app/view/impl/image_renderer.cpp
-          ./app/controller/impl/keytree.cpp
-          ./app/controller/impl/controller.cpp
+          ./app/view/page_renderer.cpp
+          ./app/view/view.cpp
+          ./app/view/document_view.cpp
+          ./app/view/image_renderer.cpp
+          ./app/controller/keytree.cpp
+          ./app/controller/controller.cpp
           ./app/loader/app_state_loader.cpp
           ./app/loader/app_persister.cpp
           ./app/loader/app_loader.cpp
           ./app/palettes.cpp)
 
 # PDFT executable
-find_package(tclap REQUIRED)
-
 add_executable(app ./app/main.cpp ./app/app.cpp ./app/cli_args.cpp
                    ./app/version.cpp ./app/entrypoint.cpp)
 
-target_link_libraries(app pdft tclap::tclap reflectcpp)
+target_link_libraries(app pdft)

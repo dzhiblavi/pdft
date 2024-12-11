@@ -1,7 +1,7 @@
 #pragma once
 
 #include "pdft/app/controller/controller.h"
-#include "pdft/app/loader/app_loader.h"
+#include "pdft/app/loader/loader.h"
 #include "pdft/app/view/view.h"
 
 #include "pdft/app/event/event_listener.h"
@@ -22,7 +22,7 @@ namespace pdft::app {
 class Application : public Module {
  public:
     Application(
-        inject<AppLoader, "loader"> loader,
+        inject<Loader, "loader"> loader,
         inject<EventListener, "listener"> listener,
         inject<io::ConsoleWriter, "writer"> writer,
         inject<io::TermControl, "term_ctrl"> term_control,
@@ -42,7 +42,7 @@ class Application : public Module {
 
     UIState ui_;
 
-    Arc<AppLoader> loader_;
+    Arc<Loader> loader_;
     Arc<EventListener> listener_;
     Arc<io::TermControl> term_control_;
     Arc<io::ConsoleWriter> console_writer_;

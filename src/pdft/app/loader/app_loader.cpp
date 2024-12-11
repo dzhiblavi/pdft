@@ -1,4 +1,4 @@
-#include "pdft/app/loader/app_loader.h"
+#include "pdft/app/loader/impl/app_loader.h"
 #include "pdft/app/palettes.h"
 
 #include "pdft/core/module/register.h"

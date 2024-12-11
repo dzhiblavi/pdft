@@ -5,23 +5,16 @@
 #include "pdft/core/awaitable.h"
 #include "pdft/core/log.h"
 #include "pdft/core/module/register.h"
+#include "pdft/core/result/make/err.h"
 #include "pdft/core/trace/log_stack_trace.h"
 #include "pdft/core/trace/stack_scope_tracer.h"
 
 #include "pdft/utils/visit.h"
 
-#include <asio/experimental/awaitable_operators.hpp>
-#include <asio/io_context.hpp>
-
-#include <ftxui/screen/screen.hpp>
-#include <magic_enum.hpp>
-
 namespace pdft::app {
 
-using namespace asio::experimental::awaitable_operators;
-
 Application::Application(
-    inject<AppLoader, "loader"> loader,
+    inject<Loader, "loader"> loader,
     inject<EventListener, "listener"> listener,
     inject<io::ConsoleWriter, "writer"> writer,
     inject<io::TermControl, "term_ctrl"> term_control,
