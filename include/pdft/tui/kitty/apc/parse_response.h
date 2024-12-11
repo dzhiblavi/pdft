@@ -5,10 +5,6 @@
 
 namespace pdft::tui {
 
-enum class ParseResponseError {
-    MalformedResponse,
-};
-
 const std::error_category& parseResponseErrorCategory();
 
 Result<Response> parseResponse(std::string_view response);

@@ -93,7 +93,7 @@ AsyncResult<Event> FswNotify::nextEvent() {
     auto [ec, event] = co_await channel_.async_receive(asio_coro_as_tuple);
 
     if (ec) {
-        co_return result::err(ec);
+        co_return result::err(errorCodeToString(ec));
     }
 
     co_return result::ok(std::move(event));

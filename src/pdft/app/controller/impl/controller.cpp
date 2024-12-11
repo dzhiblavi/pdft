@@ -203,8 +203,7 @@ Result<ControllerAction> AppController::onFilesystemEvent(
     using namespace result;
     log::debug("controller: fs event on path={}", event.path);
 
-    auto id = co_await (
-        documents.getIdByPath(event.path) | lift(makeErrorCode(ControllerError::UnkownFilePath)));
+    auto id = co_await (documents.getIdByPath(event.path) | lift("unknown file path"));
 
     co_await reloadDocument(id, event.path, ui, documents);
     co_return ControllerAction::Redraw;
@@ -238,6 +237,27 @@ Status AppController::reloadDocument(
     ui.onDocumentChanged(old_id, new_id, page_count);
 
     log::info("replaced document with path={} old_id={}, new_id={}", path, old_id, new_id);
+}
+
+Result<ControllerAction> AppController::onSignal(int signal, UIState&, DocumentStorage&) {
+    return handleSignal(signal);
+}
+
+Result<ControllerAction> AppController::handleSignal(int signal) {
+    switch (signal) {
+        using enum ControllerAction;
+
+        case SIGWINCH:
+            log::info(this, "received SIGWINCH: terminal resized, redrawing");
+            return Redraw;
+
+        case SIGINT:
+            log::info(this, "received SIGINT: exiting");
+            return Quit;
+
+        default:
+            return result::err("unknown signal");
+    }
 }
 
 }  // namespace pdft::app

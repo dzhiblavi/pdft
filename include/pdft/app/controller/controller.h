@@ -7,10 +7,6 @@
 
 namespace pdft::app {
 
-enum class ControllerError {
-    UnkownFilePath,
-};
-
 enum class ControllerAction {
     None,
     Quit,
@@ -26,6 +22,9 @@ class Controller {
 
     virtual Result<ControllerAction> onFilesystemEvent(
         const notify::Event& event, UIState& ui, DocumentStorage& documents) = 0;
+
+    virtual Result<ControllerAction> onSignal(
+        int signal, UIState& ui, DocumentStorage& documents) = 0;
 };
 
 }  // namespace pdft::app

@@ -91,13 +91,15 @@ target_sources(
           ./app/view/impl/image_renderer.cpp
           ./app/controller/impl/keytree.cpp
           ./app/controller/impl/controller.cpp
-          ./app/state_loader/impl/app_state_loader.cpp
-          ./app/persist/impl/persister.cpp)
+          ./app/loader/app_state_loader.cpp
+          ./app/loader/app_persister.cpp
+          ./app/loader/app_loader.cpp
+          ./app/palettes.cpp)
 
 # PDFT executable
 find_package(tclap REQUIRED)
 
 add_executable(app ./app/main.cpp ./app/app.cpp ./app/cli_args.cpp
-                   ./app/version.cpp ./app/palettes.cpp ./app/entrypoint.cpp)
+                   ./app/version.cpp ./app/entrypoint.cpp)
 
 target_link_libraries(app pdft tclap::tclap reflectcpp)

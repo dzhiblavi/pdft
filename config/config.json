@@ -69,10 +69,7 @@
       "factory": "pdft::app::AppEventListener"
     },
     "app": {
-      "factory": "pdft::app::Application",
-      "config": {
-        "state_path": "../../../../assets/state.json"
-      }
+      "factory": "pdft::app::Application"
     },
     "writer": {
       "factory": "pdft::io::PosixConsoleWriter"
@@ -92,11 +89,15 @@
     "media_loader": {
       "factory": "pdft::media::MupdfLoader"
     },
-    "loader": {
+    "state_loader": {
       "factory": "pdft::app::AppStateLoader",
       "config": {
-        "mode": "AddOnly"
+        "mode": "AddOnly",
+        "state_path": "../../../../assets/state.json"
       }
+    },
+    "loader": {
+      "factory": "pdft::app::AppLoader"
     },
     "docs": {
       "factory": "pdft::app::DocumentStorage"

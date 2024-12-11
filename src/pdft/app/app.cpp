@@ -8,7 +8,6 @@
 #include "pdft/core/trace/log_stack_trace.h"
 #include "pdft/core/trace/stack_scope_tracer.h"
 
-#include "pdft/utils/get_home_dir.h"
 #include "pdft/utils/visit.h"
 
 #include <asio/experimental/awaitable_operators.hpp>
@@ -22,55 +21,35 @@ namespace pdft::app {
 using namespace asio::experimental::awaitable_operators;
 
 Application::Application(
-    Config config,
+    inject<AppLoader, "loader"> loader,
     inject<EventListener, "listener"> listener,
-    inject<notify::Notify, "fswatcher"> fswatcher,
     inject<io::ConsoleWriter, "writer"> writer,
     inject<io::TermControl, "term_ctrl"> term_control,
     inject<tui::Terminal, "terminal"> terminal,
     inject<tui::Display, "display"> display,
     inject<DocumentStorage, "docs"> documents,
-    inject<StateLoader, "loader"> loader,
     inject<Controller, "controller"> controller,
     inject<View, "view"> view)
-    : config_(config)
+    : loader_(std::move(loader))
     , listener_(std::move(listener))
-    , fs_watcher_(std::move(fswatcher))
     , term_control_(std::move(term_control))
     , console_writer_(std::move(writer))
     , terminal_(std::move(terminal))
     , image_display_(std::move(display))
-    , loader_(std::move(loader))
     , documents_(std::move(documents))
     , view_(std::move(view))
     , controller_(std::move(controller)) {}
 
-Result<ControllerAction> Application::handleSignal(int signal) {
-    switch (signal) {
-        using enum ControllerAction;
-
-        case SIGWINCH:
-            log::info(this, "received SIGWINCH: terminal resized, redrawing");
-            return Redraw;
-
-        case SIGINT:
-            log::info(this, "received SIGINT: exiting");
-            return Quit;
-
-        case SIGSEGV:
-            return panic("received SIGSEGV");
-
-        default:
-            return panic("received unknown signal ({})", signal);
+AsyncStatus Application::run() {
+    if (auto res = loader_->load(ui_, *documents_); !res) {
+        co_return result::err(res.error());
     }
-}
 
-asio::awaitable<void> Application::run(const std::vector<std::string>& paths) {
     co_await prepareTerminal();
-    load(paths);
     co_await runEventLoop();
-    saveState();
     co_await cleanup();
+
+    co_return loader_->save(ui_, *documents_);
 }
 
 asio::awaitable<void> Application::prepareTerminal() {
@@ -82,39 +61,6 @@ asio::awaitable<void> Application::prepareTerminal() {
     terminal_->hideCursor(init_buffer);
     terminal_->clear(init_buffer);
     co_await console_writer_->write(init_buffer);
-}
-
-void Application::load(const std::vector<std::string>& paths) {
-    if (!config_.state_path.has_value()) {
-        log::info(this, "not restoring the state");
-        return;
-    }
-
-    auto state_path = std::filesystem::absolute(utils::expandHome(*config_.state_path));
-
-    auto err = loader_->load(paths, ui_, *documents_, state_path);
-    if (!err.has_value()) {
-        log::err(this, "failed to load state_path={}, error={}", *config_.state_path, err.error());
-        return;
-    }
-
-    for (auto&& doc : ui_.states) {
-        auto document = documents_->getDocument(doc.document_id) | result::unwrap;
-        const auto& path = document->getPath();
-
-        log::info(this, "adding path {} to filesystem watching", path);
-        fs_watcher_->add(path);
-    }
-}
-
-void Application::saveState() {
-    if (!config_.state_path.has_value()) {
-        log::info(this, "not saving the state");
-        return;
-    }
-
-    auto state_path = std::filesystem::absolute(utils::expandHome(*config_.state_path));
-    loader_->save(ui_, *documents_, state_path);
 }
 
 asio::awaitable<void> Application::runEventLoop() {
@@ -159,7 +105,7 @@ asio::awaitable<bool> Application::waitForNextRender() {
                 [&](const notify::Event& r) {
                     return controller_->onFilesystemEvent(r, ui_, *documents_);
                 },
-                [&](int signal) { return handleSignal(signal); });
+                [&](int signal) { return controller_->onSignal(signal, ui_, *documents_); });
 
         if (action.has_value()) {
             if (action == None) {
@@ -186,11 +132,6 @@ asio::awaitable<void> Application::cleanup() {
         image_display_->unloadAll(ctx, buffer);
         co_return co_await console_writer_->write(buffer.view());
     }();
-
-    {
-        auto _ = ctx.push("fsw:stop");
-        fs_watcher_->stop();
-    }
 
     log::debug(this, "total stack tracer allocations: {}", trace::getGlobalPool().numAllocations());
     trace::logStackTrace(std::move(tracer));

@@ -35,7 +35,7 @@ pdft::AsyncResult<int> AppEventListener::awaitSignal() {
     auto [ec, signal] = co_await signals_.async_wait(asio_coro_as_tuple);
 
     if (ec) {
-        co_return result::err(ec);
+        co_return result::err(errorCodeToString(ec));
     }
 
     co_return result::ok(signal);

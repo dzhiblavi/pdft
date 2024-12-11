@@ -1,4 +1,4 @@
-#include "pdft/app/persist/impl/persister.h"
+#include "pdft/app/loader/app_persister.h"
 
 #include "pdft/core/log.h"
 #include "pdft/core/module/register.h"
@@ -36,7 +36,7 @@ Status AppPersister::restore(UIState& ui, DocumentStorage& documents, std::istre
     auto maybe_state = rfl::json::read<State>(is);
 
     if (!maybe_state) {
-        return result::err(makeErrorCode(PersisterError::FailedToReadState));
+        return result::err("failed to read state");
     }
 
     auto&& state = maybe_state.value();

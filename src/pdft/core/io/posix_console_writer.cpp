@@ -17,7 +17,7 @@ AsyncStatus PosixConsoleWriter::write(std::string_view bytes) {
     auto [ec, _] = co_await asio::async_write(stdout_, asio::buffer(bytes), asio_coro_as_tuple);
 
     if (ec) {
-        co_return result::err(ec);
+        co_return result::err(errorCodeToString(ec));
     }
 
     co_return result::ok();
@@ -27,7 +27,7 @@ AsyncStatus PosixConsoleWriter::writeMany(std::vector<asio::const_buffer> buffer
     auto [ec, _] = co_await asio::async_write(stdout_, std::move(buffers), asio_coro_as_tuple);
 
     if (ec) {
-        co_return result::err(ec);
+        co_return result::err(errorCodeToString(ec));
     }
 
     co_return result::ok();

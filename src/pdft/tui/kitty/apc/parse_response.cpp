@@ -11,7 +11,7 @@ Result<ControlDataItem> parseControlDataItem(std::string_view item_view) {
     auto equal_sign_pos = item_view.find('=');
 
     if (equal_sign_pos == std::string::npos || equal_sign_pos == 0) {
-        return result::err(makeErrorCode(ParseResponseError::MalformedResponse));
+        return result::err("malformed response");
     }
 
     return std::make_pair(
@@ -51,15 +51,15 @@ Result<ControlData> parseControlData(std::string_view control_data) {
 // \033_Ga=b,c=d;OK\033 and backslash
 Result<Response> parseResponse(std::string_view response) {
     if (response.size() <= 4) {
-        return result::err(makeErrorCode(ParseResponseError::MalformedResponse));
+        return result::err("malformed response");
     }
 
     if (response[0] != '\033') {
-        return result::err(makeErrorCode(ParseResponseError::MalformedResponse));
+        return result::err("malformed response");
     }
 
     if (response.back() != '\\') {
-        return result::err(makeErrorCode(ParseResponseError::MalformedResponse));
+        return result::err("malformed response");
     }
 
     // The first two bytes after escape code are interpreted as command code (_G)
@@ -69,7 +69,7 @@ Result<Response> parseResponse(std::string_view response) {
     auto end_of_control_data = response.find(';', 3);
 
     if (end_of_control_data == std::string::npos) {
-        return result::err(makeErrorCode(ParseResponseError::MalformedResponse));
+        return result::err("malformed response");
     }
 
     auto control_data_view = response.substr(3, end_of_control_data - 3);

@@ -1,7 +1,7 @@
 #pragma once
 
-#include "pdft/app/state_loader/state_loader.h"
-#include "pdft/app/persist/persister.h"
+#include "pdft/app/loader/persister.h"
+#include "pdft/app/loader/state_loader.h"
 #include "pdft/media/loader.h"
 
 #include "pdft/core/module/inject.h"
@@ -20,6 +20,7 @@ class AppStateLoader : public StateLoader, public Module {
  public:
     struct Config {
         StateMode mode;
+        std::optional<std::string> state_path;
     };
 
     AppStateLoader(
@@ -28,19 +29,13 @@ class AppStateLoader : public StateLoader, public Module {
         inject<const Persister, "persister"> persister,
         inject<const media::Loader, "media_loader"> doc_loader);
 
-    void save(
-        const UIState& ui,
-        const DocumentStorage& documents,
-        const std::filesystem::path& state_path) override;
+    void save(const UIState& ui, const DocumentStorage& documents) override;
 
     Status load(
-        const std::vector<std::string>& paths,
-        UIState& ui,
-        DocumentStorage& documents,
-        const std::filesystem::path& state_path) override;
+        const std::vector<std::string>& paths, UIState& ui, DocumentStorage& documents) override;
 
  private:
-    StateMode mode_;
+    Config config_;
     Arc<const Persister> persister_;
     Arc<const media::Loader> doc_loader_;
 };

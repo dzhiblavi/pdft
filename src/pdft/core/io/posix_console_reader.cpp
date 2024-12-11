@@ -18,7 +18,7 @@ AsyncStatus PosixConsoleReader::read(size_t num_bytes, std::string& out) {
     auto [ec, _] = co_await asio::async_read(stdin_, asio::buffer(out), asio_coro_as_tuple);
 
     if (ec) {
-        co_return result::err(ec);
+        co_return result::err(errorCodeToString(ec));
     }
 
     co_return result::ok();

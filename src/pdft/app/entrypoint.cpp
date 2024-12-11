@@ -1,11 +1,9 @@
 #include "pdft/app/entrypoint.h"
-#include "pdft/app/palettes.h"
 #include "pdft/app/version.h"
 
 #include "pdft/core/module/register.h"
 
 #include "pdft/utils/build_info.h"
-#include "pdft/utils/cli_args/cli_args.h"
 
 #include <asio/co_spawn.hpp>
 #include <asio/detached.hpp>
@@ -16,21 +14,13 @@ struct EntrypointCliArgs {
     std::vector<std::string> p;
 };
 
-Entrypoint::Entrypoint(
-    asio::io_context& io,
-    std::span<const char*> argv,
-    inject<PaletteStorage, "palettes"> palettes,
-    inject<app::Application, "app"> app)
+Entrypoint::Entrypoint(asio::io_context& io, inject<app::Application, "app"> app)
     : io_(io)
-    , app_(std::move(app)) {
-    auto args = utils::parseFromCliArgs<EntrypointCliArgs>(argv) | result::unwrap;
-    paths_ = std::move(args.p);
-    palettes->add("skim", getSkimPalette());
-}
+    , app_(std::move(app)) {}
 
 void Entrypoint::start() {
     printAppInfo();
-    asio::co_spawn(io_, app_->run(paths_), asio::detached);
+    asio::co_spawn(io_, app_->run(), asio::detached);
 }
 
 void Entrypoint::printAppInfo() const {

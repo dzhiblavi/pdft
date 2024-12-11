@@ -1,4 +1,4 @@
-#include "pdft/app/state_loader/impl/app_state_loader.h"
+#include "pdft/app/loader/app_state_loader.h"
 
 #include "pdft/core/log.h"
 #include "pdft/core/module/register.h"
@@ -38,36 +38,42 @@ AppStateLoader::AppStateLoader(
     std::span<const char*> argv,
     inject<const Persister, "persister"> persister,
     inject<const media::Loader, "media_loader"> doc_loader)
-    : mode_(config.mode)
+    : config_(config)
     , persister_(std::move(persister))
     , doc_loader_(std::move(doc_loader)) {
     auto cli = utils::parseFromCliArgs<CliArgs>(argv) | result::unwrap;
-    mode_ = cli.state_mode.value_or(mode_);
-    log::info(this, "AppStateLoader state mode is {}", magic_enum::enum_name(mode_));
+    config_.mode = cli.state_mode.value_or(config_.mode);
+    config_.state_path = config_.state_path.transform(utils::expandHome);
+    log::info(this, "AppStateLoader state mode is {}", magic_enum::enum_name(config_.mode));
 }
 
-void AppStateLoader::save(
-    const UIState& ui, const DocumentStorage& documents, const std::filesystem::path& state_path) {
-    if (mode_ == StateMode::Standalone) {
+void AppStateLoader::save(const UIState& ui, const DocumentStorage& documents) {
+    if (config_.mode == StateMode::Standalone) {
         log::info("not saving the state in Standalone mode");
         return;
     }
+    if (!config_.state_path.has_value()) {
+        log::info("not saving the state because no state path is configured");
+        return;
+    }
 
-    std::ofstream ofs(state_path);
+    std::ofstream ofs(*config_.state_path);
     persister_->save(ui, documents, ofs);
-    log::info("the state has been successfully saved to {}", state_path);
+    log::info("the state has been successfully saved to {}", *config_.state_path);
 }
 
 Status AppStateLoader::load(
-    const std::vector<std::string>& paths,
-    UIState& ui,
-    DocumentStorage& documents,
-    const std::filesystem::path& state_path) {
-    auto mode_name = magic_enum::enum_name(mode_);
+    const std::vector<std::string>& paths, UIState& ui, DocumentStorage& documents) {
+    if (!config_.state_path.has_value()) {
+        log::info(this, "not loading the state because state path is not configured");
+        return result::ok();
+    }
 
-    if (mode_ != StateMode::Standalone && mode_ != StateMode::Clean) {
+    auto mode_name = magic_enum::enum_name(config_.mode);
+
+    if (config_.mode != StateMode::Standalone && config_.mode != StateMode::Clean) {
         log::info("loading the state because mode is {}", mode_name);
-        std::ifstream ifs(state_path);
+        std::ifstream ifs(*config_.state_path);
 
         if (auto result = persister_->restore(ui, documents, ifs); !result) {
             log::warn("failed to restore the state: {}; ignoring", result.error());
@@ -81,7 +87,7 @@ Status AppStateLoader::load(
     for (auto path : paths) {
         path = std::filesystem::absolute(utils::expandHome(path));
 
-        if (isOpened(path, ui, documents) && mode_ == StateMode::AddOnly) {
+        if (isOpened(path, ui, documents) && config_.mode == StateMode::AddOnly) {
             log::info("ignoring the new path {} because state mode is AddOnly", path);
             continue;
         }
@@ -99,7 +105,7 @@ Status AppStateLoader::load(
         log::info("loaded path {}", path);
     }
 
-    log::info("the state has been successfully restored from {}", state_path);
+    log::info("the state has been successfully restored from {}", *config_.state_path);
     return result::ok();
 }
 

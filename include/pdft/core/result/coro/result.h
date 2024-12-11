@@ -11,7 +11,7 @@
 
 namespace pdft::result {
 
-template <typename T>
+template <typename T, typename E>
 struct ResultPromiseBase {
     ResultPromiseBase() = default;
 
@@ -32,11 +32,11 @@ struct ResultPromiseBase {
         std::unreachable();
     }
 
-    ReturnedObjectHolder<Result<T>>* owner = nullptr;
+    ReturnedObjectHolder<Result<T, E>>* owner = nullptr;
 };
 
-template <typename T>
-struct ResultPromise : ResultPromiseBase<T> {
+template <typename T, typename E>
+struct ResultPromise : ResultPromiseBase<T, E> {
     ResultPromise() = default;
 
     void return_value(T x) {
@@ -45,8 +45,8 @@ struct ResultPromise : ResultPromiseBase<T> {
     }
 };
 
-template <>
-struct ResultPromise<Unit> : ResultPromiseBase<Unit> {
+template <typename E>
+struct ResultPromise<Unit, E> : ResultPromiseBase<Unit, E> {
     ResultPromise() = default;
 
     void return_void() {
@@ -55,9 +55,9 @@ struct ResultPromise<Unit> : ResultPromiseBase<Unit> {
     }
 };
 
-template <typename T>
+template <typename T, typename E>
 struct ResultAwaitable {
-    Result<T> object;
+    Result<T, E> object;
 
     bool await_ready() noexcept {
         return object.has_value();
@@ -69,7 +69,7 @@ struct ResultAwaitable {
     }
 
     template <typename U>
-    void await_suspend(std::coroutine_handle<ResultPromise<U>> h) {
+    void await_suspend(std::coroutine_handle<ResultPromise<U, E>> h) {
         auto&& promise = h.promise();
         auto* owner = promise.owner;
         PDFT_VERIFY_DBG(owner);
@@ -79,16 +79,16 @@ struct ResultAwaitable {
 
 }  // namespace pdft::result
 
-template <typename T>
-auto operator co_await(pdft::Result<T> o) {
-    return pdft::result::ResultAwaitable<T>{std::move(o)};
+template <typename T, typename E>
+auto operator co_await(pdft::Result<T, E> o) {
+    return pdft::result::ResultAwaitable<T, E>{std::move(o)};
 }
 
 namespace std {
 
-template <typename T, typename... Args>
-struct coroutine_traits<::pdft::Result<T>, Args...> {
-    using promise_type = ::pdft::result::ResultPromise<T>;
+template <typename T, typename E, typename... Args>
+struct coroutine_traits<::pdft::Result<T, E>, Args...> {
+    using promise_type = ::pdft::result::ResultPromise<T, E>;
 };
 
 }  // namespace std

@@ -56,12 +56,15 @@ class AppController : public Controller, public Module {
     Result<ControllerAction> onFilesystemEvent(
         const notify::Event& event, UIState& ui, DocumentStorage& documents) override;
 
+    Result<ControllerAction> onSignal(int signal, UIState& ui, DocumentStorage& documents) override;
+
  private:
     void bindKey(Command command, std::string_view keys);
     Result<ControllerAction> applyPendingCommand(UIState& ui, DocumentStorage& documents);
     Status reloadCurrentDocument(UIState& ui, DocumentStorage& documents);
     Status reloadDocument(
         DocumentId id, std::filesystem::path path, UIState& ui, DocumentStorage& documents);
+    Result<ControllerAction> handleSignal(int signal);
 
     KeyTree::CallbackType commandCallback(Command command);
     KeyTree::NumberCallbackType numCommandCallback(Command command);
