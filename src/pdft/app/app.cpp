@@ -25,22 +25,20 @@ Application::Application(
     , controller_(std::move(controller))
     , renderer_(std::move(renderer)) {}
 
-AsyncStatus Application::run() {
-    if (auto res = loader_->load(ui_, *documents_); !res) {
+AsyncStatus Application::run(Context& ctx) {
+    if (auto res = ctx.push("load") | loader_->load(ui_, *documents_); !res) {
         co_return result::err(res.error());
     }
 
-    Context ctx;
-
     // XXX Handle errors everywhere in this class
-    co_await renderer_->initScreen(ctx);
-    co_await runEventLoop();
-    co_await renderer_->restoreScreen(ctx);
+    ctx.push("init") | co_await renderer_->initScreen(ctx);
+    ctx.push("run") | co_await runEventLoop();
+    ctx.push("restore") | co_await renderer_->restoreScreen(ctx);
 
-    co_return loader_->save(ui_, *documents_);
+    co_return ctx.push("save") | loader_->save(ui_, *documents_);
 }
 
-asio::awaitable<void> Application::runEventLoop() {
+AsyncStatus Application::runEventLoop() {
     for (;;) {
         auto tracer = trace::getGlobalPool().getTracer("render_one");
         Context ctx(tracer);
@@ -53,7 +51,7 @@ asio::awaitable<void> Application::runEventLoop() {
         trace::logStackTrace(std::move(tracer));
 
         if (co_await waitForNextRender()) {
-            break;
+            co_return unit;
         }
     }
 }

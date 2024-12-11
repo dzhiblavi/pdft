@@ -2,6 +2,7 @@
 #include "pdft/app/version.h"
 
 #include "pdft/core/module/register.h"
+#include "pdft/core/trace/log_stack_trace.h"
 
 #include "pdft/utils/build_info.h"
 
@@ -20,7 +21,14 @@ Entrypoint::Entrypoint(asio::io_context& io, inject<app::Application, "app"> app
 
 void Entrypoint::start() {
     printAppInfo();
-    asio::co_spawn(io_, app_->run(), asio::detached);
+    asio::co_spawn(io_, run(), asio::detached);
+}
+
+Async<void> Entrypoint::run() {
+    auto tracer = trace::getGlobalPool().getTracer("entrypoint");
+    Context ctx(tracer);
+    co_await app_->run(ctx);
+    trace::logStackTrace(std::move(tracer));
 }
 
 void Entrypoint::printAppInfo() const {

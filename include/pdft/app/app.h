@@ -25,10 +25,10 @@ class Application : public Module {
         inject<View, "view"> view,
         inject<tui::Renderer, "renderer"> renderer);
 
-    AsyncStatus run();
+    AsyncStatus run(Context& ctx);
 
  private:
-    Async<void> runEventLoop();
+    AsyncStatus runEventLoop();
     Async<bool> waitForNextRender();
 
     UIState ui_;

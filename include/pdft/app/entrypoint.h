@@ -13,6 +13,7 @@ class Entrypoint : public Module {
     void start();
 
  private:
+    Async<void> run();
     void printAppInfo() const;
 
     asio::io_context& io_;
