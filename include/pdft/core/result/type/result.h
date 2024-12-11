@@ -6,7 +6,7 @@
 
 namespace pdft {
 
-template <typename T>
-using Result = std::expected<T, Error>;
+template <typename T, typename E = Error>
+using Result = std::expected<T, E>;
 
 }  // namespace pdft

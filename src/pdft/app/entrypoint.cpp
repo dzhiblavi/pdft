@@ -23,13 +23,8 @@ Entrypoint::Entrypoint(
     inject<app::Application, "app"> app)
     : io_(io)
     , app_(std::move(app)) {
-    auto args = utils::parseFromCliArgs<EntrypointCliArgs>(argv);
-
-    if (!args) {
-        panic("failed to parse CLI args: {}", args.error());
-    }
-
-    paths_ = std::move(args->p);
+    auto args = utils::parseFromCliArgs<EntrypointCliArgs>(argv) | result::unwrap;
+    paths_ = std::move(args.p);
     palettes->add("skim", getSkimPalette());
 }
 

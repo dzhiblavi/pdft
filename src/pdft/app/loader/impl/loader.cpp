@@ -2,6 +2,7 @@
 
 #include "pdft/core/log.h"
 #include "pdft/core/module/register.h"
+#include "pdft/core/result.h"
 
 #include "pdft/utils/cli_args/cli_args.h"
 #include "pdft/utils/get_home_dir.h"
@@ -40,16 +41,8 @@ AppLoader::AppLoader(
     : mode_(config.mode)
     , persister_(std::move(persister))
     , doc_loader_(std::move(doc_loader)) {
-    auto cli = utils::parseFromCliArgs<CliArgs>(argv);
-
-    if (!cli) {
-        panic("bad cli arguments: {}", cli.error());
-    }
-
-    if (cli->state_mode.has_value()) {
-        mode_ = *cli->state_mode;
-    }
-
+    auto cli = utils::parseFromCliArgs<CliArgs>(argv) | result::unwrap;
+    mode_ = cli.state_mode.value_or(mode_);
     log::info(this, "AppLoader state mode is {}", magic_enum::enum_name(mode_));
 }
 

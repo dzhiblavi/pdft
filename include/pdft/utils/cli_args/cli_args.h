@@ -1,5 +1,6 @@
 #pragma once
 
+#include "pdft/core/result/type/result.h"
 #include "pdft/core/result/type/unit.h"
 #include "pdft/utils/instanceof_template.h"
 
@@ -22,13 +23,13 @@ namespace pdft::utils {
 template <typename T>
 struct IConsumer {
     virtual ~IConsumer() = default;
-    virtual std::expected<Unit, std::string> consume(T value) = 0;
+    virtual Result<Unit, std::string> consume(T value) = 0;
 };
 
 template <typename T>
 struct ICliArg {
     virtual ~ICliArg() = default;
-    virtual std::expected<Unit, std::string> apply(IConsumer<T>* consumer) = 0;
+    virtual Result<Unit, std::string> apply(IConsumer<T>* consumer) = 0;
 };
 
 template <typename T>
@@ -42,7 +43,7 @@ template <typename T>
 struct ComplexType<std::optional<T>> {
     using type = T;
 
-    static std::expected<std::optional<T>, std::string> lift(type value) {
+    static Result<std::optional<T>, std::string> lift(type value) {
         return std::optional<T>{std::move(value)};
     }
 };
@@ -53,7 +54,7 @@ struct ComplexType<std::vector<T>> {
     using U = typename Traits::type;
     using type = std::vector<U>;
 
-    static std::expected<std::vector<T>, std::string> lift(type value) {
+    static Result<std::vector<T>, std::string> lift(type value) {
         std::vector<T> result;
         result.reserve(value.size());
 
@@ -76,7 +77,7 @@ requires std::is_enum_v<T>
 struct ComplexType<T> {
     using type = std::string;
 
-    static std::expected<T, std::string> lift(type value) {
+    static Result<T, std::string> lift(type value) {
         auto e = magic_enum::enum_cast<T>(value);
 
         if (!e.has_value()) {
@@ -96,7 +97,7 @@ struct CliArg : ICliArg<T>, IConsumer<typename ComplexType<T>::type> {
     CliArg(TCLAP::CmdLine& line) : impl_(line) {}
 
     // IConsumer<U>
-    std::expected<Unit, std::string> consume(U value) override {
+    Result<Unit, std::string> consume(U value) override {
         auto lifted = Traits::lift(std::move(value));
 
         if (!lifted) {
@@ -107,7 +108,7 @@ struct CliArg : ICliArg<T>, IConsumer<typename ComplexType<T>::type> {
     }
 
     // ICliArg<T>
-    std::expected<Unit, std::string> apply(IConsumer<T>* consumer) override {
+    Result<Unit, std::string> apply(IConsumer<T>* consumer) override {
         consumer_ = consumer;
         return impl_.apply(this);
     }
@@ -124,7 +125,7 @@ struct CliArg<Name, T> : ICliArg<T> {
         : arg_(Name.str().substr(0, 1), Name.str(), "", false, T{}, "", line) {}
 
     // ICliArg<T>
-    std::expected<Unit, std::string> apply(IConsumer<T>* consumer) override {
+    Result<Unit, std::string> apply(IConsumer<T>* consumer) override {
         if (!arg_.isSet()) {
             return unit;
         }
@@ -142,7 +143,7 @@ struct CliArg<Name, bool> : ICliArg<bool> {
     CliArg(TCLAP::CmdLine& line) : arg_(Name.str().substr(0, 1), Name.str(), "", line) {}
 
     // ICliArg<bool>
-    std::expected<Unit, std::string> apply(IConsumer<bool>* consumer) override {
+    Result<Unit, std::string> apply(IConsumer<bool>* consumer) override {
         if (!arg_.isSet()) {
             return unit;
         }
@@ -160,7 +161,7 @@ struct CliArg<Name, std::vector<T>> : ICliArg<std::vector<T>> {
     CliArg(TCLAP::CmdLine& line) : arg_(Name.str().substr(0, 1), Name.str(), "", false, "", line) {}
 
     // ICliArg
-    std::expected<Unit, std::string> apply(IConsumer<std::vector<T>>* consumer) override {
+    Result<Unit, std::string> apply(IConsumer<std::vector<T>>* consumer) override {
         return consumer->consume(arg_.getValue());
     }
 
@@ -169,7 +170,7 @@ struct CliArg<Name, std::vector<T>> : ICliArg<std::vector<T>> {
 };
 
 template <typename S>
-std::expected<S, std::string> parseFromCliArgs(std::span<const char*> args) {
+Result<S, std::string> parseFromCliArgs(std::span<const char*> args) {
     TCLAP::CmdLine cmd("", ' ', "", false);
     cmd.ignoreUnmatched(true);
 
@@ -201,7 +202,7 @@ std::expected<S, std::string> parseFromCliArgs(std::span<const char*> args) {
             Consumer(T* d) : dst(d) {}
 
             // IConsumer<T>
-            std::expected<Unit, std::string> consume(T value) override {
+            Result<Unit, std::string> consume(T value) override {
                 *dst = std::move(value);
                 return unit;
             }
@@ -213,9 +214,8 @@ std::expected<S, std::string> parseFromCliArgs(std::span<const char*> args) {
         return cli_arg.apply(&c);
     };
 
-    auto do_apply =
-        [&]<typename Self>(
-            this Self&& self, auto& arg, auto&... args) -> std::expected<Unit, std::string> {
+    auto do_apply = [&]<typename Self>(
+                        this Self&& self, auto& arg, auto&... args) -> Result<Unit, std::string> {
         if (auto ok = apply(arg); !ok) {
             return std::unexpected(std::move(ok.error()));
         }

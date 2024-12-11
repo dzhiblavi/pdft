@@ -18,8 +18,8 @@ struct Unwrap {
         return std::move(*optional);
     }
 
-    template <typename T>
-    T pipe(Result<T> result) && {
+    template <typename T, typename E>
+    T pipe(Result<T, E> result) && {
         PDFT_VERIFY(result.has_value(), "unwrap Result err: {}", result.error());
         return std::move(*result);
     }
