@@ -1,7 +1,5 @@
 #include "pdft/app/app.h"
 
-#include "pdft/tui/render.h"
-
 #include "pdft/core/awaitable.h"
 #include "pdft/core/log.h"
 #include "pdft/core/module/register.h"
@@ -14,63 +12,47 @@
 namespace pdft::app {
 
 Application::Application(
+    inject<DocumentStorage, "docs"> documents,
     inject<Loader, "loader"> loader,
     inject<EventListener, "listener"> listener,
-    inject<io::ConsoleWriter, "writer"> writer,
-    inject<io::TermControl, "term_ctrl"> term_control,
-    inject<tui::Terminal, "terminal"> terminal,
-    inject<tui::Display, "display"> display,
-    inject<DocumentStorage, "docs"> documents,
     inject<Controller, "controller"> controller,
-    inject<View, "view"> view)
-    : loader_(std::move(loader))
+    inject<View, "view"> view,
+    inject<tui::Renderer, "renderer"> renderer)
+    : documents_(std::move(documents))
+    , loader_(std::move(loader))
     , listener_(std::move(listener))
-    , term_control_(std::move(term_control))
-    , console_writer_(std::move(writer))
-    , terminal_(std::move(terminal))
-    , image_display_(std::move(display))
-    , documents_(std::move(documents))
     , view_(std::move(view))
-    , controller_(std::move(controller)) {}
+    , controller_(std::move(controller))
+    , renderer_(std::move(renderer)) {}
 
 AsyncStatus Application::run() {
     if (auto res = loader_->load(ui_, *documents_); !res) {
         co_return result::err(res.error());
     }
 
-    co_await prepareTerminal();
+    Context ctx;
+
+    // XXX Handle errors everywhere in this class
+    co_await renderer_->initScreen(ctx);
     co_await runEventLoop();
-    co_await cleanup();
+    co_await renderer_->restoreScreen(ctx);
 
     co_return loader_->save(ui_, *documents_);
 }
 
-asio::awaitable<void> Application::prepareTerminal() {
-    // Configure terminal
-    term_control_->ioControl(io::ControlType::Input, {.canonical = false, .echo = false});
-
-    // Clear the screen
-    io::OutBuffer init_buffer;
-    terminal_->hideCursor(init_buffer);
-    terminal_->clear(init_buffer);
-    co_await console_writer_->write(init_buffer);
-}
-
 asio::awaitable<void> Application::runEventLoop() {
-    pdft::tui::Renderer renderer(terminal_, console_writer_);
-
     for (;;) {
-        co_await renderer.renderOne(
-            [this](auto& ctx) { return view_->getLayout(ctx, ui_); },
-            [this](auto& ctx, auto& screen) -> Async<Unit> {
-                image_display_->clear(ctx, screen.bufpair().control_buffer);
-                co_await view_->render(ctx, ui_, screen);
-                co_return unit;
-            });
+        auto tracer = trace::getGlobalPool().getTracer("render_one");
+        Context ctx(tracer);
 
-        bool should_quit = co_await waitForNextRender();
+        auto dom = view_->getLayout(ctx, ui_);
+        auto screen = renderer_->newFrame(ctx, std::move(dom));
+        co_await view_->render(ctx, ui_, screen);
+        co_await renderer_->renderFrame(ctx);
 
-        if (should_quit) {
+        trace::logStackTrace(std::move(tracer));
+
+        if (co_await waitForNextRender()) {
             break;
         }
     }
@@ -111,23 +93,6 @@ asio::awaitable<bool> Application::waitForNextRender() {
             log::err(this, "error fron controller: {}", action.error());
         }
     }
-}
-
-asio::awaitable<void> Application::cleanup() {
-    auto tracer = trace::getGlobalPool().getTracer("cleanup");
-    Context ctx;
-    ctx.setTracer(tracer);
-
-    ctx.push("term:clear") | co_await [&]() -> AsyncStatus {
-        io::OutBuffer buffer;
-        terminal_->showCursor(buffer);
-        terminal_->clear(buffer);
-        image_display_->unloadAll(ctx, buffer);
-        co_return co_await console_writer_->write(buffer.view());
-    }();
-
-    log::debug(this, "total stack tracer allocations: {}", trace::getGlobalPool().numAllocations());
-    trace::logStackTrace(std::move(tracer));
 }
 
 }  // namespace pdft::app

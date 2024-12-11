@@ -68,6 +68,9 @@
     "listener": {
       "factory": "pdft::app::AppEventListener"
     },
+    "renderer": {
+      "factory": "pdft::tui::AppRenderer"
+    },
     "app": {
       "factory": "pdft::app::Application"
     },

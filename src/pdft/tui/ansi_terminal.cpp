@@ -1,4 +1,4 @@
-#include "pdft/tui/ansi_terminal.h"
+#include "pdft/tui/impl/ansi_terminal.h"
 
 #include "pdft/core/module/register.h"
 

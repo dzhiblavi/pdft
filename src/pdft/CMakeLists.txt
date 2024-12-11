@@ -70,6 +70,7 @@ target_sources(
   PRIVATE ./tui/fit_image.cpp
           ./tui/terminal.cpp
           ./tui/ansi_terminal.cpp
+          ./tui/app_renderer.cpp
           ./tui/elements.cpp
           ./tui/kitty/apc/parse_response.cpp
           ./tui/kitty/apc/apc_executor_base.cpp

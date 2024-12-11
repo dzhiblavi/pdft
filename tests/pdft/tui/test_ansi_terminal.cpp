@@ -1,7 +1,7 @@
 #include "tests/pdft/core/io/mock_console.h"
 #include "tests/pdft/run_coroutine.h"
 
-#include "pdft/tui/ansi_terminal.h"
+#include "pdft/tui/impl/ansi_terminal.h"
 
 namespace pdft::tui {
 
