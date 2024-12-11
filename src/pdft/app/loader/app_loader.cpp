@@ -14,7 +14,7 @@ using namespace result;
 namespace {
 
 struct CliArgs {
-    std::vector<std::string> p;
+    std::vector<std::string> path;
 };
 
 }  // namespace
@@ -33,7 +33,7 @@ Status AppLoader::load(UIState& ui, DocumentStorage& documents) {
     palettes_->add("skim", getSkimPalette());
 
     auto args = co_await utils::parseFromCliArgs<CliArgs>(argv_);
-    co_await state_loader_->load(args.p, ui, documents);
+    co_await state_loader_->load(args.path, ui, documents);
 
     for (auto&& doc : ui.states) {
         auto document =
