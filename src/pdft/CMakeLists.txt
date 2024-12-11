@@ -98,7 +98,7 @@ target_sources(
           ./app/palettes.cpp)
 
 # PDFT executable
-add_executable(app ./app/main.cpp ./app/app.cpp ./app/cli_args.cpp
-                   ./app/version.cpp ./app/entrypoint.cpp)
+add_executable(app ./app/main.cpp ./app/app.cpp ./app/version.cpp
+                   ./app/entrypoint.cpp)
 
 target_link_libraries(app pdft)
