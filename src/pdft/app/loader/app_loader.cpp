@@ -36,8 +36,7 @@ Status AppLoader::load(UIState& ui, DocumentStorage& documents) {
     co_await state_loader_->load(args.path, ui, documents);
 
     for (auto&& doc : ui.states) {
-        auto document =
-            co_await (documents.getDocument(doc.document_id) | lift("failed to open a document"));
+        auto document = documents.getDocument(doc.document_id) | result::unwrap;
         const auto& path = document->getPath();
 
         log::info(this, "adding path {} to filesystem watching", path);
