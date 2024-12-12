@@ -3,8 +3,11 @@
 
 #include "pdft/core/log/load.h"
 #include "pdft/core/module/factory_storage.h"
-#include "pdft/core/module/loader.h"
+#include "pdft/core/module/load/loader.h"
+#include "pdft/core/result/combine/unwrap.h"
+#include "pdft/core/result/syntax/pipe.h"
 
+#include "pdft/utils/cli/parsed.h"
 #include "pdft/utils/cli/register.h"
 #include "pdft/utils/get_home_dir.h"
 
@@ -29,14 +32,12 @@ void main(Config config) {
         .modules = config.modules,
     };
 
-    module::ModuleLoader loader(ctx);
-
     for (const auto& [name, conf] : ctx.modules) {
-        if (loader.isLoaded(name)) {
+        if (module::isLoaded(ctx, name)) {
             continue;
         }
 
-        auto mod = loader.getOrLoadModule(name);
+        auto mod = module::getOrLoadModule(ctx, name);
         auto traits = module::FactoryStorage::globalInstance().getTraits(conf.factory);
         traits->start(mod.get());
     }

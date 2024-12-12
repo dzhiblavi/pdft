@@ -1,6 +1,6 @@
 #pragma once
 
-#include "pdft/core/module/loader.h"
+#include "pdft/core/module/load/loader.h"
 
 #include <unordered_map>
 
@@ -8,7 +8,7 @@ namespace pdft::module {
 
 struct ModuleTraits {
     virtual void start(Module* module) const = 0;
-    virtual Arc<Module> load(ModuleLoader& loader, std::string name) const = 0;
+    virtual Arc<Module> load(LoadContext& ctx, std::string name) const = 0;
 };
 
 template <typename T>
@@ -19,8 +19,8 @@ concept Startable = requires(T& value) {
 template <typename T>
 ModuleTraits* getModuleTraits() {
     struct ModuleTraitsImpl : ModuleTraits {
-        Arc<Module> load(ModuleLoader& loader, std::string name) const override {
-            return loader.template makeModule<T>(std::move(name));
+        Arc<Module> load(LoadContext& ctx, std::string name) const override {
+            return makeModule<T>(ctx, std::move(name));
         }
 
         void start(Module* module) const override {
@@ -36,7 +36,7 @@ ModuleTraits* getModuleTraits() {
 
 class FactoryStorage {
  public:
-    using ModuleFactory = Arc<Module> (*)(ModuleLoader& loader, std::string name);
+    using ModuleFactory = Arc<Module> (*)(LoadContext& ctx, std::string name);
 
     template <IsModule T>
     void registerModule(const std::string& factory) {
@@ -60,4 +60,4 @@ class FactoryStorage {
     std::unordered_map<std::string, ModuleTraits*> factories_;
 };
 
-}  // namespace pdft
+}  // namespace pdft::module
