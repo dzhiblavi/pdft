@@ -26,11 +26,7 @@ class AppStateLoader : public StateLoader, public Module {
     };
 
     struct CliArgs {
-        cli::cli<
-            std::optional<StateMode>,
-            'S',
-            "state-mode",
-            "Override the configured state management mode">
+        cli::cli<std::optional<StateMode>, 'S', "Override the configured state management mode">
             state_mode;
     };
 

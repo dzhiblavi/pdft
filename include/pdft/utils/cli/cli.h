@@ -4,11 +4,17 @@
 
 namespace pdft::cli {
 
-template <char TShort, utils::FixedString TLong, utils::FixedString TDescription>
+template <char TShort, utils::FixedString TDescription, utils::FixedString TLong>
 struct OptionDescription {
     static constexpr auto Short = TShort;
     static constexpr auto Long = TLong;
     static constexpr auto Description = TDescription;
+
+    template <auto NewLong>
+    using UpdateLongIfEmpty = std::conditional_t<
+        Long.empty(),
+        OptionDescription<Short, Description, NewLong>,
+        OptionDescription>;
 };
 
 template <typename T, typename Desc>
@@ -48,7 +54,7 @@ struct CliOption {
     T value_;
 };
 
-template <typename T, char Short, utils::FixedString Long = "", utils::FixedString Description = "">
-using cli = CliOption<T, OptionDescription<Short, Long, Description>>;
+template <typename T, char Short, utils::FixedString Description = "", utils::FixedString Long = "">
+using cli = CliOption<T, OptionDescription<Short, Description, Long>>;
 
 }  // namespace pdft::cli

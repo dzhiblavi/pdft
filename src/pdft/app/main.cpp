@@ -54,8 +54,7 @@ void main(Config config) {
 using namespace pdft;
 
 struct CliArgs {
-    cli::cli<std::optional<std::string>, 'c', "config-path", "Path to the configuration file">
-        config_path;
+    cli::cli<std::optional<std::string>, 'c', "Path to the configuration file"> config_path;
 };
 
 int main(int argc, const char** argv) {

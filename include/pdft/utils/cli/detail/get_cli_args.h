@@ -9,6 +9,19 @@
 
 namespace pdft::cli::detail {
 
+// XXX: Usage of internal namespace
+template <size_t N>
+constexpr utils::FixedString<N> fixedStringFromStringLiteral(
+    rfl::internal::StringLiteral<N> literal) {
+    return {literal.arr_};
+}
+
+template <auto Name, typename D, typename T>
+auto makeCliArgForField(rfl::Field<Name, CliOption<T, D>*>*) {
+    using Desc = typename D::template UpdateLongIfEmpty<fixedStringFromStringLiteral(Name)>;
+    return std::make_unique<CliArg<Desc, T>>();
+}
+
 // tuple<unique_ptr<CliArg<T, D>>...>&
 template <typename C>
 auto makeCliArgs() {
@@ -16,12 +29,8 @@ auto makeCliArgs() {
     auto view = rfl::to_view(result);
     auto fields = view.fields();
 
-    auto make = [&]<auto Name, typename Description, typename T>(
-                    rfl::Field<Name, CliOption<T, Description>*>& /*field*/) {
-        return std::make_unique<CliArg<Description, T>>();
-    };
-
-    return rfl::apply([&](auto&&... field) { return std::make_tuple(make(field)...); }, fields);
+    return rfl::apply(
+        [&](auto&&... field) { return std::make_tuple(makeCliArgForField(&field)...); }, fields);
 }
 
 // tuple<IConsumer<T> auto>...>
