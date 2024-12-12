@@ -9,12 +9,18 @@
 #include "pdft/core/module/inject.h"
 #include "pdft/core/module/module.h"
 
+#include "pdft/utils/cli/cli.h"
+
 namespace pdft::app {
 
 class AppLoader : public Loader, public Module {
  public:
+    struct CliArgs {
+        cli::cli<std::vector<std::string>, 'p', "path", "Paths to the documents to be opened"> path;
+    };
+
     AppLoader(
-        std::span<const char*> argv,
+        CliArgs cli,
         inject<StateLoader, "state_loader"> state_loader,
         inject<notify::Notify, "fswatcher"> fswatcher,
         inject<PaletteStorage, "palettes"> palettes);
@@ -23,7 +29,7 @@ class AppLoader : public Loader, public Module {
     Status save(const UIState& ui, const DocumentStorage& documents) override;
 
  private:
-    std::span<const char*> argv_;
+    CliArgs cli_;
     Arc<StateLoader> state_loader_;
     Arc<notify::Notify> fs_watcher_;
     Arc<PaletteStorage> palettes_;

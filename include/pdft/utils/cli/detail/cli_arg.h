@@ -1,6 +1,7 @@
 #pragma once
 
 #include "pdft/utils/cli/detail/lift.h"
+#include "pdft/utils/cli/option.h"
 
 #include "pdft/core/result/type/result.h"
 #include "pdft/core/result/type/unit.h"
@@ -16,7 +17,7 @@ struct IConsumer {
 };
 
 template <typename T>
-struct ICliArg {
+struct ICliArg : IOption {
     virtual ~ICliArg() = default;
     virtual Result<Unit, std::string> apply(IConsumer<T>* consumer) = 0;
 };
@@ -27,7 +28,12 @@ struct CliArg : ICliArg<T>, IConsumer<typename ComplexType<T>::type> {
     using Traits = ComplexType<T>;
     using U = typename Traits::type;
 
-    CliArg(TCLAP::CmdLine& line) : impl_(line) {}
+    CliArg() = default;
+
+    // IOption
+    void attach(TCLAP::CmdLine& cmd) override {
+        impl_.attach(cmd);
+    }
 
     // IConsumer<U>
     Result<Unit, std::string> consume(U value) override {
@@ -54,15 +60,19 @@ struct CliArg : ICliArg<T>, IConsumer<typename ComplexType<T>::type> {
 // Regular types (int, string, float, ...)
 template <typename Description, BasicType T>
 struct CliArg<Description, T> : ICliArg<T> {
-    CliArg(TCLAP::CmdLine& line)
+    CliArg()
         : arg_(
               std::string(1, Description::Short),
               Description::Long.c_str(),
               Description::Description.c_str(),
               false,
               T{},
-              "",
-              line) {}
+              rfl::type_name_t<T>().name()) {}
+
+    // IOption
+    void attach(TCLAP::CmdLine& cmd) override {
+        cmd.add(arg_);
+    }
 
     // ICliArg<T>
     Result<Unit, std::string> apply(IConsumer<T>* consumer) override {
@@ -80,12 +90,16 @@ struct CliArg<Description, T> : ICliArg<T> {
 // Boolean types are just switches
 template <typename Description>
 struct CliArg<Description, bool> : ICliArg<bool> {
-    CliArg(TCLAP::CmdLine& line)
+    CliArg()
         : arg_(
               std::string(1, Description::Short),
               Description::Long.c_str(),
-              Description::Description.c_str(),
-              line) {}
+              Description::Description.c_str()) {}
+
+    // IOption
+    void attach(TCLAP::CmdLine& cmd) override {
+        cmd.add(arg_);
+    }
 
     // ICliArg<bool>
     Result<Unit, std::string> apply(IConsumer<bool>* consumer) override {
@@ -103,14 +117,18 @@ struct CliArg<Description, bool> : ICliArg<bool> {
 // Specialization for vectors of basic types
 template <typename Description, BasicType T>
 struct CliArg<Description, std::vector<T>> : ICliArg<std::vector<T>> {
-    CliArg(TCLAP::CmdLine& line)
+    CliArg()
         : arg_(
               std::string(1, Description::Short),
               Description::Long.c_str(),
               Description::Description.c_str(),
               false,
-              "",
-              line) {}
+              rfl::type_name_t<T>().name()) {}
+
+    // IOption
+    void attach(TCLAP::CmdLine& cmd) override {
+        cmd.add(arg_);
+    }
 
     // ICliArg
     Result<Unit, std::string> apply(IConsumer<std::vector<T>>* consumer) override {

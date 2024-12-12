@@ -7,6 +7,8 @@
 #include "pdft/core/module/inject.h"
 #include "pdft/core/module/module.h"
 
+#include "pdft/utils/cli/cli.h"
+
 namespace pdft::app {
 
 enum class StateMode {
@@ -23,9 +25,18 @@ class AppStateLoader : public StateLoader, public Module {
         std::optional<std::string> state_path;
     };
 
+    struct CliArgs {
+        cli::cli<
+            std::optional<StateMode>,
+            'S',
+            "state-mode",
+            "Override the configured state management mode">
+            state_mode;
+    };
+
     AppStateLoader(
         Config config,
-        std::span<const char*> argv,
+        CliArgs cli,
         inject<const Persister, "persister"> persister,
         inject<const media::Loader, "media_loader"> doc_loader);
 

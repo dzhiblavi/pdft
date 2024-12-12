@@ -7,21 +7,18 @@
 #include "pdft/core/module/module.h"
 #include "pdft/core/result.h"
 
-#include "pdft/utils/cli/parse.h"
+#include "pdft/utils/cli/parsed.h"
 
 #include <rfl/Generic.hpp>
 #include <rfl/from_generic.hpp>
 
 #include <asio/io_context.hpp>
 
-#include <span>
-
 namespace pdft::module {
 
 using LoadedModules = std::unordered_map<std::string, Arc<Module>>;
 
 struct LoadContext {
-    std::span<const char*> argv;
     asio::io_context& io;
     ModulesConfig modules;
     LoadedModules loaded = {};
@@ -34,14 +31,12 @@ class ModuleLoader {
     template <typename ArgType, IsModule ModuleType>
     ArgType injectArgument(const std::string for_module) {
         using ConfigType = detail::MaybeConfigType<ModuleType>;
-        using CliConfigType = detail::MaybeCliConfigType<ModuleType>;
+        using CliArgsType = detail::MaybeCliArgsType<ModuleType>;
 
         if constexpr (std::is_same_v<ArgType, asio::io_context&>) {
             return context_.io;
         } else if constexpr (std::is_same_v<ArgType, asio::any_io_executor>) {
             return context_.io.get_executor();
-        } else if constexpr (std::is_same_v<ArgType, std::span<const char*>>) {
-            return context_.argv;
         } else if constexpr (std::is_same_v<ArgType, ConfigType>) {
             auto&& config = getConfig(for_module).config;
 
@@ -52,8 +47,8 @@ class ModuleLoader {
             auto result = rfl::from_generic<ConfigType, rfl::DefaultIfMissing>(config);
             return *PDFT_VERIFY(
                 result, "failed to parse config for {}: {}", for_module, result.error()->what());
-        } else if constexpr (std::is_same_v<ArgType, CliConfigType>) {
-            return cli::parseFromCliArgs<CliConfigType>(context_.argv) | result::unwrap;
+        } else if constexpr (std::is_same_v<ArgType, CliArgsType>) {
+            return cli::parsed<CliArgsType>() | result::unwrap;
         } else if constexpr (std::convertible_to<ArgType&, DependsOnModuleTag&>) {
             return ArgType{getOrLoadModule(ArgType::Name.c_str())};
         } else {

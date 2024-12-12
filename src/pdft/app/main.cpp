@@ -1,10 +1,11 @@
 #include "pdft/app/config.h"
+#include "pdft/app/version.h"
 
 #include "pdft/core/log/load.h"
 #include "pdft/core/module/factory_storage.h"
 #include "pdft/core/module/loader.h"
 
-#include "pdft/utils/cli/parse.h"
+#include "pdft/utils/cli/register.h"
 #include "pdft/utils/get_home_dir.h"
 
 #include <asio/co_spawn.hpp>
@@ -18,13 +19,12 @@
 
 namespace pdft::app {
 
-void main(Config config, std::span<const char*> argv) {
+void main(Config config) {
     log::loadConfig(config.logging);
 
     asio::io_context context(1);
 
     module::LoadContext ctx{
-        .argv = argv,
         .io = context,
         .modules = config.modules,
     };
@@ -50,23 +50,28 @@ void main(Config config, std::span<const char*> argv) {
 
 }  // namespace pdft::app
 
+using namespace pdft;
+
 struct CliArgs {
-    pdft::cli::cli<std::optional<std::string>, 'c', "config-path", "Path to the configuration file">
+    cli::cli<std::optional<std::string>, 'c', "config-path", "Path to the configuration file">
         config_path;
 };
 
 int main(int argc, const char** argv) {
-    auto args = std::span(argv, argc);
+    TCLAP::CmdLine cmd("PDFT: A command line PDF reader", ' ', app::getFullVersionString());
+    cli::OptionsStorage::globalInstance().attach(cmd);
 
-    auto cli_args = pdft::cli::parseFromCliArgs<CliArgs>(args);
-    if (!cli_args.has_value()) {
-        std::cerr << std::format("Error while parsing CLI arguments: {}", cli_args.error())
-                  << std::endl;
+    try {
+        cmd.parse(argc, argv);
+    } catch (const TCLAP::ArgException& e) {
+        std::cerr << std::format("Error for argument '{}': {}", e.argId(), e.error()) << std::endl;
         return 1;
     }
 
-    auto config = rfl::json::load<pdft::app::Config, rfl::DefaultIfMissing>(
-        cli_args->config_path->value_or(pdft::utils::expandHome("~/.config/pdft/config.json")));
+    auto cli_args = cli::parsed<CliArgs>() | result::unwrap;
+
+    auto config = rfl::json::load<app::Config, rfl::DefaultIfMissing>(
+        cli_args.config_path->value_or(utils::expandHome("~/.config/pdft/config.json")));
 
     if (!config) {
         std::cerr << std::format("Error while parsing configuration: {}", config.error()->what())
@@ -74,6 +79,8 @@ int main(int argc, const char** argv) {
         return 1;
     }
 
-    pdft::app::main(*config, args);
+    app::main(*config);
     return 0;
 }
+
+PDFT_REGISTER_CLI_ARGS(CliArgs);

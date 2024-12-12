@@ -11,10 +11,6 @@
 
 namespace pdft::app {
 
-struct EntrypointCliArgs {
-    std::vector<std::string> p;
-};
-
 Entrypoint::Entrypoint(asio::io_context& io, inject<app::Application, "app"> app)
     : io_(io)
     , app_(std::move(app)) {}

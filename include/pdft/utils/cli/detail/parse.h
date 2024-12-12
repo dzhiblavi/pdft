@@ -1,7 +1,7 @@
 #pragma once
 
-#include "pdft/utils/cli/detail/args.h"
-#include "pdft/utils/cli/option.h"
+#include "pdft/utils/cli/cli.h"
+#include "pdft/utils/cli/detail/cli_arg.h"
 
 #include "pdft/core/result/type/result.h"
 #include "pdft/core/result/type/unit.h"
@@ -27,10 +27,11 @@ Result<S, std::string> parseFromCliArgs(std::span<const char*> args) {
 
     auto make = [&]<auto Name, typename Description, typename T>(
                     rfl::Field<Name, CliOption<T, Description>*>& field) {
-        return std::make_unique<std::pair<CliOption<T, Description>*, CliArg<Description, T>>>(
-            std::piecewise_construct,
-            std::forward_as_tuple(field.get()),
-            std::forward_as_tuple(cmd));
+        auto res = std::make_unique<std::pair<CliOption<T, Description>*, CliArg<Description, T>>>(
+            std::piecewise_construct, std::forward_as_tuple(field.get()), std::forward_as_tuple());
+
+        res->second.attach(cmd);
+        return res;
     };
 
     auto tuple =

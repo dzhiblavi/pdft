@@ -2,38 +2,30 @@
 #include "pdft/app/palettes.h"
 
 #include "pdft/core/module/register.h"
-#include "pdft/utils/cli/parse.h"
-
 #include "pdft/core/result/coro/maybe.h"
 #include "pdft/core/result/coro/result.h"
+
+#include "pdft/utils/cli/register.h"
 
 namespace pdft::app {
 
 using namespace result;
 
-namespace {
-
-struct CliArgs {
-    cli::cli<std::vector<std::string>, 'p', "path", "Paths to documents to be opened"> path;
-};
-
-}  // namespace
+namespace {}  // namespace
 
 AppLoader::AppLoader(
-    std::span<const char*> argv,
+    CliArgs cli,
     inject<StateLoader, "state_loader"> state_loader,
     inject<notify::Notify, "fswatcher"> fswatcher,
     inject<PaletteStorage, "palettes"> palettes)
-    : argv_(argv)
+    : cli_(cli)
     , state_loader_(std::move(state_loader))
     , fs_watcher_(std::move(fswatcher))
     , palettes_(std::move(palettes)) {}
 
 Status AppLoader::load(UIState& ui, DocumentStorage& documents) {
     palettes_->add("skim", getSkimPalette());
-
-    auto args = co_await cli::parseFromCliArgs<CliArgs>(argv_);
-    co_await state_loader_->load(args.path, ui, documents);
+    co_await state_loader_->load(cli_.path, ui, documents);
 
     for (auto&& doc : ui.states) {
         auto document = documents.getDocument(doc.document_id) | result::unwrap;
@@ -52,3 +44,4 @@ Status AppLoader::save(const UIState& ui, const DocumentStorage& documents) {
 }  // namespace pdft::app
 
 PDFT_REGISTER_MODULE(pdft::app::AppLoader);
+PDFT_REGISTER_CLI_ARGS(pdft::app::AppLoader::CliArgs);

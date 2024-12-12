@@ -8,7 +8,7 @@ template <typename T>
 concept HasConfig = requires() { typename T::Config; };
 
 template <typename T>
-concept HasCliConfig = requires() { typename T::CliConfig; };
+concept HasCliArgs = requires() { typename T::CliArgs; };
 
 template <typename T>
 struct MaybeConfigTypeImpl {
@@ -24,16 +24,16 @@ template <typename T>
 using MaybeConfigType = typename MaybeConfigTypeImpl<T>::type;
 
 template <typename T>
-struct MaybeCliConfigTypeImpl {
+struct MaybeCliArgsTypeImpl {
     using type = Unit;
 };
 
-template <HasCliConfig T>
-struct MaybeCliConfigTypeImpl<T> {
-    using type = typename T::CliConfig;
+template <HasCliArgs T>
+struct MaybeCliArgsTypeImpl<T> {
+    using type = typename T::CliArgs;
 };
 
 template <typename T>
-using MaybeCliConfigType = typename MaybeCliConfigTypeImpl<T>::type;
+using MaybeCliArgsType = typename MaybeCliArgsTypeImpl<T>::type;
 
 }  // namespace pdft::module::detail

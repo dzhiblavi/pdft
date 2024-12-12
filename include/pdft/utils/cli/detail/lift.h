@@ -55,7 +55,8 @@ struct ComplexType<T> {
         auto e = magic_enum::enum_cast<T>(value);
 
         if (!e.has_value()) {
-            return std::unexpected(std::format("failed to parse enum from {}", value));
+            return std::unexpected(
+                std::format("failed to parse {} from {}", rfl::type_name_t<T>().name(), value));
         }
 
         return *e;

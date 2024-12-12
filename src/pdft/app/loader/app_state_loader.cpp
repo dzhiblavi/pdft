@@ -4,7 +4,7 @@
 #include "pdft/core/module/register.h"
 #include "pdft/core/result.h"
 
-#include "pdft/utils/cli/parse.h"
+#include "pdft/utils/cli/register.h"
 #include "pdft/utils/get_home_dir.h"
 
 #include <magic_enum.hpp>
@@ -27,26 +27,16 @@ bool isOpened(const std::string& abs_path, const UIState& ui, const DocumentStor
     return false;
 }
 
-struct CliArgs {
-    cli::cli<
-        std::optional<StateMode>,
-        'S',
-        "state-mode",
-        "Override the configured state management mode">
-        state_mode;
-};
-
 }  // namespace
 
 AppStateLoader::AppStateLoader(
     Config config,
-    std::span<const char*> argv,
+    CliArgs cli,
     inject<const Persister, "persister"> persister,
     inject<const media::Loader, "media_loader"> doc_loader)
     : config_(config)
     , persister_(std::move(persister))
     , doc_loader_(std::move(doc_loader)) {
-    auto cli = cli::parseFromCliArgs<CliArgs>(argv) | result::unwrap;
     config_.mode = cli.state_mode->value_or(config_.mode);
     config_.state_path = config_.state_path.transform(utils::expandHome);
     log::info(this, "AppStateLoader state mode is {}", magic_enum::enum_name(config_.mode));
@@ -117,3 +107,4 @@ Status AppStateLoader::load(
 }  // namespace pdft::app
 
 PDFT_REGISTER_MODULE(pdft::app::AppStateLoader);
+PDFT_REGISTER_CLI_ARGS(pdft::app::AppStateLoader::CliArgs);

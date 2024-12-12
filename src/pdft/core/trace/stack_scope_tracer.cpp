@@ -83,7 +83,7 @@ StackScopeTracerPool::~StackScopeTracerPool() {
         delete &item;
     });
 
-    PDFT_VERIFY(num_freed == numAllocations());
+    PDFT_VERIFY_DBG(num_freed == numAllocations());
 }
 
 StackScopeTracerOwner StackScopeTracerPool::getTracer(const char* label, std::source_location loc) {

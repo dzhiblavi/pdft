@@ -50,7 +50,6 @@ AppPageRenderer::RenderingImage& AppPageRenderer::Images::getRenderingImage(tui:
 AppPageRenderer::AppPageRenderer(
     asio::io_context& io,
     Config config,
-    CliConfig cli,
     inject<const DocumentStorage, "docs"> documents,
     inject<const ImageRenderer, "img_renderer"> renderer,
     inject<tui::Display, "display"> display)
@@ -60,9 +59,7 @@ AppPageRenderer::AppPageRenderer(
     , renderer_(std::move(renderer))
     , display_(std::move(display))
     , pool_(config_.render_pool_size)
-    , media_strand_(pool_.get_executor()) {
-    log::info(this, "cli: {}", cli.override_pool_size->value_or(228));
-}
+    , media_strand_(pool_.get_executor()) {}
 
 AppPageRenderer::~AppPageRenderer() {
     pool_.stop();
