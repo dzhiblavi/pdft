@@ -1,6 +1,6 @@
 #pragma once
 
-#include "pdft/core/module/detail/constructor.h"
+#include "pdft/core/module/load/detail/constructor.h"
 #include "pdft/core/module/load/detail/inject.h"
 #include "pdft/core/module/load/detail/injector.h"
 #include "pdft/core/module/load/load_context.h"
@@ -13,9 +13,9 @@ const ModuleConfig& getConfig(LoadContext& ctx, const std::string& name);
 
 Arc<Module> addNewModule(LoadContext& ctx, const std::string& name, Arc<Module> module);
 
-Arc<Module> getOrLoadModule(LoadContext& ctx, const std::string& name);
-
 bool isLoaded(LoadContext& ctx, const std::string& name);
+
+Arc<Module> getOrLoadModule(LoadContext& ctx, const std::string& name);
 
 template <IsModule T>
 Arc<T> makeModule(LoadContext& ctx, std::string name) {
