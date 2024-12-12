@@ -7,6 +7,8 @@
 
 namespace pdft::module {
 
+void loadAllModules(LoadContext& ctx);
+
 const ModuleConfig& getConfig(LoadContext& ctx, const std::string& name);
 
 Arc<Module> addNewModule(LoadContext& ctx, const std::string& name, Arc<Module> module);

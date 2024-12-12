@@ -76,9 +76,11 @@ target_sources(
           ./tui/kitty/apc/apc_executor_base.cpp
           ./tui/kitty/apc/regular_apc_executor.cpp
           ./tui/kitty/apc/tmux_apc_executor.cpp
+          ./tui/kitty/apc/apc_executor_factory.cpp
           ./tui/kitty/display_base.cpp
           ./tui/kitty/unicode_display.cpp
-          ./tui/kitty/native_display.cpp)
+          ./tui/kitty/native_display.cpp
+          ./tui/kitty/display_factory.cpp)
 
 target_sources(
   pdft

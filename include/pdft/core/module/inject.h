@@ -5,13 +5,13 @@
 
 #include "pdft/utils/fixed_string.h"
 
-namespace pdft {
+namespace pdft::module::detail {
 
 struct DependsOnModuleTag {};
 
-template <typename T, utils::FixedString ModuleName>
+template <typename T, utils::FixedString moduleName>
 struct DependsOnModule : DependsOnModuleTag {
-    static constexpr utils::FixedString Name = ModuleName;
+    static constexpr utils::FixedString Name = moduleName;
 
     /* implicit */ DependsOnModule(Arc<T> mod) : value_(std::move(mod)) {}
 
@@ -20,7 +20,7 @@ struct DependsOnModule : DependsOnModuleTag {
         value_ = PDFT_VERIFY(
             std::dynamic_pointer_cast<T>(std::move(mod)),
             "incompatible injected value (module {})",
-            ModuleName.c_str());
+            Name.c_str());
     }
 
     operator Arc<T>() const {
@@ -39,7 +39,11 @@ struct DependsOnModule : DependsOnModuleTag {
     Arc<T> value_;
 };
 
+}  // namespace pdft::module::detail
+
+namespace pdft {
+
 template <typename T, utils::FixedString ModuleName>
-using inject = DependsOnModule<T, ModuleName>;
+using inject = module::detail::DependsOnModule<T, ModuleName>;
 
 }  // namespace pdft

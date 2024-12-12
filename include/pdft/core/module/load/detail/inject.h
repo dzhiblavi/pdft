@@ -23,7 +23,7 @@ ArgType injectArgument(LoadContext& ctx, const std::string&) {
     return ctx.io.get_executor();
 }
 
-template <IsModule ModuleType, std::derived_from<DependsOnModuleTag> ArgType>
+template <IsModule ModuleType, std::derived_from<detail::DependsOnModuleTag> ArgType>
 ArgType injectArgument(LoadContext& ctx, const std::string&) {
     return ArgType{getOrLoadModule(ctx, ArgType::Name.c_str())};
 }

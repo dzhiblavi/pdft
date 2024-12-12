@@ -10,6 +10,10 @@
 
 namespace pdft::tui {
 
+struct APCExecutorConfig {
+    size_t max_chunk_size_bytes = 4096;
+};
+
 class APCExecutor {
  public:
     virtual ~APCExecutor() = default;

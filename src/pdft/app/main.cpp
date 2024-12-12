@@ -32,15 +32,7 @@ void main(Config config) {
         .modules = config.modules,
     };
 
-    for (const auto& [name, conf] : ctx.modules) {
-        if (module::isLoaded(ctx, name)) {
-            continue;
-        }
-
-        auto mod = module::getOrLoadModule(ctx, name);
-        auto traits = module::FactoryStorage::globalInstance().getTraits(conf.factory);
-        traits->start(mod.get());
-    }
+    module::loadAllModules(ctx);
 
     try {
         context.run();

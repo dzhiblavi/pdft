@@ -6,10 +6,18 @@
 
 namespace pdft::module::detail {
 
-template <typename T>
+template <IsModule T>
 struct ModuleRegister {
     explicit ModuleRegister(const std::string& module_name) {
         FactoryStorage::globalInstance().template registerModule<T>(module_name);
+    }
+};
+
+template <typename I, IsFactory<I> F>
+requires IsModule<F>
+struct FactoryRegister {
+    explicit FactoryRegister(const std::string& module_name) {
+        FactoryStorage::globalInstance().template registerFactoryModule<I, F>(module_name);
     }
 };
 

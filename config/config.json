@@ -60,71 +60,77 @@
   },
   "modules": {
     "entrypoint": {
-      "factory": "pdft::app::Entrypoint"
+      "cls": "pdft::app::Entrypoint"
     },
     "fswatcher": {
-      "factory": "pdft::notify::FswNotify"
+      "cls": "pdft::notify::FswNotify"
     },
     "listener": {
-      "factory": "pdft::app::AppEventListener"
+      "cls": "pdft::app::AppEventListener"
     },
     "renderer": {
-      "factory": "pdft::tui::AppRenderer"
+      "cls": "pdft::tui::AppRenderer"
     },
     "app": {
-      "factory": "pdft::app::Application"
+      "cls": "pdft::app::Application"
     },
     "writer": {
-      "factory": "pdft::io::PosixConsoleWriter"
+      "cls": "pdft::io::PosixConsoleWriter"
     },
     "reader": {
-      "factory": "pdft::io::PosixConsoleReader"
+      "cls": "pdft::io::PosixConsoleReader"
     },
     "term_ctrl": {
-      "factory": "pdft::io::PosixTermControl"
+      "cls": "pdft::io::PosixTermControl"
     },
     "terminal": {
-      "factory": "pdft::tui::AnsiTerminal"
+      "cls": "pdft::tui::AnsiTerminal"
     },
     "persister": {
-      "factory": "pdft::app::AppPersister"
+      "cls": "pdft::app::AppPersister"
     },
     "media_loader": {
-      "factory": "pdft::media::MupdfLoader"
+      "cls": "pdft::media::MupdfLoader"
     },
     "state_loader": {
-      "factory": "pdft::app::AppStateLoader",
+      "cls": "pdft::app::AppStateLoader",
       "config": {
         "mode": "AddOnly",
         "state_path": "../../../../assets/state.json"
       }
     },
     "loader": {
-      "factory": "pdft::app::AppLoader"
+      "cls": "pdft::app::AppLoader"
     },
     "docs": {
-      "factory": "pdft::app::DocumentStorage"
+      "cls": "pdft::app::DocumentStorage"
     },
     "img_renderer": {
-      "factory": "pdft::app::ImageRenderer"
+      "cls": "pdft::app::ImageRenderer"
     },
     "palettes": {
-      "factory": "pdft::app::PaletteStorage"
+      "cls": "pdft::app::PaletteStorage"
+    },
+    "apc_factory": {
+      "cls": "pdft::tui::APCExecutorFactory"
     },
     "apc": {
-      "factory": "pdft::tui::TmuxAPCExecutor"
+      "factory": "apc_factory"
+    },
+    "display_factory": {
+      "cls": "pdft::tui::KittyDisplayFactory"
     },
     "display": {
-      "factory": "pdft::tui::UnicodeKittyDisplay"
+      "factory": "display_factory"
     },
     "doc_view": {
-      "factory": "pdft::app::AppDocumentView"
+      "cls": "pdft::app::AppDocumentView"
     },
     "view": {
-      "factory": "pdft::app::AppView"
+      "cls": "pdft::app::AppView"
     },
     "page_renderer": {
-      "factory": "pdft::app::AppPageRenderer",
+      "cls": "pdft::app::AppPageRenderer",
       "config": {
         "render_pool_size": 4,
         "num_preload_backward": 2,
@@ -132,7 +138,7 @@
       }
     },
     "controller": {
-      "factory": "pdft::app::AppController",
+      "cls": "pdft::app::AppController",
       "config": {
         "rows_per_scroll": 30,
         "key_mappings": [
