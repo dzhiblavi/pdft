@@ -8,6 +8,7 @@
 #include "pdft/core/module/inject.h"
 #include "pdft/core/module/module.h"
 
+#include "pdft/utils/cli_args/cli_args.h"
 #include "pdft/utils/random.h"
 
 #include <asio/io_context.hpp>
@@ -44,9 +45,19 @@ class AppPageRenderer : public PageRenderer, public Module {
         uint32_t image_id_salt = utils::random<uint32_t>();
     };
 
+    struct CliConfig {
+        cli::cli<
+            std::optional<uint32_t>,
+            'o',
+            "override-pool-size",
+            "Override render pool size from config">
+            override_pool_size;
+    };
+
     AppPageRenderer(
         asio::io_context& io,
         Config config,
+        CliConfig cli,
         inject<const DocumentStorage, "docs"> documents_,
         inject<const ImageRenderer, "img_renderer"> renderer,
         inject<tui::Display, "display"> display);

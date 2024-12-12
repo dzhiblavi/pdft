@@ -5,6 +5,9 @@
 #include "pdft/core/module/detail/constructor.h"
 #include "pdft/core/module/inject.h"
 #include "pdft/core/module/module.h"
+#include "pdft/core/result.h"
+
+#include "pdft/utils/cli_args/cli_args.h"
 
 #include <rfl/Generic.hpp>
 #include <rfl/from_generic.hpp>
@@ -28,8 +31,11 @@ class ModuleLoader {
  public:
     explicit ModuleLoader(LoadContext& context) : context_(context) {}
 
-    template <typename ArgType, typename ConfigType>
+    template <typename ArgType, IsModule ModuleType>
     ArgType injectArgument(const std::string for_module) {
+        using ConfigType = detail::MaybeConfigType<ModuleType>;
+        using CliConfigType = detail::MaybeCliConfigType<ModuleType>;
+
         if constexpr (std::is_same_v<ArgType, asio::io_context&>) {
             return context_.io;
         } else if constexpr (std::is_same_v<ArgType, asio::any_io_executor>) {
@@ -46,6 +52,8 @@ class ModuleLoader {
             auto result = rfl::from_generic<ConfigType, rfl::DefaultIfMissing>(config);
             return *PDFT_VERIFY(
                 result, "failed to parse config for {}: {}", for_module, result.error()->what());
+        } else if constexpr (std::is_same_v<ArgType, CliConfigType>) {
+            return cli::parseFromCliArgs<CliConfigType>(context_.argv) | result::unwrap;
         } else if constexpr (std::convertible_to<ArgType&, DependsOnModuleTag&>) {
             return ArgType{getOrLoadModule(ArgType::Name.c_str())};
         } else {
@@ -71,14 +79,12 @@ class ModuleLoader {
 
 template <IsModule ModuleType>
 struct ValueArgumentInjector {
-    using ConfigType = detail::MaybeConfigType<ModuleType>;
-
     ValueArgumentInjector(ModuleLoader* ctx, const std::string& name) : ctx(ctx), name(name) {}
 
     template <typename T>
     requires(!std::is_same_v<std::decay_t<T>, ModuleType>)
     operator T() const {
-        return ctx->template injectArgument<T, ConfigType>(name);
+        return ctx->template injectArgument<T, ModuleType>(name);
     }
 
     ModuleLoader* ctx;
@@ -87,29 +93,27 @@ struct ValueArgumentInjector {
 
 template <IsModule ModuleType>
 struct RefArgumentInjector {
-    using ConfigType = detail::MaybeConfigType<ModuleType>;
-
     RefArgumentInjector(ModuleLoader* ctx, const std::string& name) : ctx(ctx), name(name) {}
 
     template <typename T>
     requires(!std::is_same_v<std::decay_t<T>, ModuleType>)
     operator T() const {
-        return ctx->template injectArgument<T, ConfigType>(name);
+        return ctx->template injectArgument<T, ModuleType>(name);
     }
     template <typename T>
     requires(!std::is_same_v<std::decay_t<T>, ModuleType>)
     operator T&() const {
-        return ctx->template injectArgument<T&, ConfigType>(name);
+        return ctx->template injectArgument<T&, ModuleType>(name);
     }
     template <typename T>
     requires(!std::is_same_v<std::decay_t<T>, ModuleType>)
     operator T&&() const {
-        return ctx->template injectArgument<T&&, ConfigType>(name);
+        return ctx->template injectArgument<T&&, ModuleType>(name);
     }
     template <typename T>
     requires(!std::is_same_v<std::decay_t<T>, ModuleType>)
     operator const T&() const {
-        return ctx->template injectArgument<const T&, ConfigType>(name);
+        return ctx->template injectArgument<const T&, ModuleType>(name);
     }
 
     ModuleLoader* ctx;

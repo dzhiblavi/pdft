@@ -4,17 +4,36 @@
 
 namespace pdft::module::detail {
 
-template <typename T, typename = void>
+template <typename T>
+concept HasConfig = requires() { typename T::Config; };
+
+template <typename T>
+concept HasCliConfig = requires() { typename T::CliConfig; };
+
+template <typename T>
 struct MaybeConfigTypeImpl {
     using type = Unit;
 };
 
-template <typename T>
-struct MaybeConfigTypeImpl<T, std::void_t<typename T::Config>> {
+template <HasConfig T>
+struct MaybeConfigTypeImpl<T> {
     using type = typename T::Config;
 };
 
 template <typename T>
 using MaybeConfigType = typename MaybeConfigTypeImpl<T>::type;
 
-}  // namespace pdft::detail
+template <typename T>
+struct MaybeCliConfigTypeImpl {
+    using type = Unit;
+};
+
+template <HasCliConfig T>
+struct MaybeCliConfigTypeImpl<T> {
+    using type = typename T::CliConfig;
+};
+
+template <typename T>
+using MaybeCliConfigType = typename MaybeCliConfigTypeImpl<T>::type;
+
+}  // namespace pdft::module::detail

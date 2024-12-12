@@ -51,13 +51,14 @@ void main(Config config, std::span<const char*> argv) {
 }  // namespace pdft::app
 
 struct CliArgs {
-    std::optional<std::string> config_path;
+    pdft::cli::cli<std::optional<std::string>, 'c', "config-path", "Path to the configuration file">
+        config_path;
 };
 
 int main(int argc, const char** argv) {
     auto args = std::span(argv, argc);
 
-    auto cli_args = pdft::utils::parseFromCliArgs<CliArgs>(args);
+    auto cli_args = pdft::cli::parseFromCliArgs<CliArgs>(args);
     if (!cli_args.has_value()) {
         std::cerr << std::format("Error while parsing CLI arguments: {}", cli_args.error())
                   << std::endl;
@@ -65,7 +66,7 @@ int main(int argc, const char** argv) {
     }
 
     auto config = rfl::json::load<pdft::app::Config, rfl::DefaultIfMissing>(
-        cli_args->config_path.value_or(pdft::utils::expandHome("~/.config/pdft/config.json")));
+        cli_args->config_path->value_or(pdft::utils::expandHome("~/.config/pdft/config.json")));
 
     if (!config) {
         std::cerr << std::format("Error while parsing configuration: {}", config.error()->what())

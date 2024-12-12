@@ -4,7 +4,7 @@
 
 #include <catch2/catch_test_macros.hpp>
 
-namespace pdft::utils {
+namespace pdft::cli {
 
 enum class E {
     A,
@@ -18,7 +18,7 @@ std::array<const char*, sizeof...(Args) + 1> args(Args... args) {
 
 TEST_CASE("testParseFromCliArgsInt") {
     struct X {
-        int x = 0;
+        cli<int, 'x', "x"> x = 0;
     };
 
     auto arr = args("-x", "10");
@@ -30,19 +30,19 @@ TEST_CASE("testParseFromCliArgsInt") {
 
 TEST_CASE("testParseFromCliArgsMaybeInt") {
     struct X {
-        Maybe<int> x = 0;
+        cli<Maybe<int>, 'x', "x"> x = 0;
     };
 
     auto arr = args("-x", "10");
     auto x = parseFromCliArgs<X>(arr);
 
     CHECK(x.has_value());
-    CHECK(x->x == 10);
+    CHECK(x->x->value() == 10);
 }
 
 TEST_CASE("testParseFromCliArgsIntMissing") {
     struct X {
-        int x = 0;
+        cli<int, 'x', "x"> x = 0;
     };
 
     auto arr = args("-y", "10");
@@ -54,14 +54,14 @@ TEST_CASE("testParseFromCliArgsIntMissing") {
 
 TEST_CASE("testParseFromCliArgsMaybeIntMissing") {
     struct X {
-        Maybe<int> x = 0;
+        cli<Maybe<int>, 'x', "x"> x = 0;
     };
 
     auto arr = args("-y", "10");
     auto x = parseFromCliArgs<X>(arr);
 
     CHECK(x.has_value());
-    CHECK(x->x == 0);
+    CHECK(x->x->value() == 0);
 }
 
 TEST_CASE("testParseFromCliArgsEnum") {
@@ -71,7 +71,7 @@ TEST_CASE("testParseFromCliArgsEnum") {
     };
 
     struct X {
-        E en = E::B;
+        cli<E, 'e', "en"> en = E::B;
     };
 
     auto arr = args("--en", "A");
@@ -83,7 +83,7 @@ TEST_CASE("testParseFromCliArgsEnum") {
 
 TEST_CASE("testParseFromCliArgsEnumMissing") {
     struct X {
-        E en = E::B;
+        cli<E, 'e', "en"> en = E::B;
     };
 
     auto arr = args("--eng", "A");
@@ -95,7 +95,7 @@ TEST_CASE("testParseFromCliArgsEnumMissing") {
 
 TEST_CASE("testParseFromCliArgsEnumBad") {
     struct X {
-        E en = E::B;
+        cli<E, 'e', "en"> en = E::B;
     };
 
     auto arr = args("--en", "D");
@@ -106,74 +106,74 @@ TEST_CASE("testParseFromCliArgsEnumBad") {
 
 TEST_CASE("testParseFromCliArgsMaybeEnum") {
     struct X {
-        Maybe<E> en;
+        cli<Maybe<E>, 'e', "en"> en;
     };
 
     auto arr = args("--en", "A");
     auto x = parseFromCliArgs<X>(arr);
 
     CHECK(x.has_value());
-    CHECK(x->en == E::A);
+    CHECK(x->en->value() == E::A);
 }
 
 TEST_CASE("testParseFromCliArgsMaybeEnumMissing") {
     struct X {
-        Maybe<E> en;
+        cli<Maybe<E>, 'e', "en"> en;
     };
 
     auto arr = args("--eng", "A");
     auto x = parseFromCliArgs<X>(arr);
 
     CHECK(x.has_value());
-    CHECK(!x->en.has_value());
+    CHECK(!x->en->has_value());
 }
 
 TEST_CASE("testParseFromCliArgsVectorOfPrimitives") {
     struct X {
-        std::vector<int> v;
+        cli<std::vector<int>, 'v', "v"> v;
     };
 
     auto arr = args("--v", "10", "--v", "20");
     auto x = parseFromCliArgs<X>(arr);
 
     CHECK(x.has_value());
-    CHECK(x->v == std::vector{10, 20});
+    CHECK(x->v.get() == std::vector{10, 20});
 }
 
 TEST_CASE("testParseFromCliArgsVectorOfPrimitivesMissing") {
     struct X {
-        std::vector<int> v;
+        cli<std::vector<int>, 'v', "v"> v;
     };
 
     auto arr = args("--y", "10", "--y", "20");
     auto x = parseFromCliArgs<X>(arr);
 
     CHECK(x.has_value());
-    CHECK(x->v == std::vector<int>{});
+    CHECK(x->v.get() == std::vector<int>{});
 }
 
 TEST_CASE("testParseFromCliArgsVectorOfEnums") {
     struct X {
-        std::vector<E> v;
+        cli<std::vector<E>, 'v', "v"> v;
     };
 
     auto arr = args("--v", "B", "--v", "A");
     auto x = parseFromCliArgs<X>(arr);
 
     CHECK(x.has_value());
-    CHECK(x->v == std::vector{E::B, E::A});
+    CHECK(x->v.get() == std::vector{E::B, E::A});
 }
 
 TEST_CASE("testParseFromCliArgsVectorOfEnumsMissing") {
     struct X {
-        std::vector<E> v;
+        cli<std::vector<E>, 'v', "v"> v;
     };
 
     auto arr = args("--y", "10", "--y", "20");
     auto x = parseFromCliArgs<X>(arr);
 
     CHECK(x.has_value());
-    CHECK(x->v == std::vector<E>{});
+    CHECK(x->v.get() == std::vector<E>{});
 }
 
-}  // namespace pdft::utils
+}  // namespace pdft::cli
