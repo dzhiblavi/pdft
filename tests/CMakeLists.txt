@@ -34,7 +34,7 @@ add_test(./pdft/core/result/coro/test_result.cpp)
 add_test(./pdft/image/color.cpp)
 
 # Utils
-add_test(./pdft/utils/test_intrusive_forward_list.cpp)
+add_test(./pdft/utils/test_lock_free_stack.cpp)
 add_test(./pdft/utils/test_visit.cpp)
 add_test(./pdft/utils/test_cli_args.cpp)
 

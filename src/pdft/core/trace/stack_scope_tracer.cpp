@@ -1,5 +1,7 @@
 #include "pdft/core/trace/stack_scope_tracer.h"
 
+#include "pdft/core/assert.h"
+
 namespace pdft::trace {
 
 void StackScopeTracerBase::finalize() {
@@ -12,7 +14,7 @@ void StackScopeTracerBase::release() {
 
 void StackScopeTracerBase::addChild(StackScopeTracerBase* child) {
     ++child->refcount;
-    children.pushFront(*child);
+    children.push(*child);
 }
 
 StackScopeTraceHandle::StackScopeTraceHandle(const StackScopeTracerOwner& owner)
@@ -24,8 +26,7 @@ bool StackScopeTraceHandle::isValid() const {
 
 StackScopeTracerOwner StackScopeTraceHandle::addChild(const char* label, std::source_location loc) {
     PDFT_VERIFY(isValid());
-    // Acquire new tracer from thread local pool
-    auto c = getGlobalPool().getTracer(label, loc);
+    auto c = base_->pool->getTracer(label, loc);
     c.base_->depth = base_->depth + 1;
     c.base_->parent = base_;
     base_->addChild(c.base_);
@@ -66,17 +67,23 @@ void StackScopeTracerOwner::release() {
 }
 
 StackScopeTracerBase* StackScopeTracerPool::getTracerBase() {
-    if (free_list_.isEmpty()) {
-        ++num_allocations_;
-        return new StackScopeTracerBase;
+    if (auto base = free_list_.tryPop()) {
+        return base;
     }
 
-    return &free_list_.popFront();
+    ++num_allocations_;
+    return new StackScopeTracerBase;
 }
 
 StackScopeTracerPool::~StackScopeTracerPool() {
-    PDFT_VERIFY(free_list_.size() == numAllocations());
-    free_list_.forEachUnordered([](auto&& item) { delete &item; });
+    size_t num_freed = 0;
+
+    free_list_.forEach([&](auto&& item) {
+        ++num_freed;
+        delete &item;
+    });
+
+    PDFT_VERIFY(num_freed == numAllocations());
 }
 
 StackScopeTracerOwner StackScopeTracerPool::getTracer(const char* label, std::source_location loc) {
@@ -108,13 +115,13 @@ void StackScopeTracerPool::release(StackScopeTracerBase* item) {
     --item->refcount;
 
     if (item->refcount == 0) {
-        item->children.forEachUnordered(&StackScopeTracerBase::release);
-        free_list_.pushFront(*item);
+        item->children.forEach(&StackScopeTracerBase::release);
+        free_list_.push(*item);
     }
 }
 
 StackScopeTracerPool& getGlobalPool() {
-    thread_local StackScopeTracerPool pool;
+    static StackScopeTracerPool pool;
     return pool;
 }
 

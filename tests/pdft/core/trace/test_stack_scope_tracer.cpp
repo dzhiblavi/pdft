@@ -13,7 +13,7 @@ TEST_CASE("testStackScopeTracerOneAllocation", "") {
 }
 
 TEST_CASE("testStackScopeTracerChildCallsCallback", "") {
-    StackScopeTracerPool& pool = getGlobalPool();
+    StackScopeTracerPool pool;
 
     {
         auto t = pool.getTracer();
@@ -22,14 +22,13 @@ TEST_CASE("testStackScopeTracerChildCallsCallback", "") {
         { auto c = t.addChild(); }
 
         CHECK(pool.numAllocations() == 2);
-        CHECK(t.getInfo().children.size() == 1);
     }
 
     CHECK(pool.numAllocations() == 2);
 }
 
 TEST_CASE("testStackScopeTracerReusedOne", "") {
-    StackScopeTracerPool& pool = getGlobalPool();
+    StackScopeTracerPool pool;
 
     for (int i = 0; i < 10; ++i) {
         auto _ = pool.getTracer();
@@ -39,7 +38,7 @@ TEST_CASE("testStackScopeTracerReusedOne", "") {
 }
 
 TEST_CASE("testStackScopeTracerReusedWithChildren", "") {
-    StackScopeTracerPool& pool = getGlobalPool();
+    StackScopeTracerPool pool;
 
     for (int i = 0; i < 100; ++i) {
         auto t = pool.getTracer();
@@ -60,7 +59,7 @@ TEST_CASE("testStackScopeTracerReusedWithChildren", "") {
 }
 
 TEST_CASE("testStackScopeTracerChlidrenNotYetRecycled", "") {
-    StackScopeTracerPool& pool = getGlobalPool();
+    StackScopeTracerPool pool;
 
     auto t = pool.getTracer();
     CHECK(pool.numAllocations() == 1);

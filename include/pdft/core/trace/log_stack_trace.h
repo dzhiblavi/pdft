@@ -45,7 +45,13 @@ void logStackTrace(const StackScopeTracerBase& info, io::OutBuffer& out) {
             std::filesystem::path(loc.file_name()).filename().c_str(),
             loc.line()));
 
-    info.children.forEach([&](const auto& child) { logStackTrace<Duration>(child, out); });
+    std::vector<const StackScopeTracerBase*> children;
+    info.children.forEach([&](const auto& child) { children.push_back(&child); });
+    std::reverse(children.begin(), children.end());
+
+    for (const auto* child : children) {
+        logStackTrace<Duration>(*child, out);
+    }
 }
 
 }  // namespace detail
