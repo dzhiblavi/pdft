@@ -4,7 +4,7 @@
 #include "pdft/core/module/register.h"
 #include "pdft/core/result.h"
 
-#include "pdft/utils/cli_args/cli_args.h"
+#include "pdft/utils/cli/parse.h"
 #include "pdft/utils/get_home_dir.h"
 
 #include <magic_enum.hpp>

@@ -2,7 +2,7 @@
 #include "pdft/app/palettes.h"
 
 #include "pdft/core/module/register.h"
-#include "pdft/utils/cli_args/cli_args.h"
+#include "pdft/utils/cli/parse.h"
 
 #include "pdft/core/result/coro/maybe.h"
 #include "pdft/core/result/coro/result.h"

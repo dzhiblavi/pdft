@@ -8,7 +8,7 @@
 #include "pdft/core/module/inject.h"
 #include "pdft/core/module/module.h"
 
-#include "pdft/utils/cli_args/cli_args.h"
+#include "pdft/utils/cli/option.h"
 #include "pdft/utils/random.h"
 
 #include <asio/io_context.hpp>

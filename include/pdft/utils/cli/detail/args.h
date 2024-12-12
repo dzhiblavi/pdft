@@ -1,6 +1,6 @@
 #pragma once
 
-#include "pdft/utils/cli_args/detail/lift.h"
+#include "pdft/utils/cli/detail/lift.h"
 
 #include "pdft/core/result/type/result.h"
 #include "pdft/core/result/type/unit.h"

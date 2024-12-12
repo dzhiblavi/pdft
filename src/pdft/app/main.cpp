@@ -4,7 +4,7 @@
 #include "pdft/core/module/factory_storage.h"
 #include "pdft/core/module/loader.h"
 
-#include "pdft/utils/cli_args/cli_args.h"
+#include "pdft/utils/cli/parse.h"
 #include "pdft/utils/get_home_dir.h"
 
 #include <asio/co_spawn.hpp>
