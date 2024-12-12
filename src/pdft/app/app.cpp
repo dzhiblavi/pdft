@@ -40,7 +40,7 @@ AsyncStatus Application::run(Context& ctx) {
 
 AsyncStatus Application::runEventLoop() {
     for (;;) {
-        auto tracer = trace::getGlobalPool().getTracer("render_one");
+        auto tracer = trace::makeTracer("controller");
         Context ctx(tracer);
 
         auto dom = view_->getLayout(ctx, ui_);
@@ -57,7 +57,7 @@ AsyncStatus Application::runEventLoop() {
 }
 
 asio::awaitable<bool> Application::waitForNextRender() {
-    auto tracer = trace::getGlobalPool().getTracer("controller");
+    auto tracer = trace::makeTracer("controller");
 
     for (;;) {
         using enum ControllerAction;

@@ -97,6 +97,8 @@ class StackScopeTracerPool {
 
     size_t numAllocations() const;
 
+    static StackScopeTracerPool& globalInstance();
+
  private:
     StackScopeTracerBase* getTracerBase();
     void release(StackScopeTracerBase* item);
@@ -109,6 +111,7 @@ class StackScopeTracerPool {
     size_t num_allocations_ = 0;
 };
 
-StackScopeTracerPool& getGlobalPool();
+StackScopeTracerOwner makeTracer(
+    const char* label = "", std::source_location loc = std::source_location::current());
 
 }  // namespace pdft::trace

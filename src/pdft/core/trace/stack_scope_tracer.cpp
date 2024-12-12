@@ -120,9 +120,13 @@ void StackScopeTracerPool::release(StackScopeTracerBase* item) {
     }
 }
 
-StackScopeTracerPool& getGlobalPool() {
+StackScopeTracerPool& StackScopeTracerPool::globalInstance() {
     static StackScopeTracerPool pool;
     return pool;
+}
+
+StackScopeTracerOwner makeTracer(const char* label, std::source_location loc) {
+    return StackScopeTracerPool::globalInstance().getTracer(label, loc);
 }
 
 }  // namespace pdft::trace

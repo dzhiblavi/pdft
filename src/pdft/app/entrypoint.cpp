@@ -21,7 +21,7 @@ void Entrypoint::start() {
 }
 
 Async<void> Entrypoint::run() {
-    auto tracer = trace::getGlobalPool().getTracer("entrypoint");
+    auto tracer = trace::makeTracer("entrypoint");
     Context ctx(tracer);
     co_await app_->run(ctx);
     trace::logStackTrace(std::move(tracer));

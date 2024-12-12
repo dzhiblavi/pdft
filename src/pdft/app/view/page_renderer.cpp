@@ -129,9 +129,8 @@ void AppPageRenderer::postPrepareImages(
         asio::co_spawn(
             media_strand_,
             [=, this, p = std::move(promise)]() mutable -> asio::awaitable<void> {
-                Context ctx;
-                auto tracer = trace::getGlobalPool().getTracer("bg_task");
-                ctx.setTracer(tracer);
+                auto tracer = trace::makeTracer("bg_task");
+                Context ctx(tracer);
 
                 auto image = ctx.push("get_image") | page->getImage(display.scaling_coeff);
 
