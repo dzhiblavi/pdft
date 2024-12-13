@@ -1,4 +1,4 @@
-#include "pdft/tui/kitty/native_display.h"
+#include "pdft/tui/kitty/native_kitty_display.h"
 
 #include "pdft/core/assert.h"
 #include "pdft/core/log.h"

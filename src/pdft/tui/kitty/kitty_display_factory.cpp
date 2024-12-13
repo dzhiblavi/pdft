@@ -1,6 +1,6 @@
-#include "pdft/tui/kitty/display_factory.h"
-#include "pdft/tui/kitty/native_display.h"
-#include "pdft/tui/kitty/unicode_display.h"
+#include "pdft/tui/kitty/kitty_display_factory.h"
+#include "pdft/tui/kitty/native_kitty_display.h"
+#include "pdft/tui/kitty/unicode_kitty_display.h"
 
 #include "pdft/core/module/register.h"
 

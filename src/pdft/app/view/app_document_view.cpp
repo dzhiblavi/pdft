@@ -1,4 +1,4 @@
-#include "pdft/app/view/impl/document_view.h"
+#include "pdft/app/view/impl/app_document_view.h"
 
 #include "pdft/core/module/register.h"
 

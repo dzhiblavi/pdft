@@ -1,6 +1,6 @@
 #pragma once
 
-#include "pdft/tui/kitty/display_base.h"
+#include "pdft/tui/kitty/kitty_display_base.h"
 #include "pdft/tui/terminal.h"
 
 #include "pdft/core/module/inject.h"
@@ -8,9 +8,9 @@
 
 namespace pdft::tui {
 
-class UnicodeKittyDisplay : public KittyDisplayBase, public Module {
+class NativeKittyDisplay : public KittyDisplayBase, public Module {
  public:
-    UnicodeKittyDisplay(
+    NativeKittyDisplay(
         inject<APCExecutor, "apc"> executor, inject<const Terminal, "terminal"> terminal)
         : KittyDisplayBase(std::move(executor))
         , terminal_(std::move(terminal)) {}

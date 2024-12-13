@@ -1,4 +1,4 @@
-#include "pdft/app/controller/impl/controller.h"
+#include "pdft/app/controller/impl/app_controller.h"
 
 #include "pdft/core/assert.h"
 #include "pdft/core/log.h"

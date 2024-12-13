@@ -1,4 +1,4 @@
-#include "pdft/app/view/impl/page_renderer.h"
+#include "pdft/app/view/impl/app_page_renderer.h"
 
 #include "pdft/core/module/register.h"
 #include "pdft/core/result/combine/unwrap.h"

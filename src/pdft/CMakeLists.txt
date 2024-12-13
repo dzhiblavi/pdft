@@ -79,10 +79,10 @@ target_sources(
           ./tui/kitty/apc/regular_apc_executor.cpp
           ./tui/kitty/apc/tmux_apc_executor.cpp
           ./tui/kitty/apc/apc_executor_factory.cpp
-          ./tui/kitty/display_base.cpp
-          ./tui/kitty/unicode_display.cpp
-          ./tui/kitty/native_display.cpp
-          ./tui/kitty/display_factory.cpp)
+          ./tui/kitty/unicode_kitty_display.cpp
+          ./tui/kitty/native_kitty_display.cpp
+          ./tui/kitty/kitty_display_base.cpp
+          ./tui/kitty/kitty_display_factory.cpp)
 
 target_sources(
   pdft
@@ -90,12 +90,12 @@ target_sources(
           ./app/state/document_storage.cpp
           ./app/state/palette_storage.cpp
           ./app/event/app_event_listener.cpp
-          ./app/view/page_renderer.cpp
-          ./app/view/view.cpp
-          ./app/view/document_view.cpp
+          ./app/view/app_page_renderer.cpp
+          ./app/view/app_view.cpp
+          ./app/view/app_document_view.cpp
           ./app/view/image_renderer.cpp
           ./app/controller/keytree.cpp
-          ./app/controller/controller.cpp
+          ./app/controller/app_controller.cpp
           ./app/loader/app_state_loader.cpp
           ./app/loader/app_persister.cpp
           ./app/loader/app_loader.cpp

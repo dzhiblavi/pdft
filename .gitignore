@@ -50,3 +50,4 @@ bazel-*
 # Test assets
 assets/
 logs/
+test.awk
