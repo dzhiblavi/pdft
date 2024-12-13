@@ -14,33 +14,33 @@ class AppDocumentView : public DocumentView, public Module {
     explicit AppDocumentView(inject<PageRenderer, "page_renderer"> renderer)
         : renderer_(std::move(renderer)) {}
 
-    tui::Element getLayout(Context& ctx, const DocumentState& doc) override;
+    tui::Element getLayout(Context& ctx, const DocumentModel& doc) override;
 
     Async<void> render(
         Context& ctx,
-        const DocumentState& doc,
+        const DocumentModel& doc,
         const DisplayProperties& properties,
         tui::Screen& screen) const override;
 
  private:
     Async<void> renderOnePage(
         Context& ctx,
-        const DocumentState& doc,
+        const DocumentModel& doc,
         const DisplayProperties& properties,
         tui::Screen& screen) const;
     Async<void> renderTwoPages(
         Context& ctx,
-        const DocumentState& doc,
+        const DocumentModel& doc,
         const DisplayProperties& properties,
         tui::Screen& screen) const;
     Async<void> renderOnePageContinuous(
         Context& ctx,
-        const DocumentState& doc,
+        const DocumentModel& doc,
         const DisplayProperties& properties,
         tui::Screen& screen) const;
     Async<void> renderTwoPagesContinuous(
         Context& ctx,
-        const DocumentState& doc,
+        const DocumentModel& doc,
         const DisplayProperties& properties,
         tui::Screen& screen) const;
 

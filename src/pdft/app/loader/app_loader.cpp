@@ -14,20 +14,24 @@ namespace {}  // namespace
 
 AppLoader::AppLoader(
     CliArgs cli,
+    inject<UI, "ui"> ui,
+    inject<DocumentStorage, "docs"> documents,
     inject<StateLoader, "state_loader"> state_loader,
     inject<notify::Notify, "fswatcher"> fswatcher,
     inject<PaletteStorage, "palettes"> palettes)
     : cli_(cli)
+    , ui_(std::move(ui))
+    , documents_(std::move(documents))
     , state_loader_(std::move(state_loader))
     , fs_watcher_(std::move(fswatcher))
     , palettes_(std::move(palettes)) {}
 
-Status AppLoader::load(UIState& ui, DocumentStorage& documents) {
+Status AppLoader::load() {
     palettes_->add("skim", getSkimPalette());
-    co_await state_loader_->load(cli_.path, ui, documents);
+    co_await state_loader_->load(cli_.path);
 
-    for (auto&& doc : ui.states) {
-        auto document = documents.getDocument(doc.document_id) | result::unwrap;
+    for (auto&& doc : ui_->getModel().documents) {
+        auto document = documents_->getDocument(doc.document_id) | result::unwrap;
         const auto& path = document->getPath();
 
         log::info(this, "adding path {} to filesystem watching", path);
@@ -37,9 +41,8 @@ Status AppLoader::load(UIState& ui, DocumentStorage& documents) {
     co_return unit;
 }
 
-Status AppLoader::save(const UIState& ui, const DocumentStorage& documents) {
-    state_loader_->save(ui, documents);
-    return ok();
+Status AppLoader::save() {
+    return state_loader_->save();
 }
 
 }  // namespace pdft::app

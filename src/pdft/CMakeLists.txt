@@ -86,7 +86,7 @@ target_sources(
 
 target_sources(
   pdft
-  PRIVATE ./app/state/ui_state.cpp
+  PRIVATE ./app/state/impl/app_ui.cpp
           ./app/state/document_storage.cpp
           ./app/state/palette_storage.cpp
           ./app/event/app_event_listener.cpp

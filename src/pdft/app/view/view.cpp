@@ -10,27 +10,35 @@ namespace pdft::app {
 
 using namespace result;
 
-tui::Element AppView::getLayout(Context& ctx, const UIState& ui) {
-    auto doc = getDocumentLayout(ctx, ui).value_or(tui::emptyElement());
+AppView::AppView(
+    inject<const UI, "ui"> ui,
+    inject<const DocumentStorage, "docs"> documents,
+    inject<DocumentView, "doc_view"> view)
+    : ui_(std::move(ui))
+    , documents_(std::move(documents))
+    , doc_view_(std::move(view)) {}
 
-    if (!ui.show_sidebar) {
+tui::Element AppView::getLayout(Context& ctx) {
+    auto doc = getDocumentLayout(ctx).value_or(tui::emptyElement());
+
+    if (!ui_->getModel().sidebar) {
         return doc;
     }
 
     return tui::hbox({
-        ctx.push("appview:sidebar") | getSidebar(ui),
+        ctx.push("appview:sidebar") | getSidebar(),
         doc | tui::flex,
     });
 }
 
-Async<void> AppView::render(Context& ctx, const UIState& ui, tui::Screen& screen) {
-    if (auto state = ui.getImmutableState()) {
-        co_await doc_view_->render(ctx, *state, ui.display, screen);
+Async<void> AppView::render(Context& ctx, tui::Screen& screen) {
+    if (auto state = ui_->getDocument()) {
+        co_await doc_view_->render(ctx, *state, ui_->getModel().display, screen);
     }
 }
 
-Maybe<tui::Element> AppView::getDocumentLayout(Context& ctx, const UIState& ui) {
-    auto state = co_await fromPtr(ui.getImmutableState());
+Maybe<tui::Element> AppView::getDocumentLayout(Context& ctx) {
+    auto state = co_await fromPtr(ui_->getDocument());
     auto document = documents_->getDocument(state->document_id) | unwrap;
     auto path = document->getPath().filename();
     auto page_str = std::format("{}/{}", state->page_index + 1, state->page_count);
@@ -40,13 +48,14 @@ Maybe<tui::Element> AppView::getDocumentLayout(Context& ctx, const UIState& ui) 
         ctx.push("appview:document") | doc_view_->getLayout(ctx, *state));
 }
 
-tui::Element AppView::getSidebar(const UIState& ui) {
+tui::Element AppView::getSidebar() {
+    const UIModel& ui = ui_->getModel();
     std::vector<tui::Element> elements;
-    elements.reserve(ui.states.size());
+    elements.reserve(ui.documents.size());
 
-    for (size_t i = 0; i < ui.states.size(); ++i) {
-        const auto& st = ui.states[i];
-        bool is_current = i == *ui.idx;
+    for (size_t i = 0; i < ui.documents.size(); ++i) {
+        const auto& st = ui.documents[i];
+        bool is_current = i == *ui.index;
         auto doc_id = st.document_id;
 
         auto document = documents_->getDocument(doc_id) | unwrap;

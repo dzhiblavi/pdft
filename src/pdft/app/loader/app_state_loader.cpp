@@ -1,5 +1,6 @@
 #include "pdft/app/loader/impl/app_state_loader.h"
 
+#include "pdft/app/state/ui.h"
 #include "pdft/core/log.h"
 #include "pdft/core/module/register.h"
 #include "pdft/core/result.h"
@@ -13,10 +14,10 @@ namespace pdft::app {
 
 namespace {
 
-bool isOpened(const std::string& abs_path, const UIState& ui, const DocumentStorage& documents) {
+bool isOpened(const std::string& abs_path, const UIModel& ui, const DocumentStorage& documents) {
     // XXX this does not actually require linear search
 
-    for (const auto& state : ui.states) {
+    for (const auto& state : ui.documents) {
         auto doc = documents.getDocument(state.document_id) | result::unwrap;
 
         if (abs_path == doc->getPath()) {
@@ -32,9 +33,13 @@ bool isOpened(const std::string& abs_path, const UIState& ui, const DocumentStor
 AppStateLoader::AppStateLoader(
     Config config,
     CliArgs cli,
+    inject<UI, "ui"> ui,
+    inject<DocumentStorage, "docs"> documents,
     inject<const Persister, "persister"> persister,
     inject<const media::Loader, "media_loader"> doc_loader)
     : config_(config)
+    , ui_(std::move(ui))
+    , documents_(std::move(documents))
     , persister_(std::move(persister))
     , doc_loader_(std::move(doc_loader)) {
     config_.mode = cli.state_mode->value_or(config_.mode);
@@ -42,23 +47,22 @@ AppStateLoader::AppStateLoader(
     log::info(this, "AppStateLoader state mode is {}", magic_enum::enum_name(config_.mode));
 }
 
-void AppStateLoader::save(const UIState& ui, const DocumentStorage& documents) {
+Status AppStateLoader::save() {
     if (config_.mode == StateMode::Standalone) {
         log::info("not saving the state in Standalone mode");
-        return;
+        return result::ok();
     }
     if (!config_.state_path.has_value()) {
         log::info("not saving the state because no state path is configured");
-        return;
+        return result::ok();
     }
 
     std::ofstream ofs(*config_.state_path);
-    persister_->save(ui, documents, ofs);
-    log::info("the state has been successfully saved to {}", *config_.state_path);
+    log::info("saving state to {}", *config_.state_path);
+    return persister_->save(ofs);
 }
 
-Status AppStateLoader::load(
-    const std::vector<std::string>& paths, UIState& ui, DocumentStorage& documents) {
+Status AppStateLoader::load(const std::vector<std::string>& paths) {
     if (!config_.state_path.has_value()) {
         log::info(this, "not loading the state because state path is not configured");
         return result::ok();
@@ -70,7 +74,7 @@ Status AppStateLoader::load(
         log::info("loading the state because mode is {}", mode_name);
         std::ifstream ifs(*config_.state_path);
 
-        if (auto result = persister_->restore(ui, documents, ifs); !result) {
+        if (auto result = persister_->restore(ifs); !result) {
             log::warn("failed to restore the state: {}; ignoring", result.error());
         } else {
             log::info("the state has been successfully restored");
@@ -82,7 +86,7 @@ Status AppStateLoader::load(
     for (auto path : paths) {
         path = std::filesystem::absolute(utils::expandHome(path));
 
-        if (isOpened(path, ui, documents) && config_.mode == StateMode::AddOnly) {
+        if (isOpened(path, ui_->getModel(), *documents_) && config_.mode == StateMode::AddOnly) {
             log::info("ignoring the new path {} because state mode is AddOnly", path);
             continue;
         }
@@ -95,8 +99,8 @@ Status AppStateLoader::load(
 
         auto document = *maybe_document;
         auto page_count = document->getPageCount();
-        auto doc_id = documents.addDocument(document);
-        ui.addDocument(doc_id, page_count);
+        auto doc_id = documents_->addDocument(document);
+        ui_->addDocument(doc_id, page_count);
         log::info("loaded path {}", path);
     }
 

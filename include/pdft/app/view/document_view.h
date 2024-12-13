@@ -1,6 +1,6 @@
 #pragma once
 
-#include "pdft/app/state/ui_state.h"
+#include "pdft/app/state/ui.h"
 
 #include "pdft/tui/elements.h"
 #include "pdft/tui/screen.h"
@@ -14,11 +14,11 @@ class DocumentView {
  public:
     virtual ~DocumentView() = default;
 
-    virtual tui::Element getLayout(Context& ctx, const DocumentState& doc) = 0;
+    virtual tui::Element getLayout(Context& ctx, const DocumentModel& doc) = 0;
 
     virtual Async<void> render(
         Context& ctx,
-        const DocumentState& doc,
+        const DocumentModel& doc,
         const DisplayProperties& properties,
         tui::Screen& screen) const = 0;
 };

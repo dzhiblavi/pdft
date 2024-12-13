@@ -12,21 +12,19 @@
 namespace pdft::app {
 
 Application::Application(
-    inject<DocumentStorage, "docs"> documents,
     inject<Loader, "loader"> loader,
     inject<EventListener, "listener"> listener,
     inject<Controller, "controller"> controller,
     inject<View, "view"> view,
     inject<tui::Renderer, "renderer"> renderer)
-    : documents_(std::move(documents))
-    , loader_(std::move(loader))
+    : loader_(std::move(loader))
     , listener_(std::move(listener))
     , view_(std::move(view))
     , controller_(std::move(controller))
     , renderer_(std::move(renderer)) {}
 
 AsyncStatus Application::run(Context& ctx) {
-    if (auto res = ctx.push("load") | loader_->load(ui_, *documents_); !res) {
+    if (auto res = ctx.push("load") | loader_->load(); !res) {
         co_return result::err(res.error());
     }
 
@@ -35,7 +33,7 @@ AsyncStatus Application::run(Context& ctx) {
     ctx.push("run") | co_await runEventLoop();
     ctx.push("restore") | co_await renderer_->restoreScreen(ctx);
 
-    co_return ctx.push("save") | loader_->save(ui_, *documents_);
+    co_return ctx.push("save") | loader_->save();
 }
 
 AsyncStatus Application::runEventLoop() {
@@ -43,9 +41,9 @@ AsyncStatus Application::runEventLoop() {
         auto tracer = trace::makeTracer("controller");
         Context ctx(tracer);
 
-        auto dom = view_->getLayout(ctx, ui_);
+        auto dom = view_->getLayout(ctx);
         auto screen = renderer_->newFrame(ctx, std::move(dom));
-        co_await view_->render(ctx, ui_, screen);
+        co_await view_->render(ctx, screen);
         co_await renderer_->renderFrame(ctx);
 
         trace::logStackTrace(std::move(tracer));
@@ -74,11 +72,9 @@ asio::awaitable<bool> Application::waitForNextRender() {
             tracer.addChild("handle_event") |
             utils::visit(
                 *event,
-                [&](char c) { return controller_->onKeyEvent(c, ui_, *documents_); },
-                [&](const notify::Event& r) {
-                    return controller_->onFilesystemEvent(r, ui_, *documents_);
-                },
-                [&](int signal) { return controller_->onSignal(signal, ui_, *documents_); });
+                [&](char c) { return controller_->onKeyEvent(c); },
+                [&](const notify::Event& r) { return controller_->onFilesystemEvent(r); },
+                [&](int signal) { return controller_->onSignal(signal); });
 
         if (action.has_value()) {
             if (action == None) {

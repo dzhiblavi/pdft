@@ -9,9 +9,15 @@
 
 namespace pdft::app {
 
-AppController::AppController(Config config, inject<const media::Loader, "media_loader"> doc_loader)
+AppController::AppController(
+    Config config,
+    inject<const media::Loader, "media_loader"> doc_loader,
+    inject<UI, "ui"> ui,
+    inject<DocumentStorage, "docs"> documents)
     : config_(config)
-    , doc_loader_(std::move(doc_loader)) {
+    , doc_loader_(std::move(doc_loader))
+    , ui_(std::move(ui))
+    , documents_(std::move(documents)) {
     for (const auto& [command, keys] : config.key_mappings) {
         bindKey(command, keys);
     }
@@ -69,8 +75,7 @@ KeyTree::NumberCallbackType AppController::numCommandCallback(Command command) {
     };
 }
 
-Result<ControllerAction> AppController::applyPendingCommand(
-    UIState& ui, DocumentStorage& documents) {
+Result<ControllerAction> AppController::applyPendingCommand() {
     using namespace result;
     auto [n, command] = command_;
 
@@ -81,168 +86,164 @@ Result<ControllerAction> AppController::applyPendingCommand(
             return ControllerAction::Quit;
 
         case Reload:
-            return reloadCurrentDocument(ui, documents) |
-                   map([] { return ControllerAction::Redraw; });
+            return reloadCurrentDocument() | map([] { return ControllerAction::Redraw; });
 
         case CloseDocument:
-            if (auto id = ui.getCurrentDocumentId()) {
-                ui.removeDocument(*id);
-                PDFT_VERIFY(documents.removeDocument(*id));
+            if (auto id = ui_->getDocumentId()) {
+                ui_->removeDocument(*id);
+                PDFT_VERIFY(documents_->removeDocument(*id));
             }
             return ControllerAction::Redraw;
 
         case ScrollNext:
-            ui.scrollNext(config_.rows_per_scroll);
+            ui_->scrollNext(config_.rows_per_scroll);
             return ControllerAction::Redraw;
 
         case ScrollPrev:
-            ui.scrollNext(-config_.rows_per_scroll);
+            ui_->scrollNext(-config_.rows_per_scroll);
             return ControllerAction::Redraw;
 
         case NumNextPage:
-            ui.nextPage(n);
+            ui_->nextPage(n);
             return ControllerAction::Redraw;
 
         case NumPrevPage:
-            ui.nextPage(-n);
+            ui_->nextPage(-n);
             return ControllerAction::Redraw;
 
         case GoToFirstPage:
-            ui.setPageIndex(0);
+            ui_->setPageIndex(0);
             return ControllerAction::Redraw;
 
         case GoToLastPage:
-            ui.setPageIndex(INT_MAX);
+            ui_->setPageIndex(INT_MAX);
             return ControllerAction::Redraw;
 
         case NumGoToPage:
             if (n > 0) {
-                ui.setPageIndex(n - 1);
+                ui_->setPageIndex(n - 1);
             }
             return ControllerAction::Redraw;
 
         case NextDocument:
-            ui.nextDocument(+1);
+            ui_->nextDocument(+1);
             return ControllerAction::Redraw;
 
         case PrevDocument:
-            ui.nextDocument(-1);
+            ui_->nextDocument(-1);
             return ControllerAction::Redraw;
 
         case NumNextDocument:
-            ui.nextDocument(+n);
+            ui_->nextDocument(+n);
             return ControllerAction::Redraw;
 
         case NumPrevDocument:
-            ui.nextDocument(-n);
+            ui_->nextDocument(-n);
             return ControllerAction::Redraw;
 
         case NextLayout:
-            ui.nextLayout(1);
+            ui_->nextLayout(1);
             return ControllerAction::Redraw;
 
         case PrevLayout:
-            ui.nextLayout(-1);
+            ui_->nextLayout(-1);
             return ControllerAction::Redraw;
 
         case InvertColors:
-            ui.invertColors();
+            ui_->invertColors();
             return ControllerAction::Redraw;
 
         case IncreaseScalingFactor:
-            ui.updateScalingFactor(1.05f);
+            ui_->updateScalingFactor(1.05f);
             return ControllerAction::Redraw;
 
         case DecreaseScalingFactor:
-            ui.updateScalingFactor(1.0f / 1.05f);
+            ui_->updateScalingFactor(1.0f / 1.05f);
             return ControllerAction::Redraw;
 
         case ToggleSidebar:
-            ui.toggleSidebar();
+            ui_->toggleSidebar();
             return ControllerAction::Redraw;
 
         case ToggleBold:
-            ui.toggleBold();
+            ui_->toggleBold();
             return ControllerAction::Redraw;
 
         case TogglePalette:
-            if (ui.display.palette.has_value()) {
-                ui.setPalette(std::nullopt);
+            if (ui_->getModel().display.palette.has_value()) {
+                ui_->setPalette(std::nullopt);
             } else {
-                ui.setPalette("skim");
+                ui_->setPalette("skim");
             }
 
             return ControllerAction::Redraw;
     }
 }
 
-Result<ControllerAction> AppController::onKeyEvent(
-    char key, UIState& ui, DocumentStorage& documents) {
+Result<ControllerAction> AppController::onKeyEvent(char key) {
     log::debug("controller: key={}", key);
 
     switch (key_tree_.feed(key)) {
         using enum KeyTree::Result;
 
         case Accepted:
-            ui.onInput(key);
+            ui_->onInput(key);
             return ControllerAction::None;
 
         case Rejected:
             key_tree_.reset();
-            ui.resetInput();
+            ui_->resetInput();
             return ControllerAction::None;
 
         case Terminated:
-            ui.resetInput();
-            return applyPendingCommand(ui, documents);
+            ui_->resetInput();
+            return applyPendingCommand();
     }
 }
 
-Result<ControllerAction> AppController::onFilesystemEvent(
-    const notify::Event& event, UIState& ui, DocumentStorage& documents) {
+Result<ControllerAction> AppController::onFilesystemEvent(const notify::Event& event) {
     using namespace result;
     log::debug("controller: fs event on path={}", event.path);
 
-    auto id = co_await (documents.getIdByPath(event.path) | lift("unknown file path"));
+    auto id = co_await (documents_->getIdByPath(event.path) | lift("unknown file path"));
 
-    co_await reloadDocument(id, event.path, ui, documents);
+    co_await reloadDocument(id, event.path);
     co_return ControllerAction::Redraw;
 }
 
-Status AppController::reloadCurrentDocument(UIState& ui, DocumentStorage& documents) {
+Status AppController::reloadCurrentDocument() {
     using namespace result;
 
-    if (auto id = ui.getCurrentDocumentId()) {
-        auto document = documents.getDocument(*id) | unwrap;
-        co_await reloadDocument(*id, document->getPath(), ui, documents);
+    if (auto id = ui_->getDocumentId()) {
+        auto document = documents_->getDocument(*id) | unwrap;
+        co_await reloadDocument(*id, document->getPath());
     }
 
     co_return unit;
 }
 
-Status AppController::reloadDocument(
-    DocumentId old_id, std::filesystem::path path, UIState& ui, DocumentStorage& documents) {
+Status AppController::reloadDocument(DocumentId old_id, std::filesystem::path path) {
     using namespace result;
 
-    PDFT_VERIFY(documents.removeDocument(old_id));
+    PDFT_VERIFY(documents_->removeDocument(old_id));
     log::debug("controller: removed document with id={}", old_id);
 
     auto document =
         co_await (doc_loader_->load(path) | mapErr([&](auto error) {
                       log::warn("failed to reload document by path {}: {}", path, error);
-                      ui.removeDocument(old_id);
+                      ui_->removeDocument(old_id);
                       return error;
                   }));
 
     auto page_count = document->getPageCount();
-    auto new_id = documents.addDocument(document);
-    ui.onDocumentChanged(old_id, new_id, page_count);
+    auto new_id = documents_->addDocument(document);
+    ui_->onDocumentChanged(old_id, new_id, page_count);
 
     log::info("replaced document with path={} old_id={}, new_id={}", path, old_id, new_id);
     co_return unit;
 }
 
-Result<ControllerAction> AppController::onSignal(int signal, UIState&, DocumentStorage&) {
+Result<ControllerAction> AppController::onSignal(int signal) {
     return handleSignal(signal);
 }
 

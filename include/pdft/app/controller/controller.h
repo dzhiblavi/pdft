@@ -1,6 +1,5 @@
 #pragma once
 
-#include "pdft/app/state/ui_state.h"
 #include "pdft/notify/event.h"
 
 #include "pdft/core/result/type/result.h"
@@ -17,14 +16,9 @@ class Controller {
  public:
     virtual ~Controller() = default;
 
-    virtual Result<ControllerAction> onKeyEvent(
-        char key, UIState& ui, DocumentStorage& documents) = 0;
-
-    virtual Result<ControllerAction> onFilesystemEvent(
-        const notify::Event& event, UIState& ui, DocumentStorage& documents) = 0;
-
-    virtual Result<ControllerAction> onSignal(
-        int signal, UIState& ui, DocumentStorage& documents) = 0;
+    virtual Result<ControllerAction> onKeyEvent(char key) = 0;
+    virtual Result<ControllerAction> onFilesystemEvent(const notify::Event& event) = 0;
+    virtual Result<ControllerAction> onSignal(int signal) = 0;
 };
 
 }  // namespace pdft::app

@@ -71,6 +71,9 @@
     "renderer": {
       "cls": "pdft::tui::AppRenderer"
     },
+    "ui": {
+      "cls": "pdft::app::AppUI"
+    },
     "app": {
       "cls": "pdft::app::Application"
     },

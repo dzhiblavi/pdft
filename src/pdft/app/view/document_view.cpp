@@ -4,7 +4,7 @@
 
 namespace pdft::app {
 
-tui::Element AppDocumentView::getLayout(Context& /*ctx*/, const DocumentState& doc) {
+tui::Element AppDocumentView::getLayout(Context& /*ctx*/, const DocumentModel& doc) {
     switch (doc.view_mode) {
         using enum ViewMode;
 
@@ -44,7 +44,7 @@ tui::Element AppDocumentView::getLayout(Context& /*ctx*/, const DocumentState& d
 
 Async<void> AppDocumentView::render(
     Context& ctx,
-    const DocumentState& doc,
+    const DocumentModel& doc,
     const DisplayProperties& properties,
     tui::Screen& screen) const {
     auto _ = ctx.push("docview:render");
@@ -68,7 +68,7 @@ Async<void> AppDocumentView::render(
 
 Async<void> AppDocumentView::renderOnePage(
     Context& ctx,
-    const DocumentState& doc,
+    const DocumentModel& doc,
     const DisplayProperties& properties,
     tui::Screen& screen) const {
     auto _ = ctx.push("docview:page");
@@ -93,7 +93,7 @@ Async<void> AppDocumentView::renderOnePage(
 
 Async<void> AppDocumentView::renderTwoPages(
     Context& ctx,
-    const DocumentState& doc,
+    const DocumentModel& doc,
     const DisplayProperties& properties,
     tui::Screen& screen) const {
     ctx.push("docview:left") |
@@ -139,7 +139,7 @@ Async<void> AppDocumentView::renderTwoPages(
 
 Async<void> AppDocumentView::renderOnePageContinuous(
     Context& ctx,
-    const DocumentState& doc,
+    const DocumentModel& doc,
     const DisplayProperties& properties,
     tui::Screen& screen) const {
     float tl_ratio = float(tl.height) / rect.height;
@@ -203,7 +203,7 @@ Async<void> AppDocumentView::renderOnePageContinuous(
 
 Async<void> AppDocumentView::renderTwoPagesContinuous(
     Context& ctx,
-    const DocumentState& doc,
+    const DocumentModel& doc,
     const DisplayProperties& properties,
     tui::Screen& screen) const {
     float tl_ratio = float(tl.height) / rect.height;

@@ -3,6 +3,7 @@
 #include "pdft/app/loader/loader.h"
 #include "pdft/app/loader/state_loader.h"
 #include "pdft/app/state/palette_storage.h"
+#include "pdft/app/state/ui.h"
 
 #include "pdft/notify/notify.h"
 
@@ -21,15 +22,19 @@ class AppLoader : public Loader, public Module {
 
     AppLoader(
         CliArgs cli,
+        inject<UI, "ui"> ui,
+        inject<DocumentStorage, "docs"> documents,
         inject<StateLoader, "state_loader"> state_loader,
         inject<notify::Notify, "fswatcher"> fswatcher,
         inject<PaletteStorage, "palettes"> palettes);
 
-    Status load(UIState& ui, DocumentStorage& documents) override;
-    Status save(const UIState& ui, const DocumentStorage& documents) override;
+    Status load() override;
+    Status save() override;
 
  private:
     CliArgs cli_;
+    Arc<UI> ui_;
+    Arc<DocumentStorage> documents_;
     Arc<StateLoader> state_loader_;
     Arc<notify::Notify> fs_watcher_;
     Arc<PaletteStorage> palettes_;

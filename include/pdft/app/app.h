@@ -3,6 +3,7 @@
 #include "pdft/app/controller/controller.h"
 #include "pdft/app/event/event_listener.h"
 #include "pdft/app/loader/loader.h"
+#include "pdft/app/state/document_storage.h"
 #include "pdft/app/view/view.h"
 
 #include "pdft/tui/renderer.h"
@@ -18,7 +19,6 @@ namespace pdft::app {
 class Application : public Module {
  public:
     Application(
-        inject<DocumentStorage, "docs"> documents,
         inject<Loader, "loader"> loader,
         inject<EventListener, "listener"> listener,
         inject<Controller, "controller"> controller,
@@ -31,7 +31,6 @@ class Application : public Module {
     AsyncStatus runEventLoop();
     Async<bool> waitForNextRender();
 
-    UIState ui_;
     Arc<DocumentStorage> documents_;
     Arc<Loader> loader_;
     Arc<EventListener> listener_;

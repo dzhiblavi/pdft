@@ -1,5 +1,6 @@
 #pragma once
 
+#include "pdft/app/state/ui.h"
 #include "pdft/app/view/document_view.h"
 #include "pdft/app/view/view.h"
 
@@ -10,17 +11,19 @@ namespace pdft::app {
 
 class AppView : public View, public Module {
  public:
-    AppView(inject<const DocumentStorage, "docs"> documents, inject<DocumentView, "doc_view"> view)
-        : documents_(std::move(documents))
-        , doc_view_(std::move(view)) {}
+    AppView(
+        inject<const UI, "ui"> ui,
+        inject<const DocumentStorage, "docs"> documents,
+        inject<DocumentView, "doc_view"> view);
 
-    tui::Element getLayout(Context& ctx, const UIState& ui) override;
-    Async<void> render(Context& ctx, const UIState& ui, tui::Screen& screen) override;
+    tui::Element getLayout(Context& ctx) override;
+    Async<void> render(Context& ctx, tui::Screen& screen) override;
 
  private:
-    tui::Element getSidebar(const UIState& ui);
-    Maybe<tui::Element> getDocumentLayout(Context& ctx, const UIState& ui);
+    tui::Element getSidebar();
+    Maybe<tui::Element> getDocumentLayout(Context& ctx);
 
+    Arc<const UI> ui_;
     Arc<const DocumentStorage> documents_;
     Arc<DocumentView> doc_view_;
 };

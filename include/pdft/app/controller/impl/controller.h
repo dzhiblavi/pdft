@@ -3,10 +3,12 @@
 #include "pdft/app/controller/controller.h"
 #include "pdft/app/controller/impl/keytree.h"
 #include "pdft/app/state/document_storage.h"
-#include "pdft/core/module/module.h"
+#include "pdft/app/state/ui.h"
+
 #include "pdft/media/loader.h"
 
 #include "pdft/core/module/inject.h"
+#include "pdft/core/module/module.h"
 
 #include <vector>
 
@@ -49,21 +51,21 @@ class AppController : public Controller, public Module {
         int32_t rows_per_scroll = 10;
     };
 
-    AppController(Config config, inject<const media::Loader, "media_loader"> doc_loader);
+    AppController(
+        Config config,
+        inject<const media::Loader, "media_loader"> doc_loader,
+        inject<UI, "ui"> ui,
+        inject<DocumentStorage, "docs"> documents);
 
-    Result<ControllerAction> onKeyEvent(char key, UIState& ui, DocumentStorage& documents) override;
-
-    Result<ControllerAction> onFilesystemEvent(
-        const notify::Event& event, UIState& ui, DocumentStorage& documents) override;
-
-    Result<ControllerAction> onSignal(int signal, UIState& ui, DocumentStorage& documents) override;
+    Result<ControllerAction> onKeyEvent(char key) override;
+    Result<ControllerAction> onFilesystemEvent(const notify::Event& event) override;
+    Result<ControllerAction> onSignal(int signal) override;
 
  private:
     void bindKey(Command command, std::string_view keys);
-    Result<ControllerAction> applyPendingCommand(UIState& ui, DocumentStorage& documents);
-    Status reloadCurrentDocument(UIState& ui, DocumentStorage& documents);
-    Status reloadDocument(
-        DocumentId id, std::filesystem::path path, UIState& ui, DocumentStorage& documents);
+    Result<ControllerAction> applyPendingCommand();
+    Status reloadCurrentDocument();
+    Status reloadDocument(DocumentId id, std::filesystem::path path);
     Result<ControllerAction> handleSignal(int signal);
 
     KeyTree::CallbackType commandCallback(Command command);
@@ -78,6 +80,8 @@ class AppController : public Controller, public Module {
     KeyTree key_tree_;
     PendingCommand command_;
     Arc<const media::Loader> doc_loader_;
+    Arc<UI> ui_;
+    Arc<DocumentStorage> documents_;
 };
 
 }  // namespace pdft::app

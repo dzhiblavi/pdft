@@ -2,6 +2,9 @@
 
 #include "pdft/app/loader/persister.h"
 #include "pdft/app/loader/state_loader.h"
+#include "pdft/app/state/document_storage.h"
+#include "pdft/app/state/ui.h"
+
 #include "pdft/media/loader.h"
 
 #include "pdft/core/module/inject.h"
@@ -33,16 +36,18 @@ class AppStateLoader : public StateLoader, public Module {
     AppStateLoader(
         Config config,
         CliArgs cli,
+        inject<UI, "ui"> ui,
+        inject<DocumentStorage, "docs"> documents,
         inject<const Persister, "persister"> persister,
         inject<const media::Loader, "media_loader"> doc_loader);
 
-    void save(const UIState& ui, const DocumentStorage& documents) override;
-
-    Status load(
-        const std::vector<std::string>& paths, UIState& ui, DocumentStorage& documents) override;
+    Status save() override;
+    Status load(const std::vector<std::string>& paths) override;
 
  private:
     Config config_;
+    Arc<UI> ui_;
+    Arc<DocumentStorage> documents_;
     Arc<const Persister> persister_;
     Arc<const media::Loader> doc_loader_;
 };

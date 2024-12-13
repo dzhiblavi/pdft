@@ -1,8 +1,5 @@
 #pragma once
 
-#include "pdft/app/state/document_storage.h"
-#include "pdft/app/state/ui_state.h"
-
 #include "pdft/core/result.h"
 
 #include <ostream>
@@ -13,10 +10,8 @@ class Persister {
  public:
     virtual ~Persister() = default;
 
-    virtual void save(
-        const UIState& ui, const DocumentStorage& documents, std::ostream& os) const = 0;
-
-    virtual Status restore(UIState& ui, DocumentStorage& documents, std::istream& is) const = 0;
+    virtual Status save(std::ostream& os) const = 0;
+    virtual Status restore(std::istream& is) const = 0;
 };
 
 }  // namespace pdft::app

@@ -1,45 +1,52 @@
 #include "pdft/app/loader/impl/app_persister.h"
+#include "pdft/app/state/ui.h"
 
 #include "pdft/core/log.h"
 #include "pdft/core/module/register.h"
 
 #include <rfl/json.hpp>
 
-#include <vector>
-
 namespace pdft::app {
 
 namespace {
 
 struct State {
-    UIState ui;
+    UIModel ui;
     std::vector<std::string> paths;
 };
 
 }  // namespace
 
-void AppPersister::save(
-    const UIState& ui, const DocumentStorage& documents, std::ostream& os) const {
-    State state;
-    state.ui = ui;
+AppPersister::AppPersister(
+    inject<UI, "ui"> ui,
+    inject<DocumentStorage, "docs"> documents,
+    inject<const media::Loader, "media_loader"> doc_loader)
+    : ui_(std::move(ui))
+    , documents_(std::move(documents))
+    , doc_loader_(std::move(doc_loader)) {}
 
-    for (const auto& doc : ui.states) {
+Status AppPersister::save(std::ostream& os) const {
+    State state;
+    state.ui = ui_->getModel();
+
+    for (const auto& doc : state.ui.documents) {
         auto id = doc.document_id;
-        auto document = documents.getDocument(id) | result::unwrap;
+        auto document = documents_->getDocument(id) | result::unwrap;
         state.paths.push_back(document->getPath());
     }
 
     rfl::json::write(state, os);
+    return result::ok();
 }
 
-Status AppPersister::restore(UIState& ui, DocumentStorage& documents, std::istream& is) const {
+Status AppPersister::restore(std::istream& is) const {
     auto maybe_state = rfl::json::read<State>(is);
-
     if (!maybe_state) {
         return result::err("failed to read state");
     }
 
     auto&& state = maybe_state.value();
+    auto& ui = ui_->getModel();
     ui = state.ui;
 
     std::vector<size_t> to_be_removed;
@@ -58,16 +65,15 @@ Status AppPersister::restore(UIState& ui, DocumentStorage& documents, std::istre
 
         auto document = *maybe_document;
         auto page_count = document->getPageCount();
-        auto id = documents.addDocument(document);
-
-        ui.states[i].setDocument(id, page_count);
+        auto id = documents_->addDocument(document);
+        ui_->onDocumentChanged(ui.documents[i].document_id, id, page_count);
     }
 
     std::ranges::reverse(to_be_removed);
     for (size_t i : to_be_removed) {
         // XXX fix this hack
-        ui.idx = 0;
-        ui.states.erase(ui.states.begin() + i);
+        ui.index = 0;
+        ui.documents.erase(ui.documents.begin() + i);
     }
 
     return result::ok();
