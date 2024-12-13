@@ -1,12 +1,30 @@
 #include "pdft/core/module/load/loader.h"
 #include "pdft/core/module/detail/factory_storage.h"
+#include "pdft/core/result/coro/result.h"
+#include "pdft/core/result/make/err.h"
 
 namespace pdft::module {
 
-void loadAllModules(LoadContext& ctx) {
+namespace {
+
+bool isLoaded(LoadContext& ctx, const std::string& name) {
+    return ctx.loaded.contains(name);
+}
+
+void addNewModule(LoadContext& ctx, const std::string& name, Arc<Module> module) {
+    PDFT_VERIFY(!isLoaded(ctx, name), "duplicate loaded module {}", name);
+    ctx.loaded[name] = module;
+    log::info("successfully loaded a module: name={}", name);
+}
+
+}  // namespace
+
+Status loadAllModules(LoadContext& ctx) {
     for (const auto& [name, conf] : ctx.modules) {
-        module::getOrLoadModule(ctx, name);
+        co_await module::getOrLoadModule(ctx, name);
     }
+
+    co_return unit;
 }
 
 const ModuleConfig& getConfig(LoadContext& ctx, const std::string& name) {
@@ -14,49 +32,39 @@ const ModuleConfig& getConfig(LoadContext& ctx, const std::string& name) {
     return ctx.modules[name];
 }
 
-Arc<Module> addNewModule(LoadContext& ctx, const std::string& name, Arc<Module> module) {
-    PDFT_VERIFY(!isLoaded(ctx, name), "duplicate loaded module {}", name);
-    ctx.loaded[name] = module;
-    log::info("successfully loaded a module: name={}", name);
-    return module;
-}
-
-Arc<Module> getOrLoadModule(LoadContext& ctx, const std::string& name) {
+Result<Arc<Module>> getOrLoadModule(LoadContext& ctx, const std::string& name) {
     if (auto it = ctx.loaded.find(name); it != ctx.loaded.end()) {
-        return it->second;
+        co_return it->second;
     }
 
     const auto& config = getConfig(ctx, name);
     Arc<Module> instance;
 
     if (config.cls.has_value()) {
-        log::info("loading a module '{}' via class implementation '{}'", name, *config.cls);
-        auto* traits = detail::FactoryStorage::globalInstance().getModuleTraits(*config.cls);
+        auto&& cls = *config.cls;
+        log::info("loading a module '{}' via class implementation '{}'", name, cls);
+        auto* traits = co_await detail::FactoryStorage::globalInstance().getModuleTraits(cls);
         instance = traits->load(ctx, name);
         traits->start(instance.get());
     } else if (config.factory.has_value()) {
-        log::info("loading a module '{}' via factory '{}'", name, *config.factory);
-        PDFT_VERIFY(
-            config.factory.has_value(),
-            "neither 'cls' nor 'factory' fields have not been provided for module '{}'",
-            name);
+        auto&& fac = *config.factory;
+        log::info("loading a module '{}' via factory '{}'", name, fac);
 
-        const auto& factory_config = getConfig(ctx, *config.factory);
+        const auto& factory_config = getConfig(ctx, fac);
         PDFT_VERIFY(factory_config.cls, "factory factories are not supported");
 
-        auto factory = getOrLoadModule(ctx, *config.factory);
+        auto factory = co_await getOrLoadModule(ctx, *config.factory);
         auto* traits =
-            detail::FactoryStorage::globalInstance().getFactoryTraits(*factory_config.cls);
+            co_await detail::FactoryStorage::globalInstance().getFactoryTraits(*factory_config.cls);
+
         instance = traits->create(factory.get());
     } else {
-        panic("neither factory nor cls construction methods are provided for module '{}'", name);
+        co_return std::format(
+            "neither factory nor cls construction methods are provided for module '{}'", name);
     }
 
-    return addNewModule(ctx, name, instance);
-}
-
-bool isLoaded(LoadContext& ctx, const std::string& name) {
-    return ctx.loaded.contains(name);
+    addNewModule(ctx, name, instance);
+    co_return instance;
 }
 
 }  // namespace pdft::module

@@ -2,7 +2,6 @@
 #include "pdft/app/palettes.h"
 
 #include "pdft/core/module/register.h"
-#include "pdft/core/result/coro/maybe.h"
 #include "pdft/core/result/coro/result.h"
 
 #include "pdft/utils/cli/register.h"
@@ -34,6 +33,8 @@ Status AppLoader::load(UIState& ui, DocumentStorage& documents) {
         log::info(this, "adding path {} to filesystem watching", path);
         fs_watcher_->add(path);
     }
+
+    co_return unit;
 }
 
 Status AppLoader::save(const UIState& ui, const DocumentStorage& documents) {

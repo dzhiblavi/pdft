@@ -126,7 +126,7 @@ Maybe<int> get_int() {
 }
 
 Status aunit() {
-    co_return;
+    co_return unit;
 }
 
 TEST_CASE("testCoroResultConvertUnit") {
@@ -135,7 +135,7 @@ TEST_CASE("testCoroResultConvertUnit") {
     auto x = [&] -> Status {
         z = co_await (get_int() | result::lift("abcd"));
         co_await aunit();
-        co_return;
+        co_return unit;
     }();
 
     CHECK(x.has_value());

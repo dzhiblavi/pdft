@@ -23,14 +23,12 @@ ArgType injectArgument(LoadContext& ctx, const std::string&) {
 
 template <IsModule ModuleType, std::derived_from<InjectedTag> ArgType>
 ArgType injectArgument(LoadContext& ctx, const std::string&) {
-    return ArgType{getOrLoadModule(ctx, ArgType::Name.c_str())};
+    return ArgType{*PDFT_VERIFY(getOrLoadModule(ctx, ArgType::Name.c_str()))};
 }
 
 template <detail::HasCliArgs ModuleType, std::same_as<typename ModuleType::CliArgs> ArgType>
 ArgType injectArgument(LoadContext&, const std::string& module) {
-    using CliArgsType = typename ModuleType::CliArgs;
-
-    auto result = cli::parsed<CliArgsType>();
+    auto result = cli::parsed<ArgType>();
     return *PDFT_VERIFY(result, "bad cli arguments for module {}: {}", module, result.error());
 }
 

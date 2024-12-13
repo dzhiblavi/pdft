@@ -1,11 +1,11 @@
 #pragma once
 
 #include "pdft/core/result/coro/return_object_holder.h"
+#include "pdft/core/result/make/err.h"
 #include "pdft/core/result/make/ok.h"
 #include "pdft/core/result/type/result.h"
 
 #include "pdft/core/assert.h"
-#include "pdft/core/result/type/unit.h"
 
 #include <coroutine>
 
@@ -43,15 +43,10 @@ struct ResultPromise : ResultPromiseBase<T, E> {
         PDFT_VERIFY_DBG(this->owner);
         this->owner->assign(ok(std::move(x)));
     }
-};
 
-template <typename E>
-struct ResultPromise<Unit, E> : ResultPromiseBase<Unit, E> {
-    ResultPromise() = default;
-
-    void return_void() {
+    void return_value(E x) {
         PDFT_VERIFY_DBG(this->owner);
-        this->owner->assign(ok(unit));
+        this->owner->assign(err(std::move(x)));
     }
 };
 

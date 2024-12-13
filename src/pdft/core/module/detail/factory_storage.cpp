@@ -1,4 +1,5 @@
 #include "pdft/core/module/detail/factory_storage.h"
+#include "pdft/core/result/make/err.h"
 
 namespace pdft::module::detail {
 
@@ -14,13 +15,19 @@ void FactoryStorage::registerFactoryModule(
     factories_.emplace(cls, fac);
 }
 
-ModuleTraits* FactoryStorage::getModuleTraits(const std::string& cls) {
-    PDFT_VERIFY(modules_.contains(cls), "unknown module {}", cls);
+Result<ModuleTraits*> FactoryStorage::getModuleTraits(const std::string& cls) {
+    if (!modules_.contains(cls)) {
+        return result::err(std::format("unknown module {}", cls));
+    }
+
     return modules_[cls];
 }
 
-FactoryTraits* FactoryStorage::getFactoryTraits(const std::string& cls) {
-    PDFT_VERIFY(factories_.contains(cls), "unknown factory {}", cls);
+Result<FactoryTraits*> FactoryStorage::getFactoryTraits(const std::string& cls) {
+    if (!factories_.contains(cls)) {
+        return result::err(std::format("unknown factory {}", cls));
+    }
+
     return factories_[cls];
 }
 

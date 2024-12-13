@@ -1,6 +1,7 @@
 #pragma once
 
 #include "pdft/core/module/load/load_context.h"
+#include "pdft/core/result/type/result.h"
 
 #include <unordered_map>
 
@@ -22,8 +23,8 @@ class FactoryStorage {
     void registerModule(const std::string& cls, ModuleTraits* traits);
     void registerFactoryModule(const std::string& cls, ModuleTraits* mod, FactoryTraits* fac);
 
-    ModuleTraits* getModuleTraits(const std::string& cls);
-    FactoryTraits* getFactoryTraits(const std::string& cls);
+    Result<ModuleTraits*> getModuleTraits(const std::string& cls);
+    Result<FactoryTraits*> getFactoryTraits(const std::string& cls);
 
     static FactoryStorage& globalInstance();
 

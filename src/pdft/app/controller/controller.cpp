@@ -216,6 +216,8 @@ Status AppController::reloadCurrentDocument(UIState& ui, DocumentStorage& docume
         auto document = documents.getDocument(*id) | unwrap;
         co_await reloadDocument(*id, document->getPath(), ui, documents);
     }
+
+    co_return unit;
 }
 
 Status AppController::reloadDocument(
@@ -237,6 +239,7 @@ Status AppController::reloadDocument(
     ui.onDocumentChanged(old_id, new_id, page_count);
 
     log::info("replaced document with path={} old_id={}, new_id={}", path, old_id, new_id);
+    co_return unit;
 }
 
 Result<ControllerAction> AppController::onSignal(int signal, UIState&, DocumentStorage&) {
