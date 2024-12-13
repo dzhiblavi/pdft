@@ -16,7 +16,7 @@ struct ResultPromiseBase {
     ResultPromiseBase() = default;
 
     auto get_return_object() noexcept {
-        return ReturnedObjectHolder{&owner};
+        return detail::ReturnedObjectHolder{&owner};
     }
 
     auto initial_suspend() noexcept {
@@ -32,7 +32,7 @@ struct ResultPromiseBase {
         std::unreachable();
     }
 
-    ReturnedObjectHolder<Result<T, E>>* owner = nullptr;
+    detail::ReturnedObjectHolder<Result<T, E>>* owner = nullptr;
 };
 
 template <typename T, typename E>

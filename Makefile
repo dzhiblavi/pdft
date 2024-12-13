@@ -26,7 +26,7 @@ _prepare_target_dirs:
 	mkdir -p $(BUILD_DIR)
 
 deps: _prepare_target_dirs
-	$(CONAN) install .                             \
+	$(CONAN) install .                           \
 		--output-folder=$(DEPS_DIR)                \
 		--build=missing                            \
 		--profile:host=./conan/$(PROFILE).profile  \
@@ -35,7 +35,7 @@ deps: _prepare_target_dirs
 		--settings:build=build_type=$(BUILD_TYPE)
 
 configure: deps
-	cd $(BUILD_DIR) && $(CMAKE) ../../../../                       \
+	cd $(BUILD_DIR) && $(CMAKE) ../../../../                     \
 		-G "Unix Makefiles"                                        \
 		-DCMAKE_TOOLCHAIN_FILE="../deps/conan_toolchain.cmake"     \
 		-DCMAKE_POLICY_DEFAULT_CMP0091=NEW                         \
@@ -49,6 +49,9 @@ configure: deps
 		-DASAN=$(ASAN)                                             \
 		-DTSAN=$(TSAN)                                             \
 		-DUBSAN=$(UBSAN)
+
+gen-doc: deps
+	cd $(BUILD_DIR) && $(CMAKE) --build . --target documentation
 
 build: configure
 	cd $(BUILD_DIR) && $(CMAKE) --build . --config $(BUILD_TYPE)

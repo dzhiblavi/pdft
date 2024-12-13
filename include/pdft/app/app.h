@@ -3,7 +3,6 @@
 #include "pdft/app/controller/controller.h"
 #include "pdft/app/event/event_listener.h"
 #include "pdft/app/loader/loader.h"
-#include "pdft/app/state/document_storage.h"
 #include "pdft/app/view/view.h"
 
 #include "pdft/tui/renderer.h"
@@ -31,7 +30,6 @@ class Application : public Module {
     AsyncStatus runEventLoop();
     Async<bool> waitForNextRender();
 
-    Arc<DocumentStorage> documents_;
     Arc<Loader> loader_;
     Arc<EventListener> listener_;
     Arc<View> view_;

@@ -5,6 +5,8 @@
 #include <optional>
 #include <utility>
 
+namespace pdft::result::detail {
+
 template <typename T>
 class ReturnedObjectHolder {
  public:
@@ -36,3 +38,5 @@ class ReturnedObjectHolder {
     std::optional<T> object_ = std::nullopt;
     ReturnedObjectHolder** owner_ = nullptr;
 };
+
+}  // namespace pdft::result::detail

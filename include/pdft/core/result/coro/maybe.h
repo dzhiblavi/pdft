@@ -14,7 +14,7 @@ struct MaybePromise {
     MaybePromise() = default;
 
     auto get_return_object() noexcept {
-        return ReturnedObjectHolder{&owner};
+        return detail::ReturnedObjectHolder{&owner};
     }
 
     auto initial_suspend() noexcept {
@@ -34,7 +34,7 @@ struct MaybePromise {
         std::unreachable();
     }
 
-    ReturnedObjectHolder<Maybe<T>>* owner = nullptr;
+    detail::ReturnedObjectHolder<Maybe<T>>* owner = nullptr;
 };
 
 template <typename T>

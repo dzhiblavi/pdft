@@ -29,3 +29,4 @@ include(./cmake/GenerateBuildInfo.cmake)
 add_subdirectory(src)
 
 include(./cmake/Testing.cmake)
+include(./cmake/Documentation.cmake)
