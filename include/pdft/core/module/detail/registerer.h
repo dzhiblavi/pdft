@@ -5,35 +5,9 @@
 #include "pdft/core/module/detail/factory_storage.h"
 #include "pdft/core/module/factory.h"
 
-#include "pdft/core/module/load/detail/constructor.h"
-#include "pdft/core/module/load/detail/injector.h"
+#include "pdft/core/module/load/detail/make_module.h"
 
 namespace pdft::module::detail {
-
-template <IsModule T>
-Arc<T> makeModule(LoadContext& ctx, std::string name) {
-    using Parameters = typename detail::Constructor<T>::type;
-
-    Arc<T> module = std::apply(
-        [&, name]<typename... Types>(Types...) {
-            return std::make_shared<T>(std::conditional_t<
-                                       Types::value,
-                                       detail::RefArgumentInjector<T>,
-                                       detail::ValueArgumentInjector<T>>(ctx, name)...);
-        },
-        Parameters{});
-
-    const auto& config = getConfig(ctx, name);
-
-    module->setLogger(PDFT_VERIFY(
-        log::logger(config.logger),
-        "missing logger {} required by module {}",
-        config.logger,
-        name));
-
-    module->setName(std::move(name));
-    return module;
-}
 
 template <typename T>
 concept Startable = requires(T& value) {
@@ -43,7 +17,7 @@ concept Startable = requires(T& value) {
 template <IsModule T>
 ModuleTraits* moduleTraits() {
     struct TraitsImpl : ModuleTraits {
-        Arc<Module> load(LoadContext& ctx, std::string name) const override {
+        Result<Arc<Module>> load(LoadContext& ctx, std::string name) const override {
             return makeModule<T>(ctx, std::move(name));
         }
 
@@ -62,9 +36,11 @@ template <typename I, IsFactory<I> F>
 requires IsModule<F>
 FactoryTraits* factoryTraits() {
     struct TraitsImpl : FactoryTraits {
-        Arc<Module> create(Module* self) const override {
-            F* factory = PDFT_VERIFY(dynamic_cast<F*>(self));
-            return PDFT_VERIFY(std::dynamic_pointer_cast<Module>(factory->create()));
+        Result<Arc<Module>> create(Module* self) const override {
+            F* factory = PDFT_VERIFY(dynamic_cast<F*>(self), "inconsistent factory traits");
+            return PDFT_VERIFY(
+                std::dynamic_pointer_cast<Module>(factory->create()),
+                "inconsistent factory traits");
         }
     };
 

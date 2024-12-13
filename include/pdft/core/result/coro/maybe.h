@@ -1,5 +1,7 @@
 #pragma once
 
+// IWYU pragma: private, include "result.h"
+
 #include "pdft/core/result/coro/return_object_holder.h"
 #include "pdft/core/result/type/maybe.h"
 

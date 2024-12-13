@@ -1,6 +1,6 @@
 #pragma once
 
-#include <chrono>  // IWUY pragma: keep
+#include <chrono>  // IWYU pragma: keep
 
 namespace pdft::trace::detail {
 

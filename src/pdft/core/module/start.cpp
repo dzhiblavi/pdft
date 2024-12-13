@@ -2,7 +2,7 @@
 #include "pdft/core/log/load.h"
 #include "pdft/core/module/load/loader.h"
 #include "pdft/core/result/combine/map.h"
-#include "pdft/core/result/coro/result.h"
+#include "pdft/core/result/coro/result.h"  // IWYU pragma: keep
 #include "pdft/core/result/syntax/pipe.h"
 
 #include "pdft/app/config.h"

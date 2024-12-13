@@ -29,4 +29,9 @@ inline auto lift(Error err) {
     return pipe::Lift(std::move(err));
 }
 
+template <typename... Args>
+auto lift(std::format_string<const Args&...> fmt, const Args&... args) {
+    return pipe::Lift(std::format(fmt, args...));
+}
+
 }  // namespace pdft::result

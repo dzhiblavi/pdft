@@ -9,11 +9,11 @@ namespace pdft::module::detail {
 
 struct ModuleTraits {
     virtual void start(Module* self) const = 0;
-    virtual Arc<Module> load(LoadContext& ctx, std::string name) const = 0;
+    virtual Result<Arc<Module>> load(LoadContext& ctx, std::string name) const = 0;
 };
 
 struct FactoryTraits {
-    virtual Arc<Module> create(Module* self) const = 0;
+    virtual Result<Arc<Module>> create(Module* self) const = 0;
 };
 
 class FactoryStorage {
