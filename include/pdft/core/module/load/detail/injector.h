@@ -1,10 +1,8 @@
 #pragma once
 
-#include "pdft/core/module/load/load_context.h"
+#include "pdft/core/module/load/detail/inject.h"
 
-namespace pdft::module {
-
-namespace detail {
+namespace pdft::module::detail {
 
 template <IsModule ModuleType>
 struct ValueArgumentInjector {
@@ -52,6 +50,4 @@ struct RefArgumentInjector {
     std::string name;
 };
 
-}  // namespace detail
-
-}  // namespace pdft::module
+}  // namespace pdft::module::detail

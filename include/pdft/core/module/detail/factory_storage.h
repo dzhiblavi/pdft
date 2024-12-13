@@ -4,7 +4,7 @@
 
 #include <unordered_map>
 
-namespace pdft::module {
+namespace pdft::module::detail {
 
 struct ModuleTraits {
     virtual void start(Module* self) const = 0;
@@ -34,4 +34,4 @@ class FactoryStorage {
     std::unordered_map<std::string, FactoryTraits*> factories_;
 };
 
-}  // namespace pdft::module
+}  // namespace pdft::module::detail

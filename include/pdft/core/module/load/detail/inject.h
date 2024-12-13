@@ -1,17 +1,15 @@
 #pragma once
 
-#include "pdft/core/module/config.h"
+#include "pdft/core/module/load/loader.h"
+
 #include "pdft/core/module/detail/config_type.h"
-#include "pdft/core/module/inject.h"
-#include "pdft/core/module/load/load_context.h"
+#include "pdft/core/module/detail/inject.h"
 
 #include "pdft/utils/cli/parsed.h"
 
 #include <rfl/from_generic.hpp>
 
-namespace pdft::module {
-
-const ModuleConfig& getConfig(LoadContext& ctx, const std::string& name);
+namespace pdft::module::detail {
 
 template <IsModule ModuleType, std::same_as<asio::io_context&> ArgType>
 ArgType injectArgument(LoadContext& ctx, const std::string&) {
@@ -23,7 +21,7 @@ ArgType injectArgument(LoadContext& ctx, const std::string&) {
     return ctx.io.get_executor();
 }
 
-template <IsModule ModuleType, std::derived_from<detail::DependsOnModuleTag> ArgType>
+template <IsModule ModuleType, std::derived_from<InjectedTag> ArgType>
 ArgType injectArgument(LoadContext& ctx, const std::string&) {
     return ArgType{getOrLoadModule(ctx, ArgType::Name.c_str())};
 }
@@ -50,4 +48,4 @@ ArgType injectArgument(LoadContext& ctx, const std::string& module) {
         result, "failed to parse config for module {}: {}", module, result.error()->what());
 }
 
-}  // namespace pdft::module
+}  // namespace pdft::module::detail

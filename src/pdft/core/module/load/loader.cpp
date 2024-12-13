@@ -1,7 +1,5 @@
 #include "pdft/core/module/load/loader.h"
-
-#include "pdft/core/module/factory.h"
-#include "pdft/core/module/factory_storage.h"
+#include "pdft/core/module/detail/factory_storage.h"
 
 namespace pdft::module {
 
@@ -33,7 +31,7 @@ Arc<Module> getOrLoadModule(LoadContext& ctx, const std::string& name) {
 
     if (config.cls.has_value()) {
         log::info("loading a module '{}' via class implementation '{}'", name, *config.cls);
-        auto* traits = FactoryStorage::globalInstance().getModuleTraits(*config.cls);
+        auto* traits = detail::FactoryStorage::globalInstance().getModuleTraits(*config.cls);
         instance = traits->load(ctx, name);
         traits->start(instance.get());
     } else if (config.factory.has_value()) {
@@ -47,7 +45,8 @@ Arc<Module> getOrLoadModule(LoadContext& ctx, const std::string& name) {
         PDFT_VERIFY(factory_config.cls, "factory factories are not supported");
 
         auto factory = getOrLoadModule(ctx, *config.factory);
-        auto* traits = FactoryStorage::globalInstance().getFactoryTraits(*factory_config.cls);
+        auto* traits =
+            detail::FactoryStorage::globalInstance().getFactoryTraits(*factory_config.cls);
         instance = traits->create(factory.get());
     } else {
         panic("neither factory nor cls construction methods are provided for module '{}'", name);

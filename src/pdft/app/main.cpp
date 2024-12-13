@@ -2,7 +2,6 @@
 #include "pdft/app/version.h"
 
 #include "pdft/core/log/load.h"
-#include "pdft/core/module/factory_storage.h"
 #include "pdft/core/module/load/loader.h"
 #include "pdft/core/result/combine/unwrap.h"
 #include "pdft/core/result/syntax/pipe.h"
