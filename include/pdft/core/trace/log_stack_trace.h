@@ -19,7 +19,7 @@ std::string getAutomaticPrettyDuration(const DurationType& duration);
 template <typename Duration>
 std::string getPrettyDuration(const DurationType& duration) {
     auto dur = std::chrono::duration_cast<Duration>(duration);
-    return std::format("{}{}", dur.count(), durationSuffix<Duration>);
+    return std::format("{}{}", dur.count(), DurationSuffix<Duration>);
 }
 
 template <std::same_as<AutomaticDuration> Duration>

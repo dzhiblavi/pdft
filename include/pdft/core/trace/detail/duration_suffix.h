@@ -1,25 +1,25 @@
 #pragma once
 
-#include <chrono>
+#include <chrono>  // IWUY pragma: keep
 
 namespace pdft::trace::detail {
 
 template <typename Duration>
-inline constexpr const char* durationSuffix = "";
+inline constexpr const char* DurationSuffix = "";
 
 template <>
-inline constexpr const char* durationSuffix<std::chrono::nanoseconds> = "ns";
+inline constexpr const char* DurationSuffix<std::chrono::nanoseconds> = "ns";
 
 template <>
-inline constexpr const char* durationSuffix<std::chrono::microseconds> = "us";
+inline constexpr const char* DurationSuffix<std::chrono::microseconds> = "us";
 
 template <>
-inline constexpr const char* durationSuffix<std::chrono::milliseconds> = "ms";
+inline constexpr const char* DurationSuffix<std::chrono::milliseconds> = "ms";
 
 template <>
-inline constexpr const char* durationSuffix<std::chrono::seconds> = "s";
+inline constexpr const char* DurationSuffix<std::chrono::seconds> = "s";
 
 template <>
-inline constexpr const char* durationSuffix<std::chrono::minutes> = "m";
+inline constexpr const char* DurationSuffix<std::chrono::minutes> = "m";
 
 }  // namespace pdft::trace::detail

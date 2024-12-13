@@ -1,6 +1,6 @@
 #pragma once
 
-#include "pdft/core/log/common_adapters.h"
+#include "pdft/core/log/common_adapters.h"  // IWYU pragma: keep
 #include "pdft/core/log/impl/log.h"
 
 namespace pdft::log {

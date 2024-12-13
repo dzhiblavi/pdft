@@ -1,6 +1,7 @@
 #pragma once
 
 #include "pdft/core/result/make/err.h"
+#include "pdft/core/result/make/ok.h"
 #include "pdft/core/result/type/maybe.h"
 #include "pdft/core/result/type/result.h"
 

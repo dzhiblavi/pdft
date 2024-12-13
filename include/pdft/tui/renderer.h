@@ -12,6 +12,7 @@ namespace pdft::tui {
 
 class Renderer {
  public:
+    virtual ~Renderer() = default;
     virtual AsyncStatus initScreen(Context& ctx) = 0;
     virtual AsyncStatus restoreScreen(Context& ctx) = 0;
 

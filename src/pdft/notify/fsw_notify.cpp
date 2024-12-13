@@ -90,7 +90,7 @@ void FswNotify::add(const std::filesystem::path& path) {
 }
 
 AsyncResult<Event> FswNotify::nextEvent() {
-    auto [ec, event] = co_await channel_.async_receive(asio_coro_as_tuple);
+    auto [ec, event] = co_await channel_.async_receive(AsioCoroAsTuple);
 
     if (ec) {
         co_return result::err(errorCodeToString(ec));

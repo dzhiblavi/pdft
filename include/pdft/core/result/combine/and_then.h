@@ -1,11 +1,8 @@
 #pragma once
 
-#include "pdft/core/result/trait/value_of.h"
 #include "pdft/core/result/type/maybe.h"
 #include "pdft/core/result/type/result.h"
 #include "pdft/core/result/type/unit.h"
-
-#include <type_traits>
 
 namespace pdft::result {
 

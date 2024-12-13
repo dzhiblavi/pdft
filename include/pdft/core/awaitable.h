@@ -10,7 +10,7 @@
 
 namespace pdft {
 
-inline constexpr auto asio_coro_as_tuple = asio::as_tuple(asio::use_awaitable);
+inline constexpr auto AsioCoroAsTuple = asio::as_tuple(asio::use_awaitable);
 
 template <typename T>
 using Async = asio::awaitable<T>;

@@ -1,5 +1,7 @@
 #pragma once
 
+// IWYU pragma: private, include "register.h"
+
 #include "pdft/utils/cli/detail/cli_arg.h"
 #include "pdft/utils/cli/detail/get_cli_args.h"
 #include "pdft/utils/cli/detail/storage.h"

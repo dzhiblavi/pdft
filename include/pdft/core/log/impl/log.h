@@ -38,7 +38,7 @@ inline LoggerPtr getLogger(LoggerPtr logger) {
 }
 
 template <AsLogger Logger, typename... Args>
-struct log {
+struct log {  // NOLINT
     log(const Logger& logger,
         Level level,
         fmt::format_string<const Args&...> fmt,
@@ -64,6 +64,7 @@ log(const Logger&, Level, fmt::format_string<const Args&...>, const Args&...)
 template <AsLogger Logger, typename Msg>
 log(const Logger&, Level, const Msg&) -> log<Logger, Msg>;
 
+// NOLINTNEXTLINE
 #define PDFT_DEFINE_LOG_FOR_LEVEL(level)                                                    \
     template <AsLogger Logger, typename... Args>                                            \
     struct level {                                                                          \

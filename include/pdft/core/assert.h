@@ -16,7 +16,7 @@ namespace detail {
 }  // namespace detail
 
 template <typename... Args>
-struct panic {
+struct panic {  // NOLINT
     panic(
         fmt::format_string<const Args&...> fmt,
         const Args&... args,
@@ -42,6 +42,7 @@ panic(const Msg&) -> panic<Msg>;
 
 }  // namespace pdft
 
+// NOLINTNEXTLINE
 #define PDFT_VERIFY(expr, ...)                                                          \
     [&] {                                                                               \
         auto&& _value = expr;                                                           \
@@ -52,6 +53,7 @@ panic(const Msg&) -> panic<Msg>;
     }()
 
 #ifndef NDEBUG
+// NOLINTNEXTLINE
 #define PDFT_VERIFY_DBG(...) (void)PDFT_VERIFY(__VA_ARGS__)
 #else
 #define PDFT_VERIFY_DBG(...)

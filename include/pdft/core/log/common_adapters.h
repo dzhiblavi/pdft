@@ -1,5 +1,7 @@
 #pragma once
 
+// IWYU pragma: private, include "common_adapters.h"
+
 #include <fmt/core.h>
 #include <fmt/ostream.h>
 #include <magic_enum.hpp>

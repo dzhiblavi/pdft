@@ -1,5 +1,7 @@
 #pragma once
 
+// IWYU pragma: private, include "registerer.h"
+
 #include "pdft/core/module/detail/factory_storage.h"
 #include "pdft/core/module/factory.h"
 

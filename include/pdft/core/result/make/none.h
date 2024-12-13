@@ -4,6 +4,6 @@
 
 namespace pdft::result {
 
-inline static constexpr auto none = std::nullopt;
+inline static constexpr auto none = std::nullopt; // NOLINT
 
 }  // namespace pdft::result
