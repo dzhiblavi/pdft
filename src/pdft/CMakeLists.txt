@@ -50,7 +50,7 @@ target_sources(
 target_sources(
   pdft
   PRIVATE ./core/assert.cpp
-          ./core/module/load/loader.cpp
+          ./core/module/load.cpp
           ./core/module/detail/factory_storage.cpp
           ./core/module/start.cpp
           ./core/context.cpp

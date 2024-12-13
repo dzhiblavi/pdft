@@ -11,8 +11,6 @@
 #include "pdft/core/module/module.h"
 #include "pdft/core/rc.h"
 
-#include <asio/signal_set.hpp>
-
 namespace pdft::app {
 
 class Application : public Module {

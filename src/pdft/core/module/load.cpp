@@ -1,5 +1,6 @@
-#include "pdft/core/module/load/loader.h"
+#include "pdft/core/module/load.h"
 #include "pdft/core/module/detail/factory_storage.h"
+
 #include "pdft/core/result/combine/lift.h"
 #include "pdft/core/result/combine/unwrap.h"
 #include "pdft/core/result/coro/result.h"  // IWYU pragma: keep
@@ -8,57 +9,61 @@
 
 namespace pdft::module {
 
-namespace {
+LoadContext::LoadContext(asio::io_context& io, ModulesConfig modules)
+    : io_(io)
+    , modules_(std::move(modules)) {}
 
-bool isLoaded(LoadContext& ctx, const std::string& name) {
-    return ctx.loaded.contains(name);
+asio::io_context& LoadContext::getIoContext() {
+    return io_;
 }
 
-void addNewModule(LoadContext& ctx, const std::string& name, Arc<Module> module) {
-    PDFT_VERIFY(!isLoaded(ctx, name), "duplicate loaded module {}", name);
-    ctx.loaded[name] = module;
+bool LoadContext::isLoaded(const std::string& name) {
+    return loaded_.contains(name);
+}
+
+void LoadContext::addNewModule(const std::string& name, Arc<Module> module) {
+    PDFT_VERIFY(!isLoaded(name), "duplicate loaded module {}", name);
+    loaded_[name] = module;
     log::info("successfully loaded a module: name={}", name);
 }
 
-}  // namespace
-
-Status loadAllModules(LoadContext& ctx) {
-    for (const auto& [name, conf] : ctx.modules) {
-        co_await module::getOrLoadModule(ctx, name);
+Status LoadContext::loadAllModules() {
+    for (const auto& [name, conf] : modules_) {
+        co_await getModule(name);
     }
 
     co_return unit;
 }
 
-Maybe<const ModuleConfig*> getConfig(LoadContext& ctx, const std::string& name) {
-    if (!ctx.modules.contains(name)) {
+Maybe<const ModuleConfig*> LoadContext::getConfig(const std::string& name) {
+    auto it = modules_.find(name);
+    if (it == modules_.end()) {
         return result::none;
     }
-
-    return &ctx.modules[name];
+    return &it->second;
 }
 
-Result<Arc<Module>> getOrLoadModule(LoadContext& ctx, const std::string& name) {
-    if (auto it = ctx.loaded.find(name); it != ctx.loaded.end()) {
+Result<Arc<Module>> LoadContext::getModule(const std::string& name) {
+    if (auto it = loaded_.find(name); it != loaded_.end()) {
         co_return it->second;
     }
 
     const auto& config =
-        co_await (getConfig(ctx, name) | result::lift("no config for module '{}'", name));
+        co_await (getConfig(name) | result::lift("no config for module '{}'", name));
     Arc<Module> instance;
 
     if (config->cls.has_value()) {
         auto&& cls = *config->cls;
         log::info("loading a module '{}' via class implementation '{}'", name, cls);
         auto* traits = co_await detail::FactoryStorage::globalInstance().getModuleTraits(cls);
-        instance = co_await traits->load(ctx, name);
+        instance = co_await traits->load(*this, name);
         traits->start(instance.get());
     } else if (config->factory.has_value()) {
         auto&& fac = *config->factory;
         log::info("loading a module '{}' via factory '{}'", name, fac);
 
-        auto factory = co_await getOrLoadModule(ctx, *config->factory);
-        const auto& factory_config = getConfig(ctx, fac) | result::unwrap;
+        auto factory = co_await getModule(*config->factory);
+        const auto& factory_config = getConfig(fac) | result::unwrap;
         PDFT_VERIFY(factory_config->cls, "factory factories are not supported");
 
         auto* traits = co_await detail::FactoryStorage::globalInstance().getFactoryTraits(
@@ -69,7 +74,7 @@ Result<Arc<Module>> getOrLoadModule(LoadContext& ctx, const std::string& name) {
             "neither factory nor cls construction methods are provided for module '{}'", name);
     }
 
-    addNewModule(ctx, name, instance);
+    addNewModule(name, instance);
     co_return instance;
 }
 

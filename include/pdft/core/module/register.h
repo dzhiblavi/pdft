@@ -1,6 +1,6 @@
 #pragma once
 
-#include "pdft/core/module/detail/registerer.h"
+#include "pdft/core/module/detail/registerer.h"  // IWYU pragma: keep
 #include "pdft/utils/anon_var_name.h"
 
 #define PDFT_REGISTER_MODULE(Type)                            \

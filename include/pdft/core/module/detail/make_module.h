@@ -1,7 +1,7 @@
 #pragma once
 
-#include "pdft/core/module/load/detail/constructor.h"
-#include "pdft/core/module/load/detail/injector.h"
+#include "pdft/core/module/detail/constructor.h"
+#include "pdft/core/module/detail/injector.h"
 #include "pdft/core/result/combine/lift.h"
 #include "pdft/core/result/coro/result.h"  // IWYU pragma: keep
 
@@ -12,7 +12,7 @@ Result<Arc<T>> makeModule(LoadContext& ctx, std::string name) {
     using Parameters = typename detail::Constructor<T>::type;
 
     auto* config = co_await (
-        getConfig(ctx, name) |
+        ctx.getConfig(name) |
         result::lift(
             "module '{}' of type {} is not configured", name, rfl::type_name_t<T>().name()));
 

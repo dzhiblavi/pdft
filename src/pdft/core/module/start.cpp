@@ -1,6 +1,6 @@
 #include "pdft/core/module/start.h"
 #include "pdft/core/log/load.h"
-#include "pdft/core/module/load/loader.h"
+#include "pdft/core/module/load.h"
 #include "pdft/core/result/combine/map.h"
 #include "pdft/core/result/coro/result.h"  // IWYU pragma: keep
 #include "pdft/core/result/syntax/pipe.h"
@@ -25,13 +25,8 @@ namespace {
 Status main(app::Config config) {
     log::loadConfig(config.logging);
     asio::io_context context(1);
-
-    module::LoadContext ctx{
-        .io = context,
-        .modules = config.modules,
-    };
-
-    co_await module::loadAllModules(ctx);
+    module::LoadContext ctx(context, std::move(config.modules));
+    co_await ctx.loadAllModules();
 
     try {
         context.run();

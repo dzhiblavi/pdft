@@ -1,6 +1,6 @@
 #pragma once
 
-#include "pdft/core/module/detail/inject.h"
+#include "pdft/core/module/detail/injected.h"
 
 namespace pdft {
 

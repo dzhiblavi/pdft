@@ -3,9 +3,8 @@
 // IWYU pragma: private, include "registerer.h"
 
 #include "pdft/core/module/detail/factory_storage.h"
+#include "pdft/core/module/detail/make_module.h"
 #include "pdft/core/module/factory.h"
-
-#include "pdft/core/module/load/detail/make_module.h"
 
 namespace pdft::module::detail {
 

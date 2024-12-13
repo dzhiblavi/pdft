@@ -1,6 +1,8 @@
 #pragma once
 
-#include "pdft/core/module/load/detail/inject.h"
+#include "pdft/core/module/detail/inject.h"
+#include "pdft/core/module/load.h"
+#include "pdft/core/module/module.h"
 #include "pdft/core/result/combine/unwrap.h"
 #include "pdft/core/result/syntax/pipe.h"  // IWYU pragma: keep
 

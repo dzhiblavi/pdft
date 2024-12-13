@@ -1,35 +1,90 @@
 #pragma once
 
-#include "pdft/core/rc.h"
+#include "pdft/core/module/detail/config_type.h"
+#include "pdft/core/module/detail/injected.h"
+#include "pdft/core/module/load.h"
+#include "pdft/core/module/module.h"
 
-#include "pdft/utils/fixed_string.h"
+#include "pdft/core/result/combine/map_err.h"
+#include "pdft/core/result/coro/result.h"  // IWYU pragma: keep
+#include "pdft/core/result/syntax/pipe.h"  // IWYU pragma: keep
+
+#include "pdft/utils/cli/parsed.h"
+
+#include <asio/io_context.hpp>
+#include <rfl/from_generic.hpp>
 
 namespace pdft::module::detail {
 
-struct InjectedTag {};
+template <IsModule ModuleType, std::same_as<LoadContext&> ArgType>
+ArgType injectArgument(LoadContext& ctx, const std::string) {
+    return ctx;
+}
 
-template <typename T, utils::FixedString moduleName>
-struct Injected : InjectedTag {
-    using InjectedType = T;
+template <IsModule ModuleType, std::same_as<asio::io_context&> ArgType>
+ArgType injectArgument(LoadContext& ctx, const std::string&) {
+    return ctx.getIoContext();
+}
 
-    static constexpr utils::FixedString Name = moduleName;
+template <IsModule ModuleType, std::same_as<asio::any_io_executor> ArgType>
+ArgType injectArgument(LoadContext& ctx, const std::string&) {
+    return ctx.getIoContext().get_executor();
+}
 
-    /* implicit */ Injected(Arc<T> mod) : value_(std::move(mod)) {}
+template <IsModule ModuleType, std::derived_from<InjectedTag> ArgType>
+Result<ArgType> injectArgument(LoadContext& ctx, const std::string& name) {
+    using T = typename ArgType::InjectedType;
 
-    operator Arc<T>() const {
-        return value_;
+    return ctx.template getModule<T>(ArgType::Name.c_str())  //
+           | result::mapErr([&](auto err) {
+                 return std::format(
+                     "failed to load module '{}' required by '{}': {}",
+                     ArgType::Name.c_str(),
+                     name,
+                     err);
+             });
+}
+
+template <detail::HasCliArgs ModuleType, std::same_as<typename ModuleType::CliArgs> ArgType>
+Result<ArgType> injectArgument(LoadContext&, const std::string& module) {
+    auto result = cli::parsed<ArgType>();
+    if (result.has_value()) {
+        return *result;
     }
 
-    T* operator->() {
-        return value_.get();
+    return result::err(
+        "failed to parse CLI arguments of type '{}': {} (required by '{}')",
+        rfl::type_name_t<ArgType>().name(),
+        result.error(),
+        module);
+}
+
+template <detail::HasConfig ModuleType, std::same_as<typename ModuleType::Config> ArgType>
+Result<ArgType> injectArgument(LoadContext& ctx, const std::string& module) {
+    auto maybe_config = ctx.getConfig(module);
+    if (!maybe_config.has_value()) {
+        return result::err(
+            "failed to retrieve config of type '{}': {} (required by '{}')",
+            rfl::type_name_t<ArgType>().name(),
+            "no configuration specified",
+            module);
     }
 
-    const T* operator->() const {
-        return value_.get();
+    auto&& config = (*maybe_config)->config;
+    if (config.is_null()) {
+        return ArgType{};
     }
 
- private:
-    Arc<T> value_;
-};
+    auto result = rfl::from_generic<ArgType, rfl::DefaultIfMissing>(config);
+    if (result) {
+        return *result;
+    }
+
+    return result::err(
+        "failed to retrieve config of type '{}': {} (required by '{}')",
+        rfl::type_name_t<ArgType>().name(),
+        result.error()->what(),
+        module);
+}
 
 }  // namespace pdft::module::detail
