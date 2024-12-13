@@ -17,7 +17,7 @@ namespace pdft::app {
 class AppLoader : public Loader, public Module {
  public:
     struct CliArgs {
-        cli::cli<std::vector<std::string>, 'p', "Paths to the documents to be opened"> path;
+        cli::opt<std::vector<std::string>, 'p', "Paths to the documents to be opened"> path;
     };
 
     AppLoader(

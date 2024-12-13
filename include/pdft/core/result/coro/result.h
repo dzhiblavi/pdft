@@ -48,6 +48,11 @@ struct ResultPromise : ResultPromiseBase<T, E> {
         PDFT_VERIFY_DBG(this->owner);
         this->owner->assign(err(std::move(x)));
     }
+
+    void return_value(Result<T, E> x) {
+        PDFT_VERIFY_DBG(this->owner);
+        this->owner->assign(std::move(x));
+    }
 };
 
 template <typename T, typename E>

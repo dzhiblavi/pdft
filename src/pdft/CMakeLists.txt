@@ -38,8 +38,14 @@ target_link_libraries(
          ftxui::dom)
 
 target_sources(
-  pdft PRIVATE ./utils/base64.cpp ./utils/zlib.cpp ./utils/get_home_dir.cpp
-               ./utils/random.cpp ./utils/base64.cpp)
+  pdft
+  PRIVATE ./utils/base64.cpp
+          ./utils/zlib.cpp
+          ./utils/get_home_dir.cpp
+          ./utils/random.cpp
+          ./utils/base64.cpp
+          ./utils/cli/parse.cpp
+          ./utils/cli/detail/storage.cpp)
 
 target_sources(
   pdft

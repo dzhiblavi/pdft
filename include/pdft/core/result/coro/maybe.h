@@ -30,6 +30,11 @@ struct MaybePromise {
         owner->assign(Maybe<T>(std::move(value)));
     }
 
+    void return_value(std::nullopt_t) {
+        PDFT_VERIFY_DBG(owner);
+        owner->assign(Maybe<T>());
+    }
+
     [[noreturn]] void unhandled_exception() noexcept {
         std::unreachable();
     }
