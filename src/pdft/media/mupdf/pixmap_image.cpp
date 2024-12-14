@@ -29,16 +29,16 @@ image::ImageSize PixmapMupdfImage::size() const {
     };
 }
 
-std::span<const image::RGBColor> PixmapMupdfImage::samples() const {
+std::span<const image::IRGBColor> PixmapMupdfImage::samples() const {
     return {
-        reinterpret_cast<const image::RGBColor*>(pixmap_->samples),  // NOLINT
+        reinterpret_cast<const image::IRGBColor*>(pixmap_->samples),  // NOLINT
         static_cast<size_t>(pixmap_->w * pixmap_->h),
     };
 }
 
-std::span<image::RGBColor> PixmapMupdfImage::mutableSamples() {
+std::span<image::IRGBColor> PixmapMupdfImage::mutableSamples() {
     return {
-        reinterpret_cast<image::RGBColor*>(pixmap_->samples),  // NOLINT
+        reinterpret_cast<image::IRGBColor*>(pixmap_->samples),  // NOLINT
         size_t(pixmap_->w * pixmap_->h),
     };
 }

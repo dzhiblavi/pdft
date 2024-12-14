@@ -6,7 +6,7 @@ namespace {
 
 template <size_t MaxSize>
 struct Cache {
-    void insert(const RGBColor& from, size_t value) {
+    void insert(const IRGBColor& from, size_t value) {
         const size_t index = find(from);
 
         if (index != MaxSize) {
@@ -23,7 +23,7 @@ struct Cache {
         };
     }
 
-    bool get(const RGBColor& from, size_t& value) {
+    bool get(const IRGBColor& from, size_t& value) {
         const size_t index = find(from);
 
         if (index == MaxSize) {
@@ -50,7 +50,7 @@ struct Cache {
         return index;
     }
 
-    size_t find(const RGBColor& from) {
+    size_t find(const IRGBColor& from) {
         for (size_t i = 0; i < MaxSize; ++i) {
             auto&& entry = cache[i];
 
@@ -65,7 +65,7 @@ struct Cache {
     static constexpr size_t None = static_cast<size_t>(-1);
 
     struct Entry {
-        RGBColor from{};
+        IRGBColor from{};
         size_t to = None;
         int count = 0;
     };
@@ -77,14 +77,14 @@ uint32_t square(int32_t value) {
     return value * value;
 }
 
-uint32_t getDistance(const RGBColor& p, const RGBColor& clr) {
+uint32_t getDistance(const IRGBColor& p, const IRGBColor& clr) {
     int32_t r = p.r;
     int32_t g = p.g;
     int32_t b = p.b;
     return square(r - clr.r) + square(g - clr.g) + square(b - clr.b);
 }
 
-size_t getClosest(const RGBColor& pixel, PaletteRef palette) {
+size_t getClosest(const IRGBColor& pixel, PaletteRef palette) {
     size_t index = 0;
     uint32_t distance = getDistance(pixel, palette[0]);
 
@@ -102,7 +102,7 @@ size_t getClosest(const RGBColor& pixel, PaletteRef palette) {
 
 }  // namespace
 
-void applyPalette(std::span<RGBColor> pixels, PaletteRef palette) {
+void applyPalette(std::span<IRGBColor> pixels, PaletteRef palette) {
     // Two-element cache for background and text colors
     Cache<2> cache;
 

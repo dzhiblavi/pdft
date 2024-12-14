@@ -29,7 +29,7 @@ void ImageRenderer::renderImage(
 
     if (display.make_bolder) {
         auto _ = ctx.push("make_bolder");
-        image::makeBolder(image);
+        image::makeBolder(image, display.invert_colors);
     }
 
     if (display.palette.has_value()) {

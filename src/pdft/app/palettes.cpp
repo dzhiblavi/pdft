@@ -3,17 +3,17 @@
 namespace pdft::app {
 
 image::PaletteRef getSkimPalette() {
-    using image::RGBColor;
+    using image::IRGBColor;
 
     static const auto palette = std::array{
-        RGBColor::gray(45),
-        RGBColor::gray(69),
-        RGBColor::gray(99),
-        RGBColor::gray(120),
-        RGBColor::gray(140),
-        RGBColor::gray(160),
-        RGBColor::gray(190),
-        RGBColor::gray(255),
+        IRGBColor::gray(45),
+        IRGBColor::gray(69),
+        IRGBColor::gray(99),
+        IRGBColor::gray(120),
+        IRGBColor::gray(140),
+        IRGBColor::gray(160),
+        IRGBColor::gray(190),
+        IRGBColor::gray(255),
     };
 
     return palette;

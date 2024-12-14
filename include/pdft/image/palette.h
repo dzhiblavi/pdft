@@ -6,8 +6,8 @@
 
 namespace pdft::image {
 
-using PaletteRef = std::span<const RGBColor>;
+using PaletteRef = std::span<const IRGBColor>;
 
-void applyPalette(std::span<RGBColor> pixels, PaletteRef palette);
+void applyPalette(std::span<IRGBColor> pixels, PaletteRef palette);
 
 }  // namespace pdft::image

@@ -14,8 +14,8 @@ class PixmapMupdfImage : public image::Image {
     ~PixmapMupdfImage() noexcept override;
 
     image::ImageSize size() const override;
-    std::span<const image::RGBColor> samples() const override;
-    std::span<image::RGBColor> mutableSamples() override;
+    std::span<const image::IRGBColor> samples() const override;
+    std::span<image::IRGBColor> mutableSamples() override;
 
  private:
     explicit PixmapMupdfImage(fz_pixmap* pixmap) : pixmap_(pixmap) {}

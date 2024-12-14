@@ -6,13 +6,13 @@
 
 namespace pdft::app {
 
-void PaletteStorage::add(const std::string& name, std::vector<image::RGBColor> palette) {
+void PaletteStorage::add(const std::string& name, std::vector<image::IRGBColor> palette) {
     PDFT_VERIFY(!palettes_.contains(name));
     palettes_[name] = std::move(palette);
 }
 
 void PaletteStorage::add(const std::string& name, image::PaletteRef palette) {
-    add(name, std::vector<image::RGBColor>{palette.begin(), palette.end()});
+    add(name, std::vector<image::IRGBColor>{palette.begin(), palette.end()});
 }
 
 Maybe<image::PaletteRef> PaletteStorage::get(const std::string& name) const {

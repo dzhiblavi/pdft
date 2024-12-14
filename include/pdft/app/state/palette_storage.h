@@ -13,13 +13,13 @@ class PaletteStorage : public Module {
  public:
     PaletteStorage() = default;
 
-    void add(const std::string& name, std::vector<image::RGBColor> palette);
+    void add(const std::string& name, std::vector<image::IRGBColor> palette);
     void add(const std::string& name, image::PaletteRef palette);
 
     Maybe<image::PaletteRef> get(const std::string& name) const;
 
  private:
-    std::unordered_map<std::string, std::vector<image::RGBColor>> palettes_;
+    std::unordered_map<std::string, std::vector<image::IRGBColor>> palettes_;
 };
 
 }  // namespace pdft::app
