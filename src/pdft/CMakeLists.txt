@@ -98,7 +98,8 @@ target_sources(
           ./app/view/app_page_renderer.cpp
           ./app/view/app_view.cpp
           ./app/view/app_document_view.cpp
-          ./app/view/image_renderer.cpp
+          ./app/view/app_image_renderer.cpp
+          ./app/view/app_page_processor.cpp
           ./app/controller/keytree.cpp
           ./app/controller/app_controller.cpp
           ./app/loader/app_state_loader.cpp

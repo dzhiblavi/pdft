@@ -1,6 +1,6 @@
 #pragma once
 
-#include "pdft/app/view/impl/image_renderer.h"
+#include "pdft/app/view/page_processor.h"
 #include "pdft/app/view/page_renderer.h"
 #include "pdft/tui/display.h"
 
@@ -38,7 +38,6 @@ struct FutureValue {
 class AppPageRenderer : public PageRenderer, public Module {
  public:
     struct Config {
-        uint32_t render_pool_size = 4;
         uint32_t num_preload_backward = 2;
         uint32_t num_preload_forward = 4;
         uint32_t image_id_salt = utils::random<uint32_t>();
@@ -47,11 +46,9 @@ class AppPageRenderer : public PageRenderer, public Module {
     AppPageRenderer(
         asio::io_context& io,
         Config config,
-        inject<const DocumentStorage, "docs"> documents_,
-        inject<const ImageRenderer, "img_renderer"> renderer,
+        inject<const DocumentStorage, "docs"> documents,
+        inject<PageProcessor, "page_processor"> processor,
         inject<tui::Display, "display"> display);
-
-    ~AppPageRenderer();
 
     Async<Unit> render(
         Context& ctx,
@@ -66,13 +63,7 @@ class AppPageRenderer : public PageRenderer, public Module {
         float image_cols;
     };
 
-    struct RenderedImage {
-        image::ImageSize size;
-        std::string compressed_samples;
-    };
-
-    using RenderingImage = FutureValue<RenderedImage>;
-
+    using RenderingImage = FutureValue<ProcessedImage>;
     using ImageState = std::variant<LoadedImage, RenderingImage>;
 
     class Images {
@@ -100,10 +91,8 @@ class AppPageRenderer : public PageRenderer, public Module {
     const Config config_;
     Images state_;
     Arc<const DocumentStorage> documents_;
-    Arc<const ImageRenderer> renderer_;
+    Arc<PageProcessor> processor_;
     Arc<tui::Display> display_;
-    asio::thread_pool pool_;
-    asio::strand<asio::thread_pool::executor_type> media_strand_;
 };
 
 }  // namespace pdft::app

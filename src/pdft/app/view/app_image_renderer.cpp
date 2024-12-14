@@ -1,4 +1,4 @@
-#include "pdft/app/view/impl/image_renderer.h"
+#include "pdft/app/view/impl/app_image_renderer.h"
 
 #include "pdft/image/image.h"
 #include "pdft/image/operations.h"
@@ -17,10 +17,10 @@
 
 namespace pdft::app {
 
-ImageRenderer::ImageRenderer(inject<const PaletteStorage, "palettes"> palettes)
+AppImageRenderer::AppImageRenderer(inject<const PaletteStorage, "palettes"> palettes)
     : palettes_(std::move(palettes)) {}
 
-void ImageRenderer::renderImage(
+void AppImageRenderer::render(
     Context& ctx, const DisplayProperties& display, image::Image& image) const {
     if (display.invert_colors) {
         auto _ = ctx.push("invert_colors");
@@ -49,4 +49,4 @@ void ImageRenderer::renderImage(
 
 }  // namespace pdft::app
 
-PDFT_REGISTER_MODULE(pdft::app::ImageRenderer);
+PDFT_REGISTER_MODULE(pdft::app::AppImageRenderer);

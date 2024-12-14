@@ -109,7 +109,7 @@
       "cls": "pdft::app::DocumentStorage"
     },
     "img_renderer": {
-      "cls": "pdft::app::ImageRenderer"
+      "cls": "pdft::app::AppImageRenderer"
     },
     "palettes": {
       "cls": "pdft::app::PaletteStorage"
