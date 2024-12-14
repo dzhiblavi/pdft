@@ -17,7 +17,7 @@ Status parse(
     cli::detail::OptionsStorage::globalInstance().attach(cmd);
 
     try {
-        cmd.parse(argv.size(), argv.data());
+        cmd.parse(static_cast<int>(argv.size()), argv.data());
     } catch (const TCLAP::ArgException& e) {
         return result::err(std::format("Error for argument '{}': {}", e.argId(), e.error()));
     } catch (const TCLAP::ExitException& e) {

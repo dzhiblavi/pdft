@@ -74,9 +74,11 @@ Async<Unit> AppPageRenderer::render(
     tui::Screen& screen) {
     const auto& [doc_id, page_index] = page;
     auto document = documents_->getDocument(page.document_id) | unwrap;
-    auto the_page = ctx.push("get_page") | document->getPage(page_index);
+    auto the_page = ctx.push("get_page") | document->getPage(int(page_index));
     float base_factor = media::getBaseScalingFactor(
-        the_page->getDefaultSize(), screen.dimensions().width_px, screen.dimensions().height_px);
+        the_page->getDefaultSize(),
+        float(screen.dimensions().width_px),
+        float(screen.dimensions().height_px));
 
     auto display = orig_display;
     display.scaling_coeff *= base_factor;
@@ -104,9 +106,9 @@ void AppPageRenderer::postPrepareImages(
     Arc<const media::Document> document, const DisplayProperties& display, const Page& page) {
     const auto& [doc_id, page_index] = page;
 
-    int forward = config_.num_preload_forward;
-    int backward = config_.num_preload_backward;
-    int page_count = document->getPageCount();
+    int forward = int(config_.num_preload_forward);
+    int backward = int(config_.num_preload_backward);
+    int page_count = int(document->getPageCount());
 
     for (int i = -backward; i < forward; ++i) {
         int index = i + static_cast<int>(page_index);
@@ -123,12 +125,13 @@ void AppPageRenderer::postPrepareImages(
             continue;
         }
 
-        auto page = document->getPage(page_index);
+        auto page = document->getPage(int(page_index));
         auto [future, promise] = makeContract<RenderedImage>(io_.get_executor());
 
         asio::co_spawn(
             media_strand_,
-            [=, this, p = std::move(promise)]() mutable -> asio::awaitable<void> {
+            // NOLINTNEXTLINE
+            [this, page, display, p = std::move(promise)]() mutable -> asio::awaitable<void> {
                 auto tracer = trace::makeTracer("bg_task");
                 Context ctx(tracer);
 
@@ -176,8 +179,8 @@ Async<void> AppPageRenderer::loadImage(Context& ctx, tui::ImageId id, tui::Scree
             ctx, id, size, compressed_data, screen.bufpair().control_buffer);
     }
 
-    float image_cols = float(size.width_px) / screen.dimensions().cell_width_px;
-    float image_rows = float(size.height_px) / screen.dimensions().cell_height_px;
+    float image_cols = float(size.width_px) / float(screen.dimensions().cell_width_px);
+    float image_rows = float(size.height_px) / float(screen.dimensions().cell_height_px);
 
     image = LoadedImage{.image_rows = image_rows, .image_cols = image_cols};
 }

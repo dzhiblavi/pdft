@@ -2,13 +2,13 @@
 
 #include "pdft/image/image.h"
 
-struct fz_pixmap;
+struct fz_pixmap;  // NOLINT
 
 namespace pdft::media {
 
 class PixmapMupdfImage : public image::Image {
  public:
-    PixmapMupdfImage(PixmapMupdfImage&&);
+    PixmapMupdfImage(PixmapMupdfImage&&) noexcept;
     PixmapMupdfImage& operator=(PixmapMupdfImage&&) = delete;
 
     ~PixmapMupdfImage() noexcept override;

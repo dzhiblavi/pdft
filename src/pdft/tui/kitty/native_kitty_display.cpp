@@ -26,10 +26,10 @@ void NativeKittyDisplay::displayImage(
     const auto& image_size = loaded_[id];
 
     const FRect ipx = {
-        .x = std::floor(image_size.width_px * riw * rix),
-        .y = std::floor(image_size.height_px * rih * riy),
-        .width = std::floor(image_size.width_px * riw),
-        .height = std::floor(image_size.height_px * rih),
+        .x = std::floor(image_size.width_px * riw * rix),   // NOLINT
+        .y = std::floor(image_size.height_px * rih * riy),  // NOLINT
+        .width = std::floor(image_size.width_px * riw),     // NOLINT
+        .height = std::floor(image_size.height_px * rih),   // NOLINT
     };
 
     log::debug(ctx, "wpx={},hpx={},SA={}", image_size.width_px, image_size.height_px, ipx);

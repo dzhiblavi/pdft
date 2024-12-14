@@ -21,7 +21,9 @@ class ConsoleWriter {
 
     template <typename... Buffers>
     AsyncStatus writeMany(Buffers&&... buffers) {
-        std::vector<asio::const_buffer> views_vec{asio::buffer(getView(buffers))...};
+        std::vector<asio::const_buffer> views_vec{
+            asio::buffer(getView(std::forward<Buffers>(buffers)))...};
+
         co_return co_await this->writeMany(std::move(views_vec));
     }
 

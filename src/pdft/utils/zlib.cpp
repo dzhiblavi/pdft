@@ -13,9 +13,12 @@ std::string zlibCompress(std::string_view data) {
 
     unsigned long size = bound;
     auto errc = compress(
-        (unsigned char*)compressed.data(), &size, (unsigned char*)data.data(), data.size());
-    PDFT_VERIFY(errc == Z_OK, "failed to compress data with zlib, errc={}", errc);
+        reinterpret_cast<unsigned char*>(compressed.data()),  // NOLINT
+        &size,
+        reinterpret_cast<const unsigned char*>(data.data()),  // NOLINT
+        data.size());
 
+    PDFT_VERIFY(errc == Z_OK, "failed to compress data with zlib, errc={}", errc);
     compressed.resize(size);
     return compressed;
 }

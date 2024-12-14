@@ -8,7 +8,7 @@ using OutBuffer = std::ostringstream;
 
 template <typename... Args>
 void write(OutBuffer& buffer, const Args&... args) {
-    ((buffer << args), ...);
+    ((buffer << args), ...);  // NOLINT
 }
 
 inline void clear(OutBuffer& buffer) {

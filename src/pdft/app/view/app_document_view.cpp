@@ -17,7 +17,8 @@ tui::Element AppDocumentView::getLayout(Context& /*ctx*/, const DocumentModel& d
         case OnePageContinuous:
             return tui::vbox({
                        tui::empty(tl) | tui::flex |
-                           tui::size(tui::HEIGHT, tui::EQUAL, 100 - doc.scroll_offset),
+                           tui::size(
+                               tui::HEIGHT, tui::EQUAL, UI::ScrollPerPage - doc.scroll_offset),
                        tui::empty(bl) | tui::flex |
                            tui::size(tui::HEIGHT, tui::EQUAL, doc.scroll_offset),
                    }) |
@@ -27,9 +28,11 @@ tui::Element AppDocumentView::getLayout(Context& /*ctx*/, const DocumentModel& d
             return tui::vbox({
                        tui::hbox({
                            tui::empty(tl) | tui::flex |
-                               tui::size(tui::HEIGHT, tui::EQUAL, 100 - doc.scroll_offset),
+                               tui::size(
+                                   tui::HEIGHT, tui::EQUAL, UI::ScrollPerPage - doc.scroll_offset),
                            tui::empty(tr) | tui::flex |
-                               tui::size(tui::HEIGHT, tui::EQUAL, 100 - doc.scroll_offset),
+                               tui::size(
+                                   tui::HEIGHT, tui::EQUAL, UI::ScrollPerPage - doc.scroll_offset),
                        }) | tui::flex,
                        tui::hbox({
                            tui::empty(bl) | tui::flex |
@@ -142,7 +145,7 @@ Async<void> AppDocumentView::renderOnePageContinuous(
     const DocumentModel& doc,
     const DisplayProperties& properties,
     tui::Screen& screen) const {
-    float tl_ratio = float(tl.height) / rect.height;
+    float tl_ratio = float(tl.height) / float(rect.height);
 
     ctx.push("docview:top") |
         co_await renderer_->render(
@@ -173,7 +176,7 @@ Async<void> AppDocumentView::renderOnePageContinuous(
         co_return;
     }
 
-    float bl_ratio = float(bl.height) / rect.height;
+    float bl_ratio = float(bl.height) / float(rect.height);
 
     ctx.push("docview:bottom") |
         co_await renderer_->render(
@@ -206,7 +209,7 @@ Async<void> AppDocumentView::renderTwoPagesContinuous(
     const DocumentModel& doc,
     const DisplayProperties& properties,
     tui::Screen& screen) const {
-    float tl_ratio = float(tl.height) / rect.height;
+    float tl_ratio = float(tl.height) / float(rect.height);
 
     ctx.push("docview:top_left") |
         co_await renderer_->render(
@@ -237,7 +240,7 @@ Async<void> AppDocumentView::renderTwoPagesContinuous(
         co_return;
     }
 
-    float tr_ratio = float(tr.height) / rect.height;
+    float tr_ratio = float(tr.height) / float(rect.height);
 
     ctx.push("docview:top_right") |
         co_await renderer_->render(
@@ -268,7 +271,7 @@ Async<void> AppDocumentView::renderTwoPagesContinuous(
         co_return;
     }
 
-    float bl_ratio = float(bl.height) / rect.height;
+    float bl_ratio = float(bl.height) / float(rect.height);
 
     ctx.push("docview:bottom_left") |
         co_await renderer_->render(
@@ -299,7 +302,7 @@ Async<void> AppDocumentView::renderTwoPagesContinuous(
         co_return;
     }
 
-    float br_ratio = float(br.height) / rect.height;
+    float br_ratio = float(br.height) / float(rect.height);
 
     ctx.push("docview:bottom_right") |
         co_await renderer_->render(

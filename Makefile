@@ -59,6 +59,19 @@ build: configure
 test: build
 	cd $(BUILD_DIR) && ctest --output-on-failure
 
+check-tidy: configure
+	run-clang-tidy \
+		-quiet \
+		-use-color \
+		-j `nproc` \
+		-p $(BUILD_DIR) \
+		-header-filter=include/pdft/ \
+		`find src/pdft -name '*.cpp'`
+
+check-format:
+	find include/ src/pdft/ -type f -name '*.h' -o -name '*.cpp' \
+		| xargs clang-format --dry-run --Werror
+
 run-lldb: build
 	cd $(BUILD_DIR) && lldb -- ./src/pdft/app $(path)
 

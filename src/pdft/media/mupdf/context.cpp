@@ -9,6 +9,7 @@ extern "C" {
 #include <mupdf/fitz/document.h>
 }
 
+#include <span>
 #include <utility>
 
 namespace pdft::media {
@@ -35,18 +36,19 @@ void registerDocumentHandlers(fz_context* ctx) {
 }
 
 void fzLockUser(void* user, int lock) {
-    auto* ma = static_cast<std::mutex*>(user);
-    ma[lock].lock();
+    auto span = *static_cast<std::span<std::mutex>*>(user);
+    span[lock].lock();
 }
 
 void fzUnlockUser(void* user, int lock) {
-    auto* ma = static_cast<std::mutex*>(user);
-    ma[lock].unlock();
+    auto span = *static_cast<std::span<std::mutex>*>(user);
+    span[lock].unlock();
 }
 
-std::mutex* getGlobalLocks() {
+std::span<std::mutex>* getGlobalLocks() {
     static std::array<std::mutex, FZ_LOCK_MAX> locks;
-    return locks.data();
+    static std::span<std::mutex> span{locks};
+    return &span;
 }
 
 }  // namespace
@@ -81,7 +83,8 @@ MupdfContext MupdfContext::Builder::build() {
     return MupdfContext{ctx};
 }
 
-MupdfContext::MupdfContext(MupdfContext&& rhs) : context_(std::exchange(rhs.context_, nullptr)) {}
+MupdfContext::MupdfContext(MupdfContext&& rhs) noexcept
+    : context_(std::exchange(rhs.context_, nullptr)) {}
 
 MupdfContext::~MupdfContext() noexcept {
     fz_drop_context(context_);

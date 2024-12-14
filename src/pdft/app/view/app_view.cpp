@@ -49,6 +49,8 @@ Maybe<tui::Element> AppView::getDocumentLayout(Context& ctx) {
 }
 
 tui::Element AppView::getSidebar() {
+    static constexpr int side_bar_width = 20;
+
     const UIModel& ui = ui_->getModel();
     std::vector<tui::Element> elements;
     elements.reserve(ui.documents.size());
@@ -66,7 +68,7 @@ tui::Element AppView::getSidebar() {
 
     return tui::vbox(std::move(elements))  //
            | tui::border                   //
-           | tui::size(tui::WIDTH, tui::EQUAL, 20);
+           | tui::size(tui::WIDTH, tui::EQUAL, side_bar_width);
 }
 
 }  // namespace pdft::app

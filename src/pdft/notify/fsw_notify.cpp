@@ -9,12 +9,16 @@
 #include "pdft/utils/build_info.h"
 
 #include <libfswatch/c/libfswatch.h>
-
 #include <magic_enum.hpp>
+
+#include <span>
 
 namespace pdft::notify {
 
-FswNotify::FswNotify(asio::any_io_executor executor) : channel_(executor, 10) {
+inline constexpr int MaxChannelBufferSize = 10;
+inline constexpr float FswLatency = 0.1f;
+
+FswNotify::FswNotify(asio::any_io_executor executor) : channel_(executor, MaxChannelBufferSize) {
     [[maybe_unused]] static auto _ = [] {
         PDFT_VERIFY(fsw_init_library() == FSW_OK);
         return 0;
@@ -47,7 +51,7 @@ FswNotify::FswNotify(asio::any_io_executor executor) : channel_(executor, 10) {
             break;
     }
 
-    PDFT_VERIFY(fsw_set_latency(handle_, 0.1) == FSW_OK);
+    PDFT_VERIFY(fsw_set_latency(handle_, FswLatency) == FSW_OK);
     PDFT_VERIFY(fsw_set_callback(handle_, processEvents, this) == FSW_OK);
 
     fsw_event_type_filter filter;
@@ -109,24 +113,25 @@ void FswNotify::monitorRunLoop(FswNotify* self) {
     log::debug("end fswatch monitorRunLoop");
 }
 
-void FswNotify::processEvents(const fsw_cevent* const events, unsigned count, void* context) {
+void FswNotify::processEvents(const fsw_cevent* const evts, unsigned count, void* context) {
     auto* self = static_cast<FswNotify*>(context);
     log::trace("received {} filesystem events", count);
 
-    for (unsigned i = 0; i < count && !self->isStopped(); ++i) {
-        if (events[i].flags_num > 0 &&
-            (events[i].flags[0] == NoOp || events[i].flags[0] == PlatformSpecific)) {
+    std::span<const fsw_cevent> events{evts, count};
+
+    for (const auto& event : events) {
+        std::span<fsw_event_flag> flags(event.flags, event.flags_num);
+
+        if (!flags.empty() && (flags[0] == NoOp || flags[0] == PlatformSpecific)) {
             continue;
         }
 
-        log::trace("received a filesystem event for path {}", events[i].path);
-
-        for (unsigned j = 0; j < events[i].flags_num; ++j) {
-            log::trace(
-                "filesystem event flag #{}: {}", j, magic_enum::enum_name(events[i].flags[j]));
+        log::trace("received a filesystem event for path {}", event.path);
+        for (fsw_event_flag flag : flags) {
+            log::trace("filesystem event flag: {}", magic_enum::enum_name(flag));
         }
 
-        self->channel_.async_send({}, Event{.path = events[i].path}, asio::use_future).get();
+        self->channel_.async_send({}, Event{.path = event.path}, asio::use_future).get();
     }
 }
 

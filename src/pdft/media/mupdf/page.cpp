@@ -16,7 +16,7 @@ extern "C" {
 
 namespace pdft::media {
 
-MupdfPage::MupdfPage(MupdfPage&& rhs)
+MupdfPage::MupdfPage(MupdfPage&& rhs) noexcept
     : page_index_(rhs.page_index_)
     , page_(std::exchange(rhs.page_, nullptr)) {}
 

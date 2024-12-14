@@ -73,7 +73,7 @@ Status AppPersister::restore(std::istream& is) const {
     for (size_t i : to_be_removed) {
         // XXX fix this hack
         ui.index = 0;
-        ui.documents.erase(ui.documents.begin() + i);
+        ui.documents.erase(ui.documents.begin() + static_cast<long>(i));
     }
 
     return result::ok();

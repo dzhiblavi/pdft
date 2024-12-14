@@ -33,7 +33,7 @@ class AppUI : public UI, public Module {
  private:
     void setDocument(DocumentModel& m, DocumentId id, uint32_t page_count);
     void scrollNext(DocumentModel& m, int32_t rows);
-    void applyScrollOffset(DocumentModel& m, uint32_t pages_per_height);
+    void applyScrollOffset(DocumentModel& m, int pages_per_height);
     void nextLayout(DocumentModel& m, int32_t delta);
     void nextPage(DocumentModel& m, int32_t delta);
     void setPageIndex(DocumentModel& m, uint32_t index);

@@ -49,4 +49,4 @@ struct AnyType1stRef : std::true_type {
     operator const T&() const;
 };
 
-}  // namespace pdft::detail
+}  // namespace pdft::module::detail

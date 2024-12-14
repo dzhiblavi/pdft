@@ -14,7 +14,7 @@ struct FixedString {
     constexpr FixedString(const std::array<char, N> _arr) : arr_(_arr) {}
 
     constexpr FixedString(const char (&str)[N]) {
-        std::copy_n(str, N, std::data(arr_));
+        std::copy_n(str, N, std::data(arr_));  // NOLINT
     }
 
     /// Returns the value as a string.
@@ -23,11 +23,11 @@ struct FixedString {
     }
 
     /// Returns the value as a string.
-    constexpr std::string_view string_view() const {
+    constexpr std::string_view string_view() const {  // NOLINT
         return std::string_view(std::data(arr_), N - 1);
     }
 
-    constexpr const char* c_str() const noexcept {
+    constexpr const char* c_str() const noexcept {  // NOLINT
         return arr_.data();
     }
 

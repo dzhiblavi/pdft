@@ -16,29 +16,28 @@ struct Fitter {
     Fitter(float image_wh_ratio, const IRect& rect, const Placement& place)
         : image_wh_ratio(image_wh_ratio)
         , rect(rect)
-        , place(place) {
-        image_ratio_is_greater = image_wh_ratio > float(rect.width) / rect.height;
-    }
+        , place(place)
+        , image_ratio_is_greater(image_wh_ratio > float(rect.width) / float(rect.height)) {}
 
     float adjustedHeight() {
-        return rect.width / image_wh_ratio;
+        return float(rect.width) / image_wh_ratio;
     }
 
     float adjustedWidth() {
-        return rect.height * image_wh_ratio;
+        return float(rect.height) * image_wh_ratio;
     }
 
     uint32_t adjustedHeightRounded() {
-        return std::roundf(adjustedHeight());
+        return std::roundf(adjustedHeight());  // NOLINT
     }
 
     uint32_t adjustedWidthRounded() {
-        return std::roundf(adjustedWidth());
+        return std::roundf(adjustedWidth());  // NOLINT
     }
 
     void fitInside() {
-        uint32_t in_img_cols;
-        uint32_t in_img_rows;
+        uint32_t in_img_cols = 0;
+        uint32_t in_img_rows = 0;
 
         if (image_ratio_is_greater) {
             in_img_rows = adjustedHeightRounded();

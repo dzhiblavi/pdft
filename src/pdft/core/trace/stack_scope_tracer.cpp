@@ -38,7 +38,7 @@ StackScopeTracerOwner::~StackScopeTracerOwner() {
     release();
 }
 
-StackScopeTracerOwner::StackScopeTracerOwner(StackScopeTracerOwner&& rhs)
+StackScopeTracerOwner::StackScopeTracerOwner(StackScopeTracerOwner&& rhs) noexcept
     : base_(std::exchange(rhs.base_, nullptr)) {}
 
 StackScopeTracerOwner StackScopeTracerOwner::addChild(const char* label, std::source_location loc) {

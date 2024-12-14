@@ -32,7 +32,7 @@ void logStackTrace(const StackScopeTracerBase& info, io::OutBuffer& out) {
     const auto& loc = info.loc;
 
     io::write(out, '\n');
-    for (int d = info.depth; d > 0; d--) {
+    for (auto d = info.depth; d > 0; d--) {
         io::write(out, "  ");
     }
 

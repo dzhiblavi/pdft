@@ -14,13 +14,13 @@ class KeyTree {
     };
 
     using CallbackType = std::function<void()>;
-    using NumberCallbackType = std::function<void(uint32_t)>;
+    using NumberCallbackType = std::function<void(int)>;
 
     KeyTree() = default;
     ~KeyTree() noexcept;
 
     struct NumberType {};
-    inline static constexpr NumberType number;
+    inline static constexpr NumberType number;  // NOLINT
 
     void bind(std::string_view keys, CallbackType callback);
     void bind(NumberType, std::string_view keys, NumberCallbackType callback);
@@ -50,7 +50,7 @@ class KeyTree {
     Node* root_ = nullptr;
     Node* curr_ = nullptr;
     State state_ = State::None;
-    uint32_t number_ = 0;
+    int number_ = 0;
 };
 
 }  // namespace pdft::app

@@ -2,7 +2,7 @@
 
 #include "pdft/core/log.h"
 
-struct fz_context;
+struct fz_context;  // NOLINT
 
 namespace pdft::media {
 
@@ -24,7 +24,7 @@ class MupdfContext {
         log::LoggerPtr logger_ = log::loggerOrGlobal("mupdf");
     };
 
-    MupdfContext(MupdfContext&& rhs);
+    MupdfContext(MupdfContext&& rhs) noexcept;
     MupdfContext& operator=(MupdfContext&&) = delete;
     MupdfContext(const MupdfContext&) = delete;
     MupdfContext& operator=(const MupdfContext&) = delete;

@@ -6,7 +6,7 @@ namespace {
 
 template <size_t MaxSize>
 struct Cache {
-    void insert(const RGBColor& from, int value) {
+    void insert(const RGBColor& from, size_t value) {
         const size_t index = find(from);
 
         if (index != MaxSize) {
@@ -14,16 +14,16 @@ struct Cache {
             return;
         }
 
-        const size_t lowest = find_lowest_count();
+        const size_t lowest = findLowestCount();
 
         cache[lowest] = {
             .from = from,
-            .count = 1,
             .to = value,
+            .count = 1,
         };
     }
 
-    bool get(const RGBColor& from, int& value) {
+    bool get(const RGBColor& from, size_t& value) {
         const size_t index = find(from);
 
         if (index == MaxSize) {
@@ -34,14 +34,14 @@ struct Cache {
         return true;
     }
 
-    size_t find_lowest_count() {
+    size_t findLowestCount() {
         size_t index = 0;
         int lowest = std::numeric_limits<int>::max();
 
         for (size_t i = 0; i < MaxSize; ++i) {
             auto&& entry = cache[i];
 
-            if (entry.to != -1 && entry.count < lowest) {
+            if (entry.to != None && entry.count < lowest) {
                 index = i;
                 lowest = entry.count;
             }
@@ -54,7 +54,7 @@ struct Cache {
         for (size_t i = 0; i < MaxSize; ++i) {
             auto&& entry = cache[i];
 
-            if (entry.to != -1 && entry.from == from) {
+            if (entry.to != None && entry.from == from) {
                 return i;
             }
         }
@@ -62,10 +62,12 @@ struct Cache {
         return MaxSize;
     }
 
+    static constexpr size_t None = static_cast<size_t>(-1);
+
     struct Entry {
-        RGBColor from;
+        RGBColor from{};
+        size_t to = None;
         int count = 0;
-        int to = -1;
     };
 
     std::array<Entry, MaxSize> cache;
@@ -82,7 +84,7 @@ uint32_t getDistance(const RGBColor& p, const RGBColor& clr) {
     return square(r - clr.r) + square(g - clr.g) + square(b - clr.b);
 }
 
-int getClosest(const RGBColor& pixel, PaletteRef palette) {
+size_t getClosest(const RGBColor& pixel, PaletteRef palette) {
     size_t index = 0;
     uint32_t distance = getDistance(pixel, palette[0]);
 
@@ -105,7 +107,7 @@ void applyPalette(std::span<RGBColor> pixels, PaletteRef palette) {
     Cache<2> cache;
 
     for (auto& pixel : pixels) {
-        int index;
+        size_t index = 0;
 
         if (!cache.get(pixel, index)) {
             index = getClosest(pixel, palette);

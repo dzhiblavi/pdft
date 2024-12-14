@@ -20,7 +20,7 @@ inline std::string_view pixelsToSamples(std::span<const RGBColor> pixels) {
     static_assert(sizeof(RGBColor) == 3);
 
     return {
-        (const char*)pixels.data(),
+        reinterpret_cast<const char*>(pixels.data()),  // NOLINT
         sizeof(RGBColor) * pixels.size(),
     };
 }

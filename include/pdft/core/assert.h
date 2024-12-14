@@ -24,8 +24,8 @@ struct panic {  // NOLINT
         detail::panic(fmt::format(fmt, args...), loc);
     }
 
-    panic(const Args&... args, const std::source_location& loc = std::source_location::current()) {
-        detail::panic(args..., loc);
+    panic(std::string_view msg, const std::source_location& loc = std::source_location::current()) {
+        detail::panic(msg, loc);
     }
 
     template <typename T>

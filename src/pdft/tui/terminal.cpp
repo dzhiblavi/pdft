@@ -9,7 +9,7 @@
 namespace pdft::tui {
 
 TerminalDimensions Terminal::getDimensions() const {
-    winsize sz;
+    winsize sz{};
 
     if (ioctl(STDIN_FILENO, TIOCGWINSZ, &sz) != 0) {
         panic("ioctl failed, errno={} ({})", errno, strerror(errno));
@@ -18,12 +18,12 @@ TerminalDimensions Terminal::getDimensions() const {
     // XXX For debugging purposes
     if (sz.ws_row == 0) {
         return {
-            .rows = 10,
-            .columns = 10,
-            .height_px = 100,
-            .width_px = 100,
-            .cell_height_px = 10,
-            .cell_width_px = 10,
+            .rows = 10,            // NOLINT
+            .columns = 10,         // NOLINT
+            .height_px = 100,      // NOLINT
+            .width_px = 100,       // NOLINT
+            .cell_height_px = 10,  // NOLINT
+            .cell_width_px = 10,   // NOLINT
         };
     }
 

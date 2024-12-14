@@ -4,10 +4,12 @@
 #include "pdft/core/log.h"
 #include "pdft/core/module/register.h"
 
-#include "pdft/core/result/coro/maybe.h"
-#include "pdft/core/result/coro/result.h"
+#include "pdft/core/result/coro/maybe.h"   // IWYU pragma: keep
+#include "pdft/core/result/coro/result.h"  // IWYU pragma: keep
 
 namespace pdft::app {
+
+inline constexpr float ZoomUpdateCoeff = 1.05f;
 
 AppController::AppController(
     Config config,
@@ -67,7 +69,7 @@ KeyTree::CallbackType AppController::commandCallback(Command command) {
 }
 
 KeyTree::NumberCallbackType AppController::numCommandCallback(Command command) {
-    return [this, command](uint32_t number) {
+    return [this, command](int number) {
         command_ = {
             .count = number,
             .command = command,
@@ -154,11 +156,11 @@ Result<ControllerAction> AppController::applyPendingCommand() {
             return ControllerAction::Redraw;
 
         case IncreaseScalingFactor:
-            ui_->updateScalingFactor(1.05f);
+            ui_->updateScalingFactor(ZoomUpdateCoeff);
             return ControllerAction::Redraw;
 
         case DecreaseScalingFactor:
-            ui_->updateScalingFactor(1.0f / 1.05f);
+            ui_->updateScalingFactor(1.0f / ZoomUpdateCoeff);
             return ControllerAction::Redraw;
 
         case ToggleSidebar:

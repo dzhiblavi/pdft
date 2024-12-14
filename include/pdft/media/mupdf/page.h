@@ -3,13 +3,13 @@
 #include "pdft/image/image.h"
 #include "pdft/media/page.h"
 
-struct fz_page;
+struct fz_page;  // NOLINT
 
 namespace pdft::media {
 
 class MupdfPage : public Page {
  public:
-    MupdfPage(MupdfPage&& rhs);
+    MupdfPage(MupdfPage&& rhs) noexcept;
     MupdfPage& operator=(MupdfPage&& rhs) = delete;
 
     ~MupdfPage() noexcept override;

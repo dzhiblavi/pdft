@@ -9,16 +9,16 @@
 
 namespace pdft::app {
 
-void AppUI::applyScrollOffset(DocumentModel& m, uint32_t pages_per_height) {
+void AppUI::applyScrollOffset(DocumentModel& m, int pages_per_height) {
     if (m.scroll_offset < 0) {
-        int count = 1 + -m.scroll_offset / 100;
-        m.scroll_offset += count * 100;
+        int count = 1 + -m.scroll_offset / ScrollPerPage;
+        m.scroll_offset += count * ScrollPerPage;
         nextPage(-pages_per_height * count);
     }
 
-    if (m.scroll_offset >= 100) {
-        int count = m.scroll_offset / 100;
-        m.scroll_offset -= count * 100;
+    if (m.scroll_offset >= ScrollPerPage) {
+        int count = m.scroll_offset / ScrollPerPage;
+        m.scroll_offset -= count * ScrollPerPage;
         nextPage(pages_per_height * count);
     }
 }
@@ -152,9 +152,9 @@ void AppUI::nextDocument(int delta) {
     auto& idx = model_.index;
 
     if (idx) {
-        const size_t n = model_.documents.size();
+        const int n = static_cast<int>(model_.documents.size());
         auto& i = *idx;
-        int index = i + delta;
+        int index = static_cast<int>(i) + delta;
 
         if (index < 0) {
             index = n - 1 - ((-index - 1) % n);

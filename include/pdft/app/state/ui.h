@@ -15,8 +15,8 @@ enum class ViewMode {
 };
 
 struct DocumentModel {
-    DocumentId document_id;
-    uint32_t page_count;
+    DocumentId document_id = 0;
+    uint32_t page_count = 0;
     uint32_t page_index = 0;
     int32_t scroll_offset = 0;
     ViewMode view_mode = ViewMode::OnePage;
@@ -32,6 +32,9 @@ struct UIModel {
 
 class UI {
  public:
+    static inline constexpr int ScrollPerPage = 100;
+
+    virtual ~UI() = default;
     virtual void onInput(char key) = 0;
     virtual void resetInput() = 0;
 

@@ -5,22 +5,24 @@
 namespace pdft::image {
 
 void invertColors(std::span<RGBColor> pixels) {
+    static constexpr uint8_t max = 255;
+
     for (RGBColor& pixel : pixels) {
-        pixel = RGBColor::gray(255) - pixel;
+        pixel = RGBColor::gray(max) - pixel;
     }
 }
 
 void makeBolder(Image& image) {
-    constexpr int positions[][2] = {
+    constexpr size_t positions[][2] = {
         {1, 0},
     };
 
     const auto size = image.size();
-    const int width = size.width_px;
-    const int height = size.height_px;
+    const auto width = size.width_px;
+    const auto height = size.height_px;
     auto samples = image.mutableSamples();
 
-    for (int x = 0; x < width * height; ++x) {
+    for (size_t x = 0; x < width * height; ++x) {
         samples[x] = samples[x] + RGBColor::gray(std::size(positions) - 1);
         samples[x] = samples[x] / RGBColor::gray(std::size(positions));
     }
@@ -28,10 +30,10 @@ void makeBolder(Image& image) {
     std::vector<RGBColor> original{samples.begin(), samples.end()};
 
     for (auto&& [left, top] : positions) {
-        for (int x = std::max(0, left); x < width + std::min(0, left); ++x) {
-            for (int y = std::max(0, top); y < height + std::min(0, top); ++y) {
-                int add_index = (x - left) + (y - top) * width;
-                int index = x + y * width;
+        for (auto x = std::max(0UL, left); x < width + std::min(0UL, left); ++x) {
+            for (auto y = std::max(0UL, top); y < height + std::min(0UL, top); ++y) {
+                size_t add_index = (x - left) + (y - top) * width;
+                size_t index = x + y * width;
                 samples[index] = samples[index] + original[add_index];
             }
         }

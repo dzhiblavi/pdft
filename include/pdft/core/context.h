@@ -9,7 +9,7 @@ class Context;
 
 class PushHandle {
  public:
-    PushHandle(PushHandle&& rhs);
+    PushHandle(PushHandle&& rhs) noexcept;
     ~PushHandle();
 
     template <typename T>

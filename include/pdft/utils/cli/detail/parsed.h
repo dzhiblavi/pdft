@@ -22,7 +22,7 @@ static Result<C> parsed() {
 
     auto do_apply =
         [&]<typename Self, size_t I, size_t... Is>(
-            this Self&& self, std::index_sequence<I, Is...>) -> Result<Unit, std::string> {
+            this const Self& self, std::index_sequence<I, Is...>) -> Result<Unit, std::string> {
         if (auto ok = apply.template operator()<I>(); !ok) {
             return std::unexpected(std::move(ok.error()));
         }

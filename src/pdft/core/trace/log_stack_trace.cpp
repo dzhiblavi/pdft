@@ -23,7 +23,8 @@ std::string getAutomaticPrettyDuration(const DurationType& duration) {
         ++index;
     }
 
-    return std::format("{:.2f}{}", float(ns) / ratios[index], names[index]);
+    return std::format(
+        "{:.2f}{}", static_cast<float>(ns) / static_cast<float>(ratios[index]), names[index]);
 }
 
 }  // namespace pdft::trace::detail

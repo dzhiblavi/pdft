@@ -14,8 +14,8 @@ struct StackScopeTracerBase : utils::IntrusiveForwardListItem<StackScopeTracerBa
     void release();
     void addChild(StackScopeTracerBase* child);
 
-    TimePointType started_at;
-    DurationType duration;
+    TimePointType started_at{};
+    DurationType duration{};
     std::source_location loc;
     const char* label = "";
 
@@ -54,7 +54,7 @@ class StackScopeTracerOwner {
  public:
     ~StackScopeTracerOwner();
     StackScopeTracerOwner() = default;
-    StackScopeTracerOwner(StackScopeTracerOwner&& rhs);
+    StackScopeTracerOwner(StackScopeTracerOwner&& rhs) noexcept;
 
     StackScopeTracerOwner& operator=(StackScopeTracerOwner&&) = delete;
     StackScopeTracerOwner(const StackScopeTracerOwner&) = delete;

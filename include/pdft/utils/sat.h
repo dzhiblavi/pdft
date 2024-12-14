@@ -7,7 +7,7 @@
 namespace pdft::utils {
 
 template <std::integral T>
-constexpr T add_sat(T x, T y) noexcept {
+constexpr T add_sat(T x, T y) noexcept {  // NOLINT
     T z;
     if (!__builtin_add_overflow(x, y, &z)) {
         return z;
@@ -22,7 +22,7 @@ constexpr T add_sat(T x, T y) noexcept {
 }
 
 template <std::integral T>
-constexpr T sub_sat(T x, T y) noexcept {
+constexpr T sub_sat(T x, T y) noexcept {  // NOLINT
     T z;
     if (!__builtin_sub_overflow(x, y, &z)) {
         return z;

@@ -11,7 +11,9 @@
 namespace pdft::tui {
 
 struct APCExecutorConfig {
-    size_t max_chunk_size_bytes = 4096;
+    static constexpr size_t TerminalMaxChunkSizeBytes = 4096;
+
+    size_t max_chunk_size_bytes = TerminalMaxChunkSizeBytes;
 };
 
 class APCExecutor {

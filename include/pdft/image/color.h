@@ -36,13 +36,13 @@ inline RGBColor operator/(const RGBColor& a, const RGBColor& b) {
 
 inline RGBColor rgbFromHex(std::string_view hex) {
     PDFT_VERIFY(hex.size() == 7);
-    uint32_t value = std::stoul(hex.substr(1).data(), nullptr, 16);
+    uint32_t value = std::stoul(hex.substr(1).data(), nullptr, 16);  // NOLINT
     constexpr uint32_t mask = 0x0000ff;
 
     return {
-        static_cast<uint8_t>((value >> 16) & mask),
-        static_cast<uint8_t>((value >> 8) & mask),
-        static_cast<uint8_t>((value >> 0) & mask),
+        static_cast<uint8_t>((value >> 16) & mask),  // NOLINT
+        static_cast<uint8_t>((value >> 8) & mask),   // NOLINT
+        static_cast<uint8_t>((value >> 0) & mask),   // NOLINT
     };
 }
 

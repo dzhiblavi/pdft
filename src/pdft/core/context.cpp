@@ -8,7 +8,7 @@ PushHandle::PushHandle(
     , previous(previous)
     , context(context) {}
 
-PushHandle::PushHandle(PushHandle&& rhs)
+PushHandle::PushHandle(PushHandle&& rhs) noexcept
     : tracer(std::move(rhs.tracer))
     , previous(rhs.previous)
     , context(std::exchange(rhs.context, nullptr)) {}

@@ -20,16 +20,16 @@ std::string_view nextChunk(std::string_view& data, size_t max_chunk_size) {
 }
 
 template <typename Arg>
-void writeControlData(io::OutBuffer& buffer, Arg&& value) {
-    auto&& [k, v] = value;
+void writeControlData(io::OutBuffer& buffer, const Arg& value) {
+    const auto& [k, v] = value;
     buffer << k << '=' << v;
 }
 
 template <typename Arg, typename... Args>
-void writeControlData(io::OutBuffer& buffer, Arg&& arg, Args&&... rest) {
-    writeControlData(buffer, std::forward<Arg>(arg));
+void writeControlData(io::OutBuffer& buffer, const Arg& arg, const Args&... rest) {
+    writeControlData(buffer, arg);
     buffer << ',';
-    writeControlData(buffer, std::forward<Args>(rest)...);
+    writeControlData(buffer, rest...);
 }
 
 void writeControlData(const Command& apc, io::OutBuffer& buffer) {

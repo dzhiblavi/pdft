@@ -3,7 +3,7 @@
 #include "pdft/core/result/type/result.h"
 
 #include "pdft/core/assert.h"
-#include "pdft/core/log/common_adapters.h"
+#include "pdft/core/log/common_adapters.h"  // IWYU pragma: keep
 
 #include <optional>
 
@@ -27,6 +27,6 @@ struct Unwrap {
 
 }  // namespace pipe
 
-inline static constexpr pipe::Unwrap unwrap;
+inline static constexpr pipe::Unwrap unwrap;  // NOLINT
 
 }  // namespace pdft::result

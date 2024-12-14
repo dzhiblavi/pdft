@@ -44,7 +44,7 @@ struct log {  // NOLINT
         fmt::format_string<const Args&...> fmt,
         const Args&... args,
         const std::source_location& loc = std::source_location::current()) {
-        auto spdlog_loc = spdlog::source_loc(loc.file_name(), loc.line(), loc.function_name());
+        auto spdlog_loc = spdlog::source_loc(loc.file_name(), int(loc.line()), loc.function_name());
         getLogger(logger)->log(spdlog_loc, level, fmt::format(fmt, args...));
     }
 
@@ -52,7 +52,7 @@ struct log {  // NOLINT
         Level level,
         const Args&... args,
         const std::source_location& loc = std::source_location::current()) {
-        auto spdlog_loc = spdlog::source_loc(loc.file_name(), loc.line(), loc.function_name());
+        auto spdlog_loc = spdlog::source_loc(loc.file_name(), int(loc.line()), loc.function_name());
         getLogger(logger)->log(spdlog_loc, level, args...);
     }
 };
@@ -112,12 +112,13 @@ log(const Logger&, Level, const Msg&) -> log<Logger, Msg>;
     template <AsLogger Logger, typename Msg>                                                \
     level(const Logger&, const Msg&)->level<Logger, Msg>
 
-PDFT_DEFINE_LOG_FOR_LEVEL(trace);
-PDFT_DEFINE_LOG_FOR_LEVEL(debug);
-PDFT_DEFINE_LOG_FOR_LEVEL(info);
-PDFT_DEFINE_LOG_FOR_LEVEL(warn);
-PDFT_DEFINE_LOG_FOR_LEVEL(err);
-PDFT_DEFINE_LOG_FOR_LEVEL(critical);
+PDFT_DEFINE_LOG_FOR_LEVEL(trace);     // NOLINT
+PDFT_DEFINE_LOG_FOR_LEVEL(debug);     // NOLINT
+PDFT_DEFINE_LOG_FOR_LEVEL(info);      // NOLINT
+PDFT_DEFINE_LOG_FOR_LEVEL(warn);      // NOLINT
+PDFT_DEFINE_LOG_FOR_LEVEL(err);       // NOLINT
+PDFT_DEFINE_LOG_FOR_LEVEL(critical);  // NOLINT
+
 #undef PDFT_DEFINE_LOG_FOR_LEVEL
 
 }  // namespace pdft::log::impl

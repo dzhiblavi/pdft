@@ -4,13 +4,13 @@
 
 #include "pdft/core/result.h"
 
-struct fz_document;
+struct fz_document;  // NOLINT
 
 namespace pdft::media {
 
 class MupdfDocument : public Document {
  public:
-    MupdfDocument(MupdfDocument&& rhs);
+    MupdfDocument(MupdfDocument&& rhs) noexcept;
     MupdfDocument& operator=(MupdfDocument&&) = delete;
 
     ~MupdfDocument() noexcept override;

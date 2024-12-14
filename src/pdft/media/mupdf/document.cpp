@@ -17,7 +17,7 @@ MupdfDocument::~MupdfDocument() noexcept {
     fz_drop_document(MupdfContext::thisThreadInstance().native(), document_);
 }
 
-MupdfDocument::MupdfDocument(MupdfDocument&& rhs)
+MupdfDocument::MupdfDocument(MupdfDocument&& rhs) noexcept
     : path_(std::move(rhs.path_))
     , document_(std::exchange(rhs.document_, nullptr)) {}
 

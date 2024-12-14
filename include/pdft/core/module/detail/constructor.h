@@ -54,7 +54,9 @@ struct Constructor<T, N, Head...> : std::true_type {
     using type = typename Constructor<T, N - 1, Head..., AnyTypeRef>::type;
 };
 
-template <typename T, size_t N = 12>
+inline constexpr size_t MaxSupportedConstructorArguments = 12;
+
+template <typename T, size_t N = MaxSupportedConstructorArguments>
 consteval size_t maxNumConstructorArguments() {
     if constexpr (N == 0) {
         static_assert(

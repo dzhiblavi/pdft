@@ -37,9 +37,12 @@ struct SimpleFileSink {
 };
 
 struct RotatingFileSink {
+    static constexpr size_t DefaultMaxSize = 1ULL << 20ULL;
+    static constexpr size_t DefaultMaxNumFiles = 5;
+
     std::string path;
-    size_t max_size = 1ULL << 20ULL;
-    size_t max_num_files = 5;
+    size_t max_size = DefaultMaxSize;
+    size_t max_num_files = DefaultMaxNumFiles;
 };
 
 struct DailyFileSink {
@@ -63,7 +66,9 @@ struct LoggerConfig {
 };
 
 struct ThreadPoolConfig {
-    size_t queue_size = 8192;
+    static constexpr size_t DefaultQueueSize = 8192;
+
+    size_t queue_size = DefaultQueueSize;
     size_t num_threads = 1;
 };
 

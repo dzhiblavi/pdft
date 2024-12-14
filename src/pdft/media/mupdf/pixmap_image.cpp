@@ -11,7 +11,7 @@ extern "C" {
 
 namespace pdft::media {
 
-PixmapMupdfImage::PixmapMupdfImage(PixmapMupdfImage&& rhs)
+PixmapMupdfImage::PixmapMupdfImage(PixmapMupdfImage&& rhs) noexcept
     : pixmap_(PDFT_VERIFY(std::exchange(rhs.pixmap_, nullptr))) {}
 
 PixmapMupdfImage::~PixmapMupdfImage() noexcept {
@@ -31,14 +31,14 @@ image::ImageSize PixmapMupdfImage::size() const {
 
 std::span<const image::RGBColor> PixmapMupdfImage::samples() const {
     return {
-        (const image::RGBColor*)pixmap_->samples,
-        size_t(pixmap_->w * pixmap_->h),
+        reinterpret_cast<const image::RGBColor*>(pixmap_->samples),  // NOLINT
+        static_cast<size_t>(pixmap_->w * pixmap_->h),
     };
 }
 
 std::span<image::RGBColor> PixmapMupdfImage::mutableSamples() {
     return {
-        (image::RGBColor*)pixmap_->samples,
+        reinterpret_cast<image::RGBColor*>(pixmap_->samples),  // NOLINT
         size_t(pixmap_->w * pixmap_->h),
     };
 }

@@ -131,7 +131,7 @@ KeyTree::Result KeyTree::feedDigit(char key) {
 
         case Counting:
             PDFT_VERIFY(curr_ == num_root_, "invalid state");
-            number_ = number_ * 10 + digit;
+            number_ = number_ * 10 + digit;  // NOLINT
             return Result::Accepted;
     }
 }

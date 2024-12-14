@@ -23,7 +23,7 @@ std::string absolute(const std::string& path) {
     return utils::expandHome(path);
 }
 
-constexpr auto GLOBAL_LOGGER_NAME = "global";
+constexpr auto GlobalLoggerName = "global";
 
 spdlog::sink_ptr loadSink(const SinkConfig& config) {
     return rfl::visit(
@@ -106,7 +106,7 @@ void loadConfig(const LogConfig& config) {
         loadLogger(name, conf);
     }
 
-    if (auto global = spdlog::get(GLOBAL_LOGGER_NAME)) {
+    if (auto global = spdlog::get(GlobalLoggerName)) {
         setGlobalLogger(global);
     }
 }

@@ -25,10 +25,10 @@ void UnicodeKittyDisplay::displayImage(
     PDFT_VERIFY(rix >= 0 && riy >= 0, "image offset must not be negative: x={},y={}", rix, riy);
     PDFT_VERIFY(riw > 0 && rih > 0, "image dimensions must be positive: w={},h={}", riw, rih);
 
-    const uint32_t image_cols = std::roundf(w / riw);
-    const uint32_t image_rows = std::roundf(h / rih);
-    const uint32_t offset_cols = image_cols * rix;
-    const uint32_t offset_rows = image_rows * riy;
+    const uint32_t image_cols = std::roundf(w / riw);  // NOLINT
+    const uint32_t image_rows = std::roundf(h / rih);  // NOLINT
+    const uint32_t offset_cols = image_cols * rix;     // NOLINT
+    const uint32_t offset_rows = image_rows * riy;     // NOLINT
 
     log::debug(ctx, "oc={},or={},wc={},hr={}", offset_cols, offset_rows, image_cols, image_rows);
 
@@ -52,19 +52,19 @@ void UnicodeKittyDisplay::displayImage(
         buffers.control_buffer);
 
     // Fill the image space with special unicode characters
-    const std::string_view ImagePlaceholder = "\U0010EEEE";
-    const std::string_view IdChar = detail::RowColDiacritics[(id >> 24) & 255];
+    const std::string_view image_placeholder = "\U0010EEEE";
+    const std::string_view id_char = detail::RowColDiacritics[(id >> 24) & 255];
 
     auto _ = ctx.push("unicode_placement");
 
     io::write(
         buffers.display_buffer,
         "\033[38:2:",
-        (id >> 16) & 255,
+        (id >> 16) & 255,  // NOLINT
         ":",
-        (id >> 8) & 255,
+        (id >> 8) & 255,  // NOLINT
         ":",
-        (id >> 0) & 255,
+        (id >> 0) & 255,  // NOLINT
         "m");
 
     for (uint32_t row = 0; row < h; ++row) {
@@ -78,10 +78,10 @@ void UnicodeKittyDisplay::displayImage(
         for (uint32_t col = 0; col < w; ++col) {
             io::write(
                 buffers.display_buffer,
-                ImagePlaceholder,
+                image_placeholder,
                 detail::RowColDiacritics[offset_rows + row],
                 detail::RowColDiacritics[offset_cols + col],
-                IdChar);
+                id_char);
         }
     }
 

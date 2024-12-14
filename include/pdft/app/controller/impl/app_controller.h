@@ -47,8 +47,10 @@ class AppController : public Controller, public Module {
     };
 
     struct Config {
+        static constexpr int DefaultRowsPerScroll = 10;
+
         std::vector<KeyMapping> key_mappings;
-        int32_t rows_per_scroll = 10;
+        int rows_per_scroll = DefaultRowsPerScroll;
     };
 
     AppController(
@@ -72,13 +74,13 @@ class AppController : public Controller, public Module {
     KeyTree::NumberCallbackType numCommandCallback(Command command);
 
     struct PendingCommand {
-        uint32_t count;
+        int count;
         Command command;
     };
 
     Config config_;
     KeyTree key_tree_;
-    PendingCommand command_;
+    PendingCommand command_{};
     Arc<const media::Loader> doc_loader_;
     Arc<UI> ui_;
     Arc<DocumentStorage> documents_;
