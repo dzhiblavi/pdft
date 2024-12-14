@@ -117,16 +117,15 @@ void FswNotify::processEvents(const fsw_cevent* const evts, unsigned count, void
     auto* self = static_cast<FswNotify*>(context);
     log::trace("received {} filesystem events", count);
 
-    std::span<const fsw_cevent> events{evts, count};
-
-    for (const auto& event : events) {
+    for (const auto& event : std::span{evts, count}) {
         std::span<fsw_event_flag> flags(event.flags, event.flags_num);
 
-        if (!flags.empty() && (flags[0] == NoOp || flags[0] == PlatformSpecific)) {
+        if (flags.empty() || flags[0] == NoOp || flags[0] == PlatformSpecific) {
             continue;
         }
 
         log::trace("received a filesystem event for path {}", event.path);
+
         for (fsw_event_flag flag : flags) {
             log::trace("filesystem event flag: {}", magic_enum::enum_name(flag));
         }
