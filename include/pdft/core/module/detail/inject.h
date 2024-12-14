@@ -38,8 +38,9 @@ Result<ArgType> injectArgument(LoadContext& ctx, const std::string& name) {
     return ctx.template getModule<T>(ArgType::Name.c_str())  //
            | result::mapErr([&](auto err) {
                  return std::format(
-                     "failed to load module '{}' required by '{}': {}",
+                     "while loading module '{}' of type {} required by '{}':\n{}",
                      ArgType::Name.c_str(),
+                     rfl::type_name_t<T>().name(),
                      name,
                      err);
              });
@@ -53,10 +54,10 @@ Result<ArgType> injectArgument(LoadContext&, const std::string& module) {
     }
 
     return result::err(
-        "failed to parse CLI arguments of type '{}': {} (required by '{}')",
+        "while parsing CLI arguments of type '{}' required by '{}':\n{}",
         rfl::type_name_t<ArgType>().name(),
-        result.error(),
-        module);
+        module,
+        result.error());
 }
 
 template <detail::HasConfig ModuleType, std::same_as<typename ModuleType::Config> ArgType>
@@ -64,10 +65,10 @@ Result<ArgType> injectArgument(LoadContext& ctx, const std::string& module) {
     auto maybe_config = ctx.getConfig(module);
     if (!maybe_config.has_value()) {
         return result::err(
-            "failed to retrieve config of type '{}': {} (required by '{}')",
+            "while retrieving config of type '{}' required by '{}':\n{}",
             rfl::type_name_t<ArgType>().name(),
-            "no configuration specified",
-            module);
+            module,
+            "no configuration specified");
     }
 
     auto&& config = (*maybe_config)->config;
@@ -81,10 +82,10 @@ Result<ArgType> injectArgument(LoadContext& ctx, const std::string& module) {
     }
 
     return result::err(
-        "failed to retrieve config of type '{}': {} (required by '{}')",
+        "while parsing config of type '{}' required by '{}':\n{}",
         rfl::type_name_t<ArgType>().name(),
-        result.error()->what(),
-        module);
+        module,
+        result.error()->what());
 }
 
 }  // namespace pdft::module::detail

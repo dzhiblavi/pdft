@@ -2,35 +2,50 @@
 
 #include "pdft/core/module/detail/constructor.h"
 #include "pdft/core/module/detail/injector.h"
+
 #include "pdft/core/result/combine/lift.h"
 #include "pdft/core/result/coro/result.h"  // IWYU pragma: keep
 
 namespace pdft::module::detail {
 
 template <IsModule T>
-Result<Arc<T>> makeModule(LoadContext& ctx, std::string name) {
+Result<Arc<T>> createModule(LoadContext& ctx, std::string name) {
     using Parameters = typename detail::Constructor<T>::type;
 
+    try {
+        co_return std::apply(
+            [&, name]<typename... Types>(Types...) {
+                return std::make_shared<T>(std::conditional_t<
+                                           Types::value,
+                                           RefArgumentInjector<T>,
+                                           ValueArgumentInjector<T>>(ctx, name)...);
+            },
+            Parameters{});
+    } catch (std::string error) {
+        co_return error;
+    }
+}
+
+template <IsModule T>
+Result<Arc<T>> loadModule(LoadContext& ctx, std::string name) {
     auto* config = co_await (
         ctx.getConfig(name) |
         result::lift(
             "module '{}' of type {} is not configured", name, rfl::type_name_t<T>().name()));
 
-    Arc<T> module = std::apply(
-        [&, name]<typename... Types>(Types...) {
-            return std::make_shared<T>(
-                std::conditional_t<Types::value, RefArgumentInjector<T>, ValueArgumentInjector<T>>(
-                    ctx, name)...);
-        },
-        Parameters{});
+    Arc<T> module = co_await createModule<T>(ctx, name);
 
-    module->setLogger(PDFT_VERIFY(
-        log::logger(config->logger),
-        "missing logger {} required by module {}",
-        config->logger,
-        name));
+    auto logger = log::logger(config->logger);
+    if (!logger) {
+        co_return result::err(
+            "missing logger {} required by module '{}' of type {}",
+            config->logger,
+            name,
+            rfl::type_name_t<T>().name());
+    }
+
+    module->setLogger(logger);
     module->setName(std::move(name));
-
     co_return module;
 }
 

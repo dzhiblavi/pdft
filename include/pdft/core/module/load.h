@@ -1,6 +1,7 @@
 #pragma once
 
 #include "pdft/core/module/config.h"
+#include "pdft/core/module/factory_storage.h"
 #include "pdft/core/module/module.h"
 
 #include "pdft/core/result/coro/result.h"  // IWYU pragma: keep
@@ -16,7 +17,7 @@ using LoadedModules = std::unordered_map<std::string, Arc<Module>>;
 
 class LoadContext {
  public:
-    LoadContext(asio::io_context& io, ModulesConfig modules);
+    LoadContext(asio::io_context& io, ModulesConfig modules, FactoryStorage& factory_storage);
 
     template <typename T>
     Result<Arc<T>> getModule(const std::string& name);
@@ -32,6 +33,7 @@ class LoadContext {
     void addNewModule(const std::string& name, Arc<Module> module);
 
     asio::io_context& io_;
+    FactoryStorage& factory_storage_;
     ModulesConfig modules_;
     LoadedModules loaded_ = {};
 };

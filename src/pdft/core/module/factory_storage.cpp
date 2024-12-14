@@ -1,7 +1,7 @@
-#include "pdft/core/module/detail/factory_storage.h"
+#include "pdft/core/module/factory_storage.h"
 #include "pdft/core/result/make/err.h"
 
-namespace pdft::module::detail {
+namespace pdft::module {
 
 void FactoryStorage::registerModule(const std::string& cls, ModuleTraits* traits) {
     PDFT_VERIFY(!modules_.contains(cls), "duplicate module {}", cls);
@@ -36,4 +36,4 @@ FactoryStorage& FactoryStorage::globalInstance() {
     return storage;
 }
 
-}  // namespace pdft::module::detail
+}  // namespace pdft::module

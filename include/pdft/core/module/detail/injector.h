@@ -3,6 +3,7 @@
 #include "pdft/core/module/detail/inject.h"
 #include "pdft/core/module/load.h"
 #include "pdft/core/module/module.h"
+
 #include "pdft/core/result/combine/unwrap.h"
 #include "pdft/core/result/syntax/pipe.h"  // IWYU pragma: keep
 
@@ -15,6 +16,9 @@ T&& unwrap(T&& value) {
 
 template <typename T>
 T unwrap(Result<T> value) {
+    if (!value.has_value()) {
+        throw std::move(value.error());
+    }
     return std::move(value) | result::unwrap;
 }
 

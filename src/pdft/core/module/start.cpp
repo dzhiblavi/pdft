@@ -25,7 +25,7 @@ namespace {
 Status main(app::Config config) {
     log::loadConfig(config.logging);
     asio::io_context context(1);
-    module::LoadContext ctx(context, std::move(config.modules));
+    module::LoadContext ctx(context, std::move(config.modules), FactoryStorage::globalInstance());
     co_await ctx.loadAllModules();
 
     try {
