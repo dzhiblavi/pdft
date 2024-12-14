@@ -10,10 +10,6 @@ struct IntrusiveForwardListItem {
     Self* next_ = nullptr;
 };
 
-// XXX: Actually is an intrusive stack.
-// Push and Pop operations are threadsafe and LF.
-// size() has purely informative semantics and may not be
-// correct under multithreaded load.
 template <typename T>
 class MPMCLockFreeStack {
  public:

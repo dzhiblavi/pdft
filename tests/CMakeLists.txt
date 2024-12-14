@@ -31,11 +31,10 @@ add_test(./pdft/core/result/coro/test_maybe.cpp)
 add_test(./pdft/core/result/coro/test_result.cpp)
 
 # Image
-add_test(./pdft/image/color.cpp)
+add_test(./pdft/image/test_color.cpp)
 
 # Utils
 add_test(./pdft/utils/test_lock_free_stack.cpp)
-add_test(./pdft/utils/test_visit.cpp)
 add_test(./pdft/utils/test_cli_args.cpp)
 
 # TUI
