@@ -10,7 +10,8 @@ namespace pdft::module::detail {
 template <IsModule T>
 struct ModuleRegister {
     explicit ModuleRegister(const std::string& module_name) {
-        FactoryStorage::globalInstance().registerModule(module_name, moduleTraits<T>());
+        FactoryStorage::globalInstance().registerModule(module_name, moduleTraits<T>()) |
+            result::unwrap;
     }
 };
 
@@ -20,7 +21,8 @@ struct FactoryRegister {
     explicit FactoryRegister(const std::string& module_name) {
         auto* mod = moduleTraits<F>();
         auto* fac = factoryTraits<I, F>();
-        FactoryStorage::globalInstance().registerFactoryModule(module_name, mod, fac);
+        FactoryStorage::globalInstance().registerFactoryModule(module_name, mod, fac) |
+            result::unwrap;
     }
 };
 

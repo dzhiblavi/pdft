@@ -1,18 +1,29 @@
 #include "pdft/core/module/factory_storage.h"
+#include "pdft/core/result/coro/result.h"  // IWYU pragma: keep
 #include "pdft/core/result/make/err.h"
+#include "pdft/core/result/make/ok.h"
 
 namespace pdft::module {
 
-void FactoryStorage::registerModule(const std::string& cls, ModuleTraits* traits) {
-    PDFT_VERIFY(!modules_.contains(cls), "duplicate module {}", cls);
+Status FactoryStorage::registerModule(const std::string& cls, ModuleTraits* traits) {
+    if (modules_.contains(cls)) {
+        return result::err("duplicate module {}", cls);
+    }
+
     modules_.emplace(cls, traits);
+    return result::ok();
 }
 
-void FactoryStorage::registerFactoryModule(
+Status FactoryStorage::registerFactoryModule(
     const std::string& cls, ModuleTraits* mod, FactoryTraits* fac) {
-    registerModule(cls, mod);
-    PDFT_VERIFY(!factories_.contains(cls), "duplicate factory {}", cls);
+    co_await registerModule(cls, mod);
+
+    if (factories_.contains(cls)) {
+        co_return result::err("duplicate factory {}", cls);
+    }
+
     factories_.emplace(cls, fac);
+    co_return result::ok();
 }
 
 Result<ModuleTraits*> FactoryStorage::getModuleTraits(const std::string& cls) {

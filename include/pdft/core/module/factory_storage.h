@@ -1,6 +1,7 @@
 #pragma once
 
 #include "pdft/core/module/traits.h"
+#include "pdft/core/result/type/status.h"
 
 #include <unordered_map>
 
@@ -10,8 +11,8 @@ class FactoryStorage {
  public:
     FactoryStorage() = default;
 
-    void registerModule(const std::string& cls, ModuleTraits* traits);
-    void registerFactoryModule(const std::string& cls, ModuleTraits* mod, FactoryTraits* fac);
+    Status registerModule(const std::string& cls, ModuleTraits* traits);
+    Status registerFactoryModule(const std::string& cls, ModuleTraits* mod, FactoryTraits* fac);
 
     Result<ModuleTraits*> getModuleTraits(const std::string& cls);
     Result<FactoryTraits*> getFactoryTraits(const std::string& cls);
