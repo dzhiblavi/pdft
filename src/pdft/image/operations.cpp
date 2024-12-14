@@ -13,25 +13,26 @@ void invertColors(std::span<RGBColor> pixels) {
 }
 
 void makeBolder(Image& image) {
-    constexpr size_t positions[][2] = {
+    constexpr int positions[][2] = {
         {1, 0},
+        {0, -1},
     };
 
     const auto size = image.size();
-    const auto width = size.width_px;
-    const auto height = size.height_px;
+    const int width = int(size.width_px);
+    const int height = int(size.height_px);
     auto samples = image.mutableSamples();
 
-    for (size_t x = 0; x < width * height; ++x) {
-        samples[x] = samples[x] + RGBColor::gray(std::size(positions) - 1);
-        samples[x] = samples[x] / RGBColor::gray(std::size(positions));
-    }
+    // for (int x = 0; x < width * height; ++x) {
+    // samples[x] = samples[x] + RGBColor::gray(std::size(positions) - 1);
+    // samples[x] = samples[x] / RGBColor::gray(std::size(positions));
+    //}
 
     std::vector<RGBColor> original{samples.begin(), samples.end()};
 
     for (auto&& [left, top] : positions) {
-        for (auto x = std::max(0UL, left); x < width + std::min(0UL, left); ++x) {
-            for (auto y = std::max(0UL, top); y < height + std::min(0UL, top); ++y) {
+        for (int x = std::max(0, left); x < width + std::min(0, left); ++x) {
+            for (auto y = std::max(0, top); y < height + std::min(0, top); ++y) {
                 size_t add_index = (x - left) + (y - top) * width;
                 size_t index = x + y * width;
                 samples[index] = samples[index] + original[add_index];
