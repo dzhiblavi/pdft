@@ -111,6 +111,12 @@
     "img_renderer": {
       "cls": "pdft::app::AppImageRenderer"
     },
+    "page_processor": {
+      "cls": "pdft::app::AppPageProcessor",
+      "config": {
+        "render_pool_size": 6
+      }
+    },
     "palettes": {
       "cls": "pdft::app::PaletteStorage"
     },
@@ -121,7 +127,13 @@
       "factory": "apc_factory"
     },
     "display_factory": {
-      "cls": "pdft::tui::KittyDisplayFactory"
+      "cls": "pdft::tui::KittyDisplayFactory",
+      "config": {
+        "force_unicode": false,
+        "base": {
+          "max_loaded_images": 128
+        }
+      }
     },
     "display": {
       "factory": "display_factory"
@@ -135,9 +147,9 @@
     "page_renderer": {
       "cls": "pdft::app::AppPageRenderer",
       "config": {
-        "render_pool_size": 4,
+        "image_cache_size": 128,
         "num_preload_backward": 2,
-        "num_preload_forward": 4
+        "num_preload_forward": 6
       }
     },
     "controller": {
