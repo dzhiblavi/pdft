@@ -60,7 +60,8 @@ Result<int> start(
         co_return std::format("Error while parsing configuration: {}", config.error()->what());
     }
 
-    co_return main(*config) | result::map([] { return 0; });
+    co_await main(*config);
+    co_return 0;
 }
 
 }  // namespace pdft::module
