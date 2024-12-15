@@ -18,7 +18,7 @@ constexpr utils::FixedString<N> fixedStringFromStringLiteral(
 
 template <auto Name, typename D, typename T>
 auto makeCliArgForField(rfl::Field<Name, CliOption<T, D>*>*) {
-    using Desc = typename D::template UpdateLongIfEmpty<fixedStringFromStringLiteral(Name)>;
+    using Desc = typename D::template fulfill<fixedStringFromStringLiteral(Name)>;
     return std::make_unique<CliArg<Desc, T>>();
 }
 

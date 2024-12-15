@@ -37,7 +37,8 @@ Status main(app::Config config) {
 }
 
 struct CliArgs {
-    cli::opt<std::optional<std::string>, 'c', "Path to the configuration file"> config_path;
+    cli::opt<std::optional<std::string>>  //
+        ::desc<"Path to the configuration file"> config_path;
 };
 
 }  // namespace

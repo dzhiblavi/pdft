@@ -39,6 +39,10 @@ struct FixedString {
         return size() == 0;
     }
 
+    constexpr char operator[](size_t i) const noexcept {
+        return arr_[i];
+    }
+
     std::array<char, N> arr_{};
 };
 

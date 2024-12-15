@@ -21,7 +21,9 @@ class KittyDisplayFactory : public AbstractFactory<Display>, public Module {
     };
 
     struct CliArgs {
-        cli::opt<bool, 'U', "Force Unicode Kitty image display protocol"> force_unicode = false;
+        cli::opt<bool>                                            //
+            ::desc<"Force Unicode Kitty image display protocol">  //
+            ::shrt<'U'> force_unicode = false;
     };
 
     KittyDisplayFactory(
