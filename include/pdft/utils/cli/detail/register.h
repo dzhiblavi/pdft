@@ -9,18 +9,18 @@
 namespace pdft::cli::detail {
 
 template <typename C>
-static void addOptions(OptionsStorage& storage) {
-    auto add = [&]<typename T, typename D>(detail::CliArg<D, T>& arg) {
+static void addOptions(OptionsStorage& storage, CliArgsFor<C>& cli_args) {
+    auto add = [&]<typename T, typename D>(CliArg<D, T>& arg) {
         storage.addOption(D::Short, &arg);
     };
 
-    std::apply([&](auto&... args) { (add(*args), ...); }, getCliArgs<C>());
+    std::apply([&](auto&... args) { (add(*args), ...); }, cli_args);
 }
 
 template <typename C>
 struct CliRegisterer {
     CliRegisterer() {
-        addOptions<C>(OptionsStorage::globalInstance());
+        addOptions<C>(OptionsStorage::globalInstance(), getGlobalCliArgs<C>());
     }
 };
 

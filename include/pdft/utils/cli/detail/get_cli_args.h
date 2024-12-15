@@ -33,6 +33,9 @@ auto makeCliArgs() {
         [&](auto&&... field) { return std::make_tuple(makeCliArgForField(&field)...); }, fields);
 }
 
+template <typename C>
+using CliArgsFor = decltype(makeCliArgs<C>());
+
 template <auto Name, typename D, typename T>
 auto makeConsumerForField(rfl::Field<Name, CliOption<T, D>*>& field) {
     struct Consumer : detail::IConsumer<T> {
@@ -50,7 +53,6 @@ auto makeConsumerForField(rfl::Field<Name, CliOption<T, D>*>& field) {
     return Consumer(field.get());
 }
 
-// tuple<IConsumer<T> auto>...>
 template <typename C>
 auto makeConsumers(C& instance) {
     auto view = rfl::to_view(instance);
@@ -60,10 +62,12 @@ auto makeConsumers(C& instance) {
         [&](auto&&... field) { return std::make_tuple(makeConsumerForField(field)...); }, fields);
 }
 
-// tuple<unique_ptr<CliArg<T, D>>...>&
 template <typename C>
-static auto& getCliArgs() {
-    static auto args = makeCliArgs<C>();
+using ConsumersFor = decltype(makeConsumers<C>(std::declval<C&>()));
+
+template <typename C>
+static CliArgsFor<C>& getGlobalCliArgs() {
+    static CliArgsFor<C> args = makeCliArgs<C>();
     return args;
 }
 

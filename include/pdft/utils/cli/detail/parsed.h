@@ -5,14 +5,9 @@
 namespace pdft::cli::detail {
 
 template <typename C>
-static Result<C> parsed() {
+static Result<C> parsed(CliArgsFor<C>& cli_args) {
     C result;
-
-    // tuple<unique_ptr<CliArg<T, D>>...>&
-    auto& cli_args = detail::getCliArgs<C>();
-
-    // tuple<IConsumer<T> auto>...>
-    auto consumers = detail::makeConsumers(result);
+    ConsumersFor<C> consumers = makeConsumers(result);
 
     auto apply = [&]<size_t I>() {
         auto& cli_arg = std::get<I>(cli_args);
