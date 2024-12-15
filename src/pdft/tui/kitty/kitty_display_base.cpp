@@ -5,6 +5,10 @@
 
 namespace pdft::tui {
 
+KittyDisplayBase::KittyDisplayBase(Config config, Arc<APCExecutor> executor)
+    : executor_(std::move(executor))
+    , loaded_(config.max_loaded_images) {}
+
 bool KittyDisplayBase::isLoaded(ImageId id) const {
     return loaded_.contains(id);
 }
@@ -18,7 +22,10 @@ void KittyDisplayBase::loadCompressedImage(
     log::debug(ctx, "loading a compressed image with id={} to the display", id);
     PDFT_VERIFY(!isLoaded(id), "image with id={} is already loaded", id);
 
-    loaded_.emplace(id, size);
+    if (auto unloaded = loaded_.add(id, size)) {
+        auto&& [unloaded_id, _] = *unloaded;
+        unload(ctx, unloaded_id, buffer);
+    }
 
     std::pair<std::string_view, std::string> control_data[] = {
         {"q", "2"},
@@ -62,10 +69,7 @@ void KittyDisplayBase::clear(Context& ctx, io::OutBuffer& buffer) {
 
 void KittyDisplayBase::unload(Context& ctx, ImageId id, io::OutBuffer& buffer) {
     log::debug(ctx, "unloading an image with id={} from the display", id);
-
-    auto it = loaded_.find(id);
-    PDFT_VERIFY(it != loaded_.end(), "tried to unload an image with unknown id {}", id);
-    loaded_.erase(it);
+    loaded_.remove(id);
 
     std::pair<std::string_view, std::string> control_data[] = {
         {"q", "2"},

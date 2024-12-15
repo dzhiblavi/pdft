@@ -23,7 +23,7 @@ void NativeKittyDisplay::displayImage(
     PDFT_VERIFY(rix >= 0 && riy >= 0, "image offset must not be negative: x={},y={}", rix, riy);
     PDFT_VERIFY(riw > 0 && rih > 0, "image dimensions must be positive: w={},h={}", riw, rih);
 
-    const auto& image_size = loaded_[id];
+    const auto& image_size = *PDFT_VERIFY(loaded_.tryGet(id));
 
     const FRect ipx = {
         .x = std::floor(image_size.width_px * riw * rix),   // NOLINT

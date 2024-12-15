@@ -3,13 +3,19 @@
 #include "pdft/tui/display.h"
 #include "pdft/tui/kitty/apc/apc_executor.h"
 
-#include <unordered_map>
+#include "pdft/utils/lru_cache.h"
 
 namespace pdft::tui {
 
 class KittyDisplayBase : public Display {
  public:
-    KittyDisplayBase(Arc<APCExecutor> executor) : executor_(std::move(executor)) {}
+    static constexpr size_t DefaultMaxLoadedImages = 128;
+
+    struct Config {
+        size_t max_loaded_images = DefaultMaxLoadedImages;
+    };
+
+    KittyDisplayBase(Config config, Arc<APCExecutor> executor);
 
     void loadCompressedImage(
         Context& ctx,
@@ -25,7 +31,7 @@ class KittyDisplayBase : public Display {
 
  protected:
     Arc<APCExecutor> executor_;
-    std::unordered_map<ImageId, image::ImageSize> loaded_;
+    utils::LRUCache<ImageId, image::ImageSize> loaded_;
 };
 
 }  // namespace pdft::tui

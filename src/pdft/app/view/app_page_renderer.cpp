@@ -13,48 +13,16 @@ namespace pdft::app {
 using tui::ImageId;
 using namespace result;
 
-void AppPageRenderer::Images::add(tui::ImageId id, RenderingImage image) {
-    PDFT_VERIFY(!contains(id));
-    images_.emplace(id, std::move(image));
-}
-
-void AppPageRenderer::Images::remove(tui::ImageId id) {
-    PDFT_VERIFY(contains(id));
-    images_.erase(id);
-}
-
-bool AppPageRenderer::Images::contains(ImageId id) const {
-    return images_.contains(id);
-}
-
-AppPageRenderer::ImageState& AppPageRenderer::Images::get(ImageId id) {
-    PDFT_VERIFY(contains(id));
-    return images_[id];
-}
-
-bool AppPageRenderer::Images::isLoaded(ImageId id) {
-    return contains(id) && std::holds_alternative<LoadedImage>(get(id));
-}
-
-const AppPageRenderer::LoadedImage& AppPageRenderer::Images::getLoadedImage(tui::ImageId id) {
-    return std::get<LoadedImage>(get(id));
-}
-
-AppPageRenderer::RenderingImage& AppPageRenderer::Images::getRenderingImage(tui::ImageId id) {
-    return std::get<RenderingImage>(get(id));
-}
-
 AppPageRenderer::AppPageRenderer(
-    asio::io_context& io,
     Config config,
     inject<const DocumentStorage, "docs"> documents,
     inject<PageProcessor, "page_processor"> processor,
     inject<tui::Display, "display"> display)
-    : io_(io)
-    , config_(std::move(config))
+    : config_(std::move(config))
     , documents_(std::move(documents))
     , processor_(std::move(processor))
-    , display_(std::move(display)) {}
+    , display_(std::move(display))
+    , rendered_(config.image_cache_size) {}
 
 Async<Unit> AppPageRenderer::render(
     Context& ctx,
@@ -74,15 +42,15 @@ Async<Unit> AppPageRenderer::render(
     display.scaling_coeff *= base_factor;
     auto id = getImageId(config_.image_id_salt, page, display);
 
-    if (!state_.isLoaded(id)) {
-        postPrepareImages(document, display, page);
-        auto _ = ctx.push("load_image");
-        co_await loadImage(ctx, id, screen);
+    co_await renderImagesAround(document, display, page);
+
+    if (!display_->isLoaded(id)) {
+        co_await loadImageToDisplay(ctx, id, screen);
     }
 
-    const auto& p = state_.getLoadedImage(id);
-    float sub_rows = p.image_rows * pos.subarea.height;
-    float sub_cols = p.image_cols * pos.subarea.width;
+    auto [rows, cols] = sizes_[id];
+    float sub_rows = rows * pos.subarea.height;
+    float sub_cols = cols * pos.subarea.width;
     auto irect = tui::fitImage(sub_cols / sub_rows, pos.rect, pos.placement);
 
     log::debug(ctx, "@={} I={}", pos.rect, irect);
@@ -92,7 +60,7 @@ Async<Unit> AppPageRenderer::render(
     co_return unit;
 }
 
-void AppPageRenderer::postPrepareImages(
+Async<void> AppPageRenderer::renderImagesAround(
     Arc<const media::Document> document, const DisplayProperties& display, const Page& page) {
     const auto& [doc_id, page_index] = page;
 
@@ -110,27 +78,29 @@ void AppPageRenderer::postPrepareImages(
         uint32_t page_index = static_cast<uint32_t>(index);
         auto image_id = getImageId(config_.image_id_salt, {doc_id, page_index}, display);
 
-        if (state_.contains(image_id)) {
-            log::info("skip image id {} because it is already rendered or loaded", image_id);
+        if (rendered_.contains(image_id)) {
             continue;
         }
 
-        auto [future, promise] = makeContract<ProcessedImage>(io_.get_executor());
+        log::info("(background) rendering image with id={}", image_id);
+        auto [future, promise] = co_await makeContract<ProcessedImage>();
         processor_->process(document->getPage(int(page_index)), display, std::move(promise));
-        state_.add(image_id, FutureValue{std::move(future)});
+
+        if (auto unloaded = rendered_.add(image_id, FutureValue{std::move(future)})) {
+            auto&& [id, _] = *unloaded;
+            log::debug("unloaded rendered image with id {}", id);
+        }
     }
 }
 
-Async<void> AppPageRenderer::loadImage(Context& ctx, tui::ImageId id, tui::Screen& screen) {
-    auto&& image = state_.get(id);
-
-    if (!std::holds_alternative<RenderingImage>(image)) {
-        co_return;
+Async<void> AppPageRenderer::loadImageToDisplay(
+    Context& ctx, tui::ImageId id, tui::Screen& screen) {
+    auto* future = rendered_.tryGet(id);
+    if (!future) {
+        panic("image with id {} is not rendered", id);
     }
 
-    auto&& rendering = std::get<RenderingImage>(image);
-    auto&& [size, compressed_data] = ctx.push("await_task") | *(co_await rendering.get());
-
+    auto&& [size, compressed_data] = ctx.push("await_task") | *(co_await future->get());
     {
         auto _ = ctx.push("load_image");
         display_->loadCompressedImage(
@@ -140,7 +110,10 @@ Async<void> AppPageRenderer::loadImage(Context& ctx, tui::ImageId id, tui::Scree
     float image_cols = float(size.width_px) / float(screen.dimensions().cell_width_px);
     float image_rows = float(size.height_px) / float(screen.dimensions().cell_height_px);
 
-    image = LoadedImage{.image_rows = image_rows, .image_cols = image_cols};
+    sizes_[id] = CellImageSize{
+        .image_rows = image_rows,
+        .image_cols = image_cols,
+    };
 }
 
 }  // namespace pdft::app

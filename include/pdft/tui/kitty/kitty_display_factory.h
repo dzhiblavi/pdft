@@ -2,6 +2,7 @@
 
 #include "pdft/tui/display.h"
 #include "pdft/tui/kitty/apc/apc_executor.h"
+#include "pdft/tui/kitty/kitty_display_base.h"
 #include "pdft/tui/terminal.h"
 
 #include "pdft/core/module/factory.h"
@@ -16,6 +17,7 @@ class KittyDisplayFactory : public AbstractFactory<Display>, public Module {
  public:
     struct Config {
         bool force_unicode = false;
+        KittyDisplayBase::Config base{};
     };
 
     struct CliArgs {
@@ -31,7 +33,8 @@ class KittyDisplayFactory : public AbstractFactory<Display>, public Module {
     Arc<Display> create() const override;
 
  private:
-    bool force_unicode_;
+    Config config_;
+    CliArgs cli_;
     Arc<APCExecutor> executor_;
     Arc<const Terminal> terminal_;
 };

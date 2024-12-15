@@ -8,6 +8,7 @@
 #include "pdft/core/module/inject.h"
 #include "pdft/core/module/module.h"
 
+#include "pdft/utils/lru_cache.h"
 #include "pdft/utils/random.h"
 
 #include <asio/io_context.hpp>
@@ -20,31 +21,32 @@ template <typename T>
 struct FutureValue {
     explicit FutureValue(Future<T> future) : value_(std::move(future)) {}
 
-    Async<const T*> get() {
+    Async<const T*> get() const {
         if (std::holds_alternative<Future<T>>(value_)) {
             Future<T> future = std::get<Future<T>>(std::move(value_));
             value_ = co_await std::move(future).async_extract(asio::use_awaitable);
         }
-
         co_return &std::get<T>(value_);
     }
 
  private:
     friend class BackgroundPool;
 
-    std::variant<Future<T>, T> value_;
+    mutable std::variant<Future<T>, T> value_;
 };
 
 class AppPageRenderer : public PageRenderer, public Module {
  public:
     struct Config {
+        static constexpr uint32_t DefaultImageCacheSize = 128;
+
+        uint32_t image_cache_size = DefaultImageCacheSize;
         uint32_t num_preload_backward = 2;
         uint32_t num_preload_forward = 4;
         uint32_t image_id_salt = utils::random<uint32_t>();
     };
 
     AppPageRenderer(
-        asio::io_context& io,
         Config config,
         inject<const DocumentStorage, "docs"> documents,
         inject<PageProcessor, "page_processor"> processor,
@@ -58,41 +60,25 @@ class AppPageRenderer : public PageRenderer, public Module {
         tui::Screen& screen) override;
 
  private:
-    struct LoadedImage {
+    struct CellImageSize {
         float image_rows;
         float image_cols;
     };
 
     using RenderingImage = FutureValue<ProcessedImage>;
-    using ImageState = std::variant<LoadedImage, RenderingImage>;
 
-    class Images {
-     public:
-        void add(tui::ImageId id, RenderingImage image);
-        void remove(tui::ImageId id);
-
-        bool contains(tui::ImageId id) const;
-        ImageState& get(tui::ImageId id);
-
-        bool isLoaded(tui::ImageId id);
-        const LoadedImage& getLoadedImage(tui::ImageId id);
-        RenderingImage& getRenderingImage(tui::ImageId id);
-
-     private:
-        std::unordered_map<tui::ImageId, ImageState> images_;
-    };
-
-    void postPrepareImages(
+    Async<void> renderImagesAround(
         Arc<const media::Document> document, const DisplayProperties& display, const Page& page);
 
-    Async<void> loadImage(Context& ctx, tui::ImageId id, tui::Screen& screen);
+    Async<void> loadImageToDisplay(Context& ctx, tui::ImageId id, tui::Screen& screen);
 
-    asio::io_context& io_;
     const Config config_;
-    Images state_;
     Arc<const DocumentStorage> documents_;
     Arc<PageProcessor> processor_;
     Arc<tui::Display> display_;
+
+    utils::LRUCache<tui::ImageId, RenderingImage> rendered_;
+    std::unordered_map<tui::ImageId, CellImageSize> sizes_;
 };
 
 }  // namespace pdft::app

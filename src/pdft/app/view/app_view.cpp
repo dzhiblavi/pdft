@@ -2,7 +2,7 @@
 
 #include "pdft/core/module/register.h"
 #include "pdft/core/result/combine/unwrap.h"
-#include "pdft/core/result/coro/maybe.h"
+#include "pdft/core/result/coro/maybe.h"  // IWYU pragma: keep
 #include "pdft/core/result/make/from_ptr.h"
 #include "pdft/core/result/syntax/pipe.h"
 

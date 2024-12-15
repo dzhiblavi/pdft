@@ -13,18 +13,21 @@ KittyDisplayFactory::KittyDisplayFactory(
     CliArgs cli,
     inject<APCExecutor, "apc"> executor,
     inject<const Terminal, "terminal"> terminal)
-    : force_unicode_(cli.force_unicode || config.force_unicode)
+    : config_(config)
+    , cli_(cli)
     , executor_(std::move(executor))
     , terminal_(std::move(terminal)) {}
 
 Arc<Display> KittyDisplayFactory::create() const {
-    if (force_unicode_ || ::getenv("SSH_TTY") || ::getenv("TMUX")) {
+    bool force_unicode = cli_.force_unicode.get() || config_.force_unicode;
+
+    if (force_unicode || ::getenv("SSH_TTY") || ::getenv("TMUX")) {
         log::info(this, "using unicode placement display");
-        return std::make_shared<UnicodeKittyDisplay>(executor_, terminal_);
+        return std::make_shared<UnicodeKittyDisplay>(config_.base, executor_, terminal_);
     }
 
     log::info(this, "using native kitty display");
-    return std::make_shared<NativeKittyDisplay>(executor_, terminal_);
+    return std::make_shared<NativeKittyDisplay>(config_.base, executor_, terminal_);
 }
 
 }  // namespace pdft::tui

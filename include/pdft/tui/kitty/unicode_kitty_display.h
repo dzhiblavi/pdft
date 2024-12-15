@@ -11,8 +11,10 @@ namespace pdft::tui {
 class UnicodeKittyDisplay : public KittyDisplayBase, public Module {
  public:
     UnicodeKittyDisplay(
-        inject<APCExecutor, "apc"> executor, inject<const Terminal, "terminal"> terminal)
-        : KittyDisplayBase(std::move(executor))
+        Config config,
+        inject<APCExecutor, "apc"> executor,
+        inject<const Terminal, "terminal"> terminal)
+        : KittyDisplayBase(config, std::move(executor))
         , terminal_(std::move(terminal)) {}
 
     void displayImage(
