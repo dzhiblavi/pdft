@@ -9,7 +9,7 @@
 
 namespace pdft::cli {
 
-Status parse(
+Result<bool> parse(
     std::span<char const*> argv, const std::string& description, const std::string& version) {
     TCLAP::CmdLine cmd(description, ' ', version);
     cmd.setExceptionHandling(false);
@@ -21,10 +21,10 @@ Status parse(
     } catch (const TCLAP::ArgException& e) {
         return result::err(std::format("Error for argument '{}': {}", e.argId(), e.error()));
     } catch (const TCLAP::ExitException& e) {
-        return result::err("");
+        return result::ok(false);
     }
 
-    return result::ok();
+    return result::ok(true);
 }
 
 }  // namespace pdft::cli

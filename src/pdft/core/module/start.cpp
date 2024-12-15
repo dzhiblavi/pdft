@@ -45,7 +45,10 @@ struct CliArgs {
 
 Result<int> start(
     const std::string& description, const std::string& version, std::span<const char*> argv) {
-    co_await cli::parse(argv, description, version);
+    if (!co_await cli::parse(argv, description, version)) {
+        co_return 0;
+    }
+
     auto cli_args = cli::parsed<CliArgs>();
     if (!cli_args) {
         co_return std::format("Failed to parse CLI arguments: {}", cli_args.error());
