@@ -30,7 +30,6 @@ target_link_libraries(
          libmupdf_ext
          libfswatch
          magic_enum::magic_enum
-         cppcoro::cppcoro
          saf
          reflectcpp
          tclap::tclap
