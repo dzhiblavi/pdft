@@ -20,6 +20,10 @@ struct Injected : InjectedTag {
         return value_;
     }
 
+    operator Arc<T>() && {
+        return std::move(value_);
+    }
+
     T* operator->() {
         return value_.get();
     }
