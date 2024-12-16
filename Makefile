@@ -54,7 +54,7 @@ gen-doc: deps
 	cd $(BUILD_DIR) && $(CMAKE) --build . --target documentation
 
 build: configure
-	cd $(BUILD_DIR) && $(CMAKE) --build . --config $(BUILD_TYPE)
+	cd $(BUILD_DIR) && $(CMAKE) --build . --config $(BUILD_TYPE) --parallel `nproc`
 
 test: build
 	cd $(BUILD_DIR) && ctest --output-on-failure

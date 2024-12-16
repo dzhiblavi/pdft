@@ -5,7 +5,7 @@
 namespace pdft::cli::detail {
 
 template <typename C>
-static Result<C> parsed(CliArgsFor<C>& cli_args) {
+Result<C> parsed(CliArgsFor<C>& cli_args) {
     C result;
     ConsumersFor<C> consumers = makeConsumers(result);
 

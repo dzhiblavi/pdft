@@ -9,7 +9,7 @@
 namespace pdft::cli::detail {
 
 template <typename C>
-static void addOptions(OptionsStorage& storage, CliArgsFor<C>& cli_args) {
+void addOptions(OptionsStorage& storage, CliArgsFor<C>& cli_args) {
     auto add = [&]<typename T, typename D>(CliArg<D, T>& arg) {
         storage.addOption(D::Short, &arg);
     };

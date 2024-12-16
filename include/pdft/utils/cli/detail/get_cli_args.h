@@ -66,7 +66,7 @@ template <typename C>
 using ConsumersFor = decltype(makeConsumers<C>(std::declval<C&>()));
 
 template <typename C>
-static CliArgsFor<C>& getGlobalCliArgs() {
+CliArgsFor<C>& getGlobalCliArgs() {
     static CliArgsFor<C> args = makeCliArgs<C>();
     return args;
 }
