@@ -49,16 +49,16 @@ AppStateLoader::AppStateLoader(
 
 Status AppStateLoader::save() {
     if (config_.mode == StateMode::Standalone) {
-        log::info("not saving the state in Standalone mode");
+        log::info(this, "not saving the state in Standalone mode");
         return result::ok();
     }
     if (!config_.state_path.has_value()) {
-        log::info("not saving the state because no state path is configured");
+        log::info(this, "not saving the state because no state path is configured");
         return result::ok();
     }
 
     std::ofstream ofs(*config_.state_path);
-    log::info("saving state to {}", *config_.state_path);
+    log::info(this, "saving state to {}", *config_.state_path);
     return persister_->save(ofs);
 }
 
@@ -71,29 +71,29 @@ Status AppStateLoader::load(const std::vector<std::string>& paths) {
     auto mode_name = magic_enum::enum_name(config_.mode);
 
     if (config_.mode != StateMode::Standalone && config_.mode != StateMode::Clean) {
-        log::info("loading the state because mode is {}", mode_name);
+        log::info(this, "loading the state because mode is {}", mode_name);
         std::ifstream ifs(*config_.state_path);
 
         if (auto result = persister_->restore(ifs); !result) {
-            log::warn("failed to restore the state: {}; ignoring", result.error());
+            log::warn(this, "failed to restore the state: {}; ignoring", result.error());
         } else {
-            log::info("the state has been successfully restored");
+            log::info(this, "the state has been successfully restored");
         }
     } else {
-        log::info("not loading the state because mode is {}", mode_name);
+        log::info(this, "not loading the state because mode is {}", mode_name);
     }
 
     for (auto path : paths) {
         path = std::filesystem::absolute(utils::expandHome(path));
 
         if (isOpened(path, ui_->getModel(), *documents_) && config_.mode == StateMode::AddOnly) {
-            log::info("ignoring the new path {} because state mode is AddOnly", path);
+            log::info(this, "ignoring the new path {} because state mode is AddOnly", path);
             continue;
         }
 
         auto maybe_document = doc_loader_->load(path);
         if (!maybe_document) {
-            log::warn("failed to open document by path {}: {}", path, maybe_document.error());
+            log::warn(this, "failed to open document by path {}: {}", path, maybe_document.error());
             continue;
         }
 
@@ -101,10 +101,10 @@ Status AppStateLoader::load(const std::vector<std::string>& paths) {
         auto page_count = document->getPageCount();
         auto doc_id = documents_->addDocument(document);
         ui_->addDocument(doc_id, page_count);
-        log::info("loaded path {}", path);
+        log::info(this, "loaded path {}", path);
     }
 
-    log::info("the state has been successfully restored from {}", *config_.state_path);
+    log::info(this, "the state has been successfully restored from {}", *config_.state_path);
     return result::ok();
 }
 
