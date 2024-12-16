@@ -15,7 +15,7 @@
 
 namespace pdft::notify {
 
-class FswNotify : public notify::Notify, public Module {
+class FswNotify : public Notify, public Module {
  public:
     explicit FswNotify(asio::any_io_executor executor);
     ~FswNotify() noexcept override;
