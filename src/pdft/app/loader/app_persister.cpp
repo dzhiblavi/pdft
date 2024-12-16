@@ -57,6 +57,7 @@ Status AppPersister::restore(std::istream& is) const {
         if (!maybe_document) {
             to_be_removed.push_back(i);
             log::warn(
+                this,
                 "failed to load file by path while restoring state path={}: {}",
                 path,
                 maybe_document.error());
