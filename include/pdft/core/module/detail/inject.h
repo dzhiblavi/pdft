@@ -38,7 +38,7 @@ Result<ArgType> injectArgument(LoadContext& ctx, const std::string& name) {
     return ctx.template getModule<T>(ArgType::Name.c_str())  //
            | result::mapErr([&](auto err) {
                  return std::format(
-                     "while loading module '{}' of type {} required by '{}':\n{}",
+                     "while loading dependency '{}' of type {} required by '{}':\n{}",
                      ArgType::Name.c_str(),
                      rfl::type_name_t<T>().name(),
                      name,

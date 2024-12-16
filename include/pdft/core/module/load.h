@@ -31,6 +31,9 @@ class LoadContext {
  private:
     bool isLoaded(const std::string& name);
     void addNewModule(const std::string& name, Arc<Module> module);
+    Result<Arc<Module>> load(const ModuleConfig& config, const std::string& name);
+    Result<Arc<Module>> loadViaClass(const ModuleConfig& config, const std::string& name);
+    Result<Arc<Module>> loadViaFactory(const ModuleConfig& config, const std::string& name);
 
     asio::io_context& io_;
     FactoryStorage& factory_storage_;
