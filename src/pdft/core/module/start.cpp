@@ -16,6 +16,7 @@
 #include <rfl/json/load.hpp>
 
 #include <asio/io_context.hpp>
+#include <rfl/json/write.hpp>
 
 namespace pdft::module {
 
@@ -35,9 +36,27 @@ Status main(app::Config config) {
     }
 }
 
+struct Modules {
+    std::unordered_map<std::string, rfl::Generic> modules;
+};
+
+void listModules() {
+    Modules res;
+
+    for (const auto& [module, traits] : FactoryStorage::globalInstance().getModules()) {
+        res.modules.emplace(module, traits->getConfig());
+    }
+
+    rfl::json::write(res, std::cout, rfl::json::pretty) << std::endl;
+}
+
 struct CliArgs {
     cli::opt<std::optional<std::string>>  //
         ::desc<"Path to the configuration file"> config_path;
+
+    cli::opt<bool>                                     //
+        ::desc<"Get default modules' configurations">  //
+        ::shrt<'L'> list_modules;
 };
 
 }  // namespace
@@ -51,6 +70,11 @@ Result<int> start(
     auto cli_args = cli::parsed<CliArgs>();
     if (!cli_args) {
         co_return result::err("Failed to parse CLI arguments: {}", cli_args.error());
+    }
+
+    if (cli_args->list_modules) {
+        listModules();
+        co_return 0;
     }
 
     auto config = rfl::json::load<app::Config, rfl::DefaultIfMissing>(

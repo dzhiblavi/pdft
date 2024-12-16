@@ -4,6 +4,8 @@
 #include "pdft/core/module/factory.h"
 #include "pdft/core/module/traits.h"
 
+#include <rfl/to_generic.hpp>
+
 namespace pdft::module::detail {
 
 template <typename T>
@@ -21,6 +23,16 @@ ModuleTraits* moduleTraits() {
         void start(Module* self) const override {
             if constexpr (Startable<T>) {
                 PDFT_VERIFY(dynamic_cast<T*>(self))->start();
+            }
+        }
+
+        rfl::Generic getConfig() const override {
+            if constexpr (HasConfig<T>) {
+                using Config = typename T::Config;
+                Config c;
+                return rfl::to_generic(c);
+            } else {
+                return rfl::Generic::Null;
             }
         }
     };

@@ -23,7 +23,7 @@ Result<C> parsed(CliArgsFor<C>& cli_args) {
         }
 
         if constexpr (sizeof...(Is) != 0) {
-            return self.template operator()<Is...>();
+            return self.template operator()(std::index_sequence<Is...>());
         } else {
             return unit;
         }

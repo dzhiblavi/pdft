@@ -1,8 +1,9 @@
 #pragma once
 
 #include "pdft/core/module/module.h"
-
 #include "pdft/core/result/type/result.h"
+
+#include <rfl/Generic.hpp>
 
 namespace pdft::module {
 
@@ -12,6 +13,7 @@ struct ModuleTraits {
     virtual ~ModuleTraits() = default;
     virtual void start(Module* self) const = 0;
     virtual Result<Arc<Module>> load(LoadContext& ctx, std::string name) const = 0;
+    virtual rfl::Generic getConfig() const = 0;
 };
 
 struct FactoryTraits {

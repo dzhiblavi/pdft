@@ -17,6 +17,8 @@ class FactoryStorage {
     Result<ModuleTraits*> getModuleTraits(const std::string& cls);
     Result<FactoryTraits*> getFactoryTraits(const std::string& cls);
 
+    const std::unordered_map<std::string, ModuleTraits*>& getModules() const;
+
     static FactoryStorage& globalInstance();
 
  private:

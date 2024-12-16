@@ -47,4 +47,8 @@ FactoryStorage& FactoryStorage::globalInstance() {
     return storage;
 }
 
+const std::unordered_map<std::string, ModuleTraits*>& FactoryStorage::getModules() const {
+    return modules_;
+}
+
 }  // namespace pdft::module
