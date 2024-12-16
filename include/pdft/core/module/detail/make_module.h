@@ -22,7 +22,7 @@ Result<Arc<T>> createModule(LoadContext& ctx, std::string name) {
             },
             Parameters{});
     } catch (std::string error) {
-        co_return error;
+        co_return result::err(error);
     }
 }
 

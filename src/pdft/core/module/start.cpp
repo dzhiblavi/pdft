@@ -31,7 +31,7 @@ Status main(app::Config config) {
         context.run();
         co_return unit;
     } catch (...) {
-        co_return "an unexpected exception in main loop";
+        co_return result::err("an unexpected exception in main loop");
     }
 }
 
@@ -50,13 +50,13 @@ Result<int> start(
 
     auto cli_args = cli::parsed<CliArgs>();
     if (!cli_args) {
-        co_return std::format("Failed to parse CLI arguments: {}", cli_args.error());
+        co_return result::err("Failed to parse CLI arguments: {}", cli_args.error());
     }
 
     auto config = rfl::json::load<app::Config, rfl::DefaultIfMissing>(
         cli_args->config_path->value_or(utils::expandHome("~/.config/pdft/config.json")));
     if (!config) {
-        co_return std::format("Error while parsing configuration: {}", config.error()->what());
+        co_return result::err("Error while parsing configuration: {}", config.error()->what());
     }
 
     co_await main(*config);

@@ -44,11 +44,6 @@ struct ResultPromise : ResultPromiseBase<T, E> {
         this->owner->assign(ok(std::move(x)));
     }
 
-    void return_value(E x) {  // NOLINT
-        PDFT_VERIFY_DBG(this->owner);
-        this->owner->assign(err(std::move(x)));
-    }
-
     void return_value(Result<T, E> x) {  // NOLINT
         PDFT_VERIFY_DBG(this->owner);
         this->owner->assign(std::move(x));
