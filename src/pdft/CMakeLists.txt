@@ -4,7 +4,6 @@ find_package(spdlog REQUIRED)
 find_package(cpptrace REQUIRED)
 find_package(ZLIB REQUIRED)
 find_package(magic_enum REQUIRED)
-find_package(cppcoro REQUIRED)
 find_package(tclap REQUIRED)
 
 add_library(pdft-buildinfo)

@@ -91,5 +91,11 @@ docker-build:
 	docker build                           \
 		-t $(BUILD_IMAGE)                  \
 		-f docker/build.Dockerfile         \
-		--platform linux/amd64,linux/arm64 \
+		--platform linux/amd64,linux/arm64/v8 \
 		.
+
+docker-run:
+	docker run -v `pwd`:/pdft -it --rm \
+		--name pdft-cxx-image-test-1   \
+		$(BUILD_IMAGE):latest          \
+		/bin/bash

@@ -68,9 +68,19 @@ Any terminal that supports [Kitty image protocol][kitty-graphics-protocol]
 
 ### Building and installation
 
-TODO
+TODO: I haven't yet figured out a way to build this in cross-platform manner.
+You can try to run
+
+```bash
+make BUILD_TYPE=Release PROFILE="<choose profile in ./conan>" build
+```
+
+and see what happens next.
 
 ### Configuration
+
+The default location of PDFT configuration is `~/.local/config/pdft/config.json`.
+This can be altered via command line argument (see `pdft --help`).
 
 The only section that might be interesting to a first-time user is `.modules.controller.config.key_mappings`.
 It is a list of key mappings. It should look like this:
@@ -113,6 +123,14 @@ To launch PDFT in standalone mode, i.e. in stateless mode, invoke
 ```bash
 pdft -S Standalone
 ```
+
+### Troubleshooting
+
+By default PDFT writes logs to `~/.local/share/pdft/*.log` files. Reading the logs
+of your last run looks like a good place to start investigating an issue.
+
+PDFT is built with debug symbols present even in release configuration. So, coredumps
+and stack traces can also be generated and will simplify troubleshooting greatly.
 
 ### Planned features
 
