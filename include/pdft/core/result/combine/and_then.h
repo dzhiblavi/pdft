@@ -18,14 +18,14 @@ struct [[nodiscard]] AndThen {
     AndThen(const AndThen&) = delete;
     AndThen& operator=(const AndThen&) = delete;
 
-    template <typename T>
+    template <typename T, typename E>
     requires(!std::same_as<T, Unit>)
-    auto pipe(Result<T> r) && {
+    auto pipe(Result<T, E> r) && {
         return std::move(r).and_then(std::move(user));
     }
 
-    template <std::same_as<Unit> T>
-    auto pipe(Result<T> r) && {
+    template <std::same_as<Unit> T, typename E>
+    auto pipe(Result<T, E> r) && {
         return std::move(r).and_then([&](Unit) { return std::move(user)(); });
     }
 

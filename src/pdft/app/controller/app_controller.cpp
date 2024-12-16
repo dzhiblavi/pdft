@@ -207,7 +207,8 @@ Result<ControllerAction> AppController::onFilesystemEvent(const notify::Event& e
     using namespace result;
     log::debug("controller: fs event on path={}", event.path);
 
-    auto id = co_await (documents_->getIdByPath(event.path) | lift("unknown file path"));
+    auto id =
+        co_await (documents_->getIdByPath(event.path) | lift(std::string("unknown file path")));
 
     co_await reloadDocument(id, event.path);
     co_return ControllerAction::Redraw;

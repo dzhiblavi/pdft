@@ -18,15 +18,15 @@ struct [[nodiscard]] OrElse {
     OrElse(const OrElse&) = delete;
     OrElse& operator=(const OrElse&) = delete;
 
-    template <typename T>
-    requires(!std::same_as<T, Unit>)
-    Result<T> pipe(Result<T> r) && {
+    template <typename T, typename E>
+    requires(!std::same_as<E, Unit>)
+    Result<T, E> pipe(Result<T, E> r) && {
         return std::move(r).or_else(std::move(user));
     }
 
-    template <std::same_as<Unit> T>
-    Result<T> pipe(Result<T> r) && {
-        return std::move(r).or_else([&](Unit) { return std::move(user)(); });
+    template <typename T, std::same_as<Unit> E>
+    Result<T, E> pipe(Result<T, E> r) && {
+        return std::move(r).or_else([&](E) { return std::move(user)(); });
     }
 
     template <typename T>

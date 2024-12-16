@@ -21,24 +21,31 @@ endfunction(add_test)
 
 # Add tests here
 
-# Core
+# core
 add_test(./pdft/core/io/test_posix_console_writer.cpp)
 add_test(./pdft/core/io/test_posix_console_reader.cpp)
 add_test(./pdft/core/trace/test_scope_tracer.cpp)
 add_test(./pdft/core/trace/test_stack_scope_tracer.cpp)
 
+# core/result
+add_test(./pdft/core/result/combine/test_and_then.cpp)
+add_test(./pdft/core/result/combine/test_lift.cpp)
+add_test(./pdft/core/result/combine/test_map.cpp)
+add_test(./pdft/core/result/combine/test_map_err.cpp)
+add_test(./pdft/core/result/combine/test_or_else.cpp)
+
 add_test(./pdft/core/result/coro/test_maybe.cpp)
 add_test(./pdft/core/result/coro/test_result.cpp)
 
-# Image
+# image
 add_test(./pdft/image/test_color.cpp)
 
-# Utils
+# utils
 add_test(./pdft/utils/test_lock_free_stack.cpp)
 add_test(./pdft/utils/test_lru_cache.cpp)
 add_test(./pdft/utils/cli/detail/test_cli_args.cpp)
 
-# TUI
+# tui
 add_test(./pdft/tui/test_alignment.cpp)
 add_test(./pdft/tui/test_fit_image.cpp)
 add_test(./pdft/tui/test_ansi_terminal.cpp)
@@ -47,5 +54,5 @@ add_test(./pdft/tui/kitty/apc/test_apc_executor_base.cpp)
 add_test(./pdft/tui/kitty/apc/test_tmux_apc_executor.cpp)
 add_test(./pdft/tui/kitty/apc/test_regular_apc_executor.cpp)
 
-# Application
+# app
 add_test(./pdft/app/controller/test_keytree.cpp)
