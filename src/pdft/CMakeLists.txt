@@ -20,8 +20,7 @@ target_include_directories(
 
 target_link_libraries(
   pdft
-  PUBLIC -static
-         pdft-buildinfo
+  PUBLIC pdft-buildinfo
          asio::asio
          aklomp::base64
          spdlog::spdlog
@@ -110,4 +109,4 @@ target_sources(
 add_executable(app ./app/main.cpp ./app/app.cpp ./app/version.cpp
                    ./app/entrypoint.cpp)
 
-target_link_libraries(app PRIVATE -static pdft)
+target_link_libraries(app PRIVATE pdft)

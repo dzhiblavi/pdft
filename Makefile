@@ -35,7 +35,7 @@ deps: _prepare_target_dirs
 		--settings:build=build_type=$(BUILD_TYPE)
 
 configure: deps
-	cd $(BUILD_DIR) && $(CMAKE) ../../../../                     \
+	cd $(BUILD_DIR) && $(CMAKE) ../../../../                       \
 		-G "Unix Makefiles"                                        \
 		-DCMAKE_TOOLCHAIN_FILE="../deps/conan_toolchain.cmake"     \
 		-DCMAKE_POLICY_DEFAULT_CMP0091=NEW                         \
@@ -44,6 +44,7 @@ configure: deps
 		-DCMAKE_BUILD_TYPE=$(BUILD_TYPE)                           \
 		-DCMAKE_EXE_LINKER_FLAGS="${LDFLAGS}"                      \
 		-DCMAKE_CXX_FLAGS="${CXXFLAGS}"                            \
+		-DBUILD_SHARED_LIBS=OFF                                    \
 		-DPDFT_BUILD_TESTS=ON                                      \
 		-DPDFT_MUPDF_LOCAL_SOURCE_DIR=${MUPDF_SOURCE_DIR}          \
 		-DASAN=$(ASAN)                                             \
