@@ -1,11 +1,10 @@
 #include "pdft/core/module/start.h"
-#include "pdft/core/log/load.h"
-#include "pdft/core/module/load.h"
-#include "pdft/core/result/combine/map.h"
-#include "pdft/core/result/coro/result.h"  // IWYU pragma: keep
-#include "pdft/core/result/syntax/pipe.h"
 
 #include "pdft/app/config.h"
+
+#include "pdft/core/log/load.h"
+#include "pdft/core/module/load.h"
+#include "pdft/core/result/coro/result.h"  // IWYU pragma: keep
 
 #include "pdft/utils/cli/cli.h"
 #include "pdft/utils/cli/parse.h"
