@@ -14,7 +14,7 @@ extern "C" {
 namespace pdft::media {
 
 MupdfDocument::~MupdfDocument() noexcept {
-    fz_drop_document(MupdfContext::thisThreadInstance().native(), document_);
+    fz_drop_document(thisThreadMupdfContext().native(), document_);
 }
 
 MupdfDocument::MupdfDocument(MupdfDocument&& rhs) noexcept
@@ -22,7 +22,7 @@ MupdfDocument::MupdfDocument(MupdfDocument&& rhs) noexcept
     , document_(std::exchange(rhs.document_, nullptr)) {}
 
 size_t MupdfDocument::getPageCount() const {
-    auto ctx = MupdfContext::thisThreadInstance().native();
+    auto ctx = thisThreadMupdfContext().native();
     int page_count = 0;
 
     PDFT_FZ_VERIFY(page_count = fz_count_pages(ctx, document_));
@@ -31,7 +31,7 @@ size_t MupdfDocument::getPageCount() const {
 
 Arc<media::Page> MupdfDocument::getPage(int index) const {
     PDFT_VERIFY(index >= 0 && index < static_cast<int>(getPageCount()));
-    auto ctx = MupdfContext::thisThreadInstance().native();
+    auto ctx = thisThreadMupdfContext().native();
     fz_page* page = nullptr;
 
     PDFT_FZ_VERIFY(page = fz_load_page(ctx, document_, index));
@@ -44,7 +44,7 @@ const std::filesystem::path& MupdfDocument::getPath() const {
 }
 
 Result<MupdfDocument> MupdfDocument::open(const std::filesystem::path& path) {
-    auto ctx = MupdfContext::thisThreadInstance().native();
+    auto ctx = thisThreadMupdfContext().native();
     fz_document* doc = nullptr;
 
     PDFT_FZ_VERIFY(doc = fz_open_document(ctx, path.c_str()));

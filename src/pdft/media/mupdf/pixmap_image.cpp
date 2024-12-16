@@ -19,7 +19,7 @@ PixmapMupdfImage::~PixmapMupdfImage() noexcept {
         return;
     }
 
-    fz_drop_pixmap(MupdfContext::thisThreadInstance().native(), pixmap_);
+    fz_drop_pixmap(thisThreadMupdfContext().native(), pixmap_);
 }
 
 image::ImageSize PixmapMupdfImage::size() const {

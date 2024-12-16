@@ -1,6 +1,7 @@
 #pragma once
 
-#include "pdft/core/log.h"
+#include "pdft/core/module/module.h"
+#include "pdft/utils/pinned.h"
 
 struct fz_context;  // NOLINT
 
@@ -8,40 +9,67 @@ namespace pdft::media {
 
 class MupdfContext {
  public:
-    enum StorageSize : int {
-        FZ_STORE_UNLIMITED = 0,
-        FZ_STORE_DEFAULT = 256 << 20,
+    virtual ~MupdfContext() = default;
+    virtual fz_context* native() const = 0;
+
+ protected:
+    static void drop(fz_context* ctx) noexcept;
+
+    using ContextDeleter = decltype(&MupdfContext::drop);
+    using ContextHolder = std::unique_ptr<fz_context, ContextDeleter>;
+};
+
+class MupdfContextOwner
+    : public MupdfContext,
+      public Module,
+      public utils::Pinned,
+      public std::enable_shared_from_this<MupdfContextOwner> {
+ public:
+    struct Config {
+        // FZ_STORE_DEFAULT
+        static constexpr int DefaultStorageSize = 256 << 20;
+        static constexpr int UseDefault = 0;
+
+        int size = DefaultStorageSize;
+        int text_aa_level = UseDefault;
+        int graphics_aa_level = UseDefault;
+        bool register_as_global = false;
+        bool enable_icc = true;
+        bool setup_logging = true;
     };
 
-    struct Builder {
-        Builder& setStorageSize(int size);
-        Builder& setLogger(log::LoggerPtr logger);
+    MupdfContextOwner(Config config);
 
-        MupdfContext build();
-
-     private:
-        int size_ = FZ_STORE_DEFAULT;
-        log::LoggerPtr logger_ = log::loggerOrGlobal("mupdf");
-    };
-
-    MupdfContext(MupdfContext&& rhs) noexcept;
-    MupdfContext& operator=(MupdfContext&&) = delete;
-    MupdfContext(const MupdfContext&) = delete;
-    MupdfContext& operator=(const MupdfContext&) = delete;
-
-    ~MupdfContext() noexcept;
-
-    fz_context* native() const;
-
-    static MupdfContext& thisThreadInstance();
+    fz_context* native() const override;
+    void start();
 
  private:
-    explicit MupdfContext(fz_context* ctx) : context_(ctx) {}
+    Config config_;
+    std::array<std::mutex, 3> locks_;
 
-    static MupdfContext& globalInstance();
-    static MupdfContext clone(const MupdfContext& context);
-
-    fz_context* context_ = nullptr;
+    // This thing must be destroyed BEFORE locks_ because
+    // the destruction involves using them.
+    ContextHolder context_{nullptr, &MupdfContext::drop};
 };
+
+class ClonedMupdfContext : public MupdfContext {
+ public:
+    ClonedMupdfContext(fz_context* context, Arc<MupdfContext> parent);
+
+    fz_context* native() const override;
+
+    static Arc<MupdfContext> clone(Arc<MupdfContext> from);
+
+ private:
+    Arc<MupdfContext> parent_;
+
+    // This thing must be destroyed BEFORE parent_ because
+    // the destruction may involve using shared resources.
+    ContextHolder context_{nullptr, &MupdfContext::drop};
+};
+
+void setGlobalMupdfContext(Arc<MupdfContext> ctx);
+
+MupdfContext& thisThreadMupdfContext();
 
 }  // namespace pdft::media

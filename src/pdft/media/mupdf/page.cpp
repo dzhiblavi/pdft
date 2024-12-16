@@ -21,13 +21,13 @@ MupdfPage::MupdfPage(MupdfPage&& rhs) noexcept
     , page_(std::exchange(rhs.page_, nullptr)) {}
 
 MupdfPage::~MupdfPage() noexcept {
-    fz_drop_page(MupdfContext::thisThreadInstance().native(), page_);
+    fz_drop_page(thisThreadMupdfContext().native(), page_);
 }
 
 Arc<image::Image> MupdfPage::getImage(float scaling_factor) const {
     PDFT_VERIFY(scaling_factor > 0.f, "scale factor should be positive");
 
-    auto ctx = MupdfContext::thisThreadInstance().native();
+    auto ctx = thisThreadMupdfContext().native();
     fz_pixmap* pix = nullptr;
     fz_matrix ctm = fz_scale(scaling_factor, scaling_factor);
 
@@ -40,7 +40,7 @@ Arc<image::Image> MupdfPage::getImage(float scaling_factor) const {
 }
 
 PageSize MupdfPage::getDefaultSize() const {
-    auto ctx = MupdfContext::thisThreadInstance().native();
+    auto ctx = thisThreadMupdfContext().native();
     fz_rect rect;
 
     PDFT_FZ_VERIFY(rect = fz_bound_page(ctx, page_));
