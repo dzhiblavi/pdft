@@ -87,15 +87,15 @@ install-dev: build
 install-local: build
 	cd $(BUILD_DIR) && cp ./src/pdft/app ~/.bin/pdft
 
-docker-build:
+docker-build-%:
 	docker build                           \
 		-t $(BUILD_IMAGE)                  \
 		-f docker/build.Dockerfile         \
-		--platform linux/amd64,linux/arm64/v8 \
+		--platform $*                      \
 		.
 
 docker-run:
 	docker run -v `pwd`:/pdft -it --rm \
-		--name pdft-cxx-image-test-1   \
+		--name pdft-build-container    \
 		$(BUILD_IMAGE):latest          \
 		/bin/bash
