@@ -5,7 +5,7 @@
 
 namespace pdft::tui {
 
-TEST_CASE("testExecuteNoPayload", "") {
+TEST_CASE("RegularAPCExecutor/control/no-payload") {
     Context ctx;
     io::OutBuffer buffer;
     auto executor = RegularAPCExecutor();
@@ -27,7 +27,7 @@ TEST_CASE("testExecuteNoPayload", "") {
     CHECK(buffer.view() == "\033_Gm=1,a=p,C=1;\033\\");
 }
 
-TEST_CASE("testExecuteWithPayload", "") {
+TEST_CASE("RegularAPCExecutor/control/payload") {
     Context ctx;
     io::OutBuffer buffer;
     auto executor = RegularAPCExecutor();

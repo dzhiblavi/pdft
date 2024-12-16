@@ -19,41 +19,41 @@ Res<T> makeErr(T val) {
     return err(val);
 }
 
-TEST_CASE("andThenOk") {
+TEST_CASE("andThen/value/ok") {
     auto r = makeOk(1);
     auto u = r | andThen([](int val) -> Res<std::string> { return std::to_string(val); });
     CHECK(u);
     CHECK(*u == "1");
 }
 
-TEST_CASE("andThenErr") {
+TEST_CASE("andThen/value/err") {
     auto r = makeErr(1);
     auto u = r | andThen([](int val) -> Res<std::string> { return std::to_string(val); });
     CHECK(!u);
     CHECK(u.error() == 1);
 }
 
-TEST_CASE("andThenOkUnit") {
+TEST_CASE("andThen/unit/ok") {
     auto r = Res<Unit>(unit);
     auto u = r | andThen([]() -> Res<int> { return 2; });
     CHECK(u);
     CHECK(*u == 2);
 }
 
-TEST_CASE("andThenErrUnit") {
+TEST_CASE("andThen/unit/err") {
     auto r = Res<Unit>(std::unexpected(1));
     auto u = r | andThen([]() -> Res<int> { return 2; });
     CHECK(!u);
     CHECK(u.error() == 1);
 }
 
-TEST_CASE("andThenSome") {
+TEST_CASE("andThen/some") {
     auto r = Maybe<int>(1);
     auto u = r | andThen([](int val) -> Maybe<int> { return 2 * val; });
     CHECK(u == 2);
 }
 
-TEST_CASE("andThenNone") {
+TEST_CASE("andThen/none") {
     auto r = Maybe<int>();
     auto u = r | andThen([](int val) -> Maybe<int> { return 2 * val; });
     CHECK(!u);

@@ -6,7 +6,7 @@ namespace pdft::app {
 
 using enum KeyTree::Result;
 
-TEST_CASE("testKeytreeEmpty", "") {
+TEST_CASE("KeyTree/empty", "") {
     KeyTree k;
 
     CHECK(k.feed('0') == Rejected);
@@ -17,7 +17,7 @@ TEST_CASE("testKeytreeEmpty", "") {
     CHECK(k.feed('c') == Rejected);
 }
 
-TEST_CASE("testKeytreeSingleSimple", "") {
+TEST_CASE("KeyTree/single-char", "") {
     KeyTree k;
 
     int a = 0;
@@ -43,7 +43,7 @@ TEST_CASE("testKeytreeSingleSimple", "") {
     CHECK((a == 3 && b == 2 && c == 1));
 }
 
-TEST_CASE("testKeytreeMultiSimple", "") {
+TEST_CASE("KeyTree/multi-char", "") {
     KeyTree k;
 
     int a = 0;
@@ -73,7 +73,7 @@ TEST_CASE("testKeytreeMultiSimple", "") {
     CHECK((a == 1 && b == 1 && c == 1));
 }
 
-TEST_CASE("testKeytreeNumberOnly", "") {
+TEST_CASE("KeyTree/number-only", "") {
     KeyTree k;
 
     int a = 0;
@@ -122,7 +122,7 @@ TEST_CASE("testKeytreeNumberOnly", "") {
     check(1, 0, 1, 21);
 }
 
-TEST_CASE("testKeytreeMixed", "") {
+TEST_CASE("KeyTree/mixed", "") {
     KeyTree k;
 
     int a = 0;
@@ -165,7 +165,7 @@ TEST_CASE("testKeytreeMixed", "") {
     check(1, 11, 1);
 }
 
-TEST_CASE("testKeytreeFeedAfterReset", "") {
+TEST_CASE("KeyTree/feed-after-reset", "") {
     KeyTree k;
 
     int a = 0;
@@ -185,7 +185,7 @@ TEST_CASE("testKeytreeFeedAfterReset", "") {
     CHECK((a == 0 && b == 1));
 }
 
-TEST_CASE("testKeytreeFeedsAfterResetNumbers", "") {
+TEST_CASE("KeyTree/feed-after-reset/numbers", "") {
     KeyTree k;
 
     int a = 0;

@@ -4,7 +4,7 @@
 
 namespace pdft::trace {
 
-TEST_CASE("testStackScopeTracerOneAllocation", "") {
+TEST_CASE("StackScopeTracer/one-allocation", "") {
     StackScopeTracerPool pool;
 
     auto t = pool.getTracer();
@@ -12,7 +12,7 @@ TEST_CASE("testStackScopeTracerOneAllocation", "") {
     CHECK(pool.numAllocations() == 1);
 }
 
-TEST_CASE("testStackScopeTracerChildCallsCallback", "") {
+TEST_CASE("StackScopeTracer/one-child", "") {
     StackScopeTracerPool pool;
 
     {
@@ -27,7 +27,7 @@ TEST_CASE("testStackScopeTracerChildCallsCallback", "") {
     CHECK(pool.numAllocations() == 2);
 }
 
-TEST_CASE("testStackScopeTracerReusedOne", "") {
+TEST_CASE("StackScopeTracer/reuse-for-loop", "") {
     StackScopeTracerPool pool;
 
     for (int i = 0; i < 10; ++i) {
@@ -37,7 +37,7 @@ TEST_CASE("testStackScopeTracerReusedOne", "") {
     CHECK(pool.numAllocations() == 1);
 }
 
-TEST_CASE("testStackScopeTracerReusedWithChildren", "") {
+TEST_CASE("StackScopeTracer/reuse-children", "") {
     StackScopeTracerPool pool;
 
     for (int i = 0; i < 100; ++i) {
@@ -58,7 +58,7 @@ TEST_CASE("testStackScopeTracerReusedWithChildren", "") {
     CHECK(pool.numAllocations() == 6);
 }
 
-TEST_CASE("testStackScopeTracerChlidrenNotYetRecycled", "") {
+TEST_CASE("StackScopeTracer/keep-children", "") {
     StackScopeTracerPool pool;
 
     auto t = pool.getTracer();

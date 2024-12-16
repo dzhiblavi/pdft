@@ -11,7 +11,7 @@ struct Item : IntrusiveForwardListItem<Item> {
 
 using List = MPMCLockFreeStack<Item>;
 
-TEST_CASE("testIntrusiveForwardListEmpty", "") {
+TEST_CASE("IntrusiveForwardList/empty", "") {
     List list;
 
     int count = 0;
@@ -19,7 +19,7 @@ TEST_CASE("testIntrusiveForwardListEmpty", "") {
     CHECK(count == 0);
 }
 
-TEST_CASE("testIntrusiveForwardListSingle", "") {
+TEST_CASE("IntrusiveForwardList/single", "") {
     List list;
     Item item{.value = 10};
     list.push(item);
@@ -32,7 +32,7 @@ TEST_CASE("testIntrusiveForwardListSingle", "") {
     CHECK(count == 1);
 }
 
-TEST_CASE("testIntrusiveForwardListPopFront", "") {
+TEST_CASE("IntrusiveForwardList/popFront", "") {
     List list;
     Item item{.value = 10};
     list.push(item);
@@ -40,7 +40,7 @@ TEST_CASE("testIntrusiveForwardListPopFront", "") {
     CHECK(list.tryPop()->value == 10);
 }
 
-TEST_CASE("testIntrusiveForwardListPopFrontPushSame", "") {
+TEST_CASE("IntrusiveForwardList/popFront/push-same", "") {
     List list;
     Item item{.value = 10};
     list.push(item);
@@ -51,7 +51,7 @@ TEST_CASE("testIntrusiveForwardListPopFrontPushSame", "") {
     CHECK(list.tryPop()->value == 10);
 }
 
-TEST_CASE("testIntrusiveForwardListPushMany", "") {
+TEST_CASE("IntrusiveForwardList/push-many", "") {
     List list;
     std::vector<Item> items;
     items.reserve(10);
@@ -66,7 +66,7 @@ TEST_CASE("testIntrusiveForwardListPushMany", "") {
     CHECK(count == 10);
 }
 
-TEST_CASE("testIntrusiveForwardListMoveBetweenLists", "") {
+TEST_CASE("IntrusiveForwardList/move-between-lists", "") {
     List list1, list2;
     std::vector<Item> items;
     items.reserve(10);

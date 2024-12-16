@@ -4,7 +4,7 @@
 
 namespace pdft::image {
 
-TEST_CASE("rgbFromHex#FFFFF") {
+TEST_CASE("rgbFromHex/#FFFFF") {
     auto hex = "#ffffff";
     auto rgb = rgbFromHex(hex);
 
@@ -13,7 +13,7 @@ TEST_CASE("rgbFromHex#FFFFF") {
     CHECK(rgb.b == 255);
 }
 
-TEST_CASE("rgbFromHex#000000") {
+TEST_CASE("rgbFromHex/#000000") {
     auto hex = "#000000";
     auto rgb = rgbFromHex(hex);
 
@@ -22,7 +22,7 @@ TEST_CASE("rgbFromHex#000000") {
     CHECK(rgb.b == 0);
 }
 
-TEST_CASE("rgbFromHex#aabb12") {
+TEST_CASE("rgbFromHex/#aabb12") {
     auto hex = "#aabb12";
     auto rgb = rgbFromHex(hex);
 

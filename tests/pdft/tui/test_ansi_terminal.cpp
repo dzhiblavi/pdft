@@ -5,15 +5,15 @@
 
 namespace pdft::tui {
 
-TEST_CASE("testsetCursorPosition", "") {
+TEST_CASE("AnsiTerminal/setCursorPosition") {
     io::OutBuffer buffer;
     auto terminal = AnsiTerminal();
 
-    terminal.setCursorPosition(CursorPosition{10, 20}, buffer);
-    CHECK(buffer.view() == "\x1b[11;21H");
+    terminal.setCursorPosition(CursorPosition{1, 2}, buffer);
+    CHECK(buffer.view() == "\x1b[2;3H");
 }
 
-TEST_CASE("testClearScreen", "") {
+TEST_CASE("AnsiTerminal/clear") {
     io::OutBuffer buffer;
     auto terminal = AnsiTerminal();
 

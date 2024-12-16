@@ -4,22 +4,22 @@
 
 namespace pdft::tui {
 
-TEST_CASE("testParseResponseEmpty", "") {
+TEST_CASE("parseResponse/empty") {
     auto resp = parseResponse("");
     CHECK(!resp.has_value());
 }
 
-TEST_CASE("testParseResponseNoFirstEscapeCode", "") {
+TEST_CASE("parseResponse/no-first-escape") {
     auto resp = parseResponse("_Ga=b;\033");
     CHECK(!resp.has_value());
 }
 
-TEST_CASE("testParseResponseNoLastEscapeCode", "") {
+TEST_CASE("parseResponse/no-last-escape") {
     auto resp = parseResponse("\033_Ga=b;\033b");
     CHECK(!resp.has_value());
 }
 
-TEST_CASE("testParseResponseNoControlDataNoPayload", "") {
+TEST_CASE("parseResponse/no-control/no-payload") {
     auto resp = parseResponse("\033_G;\033\\");
 
     CHECK(resp.has_value());
@@ -30,12 +30,12 @@ TEST_CASE("testParseResponseNoControlDataNoPayload", "") {
     CHECK(apc.control_data.empty());
 }
 
-TEST_CASE("testParseResponseNoPayloadDelimiter", "") {
+TEST_CASE("parseResponse/no-payload-delimiter") {
     auto resp = parseResponse("\033_Ga=b\033\\");
     CHECK(!resp.has_value());
 }
 
-TEST_CASE("testParseResponseSingleControlDataNoPayload", "") {
+TEST_CASE("parseResponse/control/no-payload") {
     auto resp = parseResponse("\033_Ga=b;\033\\");
 
     CHECK(resp.has_value());
@@ -47,7 +47,7 @@ TEST_CASE("testParseResponseSingleControlDataNoPayload", "") {
     CHECK(apc.control_data[0] == std::make_pair("a", "b"));
 }
 
-TEST_CASE("testParseResponseSingleControlDataWithPayload", "") {
+TEST_CASE("parseResponse/control/payload") {
     auto resp = parseResponse("\033_Ga=b;the payload is [OK]\033\\");
 
     CHECK(resp.has_value());
@@ -59,7 +59,7 @@ TEST_CASE("testParseResponseSingleControlDataWithPayload", "") {
     CHECK(apc.control_data[0] == std::make_pair("a", "b"));
 }
 
-TEST_CASE("testParseResponseMultipleControlDataNoPayload", "") {
+TEST_CASE("parseResponse/multi-control/payload") {
     auto resp = parseResponse("\033_Ga=b,c=d,a_b_'=hello world;\033\\");
 
     CHECK(resp.has_value());
@@ -73,12 +73,12 @@ TEST_CASE("testParseResponseMultipleControlDataNoPayload", "") {
     CHECK(apc.control_data[2] == std::make_pair("a_b_'", "hello world"));
 }
 
-TEST_CASE("testParseResponseInvalidControlDataEmpty", "") {
+TEST_CASE("parseResponse/invalid-control-data-empty") {
     auto resp = parseResponse("\033_G,,,,;\033\\");
     CHECK(!resp.has_value());
 }
 
-TEST_CASE("testParseResponseInvalidControlDataNotAKeyValue", "") {
+TEST_CASE("parseResponse/invalid-control-data-not-a-kv") {
     auto resp = parseResponse("\033_GAB;\033\\");
     CHECK(!resp.has_value());
 }

@@ -5,7 +5,7 @@
 
 namespace pdft::result {
 
-TEST_CASE("mapErrErr") {
+TEST_CASE("mapErr/value/err") {
     auto r = Result<int, int>(std::unexpected(2));
     auto u = r | mapErr([](int val) { return val * 2L; });
     static_assert(std::is_same_v<decltype(u), Result<int, long>>);
@@ -13,14 +13,14 @@ TEST_CASE("mapErrErr") {
     CHECK(u.error() == 4U);
 }
 
-TEST_CASE("mapErrOk") {
+TEST_CASE("mapErr/value/ok") {
     auto r = Result<int, int>(2);
     auto u = r | mapErr([](int val) { return val * 2L; });
     static_assert(std::is_same_v<decltype(u), Result<int, long>>);
     CHECK(u == 2);
 }
 
-TEST_CASE("mapErrErrUnit") {
+TEST_CASE("mapErr/unit/err") {
     auto r = Result<Unit, int>(std::unexpected(2));
     auto u = r | mapErr([](int val) { return val * 2L; });
     static_assert(std::is_same_v<decltype(u), Result<Unit, long>>);
@@ -28,7 +28,7 @@ TEST_CASE("mapErrErrUnit") {
     CHECK(u.error() == 4UL);
 }
 
-TEST_CASE("mapErrOkUnit") {
+TEST_CASE("mapErr/unit/ok") {
     auto r = Result<Unit, int>(unit);
     auto u = r | mapErr([](int val) { return val * 2L; });
     static_assert(std::is_same_v<decltype(u), Result<Unit, long>>);

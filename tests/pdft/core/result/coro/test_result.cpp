@@ -19,64 +19,32 @@ Res<int> faulty(std::string err) {
     return result::err(err);
 }
 
-TEST_CASE("andThenResultErr") {
-    auto e = "abc";
-    auto x = Res<int>{err(e)} | andThen([](int) { return ok(10); });
-    CHECK(!x.has_value());
-    CHECK(x.error() == e);
+Maybe<int> getInt() {
+    co_return 1;
 }
 
-TEST_CASE("andThenResultOk") {
-    auto x = ok(10) | andThen([](int x) { return ok(x * 2); });
-    CHECK(x.has_value());
-    CHECK(*x == 20);
+Status aunit() {
+    co_return unit;
 }
 
-TEST_CASE("mapResultErr") {
-    auto e = "abc";
-    auto x = Res<int>(err(e)) | map([](int) { return 10; });
-    CHECK(!x.has_value());
-}
-
-TEST_CASE("mapResultOk") {
-    auto x = ok(10) | map([](int x) { return x * 2; });
-    CHECK(x.has_value());
-    CHECK(*x == 20);
-}
-
-TEST_CASE("mapErrErr") {
-    auto e = "abc";
-    auto x = Res<int>(err(e)) |
-             mapErr([](auto) { return std::make_error_code(std::errc::executable_format_error); });
-    CHECK(!x.has_value());
-    CHECK(x.error() == std::make_error_code(std::errc::executable_format_error));
-}
-
-TEST_CASE("mapErrOk") {
-    auto x = ok(10) |
-             mapErr([](auto) { return std::make_error_code(std::errc::executable_format_error); });
-    CHECK(x.has_value());
-    CHECK(*x == 10);
-}
-
-TEST_CASE("coroResultOk") {
+TEST_CASE("coro/result/value/ok") {
     auto x = [] -> Res<int> {
-        int x = co_await just(10);
-        int y = co_await just(20);
+        int x = co_await just(1);
+        int y = co_await just(2);
         co_return x + y;
     }();
 
     CHECK(x.has_value());
-    CHECK(*x == 30);
+    CHECK(*x == 3);
 }
 
-TEST_CASE("coroResultFaulty") {
+TEST_CASE("coro/result/value/err/last") {
     int count = 0;
 
     auto x = [&count] -> Res<int> {
-        int x = co_await just(10);
+        int x = co_await just(1);
         ++count;
-        int y = co_await just(20);
+        int y = co_await just(2);
         ++count;
         int z = co_await faulty("abcd");
         ++count;
@@ -88,11 +56,11 @@ TEST_CASE("coroResultFaulty") {
     CHECK(count == 2);
 }
 
-TEST_CASE("coroResultFaultyMidWay") {
+TEST_CASE("coro/result/value/err/mid") {
     int count = 0;
 
     auto x = [&count] -> Res<int> {
-        int x = co_await just(10);
+        int x = co_await just(1);
         ++count;
         int y = co_await faulty("abcd");
         ++count;
@@ -104,11 +72,11 @@ TEST_CASE("coroResultFaultyMidWay") {
     CHECK(count == 1);
 }
 
-TEST_CASE("coroResultConvertError") {
+TEST_CASE("coro/result/value/err/mapped") {
     int count = 0;
 
     auto x = [&count] -> Res<int> {
-        int x = co_await just(10);
+        int x = co_await just(1);
         ++count;
         int y =
             co_await (faulty("abcd") | result::mapErr([](auto) -> std::string { return "1234"; }));
@@ -121,25 +89,17 @@ TEST_CASE("coroResultConvertError") {
     CHECK(count == 1);
 }
 
-Maybe<int> get_int() {
-    co_return 10;
-}
-
-Status aunit() {
-    co_return unit;
-}
-
-TEST_CASE("coroResultConvertUnit") {
+TEST_CASE("coro/result/value/err/lifted") {
     int z = 0;
 
     auto x = [&] -> Status {
-        z = co_await (get_int() | result::lift(std::string("abcd")));
+        z = co_await (getInt() | result::lift(std::string("abcd")));
         co_await aunit();
         co_return unit;
     }();
 
     CHECK(x.has_value());
-    CHECK(z == 10);
+    CHECK(z == 1);
 }
 
 }  // namespace pdft

@@ -21,7 +21,7 @@ struct TestExecutor : APCExecutorBase {
 
 }  // namespace
 
-TEST_CASE("testExecuteNoControlDataNoPayload", "") {
+TEST_CASE("APCExecutorBase/no-control/no-payload") {
     Context ctx;
     io::OutBuffer buffer;
     auto executor = TestExecutor();
@@ -37,7 +37,7 @@ TEST_CASE("testExecuteNoControlDataNoPayload", "") {
     CHECK(buffer.view() == "P_G;S");
 }
 
-TEST_CASE("testExecuteWithControlDataNoPayload", "") {
+TEST_CASE("APCExecutorBase/control/no-payload") {
     Context ctx;
     io::OutBuffer buffer;
     auto executor = TestExecutor();
@@ -58,7 +58,7 @@ TEST_CASE("testExecuteWithControlDataNoPayload", "") {
     CHECK(buffer.view() == "P_Ga=p,C=1;S");
 }
 
-TEST_CASE("testExecuteNoControlDataWithPayloadOneChunk", "") {
+TEST_CASE("APCExecutorBase/no-control/one-chunk") {
     Context ctx;
     io::OutBuffer buffer;
     auto executor = TestExecutor();
@@ -75,7 +75,7 @@ TEST_CASE("testExecuteNoControlDataWithPayloadOneChunk", "") {
     CHECK(buffer.view() == "P_G;abcdS");
 }
 
-TEST_CASE("testExecuteWithControlDataWithPayloadOneChunk", "") {
+TEST_CASE("APCExecutorBase/control/one-chunk") {
     Context ctx;
     io::OutBuffer buffer;
     auto executor = TestExecutor();
@@ -97,7 +97,7 @@ TEST_CASE("testExecuteWithControlDataWithPayloadOneChunk", "") {
     CHECK(buffer.view() == "P_Ga=p,C=1;abcdS");
 }
 
-TEST_CASE("testExecuteWithControlDataWithPayloadMultipleChunks", "") {
+TEST_CASE("APCExecutorBase/control/multiple-chunks") {
     Context ctx;
     io::OutBuffer buffer;
     auto executor = TestExecutor();
@@ -119,7 +119,7 @@ TEST_CASE("testExecuteWithControlDataWithPayloadMultipleChunks", "") {
     CHECK(buffer.view() == "P_Ga=p,C=1,m=1;abcdSP_Gm=1;efghSP_Gm=1;0123SP_Gm=0;45S");
 }
 
-TEST_CASE("testExecuteBase64EncodeSingleChunk", "") {
+TEST_CASE("APCExecutorBase/control/one-chunk/b64") {
     Context ctx;
     io::OutBuffer buffer;
     auto executor = TestExecutor();
@@ -142,7 +142,7 @@ TEST_CASE("testExecuteBase64EncodeSingleChunk", "") {
     CHECK(buffer.view() == "P_Ga=p,C=1;Ky09S");
 }
 
-TEST_CASE("testExecuteBase64EncodeMultipleChunks", "") {
+TEST_CASE("APCExecutorBase/control/multiple-chunks/b64") {
     Context ctx;
     io::OutBuffer buffer;
     auto executor = TestExecutor();

@@ -37,7 +37,7 @@ void test(F check, Args... args) {
     }
 }
 
-TEST_CASE("testParseFromCliArgsMissing") {
+TEST_CASE("cli/missing") {
     struct X {
         opt<int, 'x', "xxx"> x = 0;
     };
@@ -48,7 +48,7 @@ TEST_CASE("testParseFromCliArgsMissing") {
     });
 }
 
-TEST_CASE("testParseFromCliArgsShortPresent") {
+TEST_CASE("cli/short-present") {
     struct X {
         opt<int, 'x', "xxx"> xyx = 0;
     };
@@ -62,7 +62,7 @@ TEST_CASE("testParseFromCliArgsShortPresent") {
         "10");
 }
 
-TEST_CASE("testParseFromCliArgsLongPresentFieldName") {
+TEST_CASE("cli/long-present-default-spec") {
     struct X {
         opt<int, 'x'> xyx = 0;
     };
@@ -76,7 +76,7 @@ TEST_CASE("testParseFromCliArgsLongPresentFieldName") {
         "10");
 }
 
-TEST_CASE("testParseFromCliArgsLongPresentCustomName") {
+TEST_CASE("cli/long-present-custom-long") {
     struct X {
         opt<int, 'x', "", "xxx"> xyx = 0;
     };
@@ -90,7 +90,7 @@ TEST_CASE("testParseFromCliArgsLongPresentCustomName") {
         "10");
 }
 
-TEST_CASE("testParseFromCliArgsIntInvalid") {
+TEST_CASE("cli/int/invalid") {
     struct X {
         opt<int, 'x'> xyx = 0;
     };
@@ -98,7 +98,7 @@ TEST_CASE("testParseFromCliArgsIntInvalid") {
     test<X>([](auto x) { CHECK(!x); }, "-x", "abacaba");
 }
 
-TEST_CASE("testParseFromCliArgsMaybeIntMissing") {
+TEST_CASE("cli/Maybe<int>/none") {
     struct X {
         opt<Maybe<int>, 'x'> x;
     };
@@ -109,7 +109,7 @@ TEST_CASE("testParseFromCliArgsMaybeIntMissing") {
     });
 }
 
-TEST_CASE("testParseFromCliArgsMaybeIntSome") {
+TEST_CASE("cli/Maybe<Int>/some") {
     struct X {
         opt<Maybe<int>, 'x'> x = 0;
     };
@@ -124,7 +124,7 @@ TEST_CASE("testParseFromCliArgsMaybeIntSome") {
         "10");
 }
 
-TEST_CASE("testParseFromCliArgsMaybeIntInvalid") {
+TEST_CASE("cli/Maybe<Int>/invalid") {
     struct X {
         opt<Maybe<int>, 'x'> x = 0;
     };
@@ -132,7 +132,7 @@ TEST_CASE("testParseFromCliArgsMaybeIntInvalid") {
     test<X>([](auto x) { CHECK(!x); }, "-x", "abacaba");
 }
 
-TEST_CASE("testParseFromCliArgsEnumMissing") {
+TEST_CASE("cli/enum/missing") {
     struct X {
         opt<E, 'e'> e = E::A;
     };
@@ -143,7 +143,7 @@ TEST_CASE("testParseFromCliArgsEnumMissing") {
     });
 }
 
-TEST_CASE("testParseFromCliArgsEnumSome") {
+TEST_CASE("cli/enum/present") {
     struct X {
         opt<E, 'e'> e = E::A;
     };
@@ -157,7 +157,7 @@ TEST_CASE("testParseFromCliArgsEnumSome") {
         "B");
 }
 
-TEST_CASE("testParseFromCliArgsEnumInvalid") {
+TEST_CASE("cli/enum/invalid") {
     struct X {
         opt<E, 'e'> e = E::A;
     };
@@ -165,7 +165,7 @@ TEST_CASE("testParseFromCliArgsEnumInvalid") {
     test<X>([](auto x) { CHECK(!x); }, "-e", "X");
 }
 
-TEST_CASE("testParseFromCliArgsMaybeEnumMissing") {
+TEST_CASE("cli/Maybe<enum>/none") {
     struct X {
         opt<Maybe<E>, 'e'> e;
     };
@@ -176,7 +176,7 @@ TEST_CASE("testParseFromCliArgsMaybeEnumMissing") {
     });
 }
 
-TEST_CASE("testParseFromCliArgsMaybeEnumSome") {
+TEST_CASE("cli/Maybe<enum>/some") {
     struct X {
         opt<Maybe<E>, 'e'> e;
     };
@@ -191,7 +191,7 @@ TEST_CASE("testParseFromCliArgsMaybeEnumSome") {
         "A");
 }
 
-TEST_CASE("testParseFromCliArgsMaybeEnumInvalid") {
+TEST_CASE("cli/Maybe<enum>/invalid") {
     struct X {
         opt<Maybe<E>, 'e'> e;
     };
@@ -199,7 +199,7 @@ TEST_CASE("testParseFromCliArgsMaybeEnumInvalid") {
     test<X>([](auto x) { CHECK(!x); }, "-e", "X");
 }
 
-TEST_CASE("testParseFromCliArgsIntVectorNone") {
+TEST_CASE("cli/vector<int>/none") {
     struct X {
         opt<std::vector<int>, 'v'> v;
     };
@@ -210,7 +210,7 @@ TEST_CASE("testParseFromCliArgsIntVectorNone") {
     });
 }
 
-TEST_CASE("testParseFromCliArgsIntVectorOne") {
+TEST_CASE("cli/vector<int>/one") {
     struct X {
         opt<std::vector<int>, 'v'> v;
     };
@@ -225,7 +225,7 @@ TEST_CASE("testParseFromCliArgsIntVectorOne") {
         "123");
 }
 
-TEST_CASE("testParseFromCliArgsIntVectorMany") {
+TEST_CASE("cli/vector<int>/many") {
     struct X {
         opt<std::vector<int>, 'v'> v;
     };
@@ -243,7 +243,7 @@ TEST_CASE("testParseFromCliArgsIntVectorMany") {
         "456");
 }
 
-TEST_CASE("testParseFromCliArgsIntVectorInvalid") {
+TEST_CASE("cli/vector<int>/invalid") {
     struct X {
         opt<std::vector<int>, 'v'> v;
     };
@@ -251,7 +251,7 @@ TEST_CASE("testParseFromCliArgsIntVectorInvalid") {
     test<X>([](auto x) { CHECK(!x); }, "-v", "123", "-v", "abacaba");
 }
 
-TEST_CASE("testParseFromCliArgsEnumVectorOne") {
+TEST_CASE("cli/vector<enum>/one") {
     struct X {
         opt<std::vector<E>, 'v'> v;
     };
@@ -266,7 +266,7 @@ TEST_CASE("testParseFromCliArgsEnumVectorOne") {
         "A");
 }
 
-TEST_CASE("testParseFromCliArgsEnumVectorMany") {
+TEST_CASE("cli/vector<enum>/many") {
     struct X {
         opt<std::vector<E>, 'v'> v;
     };
@@ -284,7 +284,7 @@ TEST_CASE("testParseFromCliArgsEnumVectorMany") {
         "A");
 }
 
-TEST_CASE("testParseFromCliArgsEnumVectorInvalid") {
+TEST_CASE("cli/vector<enum>/invalid") {
     struct X {
         opt<std::vector<E>, 'v'> v;
     };

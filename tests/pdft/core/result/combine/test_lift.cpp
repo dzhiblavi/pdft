@@ -6,7 +6,7 @@
 
 namespace pdft::result {
 
-TEST_CASE("liftNone") {
+TEST_CASE("lift/none") {
     auto r = Maybe<int>();
     auto u = r | lift(2);
 
@@ -15,7 +15,7 @@ TEST_CASE("liftNone") {
     CHECK(u.error() == 2);
 }
 
-TEST_CASE("liftSome") {
+TEST_CASE("lift/some") {
     auto r = Maybe<int>(1);
     auto u = r | lift(2);
 

@@ -5,7 +5,7 @@
 
 namespace pdft::tui {
 
-TEST_CASE("testExecuteNoPayload", "") {
+TEST_CASE("TmuxAPCExecutor/control/no-payload", "") {
     Context ctx;
     io::OutBuffer buffer;
     auto executor = TmuxAPCExecutor();
@@ -27,7 +27,7 @@ TEST_CASE("testExecuteNoPayload", "") {
     CHECK(buffer.view() == "\033Ptmux;\033\033_Gm=1,a=p,C=1;\a\033\\");
 }
 
-TEST_CASE("testExecuteWithPayload", "") {
+TEST_CASE("TmuxAPCExecutor/control/payload") {
     Context ctx;
     io::OutBuffer buffer;
     auto executor = TmuxAPCExecutor();

@@ -28,7 +28,7 @@ void dump(const IRect& rect) {
     std::cout << std::format("IRect[x={},y={},w={},h={}]", x, y, w, h) << std::endl;
 }
 
-TEST_CASE("testFitImageExactlyMatchesProportions", "") {
+TEST_CASE("fitImage/match-proportions") {
     auto pos = Placement{
         .hor = GENERATE(Min, Center, Max),   // indifferent
         .vert = GENERATE(Min, Center, Max),  // indifferent
@@ -45,7 +45,7 @@ TEST_CASE("testFitImageExactlyMatchesProportions", "") {
     CHECK(rect == expected);
 }
 
-TEST_CASE("testFitImageInsideNarrowMin", "") {
+TEST_CASE("fitImage/narrow/inside/min") {
     auto pos = Placement{
         .hor = Min, .vert = GENERATE(Min, Center, Max),  // indifferent
     };
@@ -61,7 +61,7 @@ TEST_CASE("testFitImageInsideNarrowMin", "") {
     CHECK(rect == expected);
 }
 
-TEST_CASE("testFitImageInsideNarrowCenter", "") {
+TEST_CASE("fitImage/narrow/inside/center") {
     auto pos = Placement{
         .hor = Center, .vert = GENERATE(Min, Center, Max),  // indifferent
     };
@@ -77,7 +77,7 @@ TEST_CASE("testFitImageInsideNarrowCenter", "") {
     CHECK(rect == expected);
 }
 
-TEST_CASE("testFitImageInsideNarrowMax", "") {
+TEST_CASE("fitImage/narrow/inside/max") {
     auto pos = Placement{
         .hor = Max, .vert = GENERATE(Min, Center, Max),  // indifferent
     };
@@ -93,7 +93,7 @@ TEST_CASE("testFitImageInsideNarrowMax", "") {
     CHECK(rect == expected);
 }
 
-TEST_CASE("testFitImageInsideWideMin", "") {
+TEST_CASE("fitImage/wide/inside/min") {
     auto pos = Placement{
         .hor = GENERATE(Min, Center, Max),  // indifferent
         .vert = Min,
@@ -110,7 +110,7 @@ TEST_CASE("testFitImageInsideWideMin", "") {
     CHECK(rect == expected);
 }
 
-TEST_CASE("testFitImageInsideWideCenter", "") {
+TEST_CASE("fitImage/wide/inside/center") {
     auto pos = Placement{
         .hor = GENERATE(Min, Center, Max),  // indifferent
         .vert = Center,
@@ -127,7 +127,7 @@ TEST_CASE("testFitImageInsideWideCenter", "") {
     CHECK(rect == expected);
 }
 
-TEST_CASE("testFitImageInsideWideMax", "") {
+TEST_CASE("fitImage/wide/inside/max") {
     auto pos = Placement{
         .hor = GENERATE(Min, Center, Max),  // indifferent
         .vert = Max,

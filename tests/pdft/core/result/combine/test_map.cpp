@@ -6,28 +6,28 @@
 
 namespace pdft::result {
 
-TEST_CASE("mapNone") {
+TEST_CASE("map/none") {
     auto r = Maybe<int>();
     auto u = r | map([](int val) { return val * 2; });
     static_assert(std::is_same_v<decltype(u), Maybe<int>>);
     CHECK(!u);
 }
 
-TEST_CASE("mapSome") {
+TEST_CASE("map/some") {
     auto r = Maybe<int>(2);
     auto u = r | map([](int val) { return val * 2; });
     static_assert(std::is_same_v<decltype(u), Maybe<int>>);
     CHECK(u == 4);
 }
 
-TEST_CASE("mapOk") {
+TEST_CASE("map/value/ok") {
     auto r = Result<int, int>(2);
     auto u = r | map([](int val) { return std::to_string(val); });
     static_assert(std::is_same_v<decltype(u), Result<std::string, int>>);
     CHECK(u == "2");
 }
 
-TEST_CASE("mapErr") {
+TEST_CASE("map/value/err") {
     auto r = Result<int, int>(std::unexpected(2));
     auto u = r | map([](int val) { return std::to_string(val); });
     static_assert(std::is_same_v<decltype(u), Result<std::string, int>>);
@@ -35,14 +35,14 @@ TEST_CASE("mapErr") {
     CHECK(u.error() == 2);
 }
 
-TEST_CASE("mapOkUnit") {
+TEST_CASE("map/unit/ok") {
     auto r = Result<Unit, int>(unit);
     auto u = r | map([] { return 2; });
     static_assert(std::is_same_v<decltype(u), Result<int, int>>);
     CHECK(u == 2);
 }
 
-TEST_CASE("mapErrUnit") {
+TEST_CASE("map/unit/err") {
     auto r = Result<Unit, int>(std::unexpected(2));
     auto u = r | map([] { return 4; });
     static_assert(std::is_same_v<decltype(u), Result<int, int>>);

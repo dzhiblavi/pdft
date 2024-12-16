@@ -4,7 +4,7 @@
 
 namespace pdft::trace {
 
-TEST_CASE("testScopeTracerCallsCallback", "") {
+TEST_CASE("ScopeTracer/callback", "") {
     bool called = false;
 
     {
