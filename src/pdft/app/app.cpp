@@ -12,12 +12,14 @@
 namespace pdft::app {
 
 Application::Application(
+    Config config,
     inject<Loader, "loader"> loader,
     inject<EventListener, "listener"> listener,
     inject<Controller, "controller"> controller,
     inject<View, "view"> view,
     inject<tui::Renderer, "renderer"> renderer)
-    : loader_(std::move(loader))
+    : config_(config)
+    , loader_(std::move(loader))
     , listener_(std::move(listener))
     , view_(std::move(view))
     , controller_(std::move(controller))
@@ -31,8 +33,8 @@ AsyncStatus Application::run(Context& ctx) {
     // XXX Handle errors everywhere in this class
     ctx.push("init") | co_await renderer_->initScreen(ctx);
     ctx.push("run") | co_await runEventLoop();
+    listener_->stop();
     ctx.push("restore") | co_await renderer_->restoreScreen(ctx);
-
     co_return ctx.push("save") | loader_->save();
 }
 
@@ -68,10 +70,23 @@ asio::awaitable<bool> Application::waitForNextRender() {
             continue;
         }
 
+        auto&& [ts, ev] = *event;
+        const auto elapsed = ClockType::now() - ts;
+
+        if (elapsed > std::chrono::milliseconds(config_.event_timeout_ms)) {
+            log::warn(this, "ignoring stale event");
+            continue;
+        }
+
+        log::info(
+            this,
+            "event handle latency: {}ms",
+            std::chrono::duration_cast<std::chrono::milliseconds>(elapsed).count());
+
         auto action =
             tracer.addChild("handle_event") |
             utils::visit(
-                *event,
+                ev,
                 [&](char c) { return controller_->onKeyEvent(c); },
                 [&](const notify::Event& r) { return controller_->onFilesystemEvent(r); },
                 [&](int signal) { return controller_->onSignal(signal); });

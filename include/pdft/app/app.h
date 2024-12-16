@@ -15,7 +15,14 @@ namespace pdft::app {
 
 class Application : public Module {
  public:
+    struct Config {
+        static constexpr int DefaultEventTimeoutMs = 100;
+
+        int event_timeout_ms = DefaultEventTimeoutMs;
+    };
+
     Application(
+        Config config,
         inject<Loader, "loader"> loader,
         inject<EventListener, "listener"> listener,
         inject<Controller, "controller"> controller,
@@ -28,6 +35,7 @@ class Application : public Module {
     AsyncStatus runEventLoop();
     Async<bool> waitForNextRender();
 
+    Config config_;
     Arc<Loader> loader_;
     Arc<EventListener> listener_;
     Arc<View> view_;

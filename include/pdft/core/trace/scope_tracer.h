@@ -1,7 +1,7 @@
 #pragma once
 
 #include "pdft/core/assert.h"
-#include "pdft/core/trace/time_traits.h"
+#include "pdft/core/time_traits.h"
 
 namespace pdft::trace {
 

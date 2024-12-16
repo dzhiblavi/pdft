@@ -1,6 +1,6 @@
 #pragma once
 
-#include "pdft/core/trace/time_traits.h"
+#include "pdft/core/time_traits.h"
 #include "pdft/utils/lock_free_stack.h"
 
 #include <source_location>

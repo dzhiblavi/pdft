@@ -9,6 +9,7 @@ class EventListener {
     virtual ~EventListener() = default;
 
     virtual AsyncResult<Event> nextEvent() = 0;
+    virtual void stop() = 0;
 };
 
 }  // namespace pdft::app
