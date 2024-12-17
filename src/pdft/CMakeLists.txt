@@ -23,8 +23,4 @@ target_link_libraries(
             pdft-app)
 
 # PDFT executable
-add_executable(pdft ./app/main.cpp ./app/app.cpp ./app/version.cpp
-                    ./app/entrypoint.cpp)
-
-# Force link to preseve global module declarations
-target_force_link_libraries(pdft PRIVATE pdft-lib)
+add_subdirectory(cli)

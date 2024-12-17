@@ -1,5 +1,8 @@
 add_library(
   pdft-app OBJECT
+  ./app.cpp
+  ./entrypoint.cpp
+  ./palettes.cpp
   ./state/impl/app_ui.cpp
   ./state/document_storage.cpp
   ./state/palette_storage.cpp

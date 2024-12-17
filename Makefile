@@ -78,7 +78,7 @@ run: build
 	cd $(BUILD_DIR) && ./src/pdft/app $(args)
 
 install-local: build
-	cd $(BUILD_DIR) && cp ./src/pdft/pdft ~/.bin/pdft
+	cd $(BUILD_DIR) && cp ./src/pdft/cli/pdft ~/.bin/pdft
 
 build-docker-image:
 	docker build                           \
