@@ -1,7 +1,7 @@
 include(Catch)
+
 find_package(Catch2 REQUIRED)
 find_package(GTest REQUIRED)
-find_package(tclap REQUIRED)
 
 function(add_test path)
   string(REPLACE ".cpp" "" name ${path})
@@ -10,7 +10,7 @@ function(add_test path)
 
   add_executable("test_${name}" "${path}" ${ARGN})
 
-  target_link_libraries(test_${name} PRIVATE pdft Catch2::Catch2WithMain
+  target_link_libraries(test_${name} PRIVATE pdft-lib Catch2::Catch2WithMain
                                              GTest::gmock)
   target_include_directories(test_${name}
                              PRIVATE $<BUILD_INTERFACE:${PDFT_SOURCE_DIR}/>)
@@ -26,6 +26,7 @@ add_test(./pdft/core/io/test_posix_console_writer.cpp)
 add_test(./pdft/core/io/test_posix_console_reader.cpp)
 add_test(./pdft/core/trace/test_scope_tracer.cpp)
 add_test(./pdft/core/trace/test_stack_scope_tracer.cpp)
+add_test(./pdft/core/cli/detail/test_cli_args.cpp)
 
 # core/result
 add_test(./pdft/core/result/combine/test_and_then.cpp)
@@ -33,7 +34,6 @@ add_test(./pdft/core/result/combine/test_lift.cpp)
 add_test(./pdft/core/result/combine/test_map.cpp)
 add_test(./pdft/core/result/combine/test_map_err.cpp)
 add_test(./pdft/core/result/combine/test_or_else.cpp)
-
 add_test(./pdft/core/result/coro/test_maybe.cpp)
 add_test(./pdft/core/result/coro/test_result.cpp)
 
@@ -43,7 +43,6 @@ add_test(./pdft/image/test_color.cpp)
 # utils
 add_test(./pdft/utils/test_lock_free_stack.cpp)
 add_test(./pdft/utils/test_lru_cache.cpp)
-add_test(./pdft/utils/cli/detail/test_cli_args.cpp)
 
 # tui
 add_test(./pdft/tui/test_alignment.cpp)

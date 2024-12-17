@@ -1,6 +1,6 @@
 #include "pdft/utils/zlib.h"
-#include "pdft/core/assert.h"
 
+#include <cassert>
 #include <zlib.h>
 
 namespace pdft::utils {
@@ -12,13 +12,13 @@ std::string zlibCompress(std::string_view data) {
     compressed.resize(1 + bound);
 
     unsigned long size = bound;
-    auto errc = compress(
+    [[maybe_unused]] auto errc = compress(
         reinterpret_cast<unsigned char*>(compressed.data()),  // NOLINT
         &size,
         reinterpret_cast<const unsigned char*>(data.data()),  // NOLINT
         data.size());
 
-    PDFT_VERIFY(errc == Z_OK, "failed to compress data with zlib, errc={}", errc);
+    assert(errc == Z_OK);
     compressed.resize(size);
     return compressed;
 }

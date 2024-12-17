@@ -1,6 +1,6 @@
 #pragma once
 
-#include "pdft/utils/cli/detail/cli.h"
+#include "pdft/core/cli/detail/cli.h"
 
 namespace pdft::cli {
 

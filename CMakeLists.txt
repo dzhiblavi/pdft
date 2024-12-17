@@ -12,6 +12,7 @@ include(./cmake/Ccache.cmake)
 include(./cmake/CheckCompiler.cmake)
 include(./cmake/Development.cmake)
 include(./cmake/Sanitizers.cmake)
+include(./cmake/Flink.cmake)
 
 # Third-party libraries
 include(./cmake/thirdparty/saf.cmake)

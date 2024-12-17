@@ -9,7 +9,7 @@
 #include "pdft/core/module/inject.h"
 #include "pdft/core/module/module.h"
 
-#include "pdft/utils/cli/cli.h"
+#include "pdft/core/cli/cli.h"
 
 namespace pdft::tui {
 

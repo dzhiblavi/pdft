@@ -77,11 +77,8 @@ run-gdb: build
 run: build
 	cd $(BUILD_DIR) && ./src/pdft/app $(args)
 
-install-dev: build
-	cd $(BUILD_DIR) && cp ./src/pdft/app ~/.bin/pdft-dev
-
 install-local: build
-	cd $(BUILD_DIR) && cp ./src/pdft/app ~/.bin/pdft
+	cd $(BUILD_DIR) && cp ./src/pdft/pdft ~/.bin/pdft
 
 build-docker-image:
 	docker build                           \

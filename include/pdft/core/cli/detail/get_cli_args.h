@@ -1,7 +1,7 @@
 #pragma once
 
-#include "pdft/utils/cli/detail/cli.h"
-#include "pdft/utils/cli/detail/cli_arg.h"
+#include "pdft/core/cli/detail/cli.h"
+#include "pdft/core/cli/detail/cli_arg.h"
 
 #include <rfl/Field.hpp>
 #include <rfl/apply.hpp>

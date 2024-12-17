@@ -1,7 +1,7 @@
-#include "pdft/utils/cli/cli.h"
-#include "pdft/utils/cli/detail/parsed.h"
-#include "pdft/utils/cli/detail/register.h"
-#include "pdft/utils/cli/detail/storage.h"
+#include "pdft/core/cli/cli.h"
+#include "pdft/core/cli/detail/parsed.h"
+#include "pdft/core/cli/detail/register.h"
+#include "pdft/core/cli/detail/storage.h"
 
 #include "pdft/core/result/make/err.h"
 #include "pdft/core/result/type/maybe.h"

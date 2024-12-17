@@ -4,7 +4,7 @@
 #include "pdft/core/module/register.h"
 #include "pdft/core/result/coro/result.h"
 
-#include "pdft/utils/cli/register.h"
+#include "pdft/core/cli/register.h"
 
 namespace pdft::app {
 

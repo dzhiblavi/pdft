@@ -1,10 +1,13 @@
 #include "pdft/utils/get_home_dir.h"
-#include "pdft/core/assert.h"
+
+#include <cassert>
 
 namespace pdft::utils {
 
 std::filesystem::path getHomeDirectory() {
-    return PDFT_VERIFY(::getenv("HOME"), "failed to get HOME environment variable");
+    auto* ptr = ::getenv("HOME");
+    assert(ptr);
+    return ptr;
 }
 
 std::filesystem::path expandHome(const std::filesystem::path& path) {

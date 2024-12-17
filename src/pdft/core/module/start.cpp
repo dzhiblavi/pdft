@@ -6,10 +6,10 @@
 #include "pdft/core/module/load.h"
 #include "pdft/core/result/coro/result.h"  // IWYU pragma: keep
 
-#include "pdft/utils/cli/cli.h"
-#include "pdft/utils/cli/parse.h"
-#include "pdft/utils/cli/parsed.h"
-#include "pdft/utils/cli/register.h"
+#include "pdft/core/cli/cli.h"
+#include "pdft/core/cli/parse.h"
+#include "pdft/core/cli/parsed.h"
+#include "pdft/core/cli/register.h"
 #include "pdft/utils/get_home_dir.h"
 
 #include <rfl/Processors.hpp>

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "pdft/utils/cli/detail/option.h"
+#include "pdft/core/cli/detail/option.h"
 
 #include <tclap/CmdLine.h>
 

@@ -1,9 +1,9 @@
-#include "pdft/utils/cli/parse.h"
+#include "pdft/core/cli/parse.h"
 
 #include "pdft/core/result/make/err.h"
 #include "pdft/core/result/make/ok.h"
 
-#include "pdft/utils/cli/detail/storage.h"
+#include "pdft/core/cli/detail/storage.h"
 
 #include <tclap/CmdLine.h>
 

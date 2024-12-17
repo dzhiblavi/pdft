@@ -1,113 +1,30 @@
-find_package(asio REQUIRED)
-find_package(base64 REQUIRED)
-find_package(spdlog REQUIRED)
-find_package(cpptrace REQUIRED)
-find_package(ZLIB REQUIRED)
-find_package(magic_enum REQUIRED)
-find_package(tclap REQUIRED)
+add_subdirectory(core)
+add_subdirectory(utils)
+add_subdirectory(notify)
+add_subdirectory(media)
+add_subdirectory(image)
+add_subdirectory(tui)
+add_subdirectory(app)
 
-add_library(pdft-buildinfo)
-target_include_directories(
-  pdft-buildinfo PUBLIC $<BUILD_INTERFACE:${PDFT_SOURCE_DIR}/include/>)
-target_sources(pdft-buildinfo PRIVATE ${BUILD_INFO_SOURCE_PATH})
-
-add_library(pdft OBJECT)
-
-target_include_directories(
-  pdft PUBLIC $<BUILD_INTERFACE:${PDFT_SOURCE_DIR}/include/>)
-target_include_directories(
-  pdft SYSTEM PUBLIC $<INSTALL_INTERFACE:$<INSTALL_PREFIX>/include/>)
+add_library(
+  pdft-lib STATIC
+  $<TARGET_OBJECTS:pdft-core> $<TARGET_OBJECTS:pdft-notify>
+  $<TARGET_OBJECTS:pdft-media> $<TARGET_OBJECTS:pdft-tui>
+  $<TARGET_OBJECTS:pdft-app>)
 
 target_link_libraries(
-  pdft
-  PUBLIC dl # cpptrace dependency
-         pdft-buildinfo
-         asio::asio
-         aklomp::base64
-         spdlog::spdlog
-         cpptrace::cpptrace
-         ZLIB::ZLIB
-         libmupdf_ext
-         libfswatch
-         magic_enum::magic_enum
-         saf
-         reflectcpp
-         tclap::tclap
-         ftxui::screen
-         ftxui::dom)
-
-target_sources(
-  pdft
-  PRIVATE ./utils/base64.cpp
-          ./utils/zlib.cpp
-          ./utils/get_home_dir.cpp
-          ./utils/random.cpp
-          ./utils/base64.cpp
-          ./utils/cli/parse.cpp
-          ./utils/cli/detail/storage.cpp)
-
-target_sources(
-  pdft
-  PRIVATE ./core/assert.cpp
-          ./core/module/load.cpp
-          ./core/module/factory_storage.cpp
-          ./core/module/start.cpp
-          ./core/context.cpp
-          ./core/log/load.cpp
-          ./core/log/log.cpp
-          ./core/trace/stack_scope_tracer.cpp
-          ./core/trace/log_stack_trace.cpp
-          ./core/io/posix_console_writer.cpp
-          ./core/io/posix_console_reader.cpp
-          ./core/io/posix_terminal.cpp)
-
-target_sources(pdft PRIVATE ./notify/fsw_notify.cpp)
-
-target_sources(pdft PRIVATE ./image/operations.cpp ./image/palette.cpp)
-
-target_sources(
-  pdft
-  PRIVATE ./media/mupdf/context.cpp ./media/mupdf/document.cpp
-          ./media/mupdf/page.cpp ./media/mupdf/pixmap_image.cpp
-          ./media/mupdf/loader.cpp)
-
-target_sources(
-  pdft
-  PRIVATE ./tui/fit_image.cpp
-          ./tui/terminal.cpp
-          ./tui/ansi_terminal.cpp
-          ./tui/app_renderer.cpp
-          ./tui/elements.cpp
-          ./tui/kitty/apc/parse_response.cpp
-          ./tui/kitty/apc/apc_executor_base.cpp
-          ./tui/kitty/apc/regular_apc_executor.cpp
-          ./tui/kitty/apc/tmux_apc_executor.cpp
-          ./tui/kitty/apc/apc_executor_factory.cpp
-          ./tui/kitty/unicode_kitty_display.cpp
-          ./tui/kitty/native_kitty_display.cpp
-          ./tui/kitty/kitty_display_base.cpp
-          ./tui/kitty/kitty_display_factory.cpp)
-
-target_sources(
-  pdft
-  PRIVATE ./app/state/impl/app_ui.cpp
-          ./app/state/document_storage.cpp
-          ./app/state/palette_storage.cpp
-          ./app/event/app_event_listener.cpp
-          ./app/view/app_page_renderer.cpp
-          ./app/view/app_view.cpp
-          ./app/view/app_document_view.cpp
-          ./app/view/app_image_renderer.cpp
-          ./app/view/app_page_processor.cpp
-          ./app/controller/keytree.cpp
-          ./app/controller/app_controller.cpp
-          ./app/loader/app_state_loader.cpp
-          ./app/loader/app_persister.cpp
-          ./app/loader/app_loader.cpp
-          ./app/palettes.cpp)
+  pdft-lib
+  INTERFACE pdft-core
+            pdft-utils
+            pdft-image
+            pdft-notify
+            pdft-media
+            pdft-tui
+            pdft-app)
 
 # PDFT executable
-add_executable(app ./app/main.cpp ./app/app.cpp ./app/version.cpp
-                   ./app/entrypoint.cpp)
+add_executable(pdft ./app/main.cpp ./app/app.cpp ./app/version.cpp
+                    ./app/entrypoint.cpp)
 
-target_link_libraries(app PRIVATE pdft)
+# Force link to preseve global module declarations
+target_force_link_libraries(pdft PRIVATE pdft-lib)

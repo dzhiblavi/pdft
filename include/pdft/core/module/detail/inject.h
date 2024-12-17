@@ -9,7 +9,7 @@
 #include "pdft/core/result/coro/result.h"  // IWYU pragma: keep
 #include "pdft/core/result/syntax/pipe.h"  // IWYU pragma: keep
 
-#include "pdft/utils/cli/parsed.h"
+#include "pdft/core/cli/parsed.h"
 
 #include <asio/io_context.hpp>
 #include <rfl/from_generic.hpp>
