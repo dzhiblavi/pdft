@@ -3,7 +3,7 @@
 ## Rationale
 
 As a terminal enjoyer I always wanted to be able to edit and View LaTeX documents
-inside my terminal. It would be event better if that could be done inside tmux and over SSH.
+inside my terminal. It would be even better if that could be done inside tmux and over SSH.
 
 To my surprise, a few projects already exist that solve the task of displaying images
 inside the terminal. To list a few:
@@ -68,14 +68,35 @@ Any terminal that supports [Kitty image protocol][kitty-graphics-protocol]
 
 ### Building and installation
 
-I haven't yet figured out a way to build this in cross-platform manner reliably.
-You can try to run
+Currently the only option to obtain PDFT is to build it manually via following the instruction:
+
+1. Clone or download this repository:
 
 ```bash
-make BUILD_TYPE=Release PROFILE="<one of: armv8-macos, amd64-linux>" build
+git clone https://github.com/dzhiblavi/pdft-cxx.git
+cd pdft-cxx
 ```
 
-and see what happens next.
+2. Make sure that `clang` and `clang++` binaries are in the PATH and that the
+compiler version is at least 19:
+
+```bash
+clang -v
+Homebrew clang version 19.1.4
+[...]
+```
+
+3. Choose a conan profile located in `./conan` directory. Let's say you are
+running on MacOs with M1 chip. So you choose `armv8-macos` profile.
+
+4. Build the project. Do not forget to specify the correct profile:
+
+```bash
+make BUILD_TYPE=Release PROFILE=armv8-macos build
+```
+
+5. If build succeeds, the application can be found in `./target/armv8-macos/Release/build/src/pdft/app`.
+Feel free to copy it anywhere you want. Just make sure it is available on PATH.
 
 ### Configuration
 
