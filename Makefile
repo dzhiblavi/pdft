@@ -69,13 +69,13 @@ check-format:
 		| xargs clang-format --dry-run --Werror
 
 run-lldb: build
-	cd $(BUILD_DIR) && lldb -- ./src/pdft/app $(path)
+	cd $(BUILD_DIR) && lldb -- ./src/pdft/app $(args)
 
 run-gdb: build
-	cd $(BUILD_DIR) && gdb --args ./src/pdft/app $(path)
+	cd $(BUILD_DIR) && gdb --args ./src/pdft/app $(args)
 
 run: build
-	cd $(BUILD_DIR) && ./src/pdft/app $(path)
+	cd $(BUILD_DIR) && ./src/pdft/app $(args)
 
 install-dev: build
 	cd $(BUILD_DIR) && cp ./src/pdft/app ~/.bin/pdft-dev
@@ -83,15 +83,15 @@ install-dev: build
 install-local: build
 	cd $(BUILD_DIR) && cp ./src/pdft/app ~/.bin/pdft
 
-docker-build-%:
+build-docker-image:
 	docker build                           \
 		-t $(BUILD_IMAGE)                  \
 		-f docker/build.Dockerfile         \
-		--platform $*                      \
 		.
 
 docker-run:
-	docker run -v `pwd`:/pdft -it --rm \
+	docker run -it --rm                \
+		-v `pwd`:/pdft                 \
 		--name pdft-build-container    \
 		$(BUILD_IMAGE):latest          \
 		/bin/bash

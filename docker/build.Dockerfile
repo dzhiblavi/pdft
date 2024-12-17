@@ -9,5 +9,5 @@ ENV TZ=Europe/Moscow
 ENV LANG C.UTF-8
 ENV LC_ALL C.UTF-8
 
-ENV CXX="/usr/bin/clang++-19"
-ENV CC="/usr/bin/clang-19"
+COPY docker/set_compiler.sh .
+RUN sh set_compiler.sh
