@@ -68,11 +68,11 @@ Any terminal that supports [Kitty image protocol][kitty-graphics-protocol]
 
 ### Building and installation
 
-TODO: I haven't yet figured out a way to build this in cross-platform manner.
+I haven't yet figured out a way to build this in cross-platform manner reliably.
 You can try to run
 
 ```bash
-make BUILD_TYPE=Release PROFILE="<choose profile in ./conan>" build
+make BUILD_TYPE=Release PROFILE="<one of: armv8-macos, amd64-linux>" build
 ```
 
 and see what happens next.
@@ -150,9 +150,9 @@ and stack traces can also be generated and will simplify troubleshooting greatly
 | [fswatch/1.17.1][fswatch] | A cross-platform filesystem event watching library |
 | [reflect-cpp/v0.16.0][reflect-cpp] | Serialization, Deserialization and Reflection library |
 | [spdlog/1.14.1][spdlog] | Logging library |
-| [zlib/1.2.11][zlib] | Used to compress images before sending images |
+| [zlib/1.3.1][zlib] | Used to compress images before sending images |
 | [base64/0.5.2][base64] | Required to send image data via Kitty graphics protocol |
-| [cpptrace/0.7.2][cpptrace] | Helps to generate stacktraces |
+| [cpptrace/0.7.3][cpptrace] | Helps to generate stacktraces |
 | [magic_enum/0.9.6][magic_enum] | Static reflection for enums |
 | [tclap/1.2.5][tclap]| Command line argument parser |
 | [gtest/1.15.0][gtest] | Unit testing & mocking framework |
