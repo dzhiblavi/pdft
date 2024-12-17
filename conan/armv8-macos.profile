@@ -1,7 +1,11 @@
 [settings]
 arch=armv8
-compiler=clang
-compiler.cppstd=23
-compiler.libcxx=libc++
-compiler.version=17
 os=Macos
+compiler=clang
+compiler.version=19
+compiler.cppstd=20
+compiler.libcxx=libc++
+
+[buildenv]
+CC=clang
+CXX=clang++

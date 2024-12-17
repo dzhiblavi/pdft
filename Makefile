@@ -26,7 +26,7 @@ _prepare_target_dirs:
 	mkdir -p $(BUILD_DIR)
 
 deps: _prepare_target_dirs
-	$(CONAN) install .                           \
+	$(CONAN) install .                             \
 		--output-folder=$(DEPS_DIR)                \
 		--build=missing                            \
 		--profile:host=./conan/$(PROFILE).profile  \
@@ -39,12 +39,7 @@ configure: deps
 		-G "Unix Makefiles"                                        \
 		-DCMAKE_TOOLCHAIN_FILE="../deps/conan_toolchain.cmake"     \
 		-DCMAKE_POLICY_DEFAULT_CMP0091=NEW                         \
-		-DCMAKE_C_COMPILER=${CC}                                   \
-		-DCMAKE_CXX_COMPILER=${CXX}                                \
 		-DCMAKE_BUILD_TYPE=$(BUILD_TYPE)                           \
-		-DCMAKE_EXE_LINKER_FLAGS="${LDFLAGS}"                      \
-		-DCMAKE_CXX_FLAGS="${CXXFLAGS}"                            \
-		-DBUILD_SHARED_LIBS=OFF                                    \
 		-DPDFT_BUILD_TESTS=ON                                      \
 		-DPDFT_MUPDF_LOCAL_SOURCE_DIR=${MUPDF_SOURCE_DIR}          \
 		-DASAN=$(ASAN)                                             \
