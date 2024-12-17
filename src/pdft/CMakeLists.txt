@@ -20,7 +20,8 @@ target_include_directories(
 
 target_link_libraries(
   pdft
-  PUBLIC pdft-buildinfo
+  PUBLIC dl # cpptrace dependency
+         pdft-buildinfo
          asio::asio
          aklomp::base64
          spdlog::spdlog
