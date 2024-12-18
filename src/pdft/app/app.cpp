@@ -9,99 +9,180 @@
 
 #include "pdft/utils/visit.h"
 
+#include <asio/co_spawn.hpp>
+#include <asio/detached.hpp>
+
 namespace pdft::app {
+
+namespace {
+
+ControllerAction combineActions(ControllerAction a, ControllerAction b) {
+    using enum ControllerAction;
+
+    if (a == Quit || b == Quit) {
+        return Quit;
+    }
+
+    if (a == Redraw || b == Redraw) {
+        return Redraw;
+    }
+
+    return None;
+}
+
+}  // namespace
 
 Application::Application(
     Config config,
+    asio::io_context& io,
     inject<Loader, "loader"> loader,
-    inject<EventListener, "listener"> listener,
+    inject<event::EventEmitter<notify::Event>, "fswatcher"> fswatcher,
+    inject<event::EventEmitter<char>, "key_listener"> key_listener,
+    inject<event::EventEmitter<int>, "sig_listener"> sig_listener,
     inject<Controller, "controller"> controller,
     inject<View, "view"> view,
     inject<tui::Renderer, "renderer"> renderer)
     : config_(config)
+    , io_(io)
     , loader_(std::move(loader))
-    , listener_(std::move(listener))
     , view_(std::move(view))
     , controller_(std::move(controller))
-    , renderer_(std::move(renderer)) {}
+    , renderer_(std::move(renderer))
+    , fswatcher_(std::move(fswatcher))
+    , key_listener_(std::move(key_listener))
+    , sig_listener_(std::move(sig_listener))
+    , events_chan_(io.get_executor(), config_.event_max_buffer_size) {}
 
-AsyncStatus Application::run(Context& ctx) {
+Async<Status> Application::run(Context& ctx) {
     if (auto res = ctx.push("load") | loader_->load(); !res) {
         co_return result::err(res.error());
     }
 
     // XXX Handle errors everywhere in this class
     ctx.push("init") | co_await renderer_->initScreen(ctx);
-    ctx.push("run") | co_await runEventLoop();
-    listener_->stop();
-    ctx.push("restore") | co_await renderer_->restoreScreen(ctx);
-    co_return ctx.push("save") | loader_->save();
+
+    subscribe();
+    co_await runApplicationLoop();
+    co_await shutdown();
+    co_return unit;
 }
 
-AsyncStatus Application::runEventLoop() {
+Async<Status> Application::runApplicationLoop() {
+    auto on_event = [&](const auto& event) {
+        return utils::visit(event, [&](const auto& ev) { return onEvent(ev); });
+    };
+
+    co_await renderOne();
+
     for (;;) {
-        auto tracer = trace::makeTracer("controller");
-        Context ctx(tracer);
+        auto [errc, event] = co_await events_chan_.async_receive(AsioCoroAsTuple);
 
-        auto dom = view_->getLayout(ctx);
-        auto screen = renderer_->newFrame(ctx, std::move(dom));
-        co_await view_->render(ctx, screen);
-        co_await renderer_->renderFrame(ctx);
+        if (errc) {
+            log::err(this, "failed to receive an event from the channel: {}", errc);
+            continue;
+        }
 
-        trace::logStackTrace(std::move(tracer));
+        auto action = on_event(event);
 
-        if (co_await waitForNextRender()) {
-            co_return unit;
+        while (events_chan_.ready()) {
+            events_chan_.try_receive([&](asio::error_code errc, Event event) {
+                if (errc) {
+                    log::err(this, "try_receive failed: {}", errc);
+                } else {
+                    action = combineActions(action, on_event(event));
+                }
+            });
+        }
+
+        switch (action) {
+            using enum ControllerAction;
+
+            case None:
+                break;
+
+            case Quit:
+                co_return unit;
+
+            case Redraw:
+                co_await renderOne();
+                break;
         }
     }
 }
 
-asio::awaitable<bool> Application::waitForNextRender() {
-    auto tracer = trace::makeTracer("controller");
+void Application::subscribe() {
+    auto accept = [this](Event ev) -> Async<void> {
+        auto [errc] = co_await events_chan_.async_send({}, ev, AsioCoroAsTuple);
 
-    for (;;) {
-        using enum ControllerAction;
-
-        // XXX Debouncing?
-        auto event = tracer.addChild("wait_input") | co_await listener_->nextEvent();
-
-        if (!event) {
-            log::err(this, "error event received: {}", event.error());
-            continue;
+        if (errc) {
+            log::err(this, "failed to push an event to the channel: {}", errc);
         }
+    };
 
-        auto&& [ts, ev] = *event;
-        const auto elapsed = SteadyClockType::now() - ts;
+    auto event_cb = [this, accept](auto ev) {
+        asio::co_spawn(io_, accept(std::move(ev)), asio::detached);
+    };
 
-        if (elapsed > std::chrono::milliseconds(config_.event_timeout_ms)) {
-            log::warn(this, "ignoring stale event");
-            continue;
-        }
+    fswatcher_->subscribe(event_cb);
+    key_listener_->subscribe(event_cb);
+    sig_listener_->subscribe(event_cb);
+}
 
-        log::info(
-            this,
-            "event handle latency: {}ms",
-            std::chrono::duration_cast<std::chrono::milliseconds>(elapsed).count());
+Async<Status> Application::shutdown() {
+    auto tracer = trace::makeTracer("shutdown");
+    Context ctx(tracer);
 
-        auto action =
-            tracer.addChild("handle_event") |
-            utils::visit(
-                ev,
-                [&](char c) { return controller_->onKeyEvent(c); },
-                [&](const notify::Event& r) { return controller_->onFilesystemEvent(r); },
-                [&](int signal) { return controller_->onSignal(signal); });
+    stop();
+    co_await renderer_->restoreScreen(ctx);
+    co_return loader_->save();
+}
 
-        if (action.has_value()) {
-            if (action == None) {
-                continue;
-            }
+void Application::stop() {
+    fswatcher_->stop();
+    key_listener_->stop();
+    sig_listener_->stop();
+}
 
-            trace::logStackTrace(std::move(tracer));
-            co_return action == Quit;
-        } else {
-            log::err(this, "error fron controller: {}", action.error());
-        }
+bool Application::isEventStale(SteadyTimePointType timestamp) {
+    auto elapsed = SteadyClockType::now() - timestamp;
+    auto elapsed_ms = std::chrono::duration_cast<std::chrono::milliseconds>(elapsed).count();
+
+    if (elapsed_ms > config_.event_timeout_ms) {
+        log::warn(this, "event is stale: {}ms elapsed", elapsed_ms);
+        return true;
     }
+
+    return false;
+}
+
+ControllerAction Application::onEvent(const event::Event<notify::Event>& fs_event) {
+    return controller_->onFilesystemEvent(fs_event.value).value_or(ControllerAction::None);
+}
+
+ControllerAction Application::onEvent(const event::Event<char>& key_event) {
+    return controller_->onKeyEvent(key_event.value).value_or(ControllerAction::None);
+}
+
+ControllerAction Application::onEvent(const event::Event<int>& sig_event) {
+    // Check staleness for keyboard events only
+    if (isEventStale(sig_event.timestamp)) {
+        return ControllerAction::None;
+    }
+
+    return controller_->onSignal(sig_event.value).value_or(ControllerAction::None);
+}
+
+Async<Status> Application::renderOne() {
+    auto tracer = trace::makeTracer("render_one");
+    Context ctx(tracer);
+
+    auto dom = view_->getLayout(ctx);
+    auto screen = renderer_->newFrame(ctx, std::move(dom));
+    co_await view_->render(ctx, screen);
+    co_await renderer_->renderFrame(ctx);
+    trace::logStackTrace(std::move(tracer));
+
+    co_return unit;
 }
 
 }  // namespace pdft::app

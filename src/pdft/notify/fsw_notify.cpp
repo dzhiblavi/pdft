@@ -3,8 +3,6 @@
 #include "pdft/core/assert.h"
 #include "pdft/core/log.h"
 #include "pdft/core/module/register.h"
-#include "pdft/core/result/make/err.h"
-#include "pdft/core/result/make/ok.h"
 
 #include "pdft/utils/build_info.h"
 
@@ -18,7 +16,7 @@ namespace pdft::notify {
 inline constexpr int MaxChannelBufferSize = 10;
 inline constexpr float FswLatency = 0.1f;
 
-FswNotify::FswNotify(asio::any_io_executor executor) : channel_(executor, MaxChannelBufferSize) {
+FswNotify::FswNotify() {
     [[maybe_unused]] static auto _ = [] {
         PDFT_VERIFY(fsw_init_library() == FSW_OK);
         return 0;
@@ -93,16 +91,6 @@ void FswNotify::add(const std::filesystem::path& path) {
     PDFT_VERIFY(fsw_add_path(handle_, path.c_str()) == FSW_OK);
 }
 
-AsyncResult<Event> FswNotify::nextEvent() {
-    auto [ec, event] = co_await channel_.async_receive(AsioCoroAsTuple);
-
-    if (ec) {
-        co_return result::err(errorCodeToString(ec));
-    }
-
-    co_return result::ok(std::move(event));
-}
-
 void FswNotify::monitorRunLoop(FswNotify* self) {
     log::debug("start fswatch monitorRunLoop");
 
@@ -130,7 +118,7 @@ void FswNotify::processEvents(const fsw_cevent* const evts, unsigned count, void
             log::trace("filesystem event flag: {}", magic_enum::enum_name(flag));
         }
 
-        self->channel_.async_send({}, Event{.path = event.path}, asio::use_future).get();
+        self->emit({.path = event.path});
     }
 }
 

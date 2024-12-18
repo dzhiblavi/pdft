@@ -16,6 +16,7 @@ include(./cmake/Flink.cmake)
 
 # Third-party libraries
 include(./cmake/thirdparty/saf.cmake)
+#include(./cmake/thirdparty/sam.cmake)
 include(./cmake/thirdparty/MuPDF.cmake)
 include(./cmake/thirdparty/fswatch.cmake)
 include(./cmake/thirdparty/reflect-cpp.cmake)
