@@ -4,8 +4,8 @@
 
 namespace pdft {
 
-using ClockType = std::chrono::steady_clock;
-using TimePointType = typename ClockType::time_point;
-using DurationType = typename ClockType::duration;
+using SteadyClockType = std::chrono::steady_clock;
+using SteadyTimePointType = typename SteadyClockType::time_point;
+using SteadyDurationType = typename SteadyClockType::duration;
 
 }  // namespace pdft

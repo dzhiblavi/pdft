@@ -63,7 +63,7 @@ AsyncResult<Event> AppEventListener::getNextEvent() {
 
     co_return event | result::map([](EventType evt) {
         return Event{
-            .timestamp = ClockType::now(),
+            .timestamp = SteadyClockType::now(),
             .event = std::move(evt),
         };
     });

@@ -11,7 +11,7 @@ namespace pdft::app {
 using EventType = std::variant<char, notify::Event, int>;
 
 struct Event {
-    TimePointType timestamp;
+    SteadyTimePointType timestamp;
     EventType event;
 };
 

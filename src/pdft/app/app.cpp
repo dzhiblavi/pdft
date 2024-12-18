@@ -71,7 +71,7 @@ asio::awaitable<bool> Application::waitForNextRender() {
         }
 
         auto&& [ts, ev] = *event;
-        const auto elapsed = ClockType::now() - ts;
+        const auto elapsed = SteadyClockType::now() - ts;
 
         if (elapsed > std::chrono::milliseconds(config_.event_timeout_ms)) {
             log::warn(this, "ignoring stale event");

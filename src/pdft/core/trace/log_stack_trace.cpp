@@ -2,7 +2,7 @@
 
 namespace pdft::trace::detail {
 
-std::string getAutomaticPrettyDuration(const DurationType& duration) {
+std::string getAutomaticPrettyDuration(const SteadyDurationType& duration) {
     static constexpr std::array<uint64_t, 4> ratios{
         1000000000,  // seconds
         1000000,     // milliseconds

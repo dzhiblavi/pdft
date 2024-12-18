@@ -14,8 +14,8 @@ struct StackScopeTracerBase : utils::IntrusiveForwardListItem<StackScopeTracerBa
     void release();
     void addChild(StackScopeTracerBase* child);
 
-    TimePointType started_at{};
-    DurationType duration{};
+    SteadyTimePointType started_at{};
+    SteadyDurationType duration{};
     std::source_location loc;
     const char* label = "";
 

@@ -13,16 +13,16 @@ struct AutomaticDuration {};
 
 namespace detail {
 
-std::string getAutomaticPrettyDuration(const DurationType& duration);
+std::string getAutomaticPrettyDuration(const SteadyDurationType& duration);
 
 template <typename Duration>
-std::string getPrettyDuration(const DurationType& duration) {
+std::string getPrettyDuration(const SteadyDurationType& duration) {
     auto dur = std::chrono::duration_cast<Duration>(duration);
     return std::format("{}{}", dur.count(), DurationSuffix<Duration>);
 }
 
 template <std::same_as<AutomaticDuration> Duration>
-std::string getPrettyDuration(const DurationType& duration) {
+std::string getPrettyDuration(const SteadyDurationType& duration) {
     return getAutomaticPrettyDuration(duration);
 }
 

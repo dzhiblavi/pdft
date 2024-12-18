@@ -5,7 +5,7 @@
 namespace pdft::trace {
 
 void StackScopeTracerBase::finalize() {
-    duration = ClockType::now() - started_at;
+    duration = SteadyClockType::now() - started_at;
 }
 
 void StackScopeTracerBase::release() {
@@ -89,7 +89,7 @@ StackScopeTracerPool::~StackScopeTracerPool() {
 StackScopeTracerOwner StackScopeTracerPool::getTracer(const char* label, std::source_location loc) {
     auto* base = getTracerBase();
 
-    base->started_at = ClockType::now();
+    base->started_at = SteadyClockType::now();
     base->duration = {};
     base->loc = loc;
     base->label = label;
