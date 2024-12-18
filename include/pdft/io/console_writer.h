@@ -3,6 +3,7 @@
 #include "pdft/io/buffer.h"
 
 #include "pdft/core/awaitable.h"
+#include "pdft/core/result/type/status.h"
 
 #include <asio/buffer.hpp>
 
@@ -12,15 +13,15 @@ class ConsoleWriter {
  public:
     virtual ~ConsoleWriter() = default;
 
-    virtual AsyncStatus write(std::string_view buffer) = 0;
-    virtual AsyncStatus writeMany(std::vector<asio::const_buffer> buffers) = 0;
+    virtual Async<Status> write(std::string_view buffer) = 0;
+    virtual Async<Status> writeMany(std::vector<asio::const_buffer> buffers) = 0;
 
-    AsyncStatus write(OutBuffer& buffer) {
+    Async<Status> write(OutBuffer& buffer) {
         co_return co_await this->write(buffer.view());
     }
 
     template <typename... Buffers>
-    AsyncStatus writeMany(Buffers&&... buffers) {
+    Async<Status> writeMany(Buffers&&... buffers) {
         std::vector<asio::const_buffer> views_vec{
             asio::buffer(getView(std::forward<Buffers>(buffers)))...};
 

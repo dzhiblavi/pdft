@@ -12,7 +12,7 @@ class ConsoleReader {
  public:
     virtual ~ConsoleReader() = default;
 
-    virtual AsyncStatus read(size_t num_bytes, std::string& buffer) = 0;
+    virtual Async<Status> read(size_t num_bytes, std::string& buffer) = 0;
 
     AsyncResult<std::string> read(size_t num_bytes) {
         std::string buffer;

@@ -19,10 +19,10 @@ class AppRenderer : public Renderer, public Module {
         inject<io::TermControl, "term_ctrl"> term_control,
         inject<tui::Display, "display"> image_display);
 
-    AsyncStatus initScreen(Context& ctx) override;
-    AsyncStatus restoreScreen(Context& ctx) override;
+    Async<Status> initScreen(Context& ctx) override;
+    Async<Status> restoreScreen(Context& ctx) override;
     Screen newFrame(Context& ctx, tui::Element dom) override;
-    AsyncStatus renderFrame(Context& ctx) override;
+    Async<Status> renderFrame(Context& ctx) override;
 
  private:
     std::string tui_;

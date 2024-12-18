@@ -14,7 +14,7 @@ namespace pdft::io {
 PosixConsoleReader::PosixConsoleReader(asio::io_context& context, Config config)
     : stdin_(context, config.fd) {}
 
-AsyncStatus PosixConsoleReader::read(size_t num_bytes, std::string& out) {
+Async<Status> PosixConsoleReader::read(size_t num_bytes, std::string& out) {
     out.resize(num_bytes);
     auto [ec, _] = co_await asio::async_read(stdin_, asio::buffer(out), AsioCoroAsTuple);
 

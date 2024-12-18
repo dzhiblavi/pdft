@@ -60,19 +60,19 @@ struct MockConsole : ConsoleWriter, ConsoleReader {
     using ConsoleReader::read;
     using ConsoleWriter::write;
 
-    AsyncStatus write(std::string_view bytes) override {
+    Async<Status> write(std::string_view bytes) override {
         out_fd_w.write(bytes);
         co_return result::ok();
     }
 
-    AsyncStatus writeMany(std::vector<asio::const_buffer> buffers) override {
+    Async<Status> writeMany(std::vector<asio::const_buffer> buffers) override {
         for (const auto& s : buffers) {
             out_fd_w.write({(const char*)s.data(), s.size()});
         }
         co_return result::ok();
     }
 
-    AsyncStatus read(size_t num_bytes, std::string& out) override {
+    Async<Status> read(size_t num_bytes, std::string& out) override {
         out = in_fd_r.read(num_bytes);
         co_return result::ok();
     }

@@ -5,6 +5,7 @@
 
 #include "pdft/core/awaitable.h"
 #include "pdft/core/context.h"
+#include "pdft/core/result/type/status.h"
 
 #include <ftxui/screen/screen.hpp>
 
@@ -13,11 +14,11 @@ namespace pdft::tui {
 class Renderer {
  public:
     virtual ~Renderer() = default;
-    virtual AsyncStatus initScreen(Context& ctx) = 0;
-    virtual AsyncStatus restoreScreen(Context& ctx) = 0;
+    virtual Async<Status> initScreen(Context& ctx) = 0;
+    virtual Async<Status> restoreScreen(Context& ctx) = 0;
 
     virtual Screen newFrame(Context& ctx, tui::Element dom) = 0;
-    virtual AsyncStatus renderFrame(Context& ctx) = 0;
+    virtual Async<Status> renderFrame(Context& ctx) = 0;
 };
 
 }  // namespace pdft::tui

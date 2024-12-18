@@ -19,7 +19,7 @@ class PosixConsoleReader : public ConsoleReader, public Module {
 
     using ConsoleReader::read;
 
-    AsyncStatus read(size_t num_bytes, std::string& buffer) override;
+    Async<Status> read(size_t num_bytes, std::string& buffer) override;
 
  private:
     asio::posix::stream_descriptor stdin_;

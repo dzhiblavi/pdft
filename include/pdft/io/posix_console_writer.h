@@ -19,8 +19,8 @@ class PosixConsoleWriter : public ConsoleWriter, public Module {
 
     using ConsoleWriter::write;
 
-    AsyncStatus write(std::string_view bytes) override;
-    AsyncStatus writeMany(std::vector<asio::const_buffer> bytes) override;
+    Async<Status> write(std::string_view bytes) override;
+    Async<Status> writeMany(std::vector<asio::const_buffer> bytes) override;
 
  private:
     asio::posix::stream_descriptor stdout_;
