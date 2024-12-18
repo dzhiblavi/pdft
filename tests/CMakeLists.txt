@@ -37,7 +37,9 @@ add_test(./pdft/core/result/coro/test_result.cpp)
 
 # core/module
 add_test(./pdft/core/module/test_factory_storage.cpp)
-add_test(./pdft/core/module/test_load.cpp)
+add_test(./pdft/core/module/test_load_cls.cpp)
+add_test(./pdft/core/module/test_load_factory.cpp)
+add_test(./pdft/core/module/test_load_alias.cpp)
 
 # io
 add_test(./pdft/io/test_posix_console_writer.cpp)
