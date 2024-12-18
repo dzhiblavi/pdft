@@ -1,4 +1,5 @@
-#include "pdft/core/io/posix_console_writer.h"
+#include "pdft/io/posix_console_writer.h"
+
 #include "pdft/core/module/register.h"
 #include "pdft/core/result/make/err.h"
 #include "pdft/core/result/make/ok.h"

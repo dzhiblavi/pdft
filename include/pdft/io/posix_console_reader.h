@@ -1,6 +1,7 @@
 #pragma once
 
-#include "pdft/core/io/console_reader.h"
+#include "pdft/io/console_reader.h"
+
 #include "pdft/core/module/module.h"
 
 #include <asio/io_context.hpp>

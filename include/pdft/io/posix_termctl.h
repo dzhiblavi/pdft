@@ -1,6 +1,7 @@
 #pragma once
 
-#include "pdft/core/io/termctl.h"
+#include "pdft/io/termctl.h"
+
 #include "pdft/core/module/module.h"
 
 namespace pdft::io {

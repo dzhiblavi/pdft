@@ -3,7 +3,7 @@
 #include "pdft/tui/cursor_position.h"
 #include "pdft/tui/rect.h"
 
-#include "pdft/core/io/buffer.h"
+#include "pdft/io/buffer.h"
 
 namespace pdft::tui {
 

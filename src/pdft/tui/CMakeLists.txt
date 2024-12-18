@@ -15,4 +15,5 @@ add_library(
   ./kitty/kitty_display_base.cpp
   ./kitty/kitty_display_factory.cpp)
 
-target_link_libraries(pdft-tui PUBLIC pdft-core ftxui::screen ftxui::dom)
+target_link_libraries(pdft-tui PUBLIC pdft-core pdft-io ftxui::screen
+                                      ftxui::dom)

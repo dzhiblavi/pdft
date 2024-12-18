@@ -1,6 +1,6 @@
 #pragma once
 
-#include "pdft/core/io/buffer.h"
+#include "pdft/io/buffer.h"
 
 namespace pdft::tui {
 

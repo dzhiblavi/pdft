@@ -3,8 +3,9 @@
 #include "pdft/tui/display.h"
 #include "pdft/tui/renderer.h"
 
-#include "pdft/core/io/console_writer.h"
-#include "pdft/core/io/termctl.h"
+#include "pdft/io/console_writer.h"
+#include "pdft/io/termctl.h"
+
 #include "pdft/core/module/inject.h"
 #include "pdft/core/module/module.h"
 

@@ -1,5 +1,6 @@
-#include "pdft/core/io/console_reader.h"
-#include "pdft/core/io/console_writer.h"
+#include "pdft/io/console_reader.h"
+#include "pdft/io/console_writer.h"
+
 #include "pdft/core/rc.h"
 
 #include <asio/co_spawn.hpp>

@@ -3,7 +3,8 @@
 #include "pdft/app/event/event_listener.h"
 #include "pdft/notify/notify.h"
 
-#include "pdft/core/io/console_reader.h"
+#include "pdft/io/console_reader.h"
+
 #include "pdft/core/module/inject.h"
 #include "pdft/core/module/module.h"
 

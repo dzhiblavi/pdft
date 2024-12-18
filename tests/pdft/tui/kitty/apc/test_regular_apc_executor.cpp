@@ -1,6 +1,6 @@
 #include "pdft/tui/kitty/apc/regular_apc_executor.h"
 
-#include "tests/pdft/core/io/mock_console.h"
+#include "tests/pdft/io/mock_console.h"
 #include "tests/pdft/run_coroutine.h"
 
 namespace pdft::tui {

@@ -1,9 +1,9 @@
 #pragma once
 
-#include "pdft/core/awaitable.h"
-#include "pdft/core/io/buffer.h"
+#include "pdft/io/buffer.h"
 
-#include <asio/awaitable.hpp>
+#include "pdft/core/awaitable.h"
+
 #include <asio/buffer.hpp>
 
 namespace pdft::io {

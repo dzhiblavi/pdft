@@ -1,4 +1,4 @@
-#include "tests/pdft/core/io/mock_console.h"
+#include "tests/pdft/io/mock_console.h"
 #include "tests/pdft/run_coroutine.h"
 
 #include "pdft/tui/impl/ansi_terminal.h"

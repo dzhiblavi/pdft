@@ -4,12 +4,7 @@ find_package(cpptrace REQUIRED)
 find_package(magic_enum REQUIRED)
 find_package(tclap REQUIRED)
 
-add_library(pdft-core OBJECT)
-
-target_include_directories(
-  pdft-core PUBLIC $<BUILD_INTERFACE:${PDFT_SOURCE_DIR}/include/>)
-target_include_directories(
-  pdft-core SYSTEM PUBLIC $<INSTALL_INTERFACE:$<INSTALL_PREFIX>/include/>)
+add_library(pdft-core STATIC)
 
 target_link_libraries(
   pdft-core
@@ -34,8 +29,5 @@ target_sources(
           ./log/log.cpp
           ./trace/stack_scope_tracer.cpp
           ./trace/log_stack_trace.cpp
-          ./io/posix_console_writer.cpp
-          ./io/posix_console_reader.cpp
-          ./io/posix_terminal.cpp
           ./cli/parse.cpp
           ./cli/detail/storage.cpp)

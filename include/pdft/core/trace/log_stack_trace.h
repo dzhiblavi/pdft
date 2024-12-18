@@ -3,7 +3,6 @@
 #include "pdft/core/trace/detail/duration_suffix.h"
 #include "pdft/core/trace/stack_scope_tracer.h"
 
-#include "pdft/core/io/buffer.h"
 #include "pdft/core/log.h"
 
 #include <filesystem>
@@ -28,22 +27,20 @@ std::string getPrettyDuration(const DurationType& duration) {
 }
 
 template <typename Duration>
-void logStackTrace(const StackScopeTracerBase& info, io::OutBuffer& out) {
+void logStackTrace(const StackScopeTracerBase& info, std::ostream& out) {
     const auto& loc = info.loc;
 
-    io::write(out, '\n');
+    out << '\n';
     for (auto d = info.depth; d > 0; d--) {
-        io::write(out, "  ");
+        out << "  ";
     }
 
-    io::write(
-        out,
-        std::format(
-            "[{}] {} loc={}:{}",
-            info.label,
-            getPrettyDuration<Duration>(info.duration),
-            std::filesystem::path(loc.file_name()).filename().c_str(),
-            loc.line()));
+    out << std::format(
+        "[{}] {} loc={}:{}",
+        info.label,
+        getPrettyDuration<Duration>(info.duration),
+        std::filesystem::path(loc.file_name()).filename().c_str(),
+        loc.line());
 
     std::vector<const StackScopeTracerBase*> children;
     info.children.forEach([&](const auto& child) { children.push_back(&child); });
@@ -59,9 +56,9 @@ void logStackTrace(const StackScopeTracerBase& info, io::OutBuffer& out) {
 template <typename Duration = AutomaticDuration>
 auto logStackTrace(
     const StackScopeTracerBase& info, log::LoggerPtr logger = log::loggerOrGlobal("trace")) {
-    io::OutBuffer out;
-    detail::logStackTrace<Duration>(info, out);
-    logger->trace(out.view());
+    std::ostringstream os;
+    detail::logStackTrace<Duration>(info, os);
+    logger->trace(os.view());
 }
 
 template <typename Duration = AutomaticDuration>

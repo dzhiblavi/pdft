@@ -2,8 +2,9 @@
 
 #include "pdft/tui/kitty/apc/command.h"
 
+#include "pdft/io/buffer.h"
+
 #include "pdft/core/context.h"
-#include "pdft/core/io/buffer.h"
 #include "pdft/core/result.h"
 
 #include <asio/awaitable.hpp>
