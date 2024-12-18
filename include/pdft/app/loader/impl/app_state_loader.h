@@ -24,8 +24,8 @@ enum class StateMode {
 class AppStateLoader : public StateLoader, public Module {
  public:
     struct Config {
-        StateMode mode;
-        std::optional<std::string> state_path;
+        StateMode mode = StateMode::AddOnly;
+        std::optional<std::string> state_path = {};
     };
 
     struct CliArgs {
