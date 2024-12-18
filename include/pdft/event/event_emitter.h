@@ -16,7 +16,7 @@ class EventEmitter {
 
     virtual void stop() = 0;
 
-    template <typename F>
+    template <std::invocable<const EventType&> F>
     void subscribe(F&& func) {
         subs_.emplace_back(std::forward<F>(func));
     }

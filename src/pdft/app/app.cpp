@@ -36,9 +36,9 @@ Application::Application(
     Config config,
     asio::io_context& io,
     inject<Loader, "loader"> loader,
-    inject<event::EventEmitter<notify::Event>, "fswatcher"> fswatcher,
-    inject<event::EventEmitter<char>, "key_listener"> key_listener,
-    inject<event::EventEmitter<int>, "sig_listener"> sig_listener,
+    inject<event::EventEmitter<notify::Event>, "fs_event_emitter"> fs_emitter,
+    inject<event::EventEmitter<char>, "key_event_emitter"> key_emitter,
+    inject<event::EventEmitter<int>, "sig_event_emitter"> sig_emitter,
     inject<Controller, "controller"> controller,
     inject<View, "view"> view,
     inject<tui::Renderer, "renderer"> renderer)
@@ -48,9 +48,9 @@ Application::Application(
     , view_(std::move(view))
     , controller_(std::move(controller))
     , renderer_(std::move(renderer))
-    , fswatcher_(std::move(fswatcher))
-    , key_listener_(std::move(key_listener))
-    , sig_listener_(std::move(sig_listener))
+    , fs_emitter_(std::move(fs_emitter))
+    , key_emitter_(std::move(key_emitter))
+    , sig_emitter_(std::move(sig_emitter))
     , events_chan_(io.get_executor(), config_.event_max_buffer_size) {}
 
 Async<Status> Application::run(Context& ctx) {
@@ -123,9 +123,9 @@ void Application::subscribe() {
         asio::co_spawn(io_, accept(std::move(ev)), asio::detached);
     };
 
-    fswatcher_->subscribe(event_cb);
-    key_listener_->subscribe(event_cb);
-    sig_listener_->subscribe(event_cb);
+    fs_emitter_->subscribe(event_cb);
+    key_emitter_->subscribe(event_cb);
+    sig_emitter_->subscribe(event_cb);
 }
 
 Async<Status> Application::shutdown() {
@@ -138,9 +138,9 @@ Async<Status> Application::shutdown() {
 }
 
 void Application::stop() {
-    fswatcher_->stop();
-    key_listener_->stop();
-    sig_listener_->stop();
+    fs_emitter_->stop();
+    key_emitter_->stop();
+    sig_emitter_->stop();
 }
 
 bool Application::isEventStale(SteadyTimePointType timestamp) {
@@ -160,15 +160,15 @@ ControllerAction Application::onEvent(const event::Event<notify::Event>& fs_even
 }
 
 ControllerAction Application::onEvent(const event::Event<char>& key_event) {
+    // Check staleness for keyboard events only
+    if (isEventStale(key_event.timestamp)) {
+        return ControllerAction::None;
+    }
+
     return controller_->onKeyEvent(key_event.value).value_or(ControllerAction::None);
 }
 
 ControllerAction Application::onEvent(const event::Event<int>& sig_event) {
-    // Check staleness for keyboard events only
-    if (isEventStale(sig_event.timestamp)) {
-        return ControllerAction::None;
-    }
-
     return controller_->onSignal(sig_event.value).value_or(ControllerAction::None);
 }
 

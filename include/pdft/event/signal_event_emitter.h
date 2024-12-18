@@ -9,9 +9,9 @@
 
 namespace pdft::event {
 
-class SignalEventListener : public EventEmitter<int>, public Module {
+class SignalEventEmitter : public EventEmitter<int>, public Module {
  public:
-    explicit SignalEventListener(asio::io_context& io);
+    explicit SignalEventEmitter(asio::io_context& io);
 
     void start();
     void stop() override;

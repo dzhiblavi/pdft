@@ -13,6 +13,9 @@ struct ModuleConfig {
     // Or the factory module name (i.e. apc_executor_factory, a module defined elsewhere)
     std::optional<std::string> factory;
 
+    // Or an alias to another module
+    std::optional<std::string> alias;
+
     rfl::Generic config = rfl::Generic::Null;
     std::string logger = "global";
 };

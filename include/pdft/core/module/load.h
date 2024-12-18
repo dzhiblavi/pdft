@@ -34,6 +34,7 @@ class LoadContext {
     Result<Arc<Module>> load(const ModuleConfig& config, const std::string& name);
     Result<Arc<Module>> loadViaClass(const ModuleConfig& config, const std::string& name);
     Result<Arc<Module>> loadViaFactory(const ModuleConfig& config, const std::string& name);
+    Result<Arc<Module>> loadViaAlias(const ModuleConfig& config, const std::string& name);
 
     asio::io_context& io_;
     FactoryStorage& factory_storage_;

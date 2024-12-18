@@ -1,4 +1,4 @@
-#include "pdft/event/signal_event_listener.h"
+#include "pdft/event/signal_event_emitter.h"
 
 #include "pdft/core/module/register.h"
 
@@ -8,20 +8,20 @@
 
 namespace pdft::event {
 
-SignalEventListener::SignalEventListener(asio::io_context& io)
+SignalEventEmitter::SignalEventEmitter(asio::io_context& io)
     : io_(io)
     , signals_(io, SIGINT, SIGWINCH) {}
 
-void SignalEventListener::start() {
+void SignalEventEmitter::start() {
     asio::co_spawn(
         io_, listenForEvents(), asio::bind_cancellation_slot(cancel_.slot(), asio::detached));
 }
 
-void SignalEventListener::stop() {
+void SignalEventEmitter::stop() {
     cancel_.emit(asio::cancellation_type_t::terminal);
 }
 
-Async<void> SignalEventListener::listenForEvents() {
+Async<void> SignalEventEmitter::listenForEvents() {
     auto state = co_await asio::this_coro::cancellation_state;
 
     while (!state.cancelled()) {
@@ -37,4 +37,4 @@ Async<void> SignalEventListener::listenForEvents() {
 
 }  // namespace pdft::event
 
-PDFT_REGISTER_MODULE(pdft::event::SignalEventListener);
+PDFT_REGISTER_MODULE(pdft::event::SignalEventEmitter);

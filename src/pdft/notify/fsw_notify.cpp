@@ -13,7 +13,6 @@
 
 namespace pdft::notify {
 
-inline constexpr int MaxChannelBufferSize = 10;
 inline constexpr float FswLatency = 0.1f;
 
 FswNotify::FswNotify() {

@@ -1,4 +1,4 @@
-#include "pdft/event/key_event_listener.h"
+#include "pdft/event/key_event_emitter.h"
 
 #include "pdft/core/module/register.h"
 
@@ -8,20 +8,20 @@
 
 namespace pdft::event {
 
-KeyEventListener::KeyEventListener(asio::io_context& io, inject<io::ConsoleReader, "reader"> reader)
+KeyEventEmitter::KeyEventEmitter(asio::io_context& io, inject<io::ConsoleReader, "reader"> reader)
     : io_(io)
     , console_reader_(std::move(reader)) {}
 
-void KeyEventListener::start() {
+void KeyEventEmitter::start() {
     asio::co_spawn(
         io_, listenForEvents(), asio::bind_cancellation_slot(cancel_.slot(), asio::detached));
 }
 
-void KeyEventListener::stop() {
+void KeyEventEmitter::stop() {
     cancel_.emit(asio::cancellation_type_t::terminal);
 }
 
-Async<void> KeyEventListener::listenForEvents() {
+Async<void> KeyEventEmitter::listenForEvents() {
     auto state = co_await asio::this_coro::cancellation_state;
 
     while (!state.cancelled()) {
@@ -37,4 +37,4 @@ Async<void> KeyEventListener::listenForEvents() {
 
 }  // namespace pdft::event
 
-PDFT_REGISTER_MODULE(pdft::event::KeyEventListener);
+PDFT_REGISTER_MODULE(pdft::event::KeyEventEmitter);

@@ -29,9 +29,9 @@ class Application : public Module {
         Config config,
         asio::io_context& io,
         inject<Loader, "loader"> loader,
-        inject<event::EventEmitter<notify::Event>, "fswatcher"> fswatcher,
-        inject<event::EventEmitter<char>, "key_listener"> key_listener,
-        inject<event::EventEmitter<int>, "sig_listener"> sig_listener,
+        inject<event::EventEmitter<notify::Event>, "fs_event_emitter"> fs_emitter,
+        inject<event::EventEmitter<char>, "key_event_emitter"> key_emitter,
+        inject<event::EventEmitter<int>, "sig_event_emitter"> sig_emitter,
         inject<Controller, "controller"> controller,
         inject<View, "view"> view,
         inject<tui::Renderer, "renderer"> renderer);
@@ -60,9 +60,9 @@ class Application : public Module {
     Arc<Controller> controller_;
     Arc<tui::Renderer> renderer_;
 
-    Arc<event::EventEmitter<notify::Event>> fswatcher_;
-    Arc<event::EventEmitter<char>> key_listener_;
-    Arc<event::EventEmitter<int>> sig_listener_;
+    Arc<event::EventEmitter<notify::Event>> fs_emitter_;
+    Arc<event::EventEmitter<char>> key_emitter_;
+    Arc<event::EventEmitter<int>> sig_emitter_;
 
     using Event = std::variant<event::Event<notify::Event>, event::Event<char>, event::Event<int>>;
     asio::experimental::channel<void(asio::error_code, Event)> events_chan_;

@@ -52,6 +52,8 @@ Result<Arc<Module>> LoadContext::load(const ModuleConfig& config, const std::str
         return loadViaClass(config, name);
     } else if (config.factory.has_value()) {
         return loadViaFactory(config, name);
+    } else if (config.alias.has_value()) {
+        return loadViaAlias(config, name);
     } else {
         return err(
             "neither factory nor cls construction methods are provided for module '{}'", name);
@@ -93,6 +95,12 @@ Result<Arc<Module>> LoadContext::loadViaFactory(
 
     // Use factory to create a requested module
     co_return co_await traits->create(factory.get());
+}
+
+Result<Arc<Module>> LoadContext::loadViaAlias(const ModuleConfig& config, const std::string& name) {
+    auto&& alias = *config.alias;
+    log::info("loading a module '{}' as alias to '{}'", name, alias);
+    co_return co_await getModule(alias);
 }
 
 Result<Arc<Module>> LoadContext::getModule(const std::string& name) {

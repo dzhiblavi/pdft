@@ -10,9 +10,9 @@
 
 namespace pdft::event {
 
-class KeyEventListener : public EventEmitter<char>, public Module {
+class KeyEventEmitter : public EventEmitter<char>, public Module {
  public:
-    KeyEventListener(asio::io_context& io, inject<io::ConsoleReader, "reader"> reader);
+    KeyEventEmitter(asio::io_context& io, inject<io::ConsoleReader, "reader"> reader);
 
     void start();
     void stop() override;
