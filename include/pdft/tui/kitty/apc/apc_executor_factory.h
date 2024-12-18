@@ -2,7 +2,7 @@
 
 #include "pdft/tui/kitty/apc/apc_executor.h"
 
-#include "pdft/core/module/factory.h"
+#include "pdft/core/factory.h"
 #include "pdft/core/module/module.h"
 
 namespace pdft::tui {

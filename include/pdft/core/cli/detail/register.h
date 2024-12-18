@@ -4,7 +4,7 @@
 
 #include "pdft/core/cli/detail/cli_arg.h"
 #include "pdft/core/cli/detail/get_cli_args.h"
-#include "pdft/core/cli/detail/storage.h"
+#include "pdft/core/cli/storage.h"
 
 namespace pdft::cli::detail {
 

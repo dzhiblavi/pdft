@@ -5,7 +5,7 @@
 #include "pdft/tui/kitty/kitty_display_base.h"
 #include "pdft/tui/terminal.h"
 
-#include "pdft/core/module/factory.h"
+#include "pdft/core/factory.h"
 #include "pdft/core/module/inject.h"
 #include "pdft/core/module/module.h"
 

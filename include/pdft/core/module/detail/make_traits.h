@@ -1,7 +1,7 @@
 #pragma once
 
+#include "pdft/core/factory.h"
 #include "pdft/core/module/detail/make_module.h"
-#include "pdft/core/module/factory.h"
 #include "pdft/core/module/traits.h"
 
 #include <rfl/to_generic.hpp>

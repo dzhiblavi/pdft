@@ -1,7 +1,8 @@
 #include "pdft/core/cli/cli.h"
+#include "pdft/core/cli/storage.h"
+
 #include "pdft/core/cli/detail/parsed.h"
 #include "pdft/core/cli/detail/register.h"
-#include "pdft/core/cli/detail/storage.h"
 
 #include "pdft/core/result/make/err.h"
 #include "pdft/core/result/type/maybe.h"
@@ -290,6 +291,34 @@ TEST_CASE("cli/vector<enum>/invalid") {
     };
 
     test<X>([](auto x) { CHECK(!x); }, "-v", "B", "-v", "X");
+}
+
+TEST_CASE("cli/rename/short") {
+    struct X {
+        opt<int>::shrt<'x'> v;
+    };
+
+    test<X>(
+        [](auto x) {
+            CHECK(x);
+            CHECK(x->v == 10);
+        },
+        "-x",
+        "10");
+}
+
+TEST_CASE("cli/rename/long") {
+    struct X {
+        opt<int>::lng<"xyz"> v;
+    };
+
+    test<X>(
+        [](auto x) {
+            CHECK(x);
+            CHECK(x->v == 10);
+        },
+        "--xyz",
+        "10");
 }
 
 }  // namespace pdft::cli::detail

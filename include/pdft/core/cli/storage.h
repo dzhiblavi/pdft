@@ -1,12 +1,12 @@
 #pragma once
 
-#include "pdft/core/cli/detail/option.h"
+#include "pdft/core/cli/option.h"
 
 #include <tclap/CmdLine.h>
 
 #include <map>
 
-namespace pdft::cli::detail {
+namespace pdft::cli {
 
 class OptionsStorage {
  public:
@@ -21,4 +21,4 @@ class OptionsStorage {
     std::map<char, IOption*> options_;
 };
 
-}  // namespace pdft::cli::detail
+}  // namespace pdft::cli

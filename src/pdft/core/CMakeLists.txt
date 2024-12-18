@@ -30,4 +30,4 @@ target_sources(
           ./trace/stack_scope_tracer.cpp
           ./trace/log_stack_trace.cpp
           ./cli/parse.cpp
-          ./cli/detail/storage.cpp)
+          ./cli/storage.cpp)

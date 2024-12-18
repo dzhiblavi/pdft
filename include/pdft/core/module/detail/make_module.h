@@ -35,7 +35,14 @@ Result<Arc<T>> loadModule(LoadContext& ctx, std::string name) {
 
     Arc<T> module = co_await createModule<T>(ctx, name);
 
-    auto logger = log::logger(config->logger);
+    log::LoggerPtr logger;
+
+    if (config->logger != "global") {
+        logger = log::logger(config->logger);
+    } else {
+        logger = log::global();
+    }
+
     if (!logger) {
         co_return result::err(
             "missing logger {} required by module '{}' of type {}",

@@ -24,7 +24,7 @@ endfunction(add_test)
 # core
 add_test(./pdft/core/trace/test_scope_tracer.cpp)
 add_test(./pdft/core/trace/test_stack_scope_tracer.cpp)
-add_test(./pdft/core/cli/detail/test_cli_args.cpp)
+add_test(./pdft/core/cli/test_cli_args.cpp)
 
 # core/result
 add_test(./pdft/core/result/combine/test_and_then.cpp)
@@ -34,6 +34,10 @@ add_test(./pdft/core/result/combine/test_map_err.cpp)
 add_test(./pdft/core/result/combine/test_or_else.cpp)
 add_test(./pdft/core/result/coro/test_maybe.cpp)
 add_test(./pdft/core/result/coro/test_result.cpp)
+
+# core/module
+add_test(./pdft/core/module/test_factory_storage.cpp)
+add_test(./pdft/core/module/test_load.cpp)
 
 # io
 add_test(./pdft/io/test_posix_console_writer.cpp)

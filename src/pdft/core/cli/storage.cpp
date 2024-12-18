@@ -1,8 +1,8 @@
-#include "pdft/core/cli/detail/storage.h"
+#include "pdft/core/cli/storage.h"
 
 #include "pdft/core/assert.h"
 
-namespace pdft::cli::detail {
+namespace pdft::cli {
 
 void OptionsStorage::addOption(char sh, IOption* option) {
     PDFT_VERIFY(!options_.contains(sh), "duplicate short option -{}", sh);
@@ -20,4 +20,4 @@ OptionsStorage& OptionsStorage::globalInstance() {
     return storage;
 }
 
-}  // namespace pdft::cli::detail
+}  // namespace pdft::cli

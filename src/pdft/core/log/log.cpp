@@ -22,7 +22,7 @@ class GlobalLogger {
     }
 
  private:
-    LoggerPtr logger;
+    LoggerPtr logger = spdlog::default_logger();
 };
 
 }  // namespace

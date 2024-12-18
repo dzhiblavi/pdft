@@ -3,7 +3,7 @@
 #include "pdft/core/result/make/err.h"
 #include "pdft/core/result/make/ok.h"
 
-#include "pdft/core/cli/detail/storage.h"
+#include "pdft/core/cli/storage.h"
 
 #include <tclap/CmdLine.h>
 
@@ -14,7 +14,7 @@ Result<bool> parse(
     TCLAP::CmdLine cmd(description, ' ', version);
     cmd.setExceptionHandling(false);
 
-    cli::detail::OptionsStorage::globalInstance().attach(cmd);
+    cli::OptionsStorage::globalInstance().attach(cmd);
 
     try {
         cmd.parse(static_cast<int>(argv.size()), argv.data());

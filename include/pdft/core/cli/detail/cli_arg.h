@@ -1,7 +1,7 @@
 #pragma once
 
 #include "pdft/core/cli/detail/lift.h"
-#include "pdft/core/cli/detail/option.h"
+#include "pdft/core/cli/option.h"
 
 #include "pdft/core/result/type/result.h"
 #include "pdft/core/result/type/unit.h"
