@@ -18,6 +18,14 @@ constexpr char orEmpty() {
     return A == '\0' ? B : A;
 }
 
+// state_mode -> state-mode
+template <utils::FixedString A>
+constexpr auto kebabify() {
+    auto arr = A.arr_;
+    std::replace(arr.begin(), arr.end(), '_', '-');
+    return utils::FixedString(arr);
+}
+
 template <char TShort, utils::FixedString TDescription, utils::FixedString TLong>
 struct OptionDescription {
     static constexpr auto Short = TShort;
@@ -34,8 +42,10 @@ struct OptionDescription {
     using desc = OptionDescription<Short, NewDescription, Long>;
 
     template <utils::FixedString Name>
-    using fulfill =
-        OptionDescription<orEmpty<Short, Name[0]>(), Description, orEmpty<Long, Name>()>;
+    using fulfill = OptionDescription<
+        orEmpty<Short, Name[0]>(),
+        Description,
+        orEmpty<Long, kebabify<Name>()>()>;
 };
 
 template <typename T, typename Desc>
