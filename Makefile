@@ -3,11 +3,12 @@ CONAN = conan
 CMAKE = cmake
 
 BUILD_TYPE ?= Debug
-CONAN_PROFILE = $(shell echo "$(BUILD_TYPE)" | tr '[:upper:]' '[:lower:]')
+CONAN_PRESET = conan-$(shell echo "$(BUILD_TYPE)" | tr '[:upper:]' '[:lower:]')
 PROFILE ?= armv8-macos
 ASAN ?= OFF
 TSAN ?= OFF
 UBSAN ?= OFF
+TESTS ?= ON
 
 BUILD_IMAGE = pdft-build-image
 TARGET = target
@@ -33,19 +34,19 @@ deps: _prepare_target_dirs
 		--settings:build=build_type=$(BUILD_TYPE)
 
 configure: deps
-	cmake --preset conan-$(CONAN_PROFILE)                 \
-		-DPDFT_BUILD_TESTS=ON                             \
+	cmake --preset $(CONAN_PRESET)                        \
+		-DPDFT_BUILD_TESTS=$(TESTS)                       \
 		-DPDFT_MUPDF_LOCAL_SOURCE_DIR=${MUPDF_SOURCE_DIR} \
-		-DPDFT_USE_CUSTOM_LIBCXX=/opt/homebrew/opt/llvm   \
+		-DPDFT_USE_CUSTOM_LIBCXX=$(LIBCXX_PATH)           \
 		-DASAN=$(ASAN)                                    \
 		-DTSAN=$(TSAN)                                    \
 		-DUBSAN=$(UBSAN)
 
 build: configure
-	cmake --build --preset conan-$(CONAN_PROFILE)         \
-		-DPDFT_BUILD_TESTS=ON                             \
+	cmake --build --preset $(CONAN_PRESET)                \
+		-DPDFT_BUILD_TESTS=$(TESTS)                       \
 		-DPDFT_MUPDF_LOCAL_SOURCE_DIR=${MUPDF_SOURCE_DIR} \
-		-DPDFT_USE_CUSTOM_LIBCXX=/opt/homebrew/opt/llvm   \
+		-DPDFT_USE_CUSTOM_LIBCXX=$(LIBCXX_PATH)           \
 		-DASAN=$(ASAN)                                    \
 		-DTSAN=$(TSAN)                                    \
 		-DUBSAN=$(UBSAN)
