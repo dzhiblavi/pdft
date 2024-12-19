@@ -36,7 +36,7 @@ configure: deps
 	cmake --preset conan-$(CONAN_PROFILE)                 \
 		-DPDFT_BUILD_TESTS=ON                             \
 		-DPDFT_MUPDF_LOCAL_SOURCE_DIR=${MUPDF_SOURCE_DIR} \
-		-DCMAKE_EXE_LINKER_FLAGS="-L/opt/homebrew/opt/llvm/lib/c++ -L/opt/homebrew/opt/llvm/lib/unwind -lunwind" \
+		-DPDFT_USE_CUSTOM_LIBCXX=/opt/homebrew/opt/llvm   \
 		-DASAN=$(ASAN)                                    \
 		-DTSAN=$(TSAN)                                    \
 		-DUBSAN=$(UBSAN)
@@ -45,7 +45,7 @@ build: configure
 	cmake --build --preset conan-$(CONAN_PROFILE)         \
 		-DPDFT_BUILD_TESTS=ON                             \
 		-DPDFT_MUPDF_LOCAL_SOURCE_DIR=${MUPDF_SOURCE_DIR} \
-		-DCMAKE_EXE_LINKER_FLAGS="-L/opt/homebrew/opt/llvm/lib/c++ -L/opt/homebrew/opt/llvm/lib/unwind -lunwind" \
+		-DPDFT_USE_CUSTOM_LIBCXX=/opt/homebrew/opt/llvm   \
 		-DASAN=$(ASAN)                                    \
 		-DTSAN=$(TSAN)                                    \
 		-DUBSAN=$(UBSAN)

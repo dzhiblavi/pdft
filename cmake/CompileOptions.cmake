@@ -19,7 +19,20 @@ add_compile_options(-Wno-error=unused-command-line-argument)
 add_compile_options(-g -gdwarf-4)
 
 # libc++
-add_compile_options(-stdlib=libc++)
-add_link_options(-stdlib=libc++)
+if(PDFT_USE_CUSTOM_LIBCXX)
+  message(STATUS "Using custom libc++ located at ${PDFT_USE_CUSTOM_LIBCXX}")
+
+  add_compile_options(-nostdinc++ -isystem
+                      "${PDFT_USE_CUSTOM_LIBCXX}/include/c++/v1")
+
+  add_link_options(
+    -nostdlib++ "-L${PDFT_USE_CUSTOM_LIBCXX}/lib/c++"
+    -Wl,-rpath,"${PDFT_USE_CUSTOM_LIBCXX}"/lib/c++ -lc++ -lc++abi)
+else()
+  message(STATUS "Using system libc++")
+
+  add_compile_options(-stdlib=libc++)
+  add_link_options(-stdlib=libc++)
+endif(PDFT_USE_CUSTOM_LIBCXX)
 
 message(STATUS "C++ standard: ${CMAKE_CXX_STANDARD}")
