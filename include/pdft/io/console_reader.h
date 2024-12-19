@@ -1,7 +1,7 @@
 #pragma once
 
 #include "pdft/core/awaitable.h"
-#include "pdft/core/result/make/ok.h"
+#include "pdft/core/result.h"
 
 #include <asio/awaitable.hpp>
 #include <asio/buffer.hpp>
@@ -16,8 +16,8 @@ class ConsoleReader {
 
     AsyncResult<std::string> read(size_t num_bytes) {
         std::string buffer;
-        co_await this->read(num_bytes, buffer);
-        co_return result::ok(std::move(buffer));
+        co_return co_await this->read(num_bytes, buffer) |
+            result::map([&] { return std::move(buffer); });
     }
 };
 

@@ -38,6 +38,6 @@ struct fmt::formatter<std::error_code> {
 
     template <typename FormatContext>
     decltype(auto) format(const std::error_code& ec, FormatContext& ctx) {
-        return fmt::format_to(ctx.out(), "ec(cat={},msg={})", ec.category().name(), ec.message());
+        return fmt::format_to(ctx.out(), "{}: {}", ec.category().name(), ec.message());
     }
 };
