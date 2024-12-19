@@ -65,8 +65,14 @@
     "fswatcher": {
       "cls": "pdft::notify::FswNotify"
     },
-    "listener": {
-      "cls": "pdft::app::AppEventListener"
+    "fs_event_emitter": {
+      "alias": "fswatcher"
+    },
+    "key_event_emitter": {
+      "cls": "pdft::event::KeyEventEmitter"
+    },
+    "sig_event_emitter": {
+      "cls": "pdft::event::SignalEventEmitter"
     },
     "renderer": {
       "cls": "pdft::tui::AppRenderer"
@@ -75,7 +81,11 @@
       "cls": "pdft::app::AppUI"
     },
     "app": {
-      "cls": "pdft::app::Application"
+      "cls": "pdft::app::Application",
+      "config": {
+        "event_timeout_ms": 100,
+        "event_max_buffer_size": 100
+      }
     },
     "writer": {
       "cls": "pdft::io::PosixConsoleWriter"
@@ -92,6 +102,17 @@
     "persister": {
       "cls": "pdft::app::AppPersister"
     },
+    "mupdf_context": {
+      "cls": "pdft::media::MupdfContextOwner",
+      "logger": "mupdf",
+      "config": {
+        "text_aa_level": 8,
+        "graphics_aa_level": 8,
+        "register_as_global": true,
+        "enable_icc": true,
+        "setup_logging": true
+      }
+    },
     "media_loader": {
       "cls": "pdft::media::MupdfLoader"
     },
@@ -99,7 +120,7 @@
       "cls": "pdft::app::AppStateLoader",
       "config": {
         "mode": "AddOnly",
-        "state_path": "../../../../assets/state.json"
+        "state_path": "~/.local/state/pdft/state.json"
       }
     },
     "loader": {
