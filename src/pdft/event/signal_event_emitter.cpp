@@ -30,7 +30,7 @@ Async<void> SignalEventEmitter::listenForEvents() {
         if (!ec) {
             emit(signal);
         } else {
-            log::err(this, "error when receiving a signal: ", ec);
+            log::err(this, "error when receiving a signal: {}", ec);
         }
     }
 }

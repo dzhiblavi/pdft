@@ -70,13 +70,13 @@ check-format:
 		| xargs clang-format --dry-run --Werror
 
 run-lldb: build
-	cd $(TARGET_DIR) && lldb -- ./src/pdft/app $(args)
+	cd $(TARGET_DIR) && lldb -- ./src/pdft/cli/pdft $(args)
 
 run-gdb: build
-	cd $(TARGET_DIR) && gdb --args ./src/pdft/app $(args)
+	cd $(TARGET_DIR) && gdb --args ./src/pdft/cli/pdft $(args)
 
 run: build
-	cd $(TARGET_DIR) && ./src/pdft/app $(args)
+	cd $(TARGET_DIR) && ./src/pdft/cli/pdft $(args)
 
 install-local: build
 	cd $(TARGET_DIR) && cp ./src/pdft/cli/pdft ~/.bin/pdft
