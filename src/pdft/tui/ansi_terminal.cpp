@@ -1,6 +1,6 @@
 #include "pdft/tui/impl/ansi_terminal.h"
 
-#include "pdft/core/module/register.h"
+#include "pdft/runtime/module/register.h"
 
 namespace pdft::tui {
 

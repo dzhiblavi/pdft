@@ -2,14 +2,14 @@
 
 #include "pdft/io/console_reader.h"
 
-#include "pdft/core/module/module.h"
+#include "pdft/runtime/module/module.h"
 
 #include <asio/io_context.hpp>
 #include <asio/posix/stream_descriptor.hpp>
 
 namespace pdft::io {
 
-class PosixConsoleReader : public ConsoleReader, public Module {
+class PosixConsoleReader : public ConsoleReader, public rt::Module {
  public:
     struct Config {
         int fd = STDIN_FILENO;

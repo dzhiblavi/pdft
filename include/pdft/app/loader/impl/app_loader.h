@@ -7,16 +7,16 @@
 
 #include "pdft/notify/notify.h"
 
-#include "pdft/core/module/module.h"
+#include "pdft/runtime/module/module.h"
 
-#include "pdft/core/cli/cli.h"
+#include "pdft/runtime/cli/cli.h"
 
 namespace pdft::app {
 
-class AppLoader : public Loader, public Module {
+class AppLoader : public Loader, public rt::Module {
  public:
     struct CliArgs {
-        cli::opt<std::vector<std::string>>  //
+        rt::cli_opt<std::vector<std::string>>  //
             ::desc<"Paths to the documents to be opened"> path;
     };
 

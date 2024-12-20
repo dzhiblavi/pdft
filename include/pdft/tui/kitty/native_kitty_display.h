@@ -3,11 +3,11 @@
 #include "pdft/tui/kitty/kitty_display_base.h"
 #include "pdft/tui/terminal.h"
 
-#include "pdft/core/module/module.h"
+#include "pdft/runtime/module/module.h"
 
 namespace pdft::tui {
 
-class NativeKittyDisplay : public KittyDisplayBase, public Module {
+class NativeKittyDisplay : public KittyDisplayBase, public rt::Module {
  public:
     NativeKittyDisplay(Config config, Arc<APCExecutor> executor, Arc<const Terminal> terminal)
         : KittyDisplayBase(config, std::move(executor))

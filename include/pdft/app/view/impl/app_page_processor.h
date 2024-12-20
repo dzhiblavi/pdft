@@ -6,7 +6,7 @@
 
 namespace pdft::app {
 
-class AppPageProcessor : public PageProcessor, public Module {
+class AppPageProcessor : public PageProcessor, public rt::Module {
  public:
     struct Config {
         uint32_t render_pool_size = 4;

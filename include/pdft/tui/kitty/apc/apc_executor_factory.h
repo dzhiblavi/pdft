@@ -3,11 +3,11 @@
 #include "pdft/tui/kitty/apc/apc_executor.h"
 
 #include "pdft/core/factory.h"
-#include "pdft/core/module/module.h"
+#include "pdft/runtime/module/module.h"
 
 namespace pdft::tui {
 
-class APCExecutorFactory : public AbstractFactory<APCExecutor>, public Module {
+class APCExecutorFactory : public AbstractFactory<APCExecutor>, public rt::Module {
  public:
     using Config = APCExecutorConfig;
 

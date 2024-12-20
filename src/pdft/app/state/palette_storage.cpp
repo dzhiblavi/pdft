@@ -1,6 +1,6 @@
 #include "pdft/app/state/palette_storage.h"
 
-#include "pdft/core/module/register.h"
+#include "pdft/runtime/module/register.h"
 #include "pdft/core/result/make/none.h"
 #include "pdft/core/result/make/some.h"
 

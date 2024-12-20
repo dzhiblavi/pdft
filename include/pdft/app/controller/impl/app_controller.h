@@ -7,13 +7,13 @@
 
 #include "pdft/media/loader.h"
 
-#include "pdft/core/module/module.h"
+#include "pdft/runtime/module/module.h"
 
 #include <vector>
 
 namespace pdft::app {
 
-class AppController : public Controller, public Module {
+class AppController : public Controller, public rt::Module {
  public:
     enum class Command {
         Quit,

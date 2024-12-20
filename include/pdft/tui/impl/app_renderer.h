@@ -6,11 +6,11 @@
 #include "pdft/io/console_writer.h"
 #include "pdft/io/termctl.h"
 
-#include "pdft/core/module/module.h"
+#include "pdft/runtime/module/module.h"
 
 namespace pdft::tui {
 
-class AppRenderer : public Renderer, public Module {
+class AppRenderer : public Renderer, public rt::Module {
  public:
     AppRenderer(
         Arc<const tui::Terminal> terminal,

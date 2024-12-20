@@ -1,6 +1,6 @@
 #include "pdft/app/view/impl/app_page_processor.h"
 
-#include "pdft/core/module/register.h"
+#include "pdft/runtime/module/register.h"
 #include "pdft/core/trace/log_stack_trace.h"
 #include "pdft/utils/zlib.h"
 

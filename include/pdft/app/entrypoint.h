@@ -2,11 +2,11 @@
 
 #include "pdft/app/app.h"
 
-#include "pdft/core/module/module.h"
+#include "pdft/runtime/module/module.h"
 
 namespace pdft::app {
 
-class Entrypoint : public Module {
+class Entrypoint : public rt::Module {
  public:
     Entrypoint(asio::io_context& io, Arc<Application> app);
 

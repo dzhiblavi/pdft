@@ -2,9 +2,9 @@
 #include "pdft/tui/kitty/native_kitty_display.h"
 #include "pdft/tui/kitty/unicode_kitty_display.h"
 
-#include "pdft/core/module/register.h"
+#include "pdft/runtime/module/register.h"
 
-#include "pdft/core/cli/register.h"
+#include "pdft/runtime/cli/register.h"
 
 namespace pdft::tui {
 

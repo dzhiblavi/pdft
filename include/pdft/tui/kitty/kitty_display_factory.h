@@ -6,13 +6,13 @@
 #include "pdft/tui/terminal.h"
 
 #include "pdft/core/factory.h"
-#include "pdft/core/module/module.h"
+#include "pdft/runtime/module/module.h"
 
-#include "pdft/core/cli/cli.h"
+#include "pdft/runtime/cli/cli.h"
 
 namespace pdft::tui {
 
-class KittyDisplayFactory : public AbstractFactory<Display>, public Module {
+class KittyDisplayFactory : public AbstractFactory<Display>, public rt::Module {
  public:
     struct Config {
         bool force_unicode = false;
@@ -20,7 +20,7 @@ class KittyDisplayFactory : public AbstractFactory<Display>, public Module {
     };
 
     struct CliArgs {
-        cli::opt<bool>                                            //
+        rt::cli_opt<bool>                                            //
             ::desc<"Force Unicode Kitty image display protocol">  //
             ::shrt<'U'> force_unicode = false;
     };

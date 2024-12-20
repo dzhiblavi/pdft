@@ -2,7 +2,7 @@
 
 #include "pdft/media/document.h"
 
-#include "pdft/core/module/module.h"
+#include "pdft/runtime/module/module.h"
 #include "pdft/core/result/type/maybe.h"
 
 #include <unordered_map>
@@ -11,7 +11,7 @@ namespace pdft::app {
 
 using DocumentId = uint32_t;
 
-class DocumentStorage : public Module {
+class DocumentStorage : public rt::Module {
  public:
     DocumentId addDocument(Arc<media::Document> document);
 

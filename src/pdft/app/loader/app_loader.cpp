@@ -1,10 +1,10 @@
 #include "pdft/app/loader/impl/app_loader.h"
 #include "pdft/app/palettes.h"
 
-#include "pdft/core/module/register.h"
+#include "pdft/runtime/module/register.h"
 #include "pdft/core/result/coro/result.h"  // IWYU pragma: keep
 
-#include "pdft/core/cli/register.h"
+#include "pdft/runtime/cli/register.h"
 
 namespace pdft::app {
 

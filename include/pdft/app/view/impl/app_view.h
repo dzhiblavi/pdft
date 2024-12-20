@@ -4,11 +4,11 @@
 #include "pdft/app/view/document_view.h"
 #include "pdft/app/view/view.h"
 
-#include "pdft/core/module/module.h"
+#include "pdft/runtime/module/module.h"
 
 namespace pdft::app {
 
-class AppView : public View, public Module {
+class AppView : public View, public rt::Module {
  public:
     AppView(Arc<const UI> ui, Arc<const DocumentStorage> documents, Arc<DocumentView> view);
 

@@ -2,14 +2,14 @@
 
 #include "pdft/io/console_writer.h"
 
-#include "pdft/core/module/module.h"
+#include "pdft/runtime/module/module.h"
 
 #include <asio/io_context.hpp>
 #include <asio/posix/stream_descriptor.hpp>
 
 namespace pdft::io {
 
-class PosixConsoleWriter : public ConsoleWriter, public Module {
+class PosixConsoleWriter : public ConsoleWriter, public rt::Module {
  public:
     struct Config {
         int fd = STDOUT_FILENO;

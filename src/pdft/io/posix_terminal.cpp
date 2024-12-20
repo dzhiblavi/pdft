@@ -1,6 +1,6 @@
 #include "pdft/io/posix_termctl.h"
 
-#include "pdft/core/module/register.h"
+#include "pdft/runtime/module/register.h"
 
 #include <termios.h>
 #include <unistd.h>

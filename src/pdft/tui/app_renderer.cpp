@@ -1,6 +1,6 @@
 #include "pdft/tui/impl/app_renderer.h"
 
-#include "pdft/core/module/register.h"
+#include "pdft/runtime/module/register.h"
 
 namespace pdft::tui {
 

@@ -1,7 +1,7 @@
 #include "pdft/app/state/impl/app_ui.h"
 
 #include "pdft/core/assert.h"
-#include "pdft/core/module/register.h"
+#include "pdft/runtime/module/register.h"
 
 #include <magic_enum.hpp>
 

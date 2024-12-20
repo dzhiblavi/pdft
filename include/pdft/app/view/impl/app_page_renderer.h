@@ -5,7 +5,7 @@
 #include "pdft/tui/display.h"
 
 #include "pdft/core/future.h"
-#include "pdft/core/module/module.h"
+#include "pdft/runtime/module/module.h"
 
 #include "pdft/utils/lru_cache.h"
 #include "pdft/utils/random.h"
@@ -34,7 +34,7 @@ struct FutureValue {
     mutable std::variant<Future<T>, T> value_;
 };
 
-class AppPageRenderer : public PageRenderer, public Module {
+class AppPageRenderer : public PageRenderer, public rt::Module {
  public:
     struct Config {
         static constexpr uint32_t DefaultImageCacheSize = 128;

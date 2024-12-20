@@ -19,15 +19,5 @@ target_link_libraries(
          magic_enum::magic_enum)
 
 target_sources(
-  pdft-core
-  PRIVATE ./assert.cpp
-          ./module/load.cpp
-          ./module/factory_storage.cpp
-          ./module/start.cpp
-          ./context.cpp
-          ./log/load.cpp
-          ./log/log.cpp
-          ./trace/stack_scope_tracer.cpp
-          ./trace/log_stack_trace.cpp
-          ./cli/parse.cpp
-          ./cli/storage.cpp)
+  pdft-core PRIVATE ./assert.cpp ./context.cpp ./log/load.cpp ./log/log.cpp
+                    ./trace/stack_scope_tracer.cpp ./trace/log_stack_trace.cpp)

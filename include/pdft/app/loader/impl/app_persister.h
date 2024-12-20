@@ -5,11 +5,11 @@
 
 #include "pdft/media/loader.h"
 
-#include "pdft/core/module/module.h"
+#include "pdft/runtime/module/module.h"
 
 namespace pdft::app {
 
-class AppPersister : public Persister, public Module {
+class AppPersister : public Persister, public rt::Module {
  public:
     AppPersister(Arc<UI> ui, Arc<DocumentStorage> documents, Arc<const media::Loader> doc_loader);
 

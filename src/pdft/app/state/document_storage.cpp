@@ -1,5 +1,5 @@
 #include "pdft/app/state/document_storage.h"
-#include "pdft/core/module/register.h"
+#include "pdft/runtime/module/register.h"
 
 namespace pdft::app {
 

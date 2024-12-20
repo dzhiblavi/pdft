@@ -4,11 +4,11 @@
 #include "pdft/app/view/page_renderer.h"
 
 #include "pdft/core/context.h"
-#include "pdft/core/module/module.h"
+#include "pdft/runtime/module/module.h"
 
 namespace pdft::app {
 
-class AppDocumentView : public DocumentView, public Module {
+class AppDocumentView : public DocumentView, public rt::Module {
  public:
     explicit AppDocumentView(Arc<PageRenderer> renderer) : renderer_(std::move(renderer)) {}
 

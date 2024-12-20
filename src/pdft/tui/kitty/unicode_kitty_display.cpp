@@ -2,7 +2,7 @@
 
 #include "pdft/core/assert.h"
 #include "pdft/core/log.h"
-#include "pdft/core/module/register.h"
+#include "pdft/runtime/module/register.h"
 
 #include "./detail/rowcolumn_diacritics.h"
 

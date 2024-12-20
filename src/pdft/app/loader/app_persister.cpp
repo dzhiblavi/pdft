@@ -2,7 +2,7 @@
 #include "pdft/app/state/ui.h"
 
 #include "pdft/core/log.h"
-#include "pdft/core/module/register.h"
+#include "pdft/runtime/module/register.h"
 
 #include <rfl/json.hpp>
 

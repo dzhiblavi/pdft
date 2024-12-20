@@ -2,14 +2,14 @@
 
 #include "pdft/image/palette.h"
 
-#include "pdft/core/module/module.h"
+#include "pdft/runtime/module/module.h"
 #include "pdft/core/result/type/maybe.h"
 
 #include <unordered_map>
 
 namespace pdft::app {
 
-class PaletteStorage : public Module {
+class PaletteStorage : public rt::Module {
  public:
     PaletteStorage() = default;
 

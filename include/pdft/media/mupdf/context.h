@@ -1,6 +1,6 @@
 #pragma once
 
-#include "pdft/core/module/module.h"
+#include "pdft/runtime/module/module.h"
 #include "pdft/utils/pinned.h"
 
 struct fz_context;  // NOLINT
@@ -21,7 +21,7 @@ class MupdfContext {
 
 class MupdfContextOwner
     : public MupdfContext,
-      public Module,
+      public rt::Module,
       public utils::Pinned,
       public std::enable_shared_from_this<MupdfContextOwner> {
  public:

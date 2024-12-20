@@ -2,10 +2,10 @@
 
 #include "pdft/app/state/ui.h"
 #include "pdft/core/log.h"
-#include "pdft/core/module/register.h"
+#include "pdft/runtime/module/register.h"
 #include "pdft/core/result.h"
 
-#include "pdft/core/cli/register.h"
+#include "pdft/runtime/cli/register.h"
 #include "pdft/utils/get_home_dir.h"
 
 #include <magic_enum.hpp>

@@ -4,7 +4,7 @@
 #include "pdft/tui/kitty/apc/tmux_apc_executor.h"
 
 #include "pdft/core/log.h"
-#include "pdft/core/module/register.h"
+#include "pdft/runtime/module/register.h"
 
 namespace pdft::tui {
 

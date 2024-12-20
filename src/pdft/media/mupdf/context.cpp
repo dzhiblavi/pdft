@@ -2,7 +2,7 @@
 #include "pdft/core/assert.h"
 
 #include "fz_assert.h"
-#include "pdft/core/module/register.h"
+#include "pdft/runtime/module/register.h"
 
 extern "C" {
 #include <mupdf/fitz/archive.h>

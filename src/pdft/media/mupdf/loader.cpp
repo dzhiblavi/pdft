@@ -1,7 +1,7 @@
 #include "pdft/media/mupdf/loader.h"
 #include "pdft/media/mupdf/document.h"
 
-#include "pdft/core/module/register.h"
+#include "pdft/runtime/module/register.h"
 #include "pdft/core/result.h"
 #include "pdft/core/result/coro/result.h"
 

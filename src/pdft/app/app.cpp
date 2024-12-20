@@ -2,10 +2,10 @@
 
 #include "pdft/core/awaitable.h"
 #include "pdft/core/log.h"
-#include "pdft/core/module/register.h"
 #include "pdft/core/result/make/err.h"
 #include "pdft/core/trace/log_stack_trace.h"
 #include "pdft/core/trace/stack_scope_tracer.h"
+#include "pdft/runtime/module/register.h"
 
 #include "pdft/utils/visit.h"
 
@@ -36,9 +36,9 @@ Application::Application(
     Config config,
     asio::io_context& io,
     Arc<Loader> loader,
-    Arc<event::EventEmitter<notify::Event>> fs_emitter,
-    Arc<event::EventEmitter<char>> key_emitter,
-    Arc<event::EventEmitter<int>> sig_emitter,
+    Arc<rt::EventEmitter<notify::Event>> fs_emitter,
+    Arc<rt::EventEmitter<char>> key_emitter,
+    Arc<rt::EventEmitter<int>> sig_emitter,
     Arc<Controller> controller,
     Arc<View> view,
     Arc<tui::Renderer> renderer)
@@ -143,15 +143,15 @@ void Application::queueEvent(Event event) {
     asio::co_spawn(io_, accept(std::move(event)), asio::detached);
 }
 
-void Application::onSlotEvent(const event::Event<notify::Event>& fs_event) {
+void Application::onSlotEvent(const rt::Event<notify::Event>& fs_event) {
     queueEvent(Event{fs_event});
 }
 
-void Application::onSlotEvent(const event::Event<char>& key_event) {
+void Application::onSlotEvent(const rt::Event<char>& key_event) {
     queueEvent(Event{key_event});
 }
 
-void Application::onSlotEvent(const event::Event<int>& sig_event) {
+void Application::onSlotEvent(const rt::Event<int>& sig_event) {
     queueEvent(Event{sig_event});
 }
 
@@ -167,11 +167,11 @@ bool Application::isEventStale(SteadyTimePointType timestamp) {
     return false;
 }
 
-ControllerAction Application::onEvent(const event::Event<notify::Event>& fs_event) {
+ControllerAction Application::onEvent(const rt::Event<notify::Event>& fs_event) {
     return controller_->onFilesystemEvent(fs_event.value).value_or(ControllerAction::None);
 }
 
-ControllerAction Application::onEvent(const event::Event<char>& key_event) {
+ControllerAction Application::onEvent(const rt::Event<char>& key_event) {
     // Check staleness for keyboard events only
     if (isEventStale(key_event.timestamp)) {
         return ControllerAction::None;
@@ -180,7 +180,7 @@ ControllerAction Application::onEvent(const event::Event<char>& key_event) {
     return controller_->onKeyEvent(key_event.value).value_or(ControllerAction::None);
 }
 
-ControllerAction Application::onEvent(const event::Event<int>& sig_event) {
+ControllerAction Application::onEvent(const rt::Event<int>& sig_event) {
     return controller_->onSignal(sig_event.value).value_or(ControllerAction::None);
 }
 

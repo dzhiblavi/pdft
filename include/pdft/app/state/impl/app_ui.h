@@ -4,7 +4,7 @@
 
 namespace pdft::app {
 
-class AppUI : public UI, public Module {
+class AppUI : public UI, public rt::Module {
  public:
     void onInput(char key) override;
     void resetInput() override;

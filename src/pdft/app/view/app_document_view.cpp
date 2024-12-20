@@ -1,6 +1,6 @@
 #include "pdft/app/view/impl/app_document_view.h"
 
-#include "pdft/core/module/register.h"
+#include "pdft/runtime/module/register.h"
 
 namespace pdft::app {
 

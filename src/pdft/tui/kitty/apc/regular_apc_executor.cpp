@@ -1,5 +1,5 @@
 #include "pdft/tui/kitty/apc/regular_apc_executor.h"
-#include "pdft/core/module/register.h"
+#include "pdft/runtime/module/register.h"
 
 namespace pdft::tui {
 

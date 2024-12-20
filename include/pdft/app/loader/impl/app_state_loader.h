@@ -7,9 +7,9 @@
 
 #include "pdft/media/loader.h"
 
-#include "pdft/core/module/module.h"
+#include "pdft/runtime/module/module.h"
 
-#include "pdft/core/cli/cli.h"
+#include "pdft/runtime/cli/cli.h"
 
 namespace pdft::app {
 
@@ -20,7 +20,7 @@ enum class StateMode {
     AddAll,      // Use the state and append all paths to it (duplicates can be created)
 };
 
-class AppStateLoader : public StateLoader, public Module {
+class AppStateLoader : public StateLoader, public rt::Module {
  public:
     struct Config {
         StateMode mode = StateMode::AddOnly;
@@ -28,7 +28,7 @@ class AppStateLoader : public StateLoader, public Module {
     };
 
     struct CliArgs {
-        cli::opt<std::optional<StateMode>>                           //
+        rt::cli_opt<std::optional<StateMode>>                           //
             ::desc<"Override the configured state management mode">  //
             ::shrt<'S'> state_mode;
     };

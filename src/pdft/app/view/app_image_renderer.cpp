@@ -4,7 +4,7 @@
 #include "pdft/image/operations.h"
 
 #include "pdft/core/log.h"
-#include "pdft/core/module/register.h"
+#include "pdft/runtime/module/register.h"
 #include "pdft/core/result/combine/and_then.h"
 #include "pdft/core/result/combine/or_else.h"
 #include "pdft/core/result/make/none.h"

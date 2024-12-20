@@ -2,7 +2,7 @@
 
 #include "pdft/core/assert.h"
 #include "pdft/core/log.h"
-#include "pdft/core/module/register.h"
+#include "pdft/runtime/module/register.h"
 
 #include "pdft/core/result/coro/maybe.h"   // IWYU pragma: keep
 #include "pdft/core/result/coro/result.h"  // IWYU pragma: keep
