@@ -1,5 +1,5 @@
 #include "pdft/core/assert.h"
-#include "pdft/utils/intrusive/lock_free_stack.h"
+#include "pdft/utils/intrusive/mpmc_stack.h"
 #include "pdft/utils/intrusive/node.h"
 #include "pdft/utils/random.h"
 
@@ -13,9 +13,9 @@ struct Item : ForwardListItem<Item> {
     int value = 0;
 };
 
-using List = MPMCLockFreeStack<Item>;
+using List = MPMCStack<Item>;
 
-TEST_CASE("intrusive/MPMCLockFreeStack/empty", "") {
+TEST_CASE("intrusive/MPMCStack/empty", "") {
     List list;
 
     int count = 0;
@@ -23,7 +23,7 @@ TEST_CASE("intrusive/MPMCLockFreeStack/empty", "") {
     CHECK(count == 0);
 }
 
-TEST_CASE("intrusive/MPMCLockFreeStack/single", "") {
+TEST_CASE("intrusive/MPMCStack/single", "") {
     List list;
     Item item{.value = 10};
     list.push(item);
@@ -36,7 +36,7 @@ TEST_CASE("intrusive/MPMCLockFreeStack/single", "") {
     CHECK(count == 1);
 }
 
-TEST_CASE("intrusive/MPMCLockFreeStack/popFront", "") {
+TEST_CASE("intrusive/MPMCStack/popFront", "") {
     List list;
     Item item{.value = 10};
     list.push(item);
@@ -44,7 +44,7 @@ TEST_CASE("intrusive/MPMCLockFreeStack/popFront", "") {
     CHECK(list.tryPop()->value == 10);
 }
 
-TEST_CASE("intrusive/MPMCLockFreeStack/popFront/push-same", "") {
+TEST_CASE("intrusive/MPMCStack/popFront/push-same", "") {
     List list;
     Item item{.value = 10};
     list.push(item);
@@ -55,7 +55,7 @@ TEST_CASE("intrusive/MPMCLockFreeStack/popFront/push-same", "") {
     CHECK(list.tryPop()->value == 10);
 }
 
-TEST_CASE("intrusive/MPMCLockFreeStack/push-many", "") {
+TEST_CASE("intrusive/MPMCStack/push-many", "") {
     List list;
     std::vector<Item> items;
     items.reserve(10);
@@ -70,7 +70,7 @@ TEST_CASE("intrusive/MPMCLockFreeStack/push-many", "") {
     CHECK(count == 10);
 }
 
-TEST_CASE("intrusive/MPMCLockFreeStack/move-between-lists", "") {
+TEST_CASE("intrusive/MPMCStack/move-between-lists", "") {
     List list1, list2;
     std::vector<Item> items;
     items.reserve(10);
@@ -94,7 +94,7 @@ TEST_CASE("intrusive/MPMCLockFreeStack/move-between-lists", "") {
     }
 }
 
-TEST_CASE("intrusive/MPMCLockFreeStack/stress/mpmc") {
+TEST_CASE("intrusive/MPMCStack/stress/mpmc") {
     std::vector<Item> items{8128};
     std::vector<List> lists{32};
 

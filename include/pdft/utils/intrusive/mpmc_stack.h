@@ -7,7 +7,7 @@ namespace pdft::utils::intrusive {
 
 // Subject to ABA problem
 template <typename T>
-class MPMCLockFreeStack {
+class MPMCStack {
  public:
     void push(T& item) {
         item.next_ = head_.load(std::memory_order_relaxed);

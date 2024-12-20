@@ -2,7 +2,7 @@
 
 #include "pdft/core/time_traits.h"
 
-#include "pdft/utils/intrusive/lock_free_stack.h"
+#include "pdft/utils/intrusive/mpmc_stack.h"
 #include "pdft/utils/intrusive/node.h"
 
 #include <source_location>
@@ -24,7 +24,7 @@ struct StackScopeTracerBase : utils::intrusive::ForwardListItem<StackScopeTracer
     // Stack info
     uint32_t depth = 0;
     StackScopeTracerBase* parent = nullptr;
-    utils::intrusive::MPMCLockFreeStack<StackScopeTracerBase> children;
+    utils::intrusive::MPMCStack<StackScopeTracerBase> children;
 
     uint32_t refcount = 0;
     StackScopeTracerPool* pool = nullptr;
@@ -105,7 +105,7 @@ class StackScopeTracerPool {
     StackScopeTracerBase* getTracerBase();
     void release(StackScopeTracerBase* item);
 
-    utils::intrusive::MPMCLockFreeStack<StackScopeTracerBase> free_list_;
+    utils::intrusive::MPMCStack<StackScopeTracerBase> free_list_;
 
     friend class StackScopeTraceHandle;
     friend struct StackScopeTracerBase;
