@@ -12,6 +12,8 @@ class Module : public log::WithLogger {
 
     virtual ~Module() = default;
 
+    virtual void start() {}
+
     void setName(std::string name) {
         module_name = std::move(name);
     }

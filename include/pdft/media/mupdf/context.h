@@ -41,7 +41,7 @@ class MupdfContextOwner
     MupdfContextOwner(Config config);
 
     fz_context* native() const override;
-    void start();
+    void start() override;
 
  private:
     Config config_;

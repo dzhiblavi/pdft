@@ -8,9 +8,7 @@ struct X {};
 
 ModuleTraits* getModuleTraits() {
     struct XTraits : ModuleTraits {
-        void start(Module*) const override {}
-
-        Result<Arc<Module>> load(
+        Result<Arc<Module>> createVia(
             LoadContext&, const ModuleConfig&, const std::string&) const override {
             return nullptr;
         }

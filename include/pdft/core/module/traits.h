@@ -12,9 +12,10 @@ class LoadContext;
 
 struct ModuleTraits {
     virtual ~ModuleTraits() = default;
-    virtual void start(Module* self) const = 0;
-    virtual Result<Arc<Module>> load(
+
+    virtual Result<Arc<Module>> createVia(
         LoadContext& ctx, const ModuleConfig& config, const std::string& name) const = 0;
+
     virtual rfl::Generic getConfig() const = 0;
 };
 

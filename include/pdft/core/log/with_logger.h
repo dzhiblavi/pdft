@@ -12,7 +12,10 @@ class WithLogger {
     }
 
     LoggerPtr getLogger() const {
-        PDFT_VERIFY(logger_, "logger is not set");
+        if (!logger_) {
+            panic("logger is not configured for this module");
+        }
+
         return logger_;
     }
 

@@ -73,6 +73,8 @@ Result<Arc<Module>> LoadContext::loadModule(const std::string& name, const Modul
 
     instance->setLogger(logger);
     instance->setName(std::move(name));
+    instance->start();
+
     co_return instance;
 }
 
@@ -80,16 +82,8 @@ Result<Arc<Module>> LoadContext::loadViaClass(const ModuleConfig& config, const 
     auto&& cls = *config.cls;
     log::info("loading a module '{}' via class implementation '{}'", name, cls);
 
-    // Retrieve module traits for the requested module class
     auto* traits = co_await factory_storage_.getModuleTraits(cls);
-
-    // Try to create a module
-    auto instance = co_await traits->load(*this, config, name);
-
-    // Start the module
-    traits->start(instance.get());
-
-    co_return instance;
+    co_return co_await traits->createVia(*this, config, name);
 }
 
 Result<Arc<Module>> LoadContext::loadViaFactory(

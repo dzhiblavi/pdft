@@ -13,7 +13,7 @@ class KeyEventEmitter : public EventEmitter<char>, public Module {
  public:
     KeyEventEmitter(asio::io_context& io, Arc<io::ConsoleReader> reader);
 
-    void start();
+    void start() override;
     void stop() override;
 
  private:

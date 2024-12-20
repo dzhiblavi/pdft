@@ -10,23 +10,12 @@
 
 namespace pdft::module::detail {
 
-template <typename T>
-concept Startable = requires(T& value) {
-    { value.start() } -> std::convertible_to<void>;
-};
-
 template <IsModule T>
 ModuleTraits* moduleTraits() {
     struct TraitsImpl : ModuleTraits {
-        Result<Arc<Module>> load(
+        Result<Arc<Module>> createVia(
             LoadContext& ctx, const ModuleConfig& config, const std::string& name) const override {
             return createModule<T>(ctx, config, name);
-        }
-
-        void start(Module* self) const override {
-            if constexpr (Startable<T>) {
-                PDFT_VERIFY(dynamic_cast<T*>(self))->start();
-            }
         }
 
         rfl::Generic getConfig() const override {

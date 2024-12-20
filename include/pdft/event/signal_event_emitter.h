@@ -13,7 +13,7 @@ class SignalEventEmitter : public EventEmitter<int>, public Module {
  public:
     explicit SignalEventEmitter(asio::io_context& io);
 
-    void start();
+    void start() override;
     void stop() override;
 
  private:
