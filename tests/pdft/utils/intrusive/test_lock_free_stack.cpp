@@ -1,8 +1,11 @@
 #include "pdft/core/assert.h"
 #include "pdft/utils/intrusive/lock_free_stack.h"
 #include "pdft/utils/intrusive/node.h"
+#include "pdft/utils/random.h"
 
 #include <catch2/catch_test_macros.hpp>
+
+#include <thread>
 
 namespace pdft::utils::intrusive {
 
@@ -89,6 +92,43 @@ TEST_CASE("intrusive/MPMCLockFreeStack/move-between-lists", "") {
     for (int i = 0; i < 5; ++i) {
         list1.push(*PDFT_VERIFY(list2.tryPop()));
     }
+}
+
+TEST_CASE("intrusive/MPMCLockFreeStack/stress/mpmc") {
+    std::vector<Item> items{8128};
+    std::vector<List> lists{32};
+
+    int value = 0;
+    for (auto& item : items) {
+        item.value = value++;
+        auto idx = utils::random<uint32_t>(0, lists.size() - 1);
+        lists[idx].push(item);
+    }
+
+    auto worker = [&] {
+        int iterations = 65536;
+
+        while (iterations--) {
+            auto from = utils::random<uint32_t>(0, lists.size() - 1);
+            auto to = utils::random<uint32_t>(0, lists.size() - 1);
+
+            if (auto* item = lists[from].tryPop()) {
+                lists[to].push(*item);
+            }
+        }
+    };
+
+    std::vector<std::thread> threads;
+    for (int i = 0; i < 8; ++i) {
+        threads.emplace_back(worker);
+    }
+
+    for (auto& t : threads) {
+        t.join();
+    }
+
+    // The result will not always be correct because
+    // of the ABA problem.
 }
 
 }  // namespace pdft::utils::intrusive

@@ -5,13 +5,15 @@
 
 namespace pdft::utils::intrusive {
 
+// Subject to ABA problem
 template <typename T>
 class MPMCLockFreeStack {
  public:
     void push(T& item) {
         item.next_ = head_.load(std::memory_order_relaxed);
 
-        while (!head_.compare_exchange_weak(item.next_, &item)) {
+        while (!head_.compare_exchange_weak(
+            item.next_, &item, std::memory_order_release, std::memory_order_relaxed)) {
             // CAS loop
         }
     }
@@ -24,7 +26,12 @@ class MPMCLockFreeStack {
                 return nullptr;
             }
 
-            if (head_.compare_exchange_weak(curr_head, curr_head->next_)) {
+            if (head_.compare_exchange_weak(
+                    curr_head,
+                    curr_head->next_,
+                    std::memory_order_release,
+                    std::memory_order_relaxed)) {
+                curr_head->next_ = nullptr;
                 return curr_head;
             }
         }
