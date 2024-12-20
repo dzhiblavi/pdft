@@ -139,4 +139,4 @@ struct CliArg<Description, std::vector<T>> : ICliArg<std::vector<T>> {
     TCLAP::MultiArg<T> arg_;
 };
 
-}  // namespace pdft::rt::cli::detail
+}  // namespace pdft::rt::detail

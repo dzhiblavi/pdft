@@ -71,4 +71,4 @@ CliArgsFor<C>& getGlobalCliArgs() {
     return args;
 }
 
-}  // namespace pdft::rt::cli::detail
+}  // namespace pdft::rt::detail

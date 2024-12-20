@@ -2,8 +2,8 @@
 
 #include "pdft/image/palette.h"
 
-#include "pdft/runtime/module/module.h"
 #include "pdft/core/result/type/maybe.h"
+#include "pdft/runtime/module/module.h"
 
 #include <unordered_map>
 

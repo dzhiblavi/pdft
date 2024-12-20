@@ -28,7 +28,7 @@ class AppStateLoader : public StateLoader, public rt::Module {
     };
 
     struct CliArgs {
-        rt::cli_opt<std::optional<StateMode>>                           //
+        rt::cli_opt<std::optional<StateMode>>                        //
             ::desc<"Override the configured state management mode">  //
             ::shrt<'S'> state_mode;
     };

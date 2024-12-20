@@ -20,7 +20,7 @@ class KittyDisplayFactory : public AbstractFactory<Display>, public rt::Module {
     };
 
     struct CliArgs {
-        rt::cli_opt<bool>                                            //
+        rt::cli_opt<bool>                                         //
             ::desc<"Force Unicode Kitty image display protocol">  //
             ::shrt<'U'> force_unicode = false;
     };

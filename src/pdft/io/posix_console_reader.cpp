@@ -1,8 +1,8 @@
 #include "pdft/io/posix_console_reader.h"
 
-#include "pdft/runtime/module/register.h"
 #include "pdft/core/result/make/err.h"
 #include "pdft/core/result/make/ok.h"
+#include "pdft/runtime/module/register.h"
 
 #include <asio/read.hpp>
 #include <asio/streambuf.hpp>

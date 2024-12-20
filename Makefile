@@ -70,6 +70,10 @@ check-format:
 	find include/ src/pdft/ -type f -name '*.h' -o -name '*.cpp' \
 		| xargs clang-format --dry-run --Werror
 
+do-format:
+	find include/ src/pdft/ -type f -name '*.h' -o -name '*.cpp' \
+		| xargs clang-format -i
+
 run-lldb: build
 	cd $(TARGET_DIR) && lldb -- ./src/pdft/cli/pdft $(args)
 

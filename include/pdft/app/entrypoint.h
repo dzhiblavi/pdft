@@ -10,7 +10,7 @@ class Entrypoint : public rt::Module {
  public:
     Entrypoint(asio::io_context& io, Arc<Application> app);
 
-    void start();
+    void start() override;
 
  private:
     Async<void> run();

@@ -94,4 +94,4 @@ struct CliOption {
     T value_;
 };
 
-}  // namespace pdft::cli::detail
+}  // namespace pdft::rt::detail

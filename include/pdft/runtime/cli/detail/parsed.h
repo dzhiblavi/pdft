@@ -33,4 +33,4 @@ Result<C> parsed(CliArgsFor<C>& cli_args) {
         .transform([&](Unit) { return result; });
 }
 
-}  // namespace pdft::rt::cli::detail
+}  // namespace pdft::rt::detail

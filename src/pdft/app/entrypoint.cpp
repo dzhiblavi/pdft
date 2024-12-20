@@ -1,8 +1,8 @@
 #include "pdft/app/entrypoint.h"
 #include "pdft/app/version.h"
 
-#include "pdft/runtime/module/register.h"
 #include "pdft/core/trace/log_stack_trace.h"
+#include "pdft/runtime/module/register.h"
 
 #include "pdft/utils/build_info.h"
 

@@ -4,12 +4,12 @@
 #include "pdft/image/operations.h"
 
 #include "pdft/core/log.h"
-#include "pdft/runtime/module/register.h"
 #include "pdft/core/result/combine/and_then.h"
 #include "pdft/core/result/combine/or_else.h"
 #include "pdft/core/result/make/none.h"
 #include "pdft/core/result/make/some.h"
 #include "pdft/core/result/syntax/pipe.h"
+#include "pdft/runtime/module/register.h"
 
 #include <asio/any_io_executor.hpp>
 #include <asio/post.hpp>

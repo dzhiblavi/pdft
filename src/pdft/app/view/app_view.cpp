@@ -1,10 +1,10 @@
 #include "pdft/app/view/impl/app_view.h"
 
-#include "pdft/runtime/module/register.h"
 #include "pdft/core/result/combine/unwrap.h"
 #include "pdft/core/result/coro/maybe.h"  // IWYU pragma: keep
 #include "pdft/core/result/make/from_ptr.h"
 #include "pdft/core/result/syntax/pipe.h"
+#include "pdft/runtime/module/register.h"
 
 namespace pdft::app {
 

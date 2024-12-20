@@ -9,4 +9,4 @@ struct IOption {
     virtual void attach(TCLAP::CmdLine& cmd) = 0;
 };
 
-}  // namespace pdft::rt::cli
+}  // namespace pdft::rt

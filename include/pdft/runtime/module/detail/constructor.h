@@ -77,4 +77,4 @@ static constexpr size_t MaxConstructorArguments = impl::maxNumConstructorArgumen
 template <typename T, size_t N = MaxConstructorArguments<T>>
 using Constructor = impl::Constructor<T, N>;
 
-}  // namespace pdft::module::detail
+}  // namespace pdft::rt::detail

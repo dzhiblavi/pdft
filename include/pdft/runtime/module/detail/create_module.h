@@ -40,4 +40,4 @@ Result<Arc<T>> createModule(LoadContext& ctx, const ModuleConfig& config, const 
     }
 }
 
-}  // namespace pdft::module::detail
+}  // namespace pdft::rt::detail
