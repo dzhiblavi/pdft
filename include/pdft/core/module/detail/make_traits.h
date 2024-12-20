@@ -41,7 +41,7 @@ FactoryTraits* factoryTraits() {
             F* factory = PDFT_VERIFY(dynamic_cast<F*>(self), "inconsistent factory traits");
             return PDFT_VERIFY(
                 std::dynamic_pointer_cast<Module>(factory->create()),
-                "inconsistent factory traits");
+                "stuff created by this factory is not event a module");
         }
     };
 
