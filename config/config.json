@@ -83,7 +83,12 @@
       ]
     },
     "sig_emitter": {
-      "cls": "pdft::rt::SignalEventEmitter"
+      "cls": "pdft::rt::SignalEventEmitter",
+      "config": {
+        "signals": [
+          2, 28
+        ]
+      }
     },
     "ui": {
       "cls": "pdft::app::AppUI"

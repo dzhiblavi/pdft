@@ -7,9 +7,14 @@
 
 namespace pdft::rt {
 
-SignalEventEmitter::SignalEventEmitter(asio::io_context& io)
+SignalEventEmitter::SignalEventEmitter(Config config, asio::io_context& io)
     : io_(io)
-    , signals_(io, SIGINT, SIGWINCH) {}
+    , signals_(io) {
+    for (int signal : config.signals) {
+        // Don't care about the errors thrown
+        signals_.add(signal);
+    }
+}
 
 void SignalEventEmitter::start() {
     asio::co_spawn(

@@ -11,7 +11,11 @@ namespace pdft::rt {
 
 class SignalEventEmitter : public EventEmitter<int>, public rt::Module {
  public:
-    explicit SignalEventEmitter(asio::io_context& io);
+    struct Config {
+        std::vector<int> signals = {};
+    };
+
+    SignalEventEmitter(Config config, asio::io_context& io);
 
     void start() override;
     void stop() override;
