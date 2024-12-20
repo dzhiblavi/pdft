@@ -1,7 +1,9 @@
 #pragma once
 
 #include "pdft/core/time_traits.h"
-#include "pdft/utils/lock_free_stack.h"
+
+#include "pdft/utils/intrusive/lock_free_stack.h"
+#include "pdft/utils/intrusive/node.h"
 
 #include <source_location>
 
@@ -9,7 +11,7 @@ namespace pdft::trace {
 
 class StackScopeTracerPool;
 
-struct StackScopeTracerBase : utils::IntrusiveForwardListItem<StackScopeTracerBase> {
+struct StackScopeTracerBase : utils::intrusive::ForwardListItem<StackScopeTracerBase> {
     void finalize();
     void release();
     void addChild(StackScopeTracerBase* child);
@@ -22,7 +24,7 @@ struct StackScopeTracerBase : utils::IntrusiveForwardListItem<StackScopeTracerBa
     // Stack info
     uint32_t depth = 0;
     StackScopeTracerBase* parent = nullptr;
-    utils::MPMCLockFreeStack<StackScopeTracerBase> children;
+    utils::intrusive::MPMCLockFreeStack<StackScopeTracerBase> children;
 
     uint32_t refcount = 0;
     StackScopeTracerPool* pool = nullptr;
@@ -103,7 +105,7 @@ class StackScopeTracerPool {
     StackScopeTracerBase* getTracerBase();
     void release(StackScopeTracerBase* item);
 
-    utils::MPMCLockFreeStack<StackScopeTracerBase> free_list_;
+    utils::intrusive::MPMCLockFreeStack<StackScopeTracerBase> free_list_;
 
     friend class StackScopeTraceHandle;
     friend struct StackScopeTracerBase;

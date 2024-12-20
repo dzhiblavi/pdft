@@ -111,9 +111,9 @@ Async<Status> Application::runApplicationLoop() {
 }
 
 void Application::subscribe() {
-    fs_emitter_->subscribe(&fs_slot_);
-    key_emitter_->subscribe(&key_slot_);
-    sig_emitter_->subscribe(&sig_slot_);
+    fs_slot_.plug(*fs_emitter_);
+    key_slot_.plug(*key_emitter_);
+    sig_slot_.plug(*sig_emitter_);
 }
 
 Async<Status> Application::shutdown() {

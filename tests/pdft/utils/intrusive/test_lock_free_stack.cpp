@@ -1,17 +1,18 @@
 #include "pdft/core/assert.h"
-#include "pdft/utils/lock_free_stack.h"
+#include "pdft/utils/intrusive/lock_free_stack.h"
+#include "pdft/utils/intrusive/node.h"
 
 #include <catch2/catch_test_macros.hpp>
 
-namespace pdft::utils {
+namespace pdft::utils::intrusive {
 
-struct Item : IntrusiveForwardListItem<Item> {
+struct Item : ForwardListItem<Item> {
     int value = 0;
 };
 
 using List = MPMCLockFreeStack<Item>;
 
-TEST_CASE("IntrusiveForwardList/empty", "") {
+TEST_CASE("intrusive/MPMCLockFreeStack/empty", "") {
     List list;
 
     int count = 0;
@@ -19,7 +20,7 @@ TEST_CASE("IntrusiveForwardList/empty", "") {
     CHECK(count == 0);
 }
 
-TEST_CASE("IntrusiveForwardList/single", "") {
+TEST_CASE("intrusive/MPMCLockFreeStack/single", "") {
     List list;
     Item item{.value = 10};
     list.push(item);
@@ -32,7 +33,7 @@ TEST_CASE("IntrusiveForwardList/single", "") {
     CHECK(count == 1);
 }
 
-TEST_CASE("IntrusiveForwardList/popFront", "") {
+TEST_CASE("intrusive/MPMCLockFreeStack/popFront", "") {
     List list;
     Item item{.value = 10};
     list.push(item);
@@ -40,7 +41,7 @@ TEST_CASE("IntrusiveForwardList/popFront", "") {
     CHECK(list.tryPop()->value == 10);
 }
 
-TEST_CASE("IntrusiveForwardList/popFront/push-same", "") {
+TEST_CASE("intrusive/MPMCLockFreeStack/popFront/push-same", "") {
     List list;
     Item item{.value = 10};
     list.push(item);
@@ -51,7 +52,7 @@ TEST_CASE("IntrusiveForwardList/popFront/push-same", "") {
     CHECK(list.tryPop()->value == 10);
 }
 
-TEST_CASE("IntrusiveForwardList/push-many", "") {
+TEST_CASE("intrusive/MPMCLockFreeStack/push-many", "") {
     List list;
     std::vector<Item> items;
     items.reserve(10);
@@ -66,7 +67,7 @@ TEST_CASE("IntrusiveForwardList/push-many", "") {
     CHECK(count == 10);
 }
 
-TEST_CASE("IntrusiveForwardList/move-between-lists", "") {
+TEST_CASE("intrusive/MPMCLockFreeStack/move-between-lists", "") {
     List list1, list2;
     std::vector<Item> items;
     items.reserve(10);
@@ -90,4 +91,4 @@ TEST_CASE("IntrusiveForwardList/move-between-lists", "") {
     }
 }
 
-}  // namespace pdft::utils
+}  // namespace pdft::utils::intrusive

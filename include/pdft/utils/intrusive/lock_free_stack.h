@@ -3,12 +3,7 @@
 #include <atomic>
 #include <functional>
 
-namespace pdft::utils {
-
-template <typename Self>
-struct IntrusiveForwardListItem {
-    Self* next_ = nullptr;
-};
+namespace pdft::utils::intrusive {
 
 template <typename T>
 class MPMCLockFreeStack {
@@ -40,19 +35,8 @@ class MPMCLockFreeStack {
     }
 
     template <typename F>
-    void forEach(F func) {
-        T* curr = head_;
-
-        while (curr != nullptr) {
-            auto next = curr->next_;
-            std::invoke(func, *curr);
-            curr = next;
-        }
-    }
-
-    template <typename F>
-    void forEach(F func) const {
-        const T* curr = head_;
+    void forEach(this auto&& self, F func) {
+        auto* curr = self.head_.load(std::memory_order_relaxed);
 
         while (curr != nullptr) {
             auto next = curr->next_;
@@ -65,4 +49,4 @@ class MPMCLockFreeStack {
     std::atomic<T*> head_ = nullptr;
 };
 
-}  // namespace pdft::utils
+}  // namespace pdft::utils::intrusive

@@ -5,6 +5,7 @@
 #include "pdft/app/view/view.h"
 
 #include "pdft/runtime/event/event_emitter.h"
+#include "pdft/runtime/event/slot.h"
 #include "pdft/runtime/module/module.h"
 
 #include "pdft/tui/renderer.h"
@@ -66,13 +67,13 @@ class Application : public rt::Module {
     Arc<Controller> controller_;
     Arc<tui::Renderer> renderer_;
 
-    rt::Slot<Application, notify::Event> fs_slot_{this, &Application::onSlotEvent};
-    rt::Slot<Application, char> key_slot_{this, &Application::onSlotEvent};
-    rt::Slot<Application, int> sig_slot_{this, &Application::onSlotEvent};
-
     Arc<rt::EventEmitter<notify::Event>> fs_emitter_;
     Arc<rt::EventEmitter<char>> key_emitter_;
     Arc<rt::EventEmitter<int>> sig_emitter_;
+
+    rt::Slot<Application, notify::Event> fs_slot_{this, &Application::onSlotEvent};
+    rt::Slot<Application, char> key_slot_{this, &Application::onSlotEvent};
+    rt::Slot<Application, int> sig_slot_{this, &Application::onSlotEvent};
 
     asio::experimental::channel<void(asio::error_code, Event)> events_chan_;
 };
