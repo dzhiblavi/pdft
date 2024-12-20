@@ -18,7 +18,6 @@ class EventEmitter {
         subs_.push(*slot);
     }
 
- protected:
     void emit(T event) {
         Event<T> evt{std::move(event), SteadyClockType::now()};
         emit(evt);
