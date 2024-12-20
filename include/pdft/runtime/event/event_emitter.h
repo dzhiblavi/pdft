@@ -12,7 +12,7 @@ class EventEmitter {
  public:
     virtual ~EventEmitter() = default;
 
-    virtual void stop() = 0;
+    virtual void stop() {}
 
     void emit(T event) {
         Event<T> evt{std::move(event), SteadyClockType::now()};
@@ -23,6 +23,14 @@ class EventEmitter {
     using ActiveHook = typename SlotBase<T>::ActiveHook;
     using UnsubHook = typename SlotBase<T>::UnsubHook;
 
+    void clear() {
+        for (auto& sub : unsubs_) {
+            static_cast<ActiveHook&>(sub).unlink();
+        }
+
+        unsubs_.clear();
+    }
+
     void plug(SlotBase<T>* slot) {
         subs_.push_back(*slot);
     }
@@ -32,15 +40,11 @@ class EventEmitter {
     }
 
     void emit(const Event<T>& event) {
+        clear();
         for (auto& sub : subs_) {
             sub.consume(event);
         }
-
-        for (auto& sub : unsubs_) {
-            static_cast<ActiveHook&>(sub).unlink();
-        }
-
-        unsubs_.clear();
+        clear();
     }
 
     boost::intrusive::list<

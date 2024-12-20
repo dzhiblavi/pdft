@@ -36,6 +36,7 @@ add_test(./pdft/core/result/coro/test_result.cpp)
 
 # runtime
 add_test(./pdft/runtime/cli/test_cli_args.cpp)
+add_test(./pdft/runtime/event/test_event_emitter.cpp)
 add_test(./pdft/runtime/module/test_factory_storage.cpp)
 add_test(./pdft/runtime/module/test_load_cls.cpp)
 add_test(./pdft/runtime/module/test_load_factory.cpp)

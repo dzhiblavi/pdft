@@ -31,7 +31,7 @@ struct SlotBase
     virtual void consume(const Event<T>& event) = 0;
 
     void plug(EventEmitter<T>& emitter) {
-        assert(!emitter_);
+        assert(emitter_ == nullptr);
         emitter_ = &emitter;
         emitter_->plug(this);
     }
@@ -42,6 +42,7 @@ struct SlotBase
         }
 
         emitter_->unplug(this);
+        emitter_ = nullptr;
     }
 
  protected:
