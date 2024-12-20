@@ -1,41 +1,36 @@
 #pragma once
 
 #include "pdft/event/event.h"
+#include "pdft/event/slot.h"
 
-#include <functional>
-#include <vector>
+#include "pdft/utils/lock_free_stack.h"
 
 namespace pdft::event {
 
 template <typename T>
 class EventEmitter {
  public:
-    using EventType = Event<T>;
-
     virtual ~EventEmitter() = default;
 
     virtual void stop() = 0;
 
-    template <std::invocable<const EventType&> F>
-    void subscribe(F&& func) {
-        subs_.emplace_back(std::forward<F>(func));
+    void subscribe(SlotBase<T>* slot) {
+        subs_.push(*slot);
     }
 
  protected:
     void emit(T event) {
-        EventType evt{std::move(event), SteadyClockType::now()};
+        Event<T> evt{std::move(event), SteadyClockType::now()};
         emit(evt);
     }
 
  private:
-    void emit(const EventType& event) {
+    void emit(const Event<T>& event) {
         // XXX Subscribers cannot unsubscribe, so we can iterate safely
-        for (auto& sub : subs_) {
-            sub(event);
-        }
+        subs_.forEach([&](auto&& sub) { sub.consume(event); });
     }
 
-    std::vector<std::function<void(const EventType&)>> subs_;
+    utils::MPMCLockFreeStack<SlotBase<T>> subs_;
 };
 
 }  // namespace pdft::event

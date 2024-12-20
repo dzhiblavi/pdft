@@ -111,21 +111,9 @@ Async<Status> Application::runApplicationLoop() {
 }
 
 void Application::subscribe() {
-    auto accept = [this](Event ev) -> Async<void> {
-        auto [errc] = co_await events_chan_.async_send({}, ev, AsioCoroAsTuple);
-
-        if (errc) {
-            log::err(this, "failed to push an event to the channel: {}", errc);
-        }
-    };
-
-    auto event_cb = [this, accept](auto ev) {
-        asio::co_spawn(io_, accept(std::move(ev)), asio::detached);
-    };
-
-    fs_emitter_->subscribe(event_cb);
-    key_emitter_->subscribe(event_cb);
-    sig_emitter_->subscribe(event_cb);
+    fs_emitter_->subscribe(&fs_slot_);
+    key_emitter_->subscribe(&key_slot_);
+    sig_emitter_->subscribe(&sig_slot_);
 }
 
 Async<Status> Application::shutdown() {
@@ -141,6 +129,30 @@ void Application::stop() {
     fs_emitter_->stop();
     key_emitter_->stop();
     sig_emitter_->stop();
+}
+
+void Application::queueEvent(Event event) {
+    auto accept = [this](Event ev) -> Async<void> {
+        auto [errc] = co_await events_chan_.async_send({}, ev, AsioCoroAsTuple);
+
+        if (errc) {
+            log::err(this, "failed to push an event to the channel: {}", errc);
+        }
+    };
+
+    asio::co_spawn(io_, accept(std::move(event)), asio::detached);
+}
+
+void Application::onSlotEvent(const event::Event<notify::Event>& fs_event) {
+    queueEvent(Event{fs_event});
+}
+
+void Application::onSlotEvent(const event::Event<char>& key_event) {
+    queueEvent(Event{key_event});
+}
+
+void Application::onSlotEvent(const event::Event<int>& sig_event) {
+    queueEvent(Event{sig_event});
 }
 
 bool Application::isEventStale(SteadyTimePointType timestamp) {
