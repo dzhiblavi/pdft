@@ -5,6 +5,9 @@
 #include "pdft/core/module/detail/make_traits.h"
 #include "pdft/core/module/factory_storage.h"
 
+#include "pdft/core/result/combine/unwrap.h"
+#include "pdft/core/result/syntax/pipe.h"  // IWYU pragma: keep
+
 namespace pdft::module::detail {
 
 template <IsModule T>

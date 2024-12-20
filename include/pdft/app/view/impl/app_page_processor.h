@@ -1,8 +1,6 @@
 #include "pdft/app/view/image_renderer.h"
 #include "pdft/app/view/page_processor.h"
 
-#include "pdft/core/module/inject.h"
-
 #include <asio/strand.hpp>
 #include <asio/thread_pool.hpp>
 
@@ -14,7 +12,7 @@ class AppPageProcessor : public PageProcessor, public Module {
         uint32_t render_pool_size = 4;
     };
 
-    AppPageProcessor(Config config, inject<const ImageRenderer, "img_renderer"> renderer);
+    AppPageProcessor(Config config, Arc<const ImageRenderer> renderer);
 
     ~AppPageProcessor() noexcept;
 

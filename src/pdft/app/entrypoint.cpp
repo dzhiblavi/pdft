@@ -11,7 +11,7 @@
 
 namespace pdft::app {
 
-Entrypoint::Entrypoint(asio::io_context& io, inject<app::Application, "app"> app)
+Entrypoint::Entrypoint(asio::io_context& io, Arc<app::Application> app)
     : io_(io)
     , app_(std::move(app)) {}
 

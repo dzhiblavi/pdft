@@ -4,17 +4,13 @@
 #include "pdft/app/view/document_view.h"
 #include "pdft/app/view/view.h"
 
-#include "pdft/core/module/inject.h"
 #include "pdft/core/module/module.h"
 
 namespace pdft::app {
 
 class AppView : public View, public Module {
  public:
-    AppView(
-        inject<const UI, "ui"> ui,
-        inject<const DocumentStorage, "docs"> documents,
-        inject<DocumentView, "doc_view"> view);
+    AppView(Arc<const UI> ui, Arc<const DocumentStorage> documents, Arc<DocumentView> view);
 
     tui::Element getLayout(Context& ctx) override;
     Async<void> render(Context& ctx, tui::Screen& screen) override;

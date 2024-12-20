@@ -5,7 +5,6 @@
 #include "pdft/tui/display.h"
 
 #include "pdft/core/future.h"
-#include "pdft/core/module/inject.h"
 #include "pdft/core/module/module.h"
 
 #include "pdft/utils/lru_cache.h"
@@ -48,9 +47,9 @@ class AppPageRenderer : public PageRenderer, public Module {
 
     AppPageRenderer(
         Config config,
-        inject<const DocumentStorage, "docs"> documents,
-        inject<PageProcessor, "page_processor"> processor,
-        inject<tui::Display, "display"> display);
+        Arc<const DocumentStorage> documents,
+        Arc<PageProcessor> processor,
+        Arc<tui::Display> display);
 
     Async<Unit> render(
         Context& ctx,

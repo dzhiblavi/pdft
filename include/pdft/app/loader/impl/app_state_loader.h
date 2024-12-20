@@ -7,7 +7,6 @@
 
 #include "pdft/media/loader.h"
 
-#include "pdft/core/module/inject.h"
 #include "pdft/core/module/module.h"
 
 #include "pdft/core/cli/cli.h"
@@ -37,10 +36,10 @@ class AppStateLoader : public StateLoader, public Module {
     AppStateLoader(
         Config config,
         CliArgs cli,
-        inject<UI, "ui"> ui,
-        inject<DocumentStorage, "docs"> documents,
-        inject<const Persister, "persister"> persister,
-        inject<const media::Loader, "media_loader"> doc_loader);
+        Arc<UI> ui,
+        Arc<DocumentStorage> documents,
+        Arc<const Persister> persister,
+        Arc<const media::Loader> doc_loader);
 
     Status save() override;
     Status load(const std::vector<std::string>& paths) override;

@@ -12,10 +12,7 @@ namespace pdft::app {
 inline constexpr float ZoomUpdateCoeff = 1.05f;
 
 AppController::AppController(
-    Config config,
-    inject<const media::Loader, "media_loader"> doc_loader,
-    inject<UI, "ui"> ui,
-    inject<DocumentStorage, "docs"> documents)
+    Config config, Arc<const media::Loader> doc_loader, Arc<UI> ui, Arc<DocumentStorage> documents)
     : config_(config)
     , doc_loader_(std::move(doc_loader))
     , ui_(std::move(ui))

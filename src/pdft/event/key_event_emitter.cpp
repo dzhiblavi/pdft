@@ -8,7 +8,7 @@
 
 namespace pdft::event {
 
-KeyEventEmitter::KeyEventEmitter(asio::io_context& io, inject<io::ConsoleReader, "reader"> reader)
+KeyEventEmitter::KeyEventEmitter(asio::io_context& io, Arc<io::ConsoleReader> reader)
     : io_(io)
     , console_reader_(std::move(reader)) {}
 

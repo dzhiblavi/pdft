@@ -3,7 +3,6 @@
 #include "pdft/event/event_emitter.h"
 #include "pdft/io/console_reader.h"
 
-#include "pdft/core/module/inject.h"
 #include "pdft/core/module/module.h"
 
 #include <asio/io_context.hpp>
@@ -12,7 +11,7 @@ namespace pdft::event {
 
 class KeyEventEmitter : public EventEmitter<char>, public Module {
  public:
-    KeyEventEmitter(asio::io_context& io, inject<io::ConsoleReader, "reader"> reader);
+    KeyEventEmitter(asio::io_context& io, Arc<io::ConsoleReader> reader);
 
     void start();
     void stop() override;

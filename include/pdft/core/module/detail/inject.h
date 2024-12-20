@@ -1,13 +1,8 @@
 #pragma once
 
 #include "pdft/core/module/detail/config_type.h"
-#include "pdft/core/module/detail/injected.h"
 #include "pdft/core/module/load.h"
 #include "pdft/core/module/module.h"
-
-#include "pdft/core/result/combine/map_err.h"
-#include "pdft/core/result/coro/result.h"  // IWYU pragma: keep
-#include "pdft/core/result/syntax/pipe.h"  // IWYU pragma: keep
 
 #include "pdft/core/cli/parsed.h"
 
@@ -16,62 +11,36 @@
 
 namespace pdft::module::detail {
 
+struct InjectCtx {
+    LoadContext& load;
+    const std::string& self;
+    const ModuleConfig& config;
+    size_t arg_index;
+};
+
 template <IsModule ModuleType, std::same_as<LoadContext&> ArgType>
-ArgType injectArgument(LoadContext& ctx, const std::string) {
+ArgType injectArgument(const InjectCtx& ctx) {
     return ctx;
 }
 
 template <IsModule ModuleType, std::same_as<asio::io_context&> ArgType>
-ArgType injectArgument(LoadContext& ctx, const std::string&) {
-    return ctx.getIoContext();
+ArgType injectArgument(const InjectCtx& ctx) {
+    return ctx.load.getIoContext();
 }
 
 template <IsModule ModuleType, std::same_as<asio::any_io_executor> ArgType>
-ArgType injectArgument(LoadContext& ctx, const std::string&) {
-    return ctx.getIoContext().get_executor();
-}
-
-template <IsModule ModuleType, std::derived_from<InjectedTag> ArgType>
-Result<ArgType> injectArgument(LoadContext& ctx, const std::string& name) {
-    using T = typename ArgType::InjectedType;
-
-    return ctx.template getModule<T>(ArgType::Name.c_str())  //
-           | result::mapErr([&](auto err) {
-                 return std::format(
-                     "while loading dependency '{}' of type {} required by '{}':\n{}",
-                     ArgType::Name.c_str(),
-                     rfl::type_name_t<T>().name(),
-                     name,
-                     err);
-             });
+ArgType injectArgument(const InjectCtx& ctx) {
+    return ctx.load.getIoContext().get_executor();
 }
 
 template <detail::HasCliArgs ModuleType, std::same_as<typename ModuleType::CliArgs> ArgType>
-Result<ArgType> injectArgument(LoadContext&, const std::string& module) {
-    auto result = cli::parsed<ArgType>();
-    if (result.has_value()) {
-        return *result;
-    }
-
-    return result::err(
-        "while parsing CLI arguments of type '{}' required by '{}':\n{}",
-        rfl::type_name_t<ArgType>().name(),
-        module,
-        result.error());
+Result<ArgType> injectArgument(const InjectCtx&) {
+    return cli::parsed<ArgType>();
 }
 
 template <detail::HasConfig ModuleType, std::same_as<typename ModuleType::Config> ArgType>
-Result<ArgType> injectArgument(LoadContext& ctx, const std::string& module) {
-    auto maybe_config = ctx.getConfig(module);
-    if (!maybe_config.has_value()) {
-        return result::err(
-            "while retrieving config of type '{}' required by '{}':\n{}",
-            rfl::type_name_t<ArgType>().name(),
-            module,
-            "no configuration specified");
-    }
-
-    auto&& config = (*maybe_config)->config;
+Result<ArgType> injectArgument(const InjectCtx& ctx) {
+    auto&& config = ctx.config.config;
     if (config.is_null()) {
         return ArgType{};
     }
@@ -81,11 +50,32 @@ Result<ArgType> injectArgument(LoadContext& ctx, const std::string& module) {
         return *result;
     }
 
-    return result::err(
-        "while parsing config of type '{}' required by '{}':\n{}",
-        rfl::type_name_t<ArgType>().name(),
-        module,
-        result.error()->what());
+    return result::err(result.error()->what());
+}
+
+template <IsModule ModuleType, utils::InstanceOfTemplate<std::shared_ptr> ArgType>
+Result<ArgType> injectArgument(const InjectCtx& ctx) {
+    using T = typename ArgType::element_type;
+    auto type_name = rfl::type_name_t<std::decay_t<T>>().name();
+
+    auto&& deps = ctx.config.deps;
+
+    if (ctx.arg_index >= deps.size()) {
+        return result::err(
+            "dependency index {} is out of range [0..{})", ctx.arg_index, deps.size());
+    }
+
+    const auto& dep = deps[ctx.arg_index];
+
+    if (auto* dep_name = std::get_if<std::string>(&dep)) {
+        return ctx.load.getModule<T>(*dep_name);
+    } else {
+        const auto anon_module_name =
+            std::format("anon(type={},owner={},idx={})", type_name, ctx.self, ctx.arg_index);
+        const ModuleConfig& dep_conf = std::get<ModuleConfig>(dep);
+
+        return ctx.load.loadModule<T>(anon_module_name, dep_conf);
+    }
 }
 
 }  // namespace pdft::module::detail

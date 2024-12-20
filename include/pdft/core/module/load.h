@@ -19,19 +19,25 @@ class LoadContext {
  public:
     LoadContext(asio::io_context& io, ModulesConfig modules, FactoryStorage& factory_storage);
 
-    template <typename T>
-    Result<Arc<T>> getModule(const std::string& name);
-
-    Result<Arc<Module>> getModule(const std::string& name);
     Status loadAllModules();
 
     asio::io_context& getIoContext();
     Maybe<const ModuleConfig*> getConfig(const std::string& name);
 
+    template <typename T>
+    Result<Arc<T>> getModule(const std::string& name);
+    Result<Arc<Module>> getModule(const std::string& name);
+
+    template <typename T>
+    Result<Arc<T>> loadModule(const std::string& name, const ModuleConfig& config);
+    Result<Arc<Module>> loadModule(const std::string& name, const ModuleConfig& config);
+
  private:
+    template <typename T>
+    Result<Arc<T>> castModule(Arc<Module> module);
+
     bool isLoaded(const std::string& name);
     void addNewModule(const std::string& name, Arc<Module> module);
-    Result<Arc<Module>> load(const ModuleConfig& config, const std::string& name);
     Result<Arc<Module>> loadViaClass(const ModuleConfig& config, const std::string& name);
     Result<Arc<Module>> loadViaFactory(const ModuleConfig& config, const std::string& name);
     Result<Arc<Module>> loadViaAlias(const ModuleConfig& config, const std::string& name);
@@ -44,15 +50,23 @@ class LoadContext {
 
 template <typename T>
 Result<Arc<T>> LoadContext::getModule(const std::string& name) {
-    auto raw = co_await getModule(name);
+    co_return co_await castModule<T>(co_await getModule(name));
+}
 
-    if (auto casted = std::dynamic_pointer_cast<T>(std::move(raw))) {
+template <typename T>
+Result<Arc<T>> LoadContext::loadModule(const std::string& name, const ModuleConfig& config) {
+    co_return co_await castModule<T>(co_await loadModule(name, config));
+}
+
+template <typename T>
+Result<Arc<T>> LoadContext::castModule(Arc<Module> module) {
+    if (auto casted = std::dynamic_pointer_cast<T>(std::move(module))) {
         co_return std::move(casted);
     }
 
     co_return result::err(
-        "type of loaded module '{}' does not match the expected type '{}'",
-        name,
+        "type of module '{}' does not match the expected type '{}'",
+        module->name(),
         rfl::type_name_t<T>().name());
 }
 

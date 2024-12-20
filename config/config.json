@@ -60,49 +60,182 @@
   },
   "modules": {
     "entrypoint": {
-      "cls": "pdft::app::Entrypoint"
+      "cls": "pdft::app::Entrypoint",
+      "deps": [
+        "_io",
+        "app"
+      ]
     },
-    "fswatcher": {
+    "pdft::notify::Notify": {
       "cls": "pdft::notify::FswNotify"
     },
-    "fs_event_emitter": {
-      "alias": "fswatcher"
+    "fswatcher": {
+      "alias": "pdft::notify::Notify"
     },
-    "key_event_emitter": {
-      "cls": "pdft::event::KeyEventEmitter"
+    "console_reader": {
+      "cls": "pdft::io::PosixConsoleReader"
     },
-    "sig_event_emitter": {
+    "key_emitter": {
+      "cls": "pdft::event::KeyEventEmitter",
+      "deps": [
+        "_io",
+        "console_reader"
+      ]
+    },
+    "sig_emitter": {
       "cls": "pdft::event::SignalEventEmitter"
-    },
-    "renderer": {
-      "cls": "pdft::tui::AppRenderer"
     },
     "ui": {
       "cls": "pdft::app::AppUI"
+    },
+    "documents": {
+      "cls": "pdft::app::DocumentStorage"
+    },
+    "doc_loader": {
+      "cls": "pdft::media::MupdfLoader"
+    },
+    "persister": {
+      "cls": "pdft::app::AppPersister",
+      "deps": [
+        "ui",
+        "documents",
+        "doc_loader"
+      ]
+    },
+    "state_loader": {
+      "cls": "pdft::app::AppStateLoader",
+      "config": {
+        "mode": "AddOnly",
+        "state_path": "~/.local/state/pdft/state.json"
+      },
+      "deps": [
+        "_config",
+        "_cli",
+        "ui",
+        "documents",
+        "persister",
+        "doc_loader"
+      ]
+    },
+    "palettes": {
+      "cls": "pdft::app::PaletteStorage"
+    },
+    "loader": {
+      "cls": "pdft::app::AppLoader",
+      "deps": [
+        "_cli",
+        "ui",
+        "documents",
+        "state_loader",
+        "fswatcher",
+        "palettes"
+      ]
+    },
+    "image_renderer": {
+      "cls": "pdft::app::AppImageRenderer",
+      "deps": [
+        "palettes"
+      ]
+    },
+    "page_processor": {
+      "cls": "pdft::app::AppPageProcessor",
+      "config": {
+        "render_pool_size": 6
+      },
+      "deps": [
+        "_config",
+        "image_renderer"
+      ]
+    },
+    "apc_executor_factory": {
+      "cls": "pdft::tui::APCExecutorFactory"
+    },
+    "apc_executor": {
+      "factory": "apc_executor_factory"
+    },
+    "terminal": {
+      "cls": "pdft::tui::AnsiTerminal"
+    },
+    "image_display_factory": {
+      "cls": "pdft::tui::KittyDisplayFactory",
+      "config": {
+        "force_unicode": false,
+        "base": {
+          "max_loaded_images": 128
+        }
+      },
+      "deps": [
+        "_config",
+        "_cli",
+        "apc_executor",
+        "terminal"
+      ]
+    },
+    "image_display": {
+      "factory": "image_display_factory"
+    },
+    "page_renderer": {
+      "cls": "pdft::app::AppPageRenderer",
+      "config": {
+        "image_cache_size": 128,
+        "num_preload_backward": 2,
+        "num_preload_forward": 6
+      },
+      "deps": [
+        "_config",
+        "documents",
+        "page_processor",
+        "image_display"
+      ]
+    },
+    "document_view": {
+      "cls": "pdft::app::AppDocumentView",
+      "deps": [
+        "page_renderer"
+      ]
+    },
+    "view": {
+      "cls": "pdft::app::AppView",
+      "deps": [
+        "ui",
+        "documents",
+        "document_view"
+      ]
+    },
+    "console_writer": {
+      "cls": "pdft::io::PosixConsoleWriter"
+    },
+    "term_control": {
+      "cls": "pdft::io::PosixTermControl"
+    },
+    "renderer": {
+      "cls": "pdft::tui::AppRenderer",
+      "deps": [
+        "terminal",
+        "console_writer",
+        "term_control",
+        "image_display"
+      ]
     },
     "app": {
       "cls": "pdft::app::Application",
       "config": {
         "event_timeout_ms": 100,
         "event_max_buffer_size": 100
-      }
+      },
+      "deps": [
+        "_config",
+        "_io",
+        "loader",
+        "fswatcher",
+        "key_emitter",
+        "sig_emitter",
+        "controller",
+        "view",
+        "renderer"
+      ]
     },
-    "writer": {
-      "cls": "pdft::io::PosixConsoleWriter"
-    },
-    "reader": {
-      "cls": "pdft::io::PosixConsoleReader"
-    },
-    "term_ctrl": {
-      "cls": "pdft::io::PosixTermControl"
-    },
-    "terminal": {
-      "cls": "pdft::tui::AnsiTerminal"
-    },
-    "persister": {
-      "cls": "pdft::app::AppPersister"
-    },
-    "mupdf_context": {
+    "mupdf_context_owner": {
       "cls": "pdft::media::MupdfContextOwner",
       "logger": "mupdf",
       "config": {
@@ -113,68 +246,14 @@
         "setup_logging": true
       }
     },
-    "media_loader": {
-      "cls": "pdft::media::MupdfLoader"
-    },
-    "state_loader": {
-      "cls": "pdft::app::AppStateLoader",
-      "config": {
-        "mode": "AddOnly",
-        "state_path": "../../../assets/state.json"
-      }
-    },
-    "loader": {
-      "cls": "pdft::app::AppLoader"
-    },
-    "docs": {
-      "cls": "pdft::app::DocumentStorage"
-    },
-    "img_renderer": {
-      "cls": "pdft::app::AppImageRenderer"
-    },
-    "page_processor": {
-      "cls": "pdft::app::AppPageProcessor",
-      "config": {
-        "render_pool_size": 6
-      }
-    },
-    "palettes": {
-      "cls": "pdft::app::PaletteStorage"
-    },
-    "apc_factory": {
-      "cls": "pdft::tui::APCExecutorFactory"
-    },
-    "apc": {
-      "factory": "apc_factory"
-    },
-    "display_factory": {
-      "cls": "pdft::tui::KittyDisplayFactory",
-      "config": {
-        "force_unicode": false,
-        "base": {
-          "max_loaded_images": 128
-        }
-      }
-    },
-    "display": {
-      "factory": "display_factory"
-    },
-    "doc_view": {
-      "cls": "pdft::app::AppDocumentView"
-    },
-    "view": {
-      "cls": "pdft::app::AppView"
-    },
-    "page_renderer": {
-      "cls": "pdft::app::AppPageRenderer",
-      "config": {
-        "image_cache_size": 128,
-        "num_preload_backward": 2,
-        "num_preload_forward": 6
-      }
-    },
     "controller": {
       "cls": "pdft::app::AppController",
+      "deps": [
+        "_config",
+        "doc_loader",
+        "ui",
+        "documents"
+      ],
       "config": {
         "rows_per_scroll": 30,
         "key_mappings": [

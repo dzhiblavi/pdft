@@ -7,7 +7,6 @@
 #include "pdft/event/event_emitter.h"
 #include "pdft/tui/renderer.h"
 
-#include "pdft/core/module/inject.h"
 #include "pdft/core/module/module.h"
 #include "pdft/core/rc.h"
 
@@ -28,13 +27,13 @@ class Application : public Module {
     Application(
         Config config,
         asio::io_context& io,
-        inject<Loader, "loader"> loader,
-        inject<event::EventEmitter<notify::Event>, "fs_event_emitter"> fs_emitter,
-        inject<event::EventEmitter<char>, "key_event_emitter"> key_emitter,
-        inject<event::EventEmitter<int>, "sig_event_emitter"> sig_emitter,
-        inject<Controller, "controller"> controller,
-        inject<View, "view"> view,
-        inject<tui::Renderer, "renderer"> renderer);
+        Arc<Loader> loader,
+        Arc<event::EventEmitter<notify::Event>> fs_emitter,
+        Arc<event::EventEmitter<char>> key_emitter,
+        Arc<event::EventEmitter<int>> sig_emitter,
+        Arc<Controller> controller,
+        Arc<View> view,
+        Arc<tui::Renderer> renderer);
 
     Async<Status> run(Context& ctx);
 

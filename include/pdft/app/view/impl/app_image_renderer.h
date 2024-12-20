@@ -3,14 +3,13 @@
 #include "pdft/app/state/palette_storage.h"
 #include "pdft/app/view/image_renderer.h"
 
-#include "pdft/core/module/inject.h"
 #include "pdft/core/module/module.h"
 
 namespace pdft::app {
 
 class AppImageRenderer : public ImageRenderer, public Module {
  public:
-    explicit AppImageRenderer(inject<const PaletteStorage, "palettes"> palettes);
+    explicit AppImageRenderer(Arc<const PaletteStorage> palettes);
 
     void render(Context& ctx, const DisplayProperties& display, image::Image& image) const override;
 

@@ -10,8 +10,7 @@
 
 namespace pdft::app {
 
-AppPageProcessor::AppPageProcessor(
-    Config config, inject<const ImageRenderer, "img_renderer"> renderer)
+AppPageProcessor::AppPageProcessor(Config config, Arc<const ImageRenderer> renderer)
     : renderer_(std::move(renderer))
     , pool_(config.render_pool_size)
     , media_strand_(pool_.get_executor()) {}

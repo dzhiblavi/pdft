@@ -18,9 +18,7 @@ struct State {
 }  // namespace
 
 AppPersister::AppPersister(
-    inject<UI, "ui"> ui,
-    inject<DocumentStorage, "docs"> documents,
-    inject<const media::Loader, "media_loader"> doc_loader)
+    Arc<UI> ui, Arc<DocumentStorage> documents, Arc<const media::Loader> doc_loader)
     : ui_(std::move(ui))
     , documents_(std::move(documents))
     , doc_loader_(std::move(doc_loader)) {}

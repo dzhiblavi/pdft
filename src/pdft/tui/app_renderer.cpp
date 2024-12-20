@@ -1,15 +1,14 @@
 #include "pdft/tui/impl/app_renderer.h"
 
-#include "pdft/core/module/inject.h"
 #include "pdft/core/module/register.h"
 
 namespace pdft::tui {
 
 AppRenderer::AppRenderer(
-    inject<const tui::Terminal, "terminal"> terminal,
-    inject<io::ConsoleWriter, "writer"> console,
-    inject<io::TermControl, "term_ctrl"> term_control,
-    inject<tui::Display, "display"> image_display)
+    Arc<const tui::Terminal> terminal,
+    Arc<io::ConsoleWriter> console,
+    Arc<io::TermControl> term_control,
+    Arc<tui::Display> image_display)
     : image_display_(std::move(image_display))
     , terminal_(std::move(terminal))
     , term_control_(std::move(term_control))

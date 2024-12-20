@@ -7,7 +7,6 @@
 
 #include "pdft/notify/notify.h"
 
-#include "pdft/core/module/inject.h"
 #include "pdft/core/module/module.h"
 
 #include "pdft/core/cli/cli.h"
@@ -23,11 +22,11 @@ class AppLoader : public Loader, public Module {
 
     AppLoader(
         CliArgs cli,
-        inject<UI, "ui"> ui,
-        inject<DocumentStorage, "docs"> documents,
-        inject<StateLoader, "state_loader"> state_loader,
-        inject<notify::Notify, "fswatcher"> fswatcher,
-        inject<PaletteStorage, "palettes"> palettes);
+        Arc<UI> ui,
+        Arc<DocumentStorage> documents,
+        Arc<StateLoader> state_loader,
+        Arc<notify::Notify> fswatcher,
+        Arc<PaletteStorage> palettes);
 
     Status load() override;
     Status save() override;

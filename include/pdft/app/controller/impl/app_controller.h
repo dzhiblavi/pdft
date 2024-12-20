@@ -7,7 +7,6 @@
 
 #include "pdft/media/loader.h"
 
-#include "pdft/core/module/inject.h"
 #include "pdft/core/module/module.h"
 
 #include <vector>
@@ -55,9 +54,9 @@ class AppController : public Controller, public Module {
 
     AppController(
         Config config,
-        inject<const media::Loader, "media_loader"> doc_loader,
-        inject<UI, "ui"> ui,
-        inject<DocumentStorage, "docs"> documents);
+        Arc<const media::Loader> doc_loader,
+        Arc<UI> ui,
+        Arc<DocumentStorage> documents);
 
     Result<ControllerAction> onKeyEvent(char key) override;
     Result<ControllerAction> onFilesystemEvent(const notify::Event& event) override;

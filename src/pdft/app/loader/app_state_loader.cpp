@@ -33,10 +33,10 @@ bool isOpened(const std::string& abs_path, const UIModel& ui, const DocumentStor
 AppStateLoader::AppStateLoader(
     Config config,
     CliArgs cli,
-    inject<UI, "ui"> ui,
-    inject<DocumentStorage, "docs"> documents,
-    inject<const Persister, "persister"> persister,
-    inject<const media::Loader, "media_loader"> doc_loader)
+    Arc<UI> ui,
+    Arc<DocumentStorage> documents,
+    Arc<const Persister> persister,
+    Arc<const media::Loader> doc_loader)
     : config_(config)
     , ui_(std::move(ui))
     , documents_(std::move(documents))

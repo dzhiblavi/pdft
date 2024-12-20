@@ -15,9 +15,9 @@ using namespace result;
 
 AppPageRenderer::AppPageRenderer(
     Config config,
-    inject<const DocumentStorage, "docs"> documents,
-    inject<PageProcessor, "page_processor"> processor,
-    inject<tui::Display, "display"> display)
+    Arc<const DocumentStorage> documents,
+    Arc<PageProcessor> processor,
+    Arc<tui::Display> display)
     : config_(std::move(config))
     , documents_(std::move(documents))
     , processor_(std::move(processor))

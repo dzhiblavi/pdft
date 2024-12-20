@@ -17,7 +17,7 @@
 
 namespace pdft::app {
 
-AppImageRenderer::AppImageRenderer(inject<const PaletteStorage, "palettes"> palettes)
+AppImageRenderer::AppImageRenderer(Arc<const PaletteStorage> palettes)
     : palettes_(std::move(palettes)) {}
 
 void AppImageRenderer::render(

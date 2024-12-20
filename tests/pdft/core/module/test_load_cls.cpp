@@ -1,7 +1,6 @@
 #include "pdft/core/cli/cli.h"
 
 #include "pdft/core/module/detail/make_traits.h"
-#include "pdft/core/module/inject.h"
 #include "pdft/core/module/load.h"
 
 #include <catch2/catch_test_macros.hpp>
@@ -37,7 +36,7 @@ struct CliArgsArgumentModule : Module {
 };
 
 struct InjectArgumentModule : Module {
-    InjectArgumentModule(inject<NoArgumentsModule, "dependency">) {}
+    InjectArgumentModule(Arc<NoArgumentsModule>) {}
 };
 
 struct MixedArgumentsModule : Module {
@@ -52,8 +51,8 @@ struct MixedArgumentsModule : Module {
         Config conf,
         CliArgs cli,
         asio::io_context&,
-        inject<NoArgumentsModule, "dep-no-args">,
-        inject<IoArgumentModule, "dep-io">) {
+        Arc<NoArgumentsModule>,
+        Arc<IoArgumentModule>) {
         CHECK(conf.x == 10);
         CHECK(cli.x.get() == 1);
     }
@@ -141,7 +140,10 @@ TEST_CASE("LoadContext/load/cls/inject-arg") {
         {
             {
                 "test",
-                {.cls = "test-factory"},
+                {
+                    .cls = "test-factory",
+                    .deps = {"dependency"},
+                },
             },
             {
                 "dependency",
@@ -170,20 +172,32 @@ TEST_CASE("LoadContext/load/cls/mixed-args") {
                 {
                     .cls = "test-factory",
                     .config = rfl::to_generic(MixedArgumentsModule::Config{.x = 10}),
+                    .deps =
+                        {
+                            // The limitation of the current load system is that
+                            // one should fix all dependencies here, including non-module ones,
+                            // except when there are no non-module deps.
+                            "",
+                            "",
+                            "",
+                            // shared module
+                            "dep-no-args",
+                            // anonymous module
+                            ModuleConfig{
+                                .cls = "test-io",
+                            },
+                        },
                 },
             },
             {
                 "dep-no-args",
                 {.cls = "test-noargs"},
             },
-            {
-                "dep-io",
-                {.cls = "test-io"},
-            },
         },
         storage);
 
     auto mod = ctx.getModule<MixedArgumentsModule>("test");
+    log::info(mod.error());
     CHECK(mod.has_value());
 }
 

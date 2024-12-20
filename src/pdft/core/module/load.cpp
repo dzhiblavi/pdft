@@ -1,7 +1,6 @@
 #include "pdft/core/module/load.h"
 
 #include "pdft/core/result/combine/lift.h"
-#include "pdft/core/result/combine/map_err.h"
 #include "pdft/core/result/combine/unwrap.h"
 #include "pdft/core/result/coro/result.h"  // IWYU pragma: keep
 #include "pdft/core/result/make/none.h"
@@ -47,17 +46,34 @@ Maybe<const ModuleConfig*> LoadContext::getConfig(const std::string& name) {
     return &it->second;
 }
 
-Result<Arc<Module>> LoadContext::load(const ModuleConfig& config, const std::string& name) {
+Result<Arc<Module>> LoadContext::loadModule(const std::string& name, const ModuleConfig& config) {
+    Arc<Module> instance;
+
     if (config.cls.has_value()) {
-        return loadViaClass(config, name);
+        instance = co_await loadViaClass(config, name);
     } else if (config.factory.has_value()) {
-        return loadViaFactory(config, name);
+        instance = co_await loadViaFactory(config, name);
     } else if (config.alias.has_value()) {
-        return loadViaAlias(config, name);
+        instance = co_await loadViaAlias(config, name);
     } else {
-        return err(
+        co_return err(
             "neither factory nor cls construction methods are provided for module '{}'", name);
     }
+
+    log::LoggerPtr logger;
+    if (config.logger != "global") {
+        logger = log::logger(config.logger);
+    } else {
+        logger = log::global();
+    }
+
+    if (!logger) {
+        co_return err("missing logger {} required by module '{}'", config.logger, name);
+    }
+
+    instance->setLogger(logger);
+    instance->setName(std::move(name));
+    co_return instance;
 }
 
 Result<Arc<Module>> LoadContext::loadViaClass(const ModuleConfig& config, const std::string& name) {
@@ -68,7 +84,7 @@ Result<Arc<Module>> LoadContext::loadViaClass(const ModuleConfig& config, const 
     auto* traits = co_await factory_storage_.getModuleTraits(cls);
 
     // Try to create a module
-    auto instance = co_await traits->load(*this, name);
+    auto instance = co_await traits->load(*this, config, name);
 
     // Start the module
     traits->start(instance.get());
@@ -87,7 +103,7 @@ Result<Arc<Module>> LoadContext::loadViaFactory(
     // Check that factory is not created via factory (not supported)
     const auto& factory_config = getConfig(fac) | unwrap;
     if (!factory_config->cls) {
-        co_return err("factory factories are not supported");
+        co_return err("factory factories and aliases are not supported");
     }
 
     // Get the factory class traits (unwrap because we have already created the module successfully)
@@ -109,12 +125,7 @@ Result<Arc<Module>> LoadContext::getModule(const std::string& name) {
     }
 
     const auto& config = co_await (getConfig(name) | lift("no config for module '{}'", name));
-
-    auto map_err = [&name](const auto& err) {
-        return std::format("while loading module '{}':\n{}", name, err);
-    };
-
-    auto instance = co_await (load(*config, name) | mapErr(map_err));
+    auto instance = co_await loadModule(name, *config);
     addNewModule(name, instance);
     co_return instance;
 }

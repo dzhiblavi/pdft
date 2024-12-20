@@ -10,10 +10,7 @@ namespace pdft::app {
 
 using namespace result;
 
-AppView::AppView(
-    inject<const UI, "ui"> ui,
-    inject<const DocumentStorage, "docs"> documents,
-    inject<DocumentView, "doc_view"> view)
+AppView::AppView(Arc<const UI> ui, Arc<const DocumentStorage> documents, Arc<DocumentView> view)
     : ui_(std::move(ui))
     , documents_(std::move(documents))
     , doc_view_(std::move(view)) {}

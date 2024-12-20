@@ -10,7 +10,8 @@ ModuleTraits* getModuleTraits() {
     struct XTraits : ModuleTraits {
         void start(Module*) const override {}
 
-        Result<Arc<Module>> load(LoadContext&, std::string) const override {
+        Result<Arc<Module>> load(
+            LoadContext&, const ModuleConfig&, const std::string&) const override {
             return nullptr;
         }
 

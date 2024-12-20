@@ -1,8 +1,10 @@
 #pragma once
 
-#include "pdft/core/factory.h"
-#include "pdft/core/module/detail/make_module.h"
+#include "pdft/core/module/detail/create_module.h"
+#include "pdft/core/module/load.h"
 #include "pdft/core/module/traits.h"
+
+#include "pdft/core/factory.h"
 
 #include <rfl/to_generic.hpp>
 
@@ -16,8 +18,9 @@ concept Startable = requires(T& value) {
 template <IsModule T>
 ModuleTraits* moduleTraits() {
     struct TraitsImpl : ModuleTraits {
-        Result<Arc<Module>> load(LoadContext& ctx, std::string name) const override {
-            return loadModule<T>(ctx, std::move(name));
+        Result<Arc<Module>> load(
+            LoadContext& ctx, const ModuleConfig& config, const std::string& name) const override {
+            return createModule<T>(ctx, config, name);
         }
 
         void start(Module* self) const override {

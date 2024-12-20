@@ -8,7 +8,7 @@ namespace pdft::app {
 
 class Entrypoint : public Module {
  public:
-    Entrypoint(asio::io_context& io, inject<Application, "app"> app);
+    Entrypoint(asio::io_context& io, Arc<Application> app);
 
     void start();
 

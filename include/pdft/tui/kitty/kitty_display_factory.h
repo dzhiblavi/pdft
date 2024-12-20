@@ -6,7 +6,6 @@
 #include "pdft/tui/terminal.h"
 
 #include "pdft/core/factory.h"
-#include "pdft/core/module/inject.h"
 #include "pdft/core/module/module.h"
 
 #include "pdft/core/cli/cli.h"
@@ -27,10 +26,7 @@ class KittyDisplayFactory : public AbstractFactory<Display>, public Module {
     };
 
     KittyDisplayFactory(
-        Config config,
-        CliArgs cli,
-        inject<APCExecutor, "apc"> executor,
-        inject<const Terminal, "terminal"> terminal);
+        Config config, CliArgs cli, Arc<APCExecutor> executor, Arc<const Terminal> terminal);
 
     Arc<Display> create() const override;
 

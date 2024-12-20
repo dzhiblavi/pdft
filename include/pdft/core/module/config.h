@@ -16,7 +16,14 @@ struct ModuleConfig {
     // Or an alias to another module
     std::optional<std::string> alias = {};
 
+    // Module configuration that will be deserialized to typename Module::Config
     rfl::Generic config = rfl::Generic::Null;
+
+    // Module's required dependencies: each element is either
+    // other module's name or a ModuleConfig of anonymous module in it.
+    std::vector<std::variant<std::string, ModuleConfig>> deps = {};
+
+    // A logger that will be assigned to the module
     std::string logger = "global";
 };
 

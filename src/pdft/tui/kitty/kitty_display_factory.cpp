@@ -9,10 +9,7 @@
 namespace pdft::tui {
 
 KittyDisplayFactory::KittyDisplayFactory(
-    Config config,
-    CliArgs cli,
-    inject<APCExecutor, "apc"> executor,
-    inject<const Terminal, "terminal"> terminal)
+    Config config, CliArgs cli, Arc<APCExecutor> executor, Arc<const Terminal> terminal)
     : config_(config)
     , cli_(cli)
     , executor_(std::move(executor))

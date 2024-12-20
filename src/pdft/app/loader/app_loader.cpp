@@ -2,7 +2,7 @@
 #include "pdft/app/palettes.h"
 
 #include "pdft/core/module/register.h"
-#include "pdft/core/result/coro/result.h"
+#include "pdft/core/result/coro/result.h"  // IWYU pragma: keep
 
 #include "pdft/core/cli/register.h"
 
@@ -10,15 +10,13 @@ namespace pdft::app {
 
 using namespace result;
 
-namespace {}  // namespace
-
 AppLoader::AppLoader(
     CliArgs cli,
-    inject<UI, "ui"> ui,
-    inject<DocumentStorage, "docs"> documents,
-    inject<StateLoader, "state_loader"> state_loader,
-    inject<notify::Notify, "fswatcher"> fswatcher,
-    inject<PaletteStorage, "palettes"> palettes)
+    Arc<UI> ui,
+    Arc<DocumentStorage> documents,
+    Arc<StateLoader> state_loader,
+    Arc<notify::Notify> fswatcher,
+    Arc<PaletteStorage> palettes)
     : cli_(cli)
     , ui_(std::move(ui))
     , documents_(std::move(documents))
