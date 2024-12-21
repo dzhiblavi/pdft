@@ -20,6 +20,7 @@ inline std::string_view pixelsToSamples(std::span<const IRGBColor> pixels) {
     static_assert(sizeof(IRGBColor) == 3);
 
     return {
+        // It is legal to observe byte representation of any object.
         reinterpret_cast<const char*>(pixels.data()),  // NOLINT
         sizeof(IRGBColor) * pixels.size(),
     };

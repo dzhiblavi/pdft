@@ -3,6 +3,8 @@
 
 #include "pdft/core/assert.h"
 
+#include "pdft/utils/cxx/memory.h"
+
 extern "C" {
 #include <mupdf/fitz/pixmap.h>
 }
@@ -30,16 +32,18 @@ image::ImageSize PixmapMupdfImage::size() const {
 }
 
 std::span<const image::IRGBColor> PixmapMupdfImage::samples() const {
+    size_t pixels_count = pixmap_->w * pixmap_->h;
     return {
-        reinterpret_cast<const image::IRGBColor*>(pixmap_->samples),  // NOLINT
-        static_cast<size_t>(pixmap_->w * pixmap_->h),
+        cxx::start_lifetime_as_array<const image::IRGBColor>(pixmap_->samples, pixels_count),
+        pixels_count,
     };
 }
 
 std::span<image::IRGBColor> PixmapMupdfImage::mutableSamples() {
+    size_t pixels_count = pixmap_->w * pixmap_->h;
     return {
-        reinterpret_cast<image::IRGBColor*>(pixmap_->samples),  // NOLINT
-        size_t(pixmap_->w * pixmap_->h),
+        cxx::start_lifetime_as_array<image::IRGBColor>(pixmap_->samples, pixels_count),
+        pixels_count,
     };
 }
 
