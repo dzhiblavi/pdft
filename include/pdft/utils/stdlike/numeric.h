@@ -4,7 +4,7 @@
 #include <limits>
 #include <type_traits>
 
-namespace pdft::utils {
+namespace pdft::stdlike {
 
 template <std::integral T>
 constexpr T add_sat(T x, T y) noexcept {  // NOLINT
@@ -81,4 +81,4 @@ constexpr T div_sat(T x, T y) noexcept {  // NOLINT
     return x / y;
 }
 
-}  // namespace pdft::utils
+}  // namespace pdft::stdlike

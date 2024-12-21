@@ -4,7 +4,7 @@
 #include <new>
 #include <type_traits>
 
-namespace pdft::cxx {
+namespace pdft::stdlike {
 
 template <class T>
 requires(std::is_trivially_copyable_v<T> /* && std::is_implicit_lifetime_v<T>*/)
