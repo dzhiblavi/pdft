@@ -11,7 +11,7 @@ namespace pdft::trace {
 
 class StackScopeTracerPool;
 
-struct StackScopeTracerBase : utils::intrusive::ForwardListItem<StackScopeTracerBase> {
+struct StackScopeTracerBase : utils::intrusive::ForwardListItem<> {
     void finalize();
     void release();
     void addChild(StackScopeTracerBase* child);

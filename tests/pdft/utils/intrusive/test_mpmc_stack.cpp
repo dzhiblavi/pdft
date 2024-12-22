@@ -9,11 +9,11 @@
 
 namespace pdft::utils::intrusive {
 
-struct Item : ForwardListItem<Item> {
+struct Item : ForwardListItem<int> {
     int value = 0;
 };
 
-using List = MPMCStack<Item>;
+using List = MPMCStack<Item, int>;
 
 TEST_CASE("intrusive/MPMCStack/empty", "") {
     List list;

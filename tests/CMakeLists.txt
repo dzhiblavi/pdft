@@ -51,7 +51,7 @@ add_test(./pdft/image/test_color.cpp)
 
 # utils
 add_test(./pdft/utils/test_lru_cache.cpp)
-add_test(./pdft/utils/intrusive/test_lock_free_stack.cpp)
+add_test(./pdft/utils/intrusive/test_mpmc_stack.cpp)
 
 # tui
 add_test(./pdft/tui/test_alignment.cpp)

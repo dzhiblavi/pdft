@@ -2,9 +2,9 @@
 
 namespace pdft::utils::intrusive {
 
-template <typename Self>
+template <typename Tag = void>
 struct ForwardListItem {
-    Self* next_ = nullptr;
+    ForwardListItem<Tag>* next_ = nullptr;
 };
 
 }  // namespace pdft::utils::intrusive
