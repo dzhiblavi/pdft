@@ -20,12 +20,14 @@ class EventEmitter {
     }
 
  private:
+    using ActiveNode = utils::intrusive::ListNode<ActiveTag>;
+    using UnsubNode = utils::intrusive::ListNode<UnsubscriberTag>;
+
     void clear() {
         for (auto& sub : unsubs_) {
-            static_cast<utils::intrusive::ListNode<ActiveTag>&>(sub).unlink();
+            static_cast<ActiveNode&>(sub).unlink();
+            static_cast<UnsubNode&>(sub).unlink();
         }
-
-        unsubs_.clear();
     }
 
     void plug(SlotBase<T>* slot) {

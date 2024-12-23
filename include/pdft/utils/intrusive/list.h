@@ -101,10 +101,6 @@ class List {
         node->next_ = node->prev_ = nullptr;
     }
 
-    void clear() {
-        sentinel_ = {&sentinel_, &sentinel_};
-    }
-
     bool empty() const {
         return sentinel_.next_ == &sentinel_;
     }
