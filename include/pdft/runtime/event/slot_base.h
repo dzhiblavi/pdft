@@ -2,7 +2,9 @@
 
 #include "pdft/runtime/event/event.h"
 
-#include <boost/intrusive/list_hook.hpp>
+#include "pdft/utils/intrusive/node.h"
+
+#include <cassert>
 
 namespace pdft::rt {
 
@@ -13,20 +15,8 @@ template <typename T>
 class EventEmitter;
 
 template <typename T>
-struct SlotBase
-    : boost::intrusive::list_base_hook<
-          boost::intrusive::tag<ActiveTag>,
-          boost::intrusive::link_mode<boost::intrusive::auto_unlink>>,
-      boost::intrusive::list_base_hook<
-          boost::intrusive::tag<UnsubscriberTag>,
-          boost::intrusive::link_mode<boost::intrusive::auto_unlink>> {
-    using ActiveHook = boost::intrusive::list_base_hook<
-        boost::intrusive::tag<ActiveTag>,
-        boost::intrusive::link_mode<boost::intrusive::auto_unlink>>;
-    using UnsubHook = boost::intrusive::list_base_hook<
-        boost::intrusive::tag<UnsubscriberTag>,
-        boost::intrusive::link_mode<boost::intrusive::auto_unlink>>;
-
+struct SlotBase : utils::intrusive::ListNode<ActiveTag>,
+                  utils::intrusive::ListNode<UnsubscriberTag> {
     virtual ~SlotBase() = default;
     virtual void consume(const Event<T>& event) = 0;
 

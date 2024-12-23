@@ -3,7 +3,7 @@
 #include "pdft/runtime/event/event.h"
 #include "pdft/runtime/event/slot_base.h"
 
-#include <boost/intrusive/list.hpp>
+#include "pdft/utils/intrusive/list.h"
 
 namespace pdft::rt {
 
@@ -20,12 +20,9 @@ class EventEmitter {
     }
 
  private:
-    using ActiveHook = typename SlotBase<T>::ActiveHook;
-    using UnsubHook = typename SlotBase<T>::UnsubHook;
-
     void clear() {
         for (auto& sub : unsubs_) {
-            static_cast<ActiveHook&>(sub).unlink();
+            static_cast<utils::intrusive::ListNode<ActiveTag>&>(sub).unlink();
         }
 
         unsubs_.clear();
@@ -47,17 +44,8 @@ class EventEmitter {
         clear();
     }
 
-    boost::intrusive::list<
-        SlotBase<T>,
-        boost::intrusive::base_hook<ActiveHook>,
-        boost::intrusive::constant_time_size<false>>
-        subs_;
-
-    boost::intrusive::list<
-        SlotBase<T>,
-        boost::intrusive::base_hook<UnsubHook>,
-        boost::intrusive::constant_time_size<false>>
-        unsubs_;
+    utils::intrusive::List<SlotBase<T>, ActiveTag> subs_;
+    utils::intrusive::List<SlotBase<T>, UnsubscriberTag> unsubs_;
 
     friend struct SlotBase<T>;
 };
