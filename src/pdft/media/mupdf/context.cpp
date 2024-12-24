@@ -30,7 +30,7 @@ void setupMupdfLogging(fz_context* ctx, log::LoggerPtr logger) {
 }
 
 void registerDocumentHandlers(fz_context* ctx) {
-    PDFT_FZ_VERIFY(fz_register_document_handlers(ctx));
+    verify(tryFz(ctx, [&] { fz_register_document_handlers(ctx); }), "");
 }
 
 void fzLockUser(void* user, int lock) {
@@ -68,15 +68,19 @@ void MupdfContextOwner::start() {
     auto* ctx = native();
 
     if (config_.enable_icc) {
-        PDFT_FZ_VERIFY(fz_enable_icc(ctx));
+        verify(tryFz(ctx, [&] { fz_enable_icc(ctx); }), "failed to enable icc");
     }
 
     if (config_.text_aa_level != Config::UseDefault) {
-        PDFT_FZ_VERIFY(fz_set_text_aa_level(ctx, config_.text_aa_level));
+        verify(
+            tryFz(ctx, [&] { fz_set_text_aa_level(ctx, config_.text_aa_level); }),
+            "failed to set text aa level");
     }
 
     if (config_.graphics_aa_level != Config::UseDefault) {
-        PDFT_FZ_VERIFY(fz_set_graphics_aa_level(ctx, config_.graphics_aa_level));
+        verify(
+            tryFz(ctx, [&] { fz_set_graphics_aa_level(ctx, config_.graphics_aa_level); }),
+            "failed to set graphics aa level");
     }
 
     if (config_.setup_logging) {

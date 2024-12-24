@@ -1,11 +1,46 @@
 #pragma once
 
-#define PDFT_FZ_VERIFY(...)                                         \
-    [&] {                                                           \
-        fz_try(ctx) {                                               \
-            __VA_ARGS__;                                            \
-        }                                                           \
-        fz_catch(ctx) {                                             \
-            ::pdft::panic("fz (mupdf) call failed: " #__VA_ARGS__); \
-        }                                                           \
-    }()
+#include "pdft/core/result/make/err.h"
+#include "pdft/core/result/type/result.h"
+#include "pdft/core/result/type/status.h"
+
+extern "C" {
+#include <mupdf/fitz/context.h>
+}
+
+namespace pdft::media {
+
+template <std::invocable T>
+requires(!std::is_same_v<void, std::invoke_result_t<T>>)
+Result<std::invoke_result_t<T>> tryFz(fz_context* ctx, T&& func) {
+    Result<std::invoke_result_t<T>> result{};
+
+    fz_try(ctx) {
+        // It is illegal to return from here
+        result = std::forward<T>(func)();
+    }
+    fz_catch(ctx) {
+        result = result::err("mupdf (fz) call failed: {}", ctx->error.message);
+    }
+
+    return result;
+}
+
+template <std::invocable T>
+requires(std::is_same_v<void, std::invoke_result_t<T>>)
+Status tryFz(fz_context* ctx, T&& func) {
+    Status result;
+
+    fz_try(ctx) {
+        // It is illegal to return from here
+        std::forward<T>(func)();
+        result = unit;
+    }
+    fz_catch(ctx) {
+        result = result::err("mupdf (fz) call failed: {}", ctx->error.message);
+    }
+
+    return result;
+}
+
+}  // namespace pdft::media

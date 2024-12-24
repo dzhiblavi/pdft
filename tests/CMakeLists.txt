@@ -24,6 +24,7 @@ endfunction(add_test)
 # core
 add_test(./pdft/core/trace/test_scope_tracer.cpp)
 add_test(./pdft/core/trace/test_stack_scope_tracer.cpp)
+add_test(./pdft/core/test_assert.cpp)
 
 # core/result
 add_test(./pdft/core/result/combine/test_and_then.cpp)

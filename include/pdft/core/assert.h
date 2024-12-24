@@ -40,6 +40,43 @@ panic(fmt::format_string<const Args&...>, const Args&...) -> panic<Args...>;
 template <typename Msg>
 panic(const Msg&) -> panic<Msg>;
 
+template <typename T, typename... Args>
+struct verify {  // NOLINT
+    verify(
+        T value,
+        fmt::format_string<const Args&...> fmt,
+        const Args&... args,
+        const std::source_location& loc = std::source_location::current())
+        : val_(std::forward<T>(value)) {
+        if (!static_cast<bool>(val_)) {
+            detail::panic(fmt::format(fmt, args...), loc);
+        }
+    }
+
+    verify(
+        T value,
+        std::string_view msg,
+        const std::source_location& loc = std::source_location::current())
+        : val_(std::forward<T>(value)) {
+        if (!static_cast<bool>(val_)) {
+            detail::panic(msg, loc);
+        }
+    }
+
+    operator T() && {
+        return std::forward<T>(val_);
+    }
+
+ private:
+    T val_;
+};
+
+template <typename T, typename... Args>
+verify(T&&, fmt::format_string<const Args&...>, const Args&...) -> verify<T&&, Args...>;
+
+template <typename T, typename Msg>
+verify(T&&, const Msg&) -> verify<T&&, Msg>;
+
 }  // namespace pdft
 
 // NOLINTNEXTLINE

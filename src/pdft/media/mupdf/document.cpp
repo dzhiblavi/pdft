@@ -23,20 +23,22 @@ MupdfDocument::MupdfDocument(MupdfDocument&& rhs) noexcept
 
 size_t MupdfDocument::getPageCount() const {
     auto ctx = thisThreadMupdfContext().native();
-    int page_count = 0;
-
-    PDFT_FZ_VERIFY(page_count = fz_count_pages(ctx, document_));
-    return page_count;
+    auto page_count = tryFz(ctx, [&] { return fz_count_pages(ctx, document_); });
+    verify(page_count, "failed to retrieve document's page count");
+    return *page_count;
 }
 
 Arc<media::Page> MupdfDocument::getPage(int index) const {
-    PDFT_VERIFY(index >= 0 && index < static_cast<int>(getPageCount()));
-    auto ctx = thisThreadMupdfContext().native();
-    fz_page* page = nullptr;
+    verify(
+        index >= 0 && index < static_cast<int>(getPageCount()),
+        "page index {} is out of range",
+        index);
 
-    PDFT_FZ_VERIFY(page = fz_load_page(ctx, document_, index));
-    PDFT_VERIFY(page);
-    return Arc<media::Page>(new MupdfPage(index, page));
+    auto ctx = thisThreadMupdfContext().native();
+    auto page = tryFz(ctx, [&] { return fz_load_page(ctx, document_, index); });
+    verify(page, "failed to retrieve document's page with index {}", index);
+
+    return Arc<media::Page>(new MupdfPage(index, *page));
 }
 
 const std::filesystem::path& MupdfDocument::getPath() const {
@@ -45,11 +47,9 @@ const std::filesystem::path& MupdfDocument::getPath() const {
 
 Result<MupdfDocument> MupdfDocument::open(const std::filesystem::path& path) {
     auto ctx = thisThreadMupdfContext().native();
-    fz_document* doc = nullptr;
-
-    PDFT_FZ_VERIFY(doc = fz_open_document(ctx, path.c_str()));
-    PDFT_VERIFY(doc);
-    return MupdfDocument(path, doc);
+    auto doc = tryFz(ctx, [&] { return fz_open_document(ctx, path.c_str()); });
+    verify(doc, "failed to open document by path {}", path);
+    return MupdfDocument(path, *doc);
 }
 
 }  // namespace pdft::media

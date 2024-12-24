@@ -25,25 +25,25 @@ MupdfPage::~MupdfPage() noexcept {
 }
 
 Arc<image::Image> MupdfPage::getImage(float scaling_factor) const {
-    PDFT_VERIFY(scaling_factor > 0.f, "scale factor should be positive");
+    verify(scaling_factor > 0.f, "scale factor should be positive");
 
     auto ctx = thisThreadMupdfContext().native();
-    fz_pixmap* pix = nullptr;
     fz_matrix ctm = fz_scale(scaling_factor, scaling_factor);
 
-    PDFT_FZ_VERIFY(
-        pix = fz_new_pixmap_from_page(ctx, page_, ctm, fz_device_rgb(ctx), /* alpha= */ 0));
-    PDFT_VERIFY(pix->w > 0 && pix->h > 0, "loaded an image with negative size");
-    PDFT_VERIFY(pix, "fz_new_pixmap_from_page is null");
+    auto pix = tryFz(ctx, [&] {
+        return fz_new_pixmap_from_page(ctx, page_, ctm, fz_device_rgb(ctx), /* alpha= */ 0);
+    });
 
-    return Arc<image::Image>(new PixmapMupdfImage(pix));
+    verify(pix, "failed to get pixmap by page");
+    verify((*pix)->w > 0 && (*pix)->h > 0, "loaded an image with negative size");
+    return Arc<image::Image>(new PixmapMupdfImage(*pix));
 }
 
 PageSize MupdfPage::getDefaultSize() const {
     auto ctx = thisThreadMupdfContext().native();
-    fz_rect rect;
-
-    PDFT_FZ_VERIFY(rect = fz_bound_page(ctx, page_));
+    auto maybe_rect = tryFz(ctx, [&] { return fz_bound_page(ctx, page_); });
+    verify(maybe_rect, "failed to get default size for page");
+    fz_rect rect = *maybe_rect;
 
     return {
         .width_px = rect.x1 - rect.x0,
