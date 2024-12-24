@@ -5,7 +5,7 @@
 namespace pdft::rt {
 
 void OptionsStorage::addOption(char sh, IOption* option) {
-    PDFT_VERIFY(!options_.contains(sh), "duplicate short option -{}", sh);
+    verify(!options_.contains(sh), "duplicate short option -{}", sh);
     options_[sh] = option;
 }
 

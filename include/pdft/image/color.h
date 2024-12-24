@@ -52,7 +52,7 @@ inline FRGBColor floatColorFromInt(const IRGBColor& color) {
 }
 
 inline RGBColor<uint8_t> rgbFromHex(std::string_view hex) {
-    PDFT_VERIFY(hex.size() == 7);
+    verify(hex.size() == 7);
     uint32_t value = std::stoul(hex.substr(1).data(), nullptr, 16);  // NOLINT
     constexpr uint32_t mask = 0x0000ff;
 

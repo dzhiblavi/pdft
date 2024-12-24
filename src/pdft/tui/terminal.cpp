@@ -27,10 +27,6 @@ TerminalDimensions Terminal::getDimensions() const {
         };
     }
 
-    // PDFT_VERIFY(sz.ws_row > 0 && sz.ws_col > 0, "terminal does not support ioctl TIOCGWINSZ
-    // fully"); PDFT_VERIFY( sz.ws_ypixel > 0 && sz.ws_xpixel > 0, "terminal does not support ioctl
-    // TIOCGWINSZ fully");
-
     return {
         .rows = sz.ws_row,
         .columns = sz.ws_col,

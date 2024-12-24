@@ -90,7 +90,7 @@ Result<ControllerAction> AppController::applyPendingCommand() {
         case CloseDocument:
             if (auto id = ui_->getDocumentId()) {
                 ui_->removeDocument(*id);
-                PDFT_VERIFY(documents_->removeDocument(*id));
+                verify(documents_->removeDocument(*id));
             }
             return ControllerAction::Redraw;
 
@@ -225,7 +225,7 @@ Status AppController::reloadCurrentDocument() {
 Status AppController::reloadDocument(DocumentId old_id, std::filesystem::path path) {
     using namespace result;
 
-    PDFT_VERIFY(documents_->removeDocument(old_id));
+    verify(documents_->removeDocument(old_id));
     log::debug("controller: removed document with id={}", old_id);
 
     auto document =

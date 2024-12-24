@@ -63,6 +63,13 @@ struct verify {  // NOLINT
         }
     }
 
+    verify(T value, const std::source_location& loc = std::source_location::current())
+        : val_(std::forward<T>(value)) {
+        if (!static_cast<bool>(val_)) {
+            detail::panic("verify() failed", loc);
+        }
+    }
+
     operator T() && {
         return std::forward<T>(val_);
     }
@@ -79,19 +86,9 @@ verify(T&&, const Msg&) -> verify<T&&, Msg>;
 
 }  // namespace pdft
 
-// NOLINTNEXTLINE
-#define PDFT_VERIFY(expr, ...)                                                          \
-    [&] {                                                                               \
-        auto&& _value = expr;                                                           \
-        if (!static_cast<bool>(_value)) [[unlikely]] {                                  \
-            ::pdft::panic("PDFT_VERIFY failed: '" #expr "' is not true: " __VA_ARGS__); \
-        }                                                                               \
-        return std::forward<decltype(_value)>(_value);                                  \
-    }()
-
 #ifndef NDEBUG
 // NOLINTNEXTLINE
-#define PDFT_VERIFY_DBG(...) (void)PDFT_VERIFY(__VA_ARGS__)
+#define PDFT_VERIFY_DBG(...) (void)verify(__VA_ARGS__)
 #else
 #define PDFT_VERIFY_DBG(...)
 #endif

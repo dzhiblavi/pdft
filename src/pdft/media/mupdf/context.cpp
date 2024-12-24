@@ -61,7 +61,7 @@ MupdfContextOwner::MupdfContextOwner(Config config) : config_(config) {
     };
 
     context_.reset(fz_new_context(NULL, &locks_ctx, static_cast<int>(config.size)));
-    PDFT_VERIFY(native(), "failed to create new fz_context");
+    verify(native(), "failed to create new fz_context");
 }
 
 void MupdfContextOwner::start() {
@@ -104,7 +104,7 @@ fz_context* MupdfContextOwner::native() const {
 
 ClonedMupdfContext::ClonedMupdfContext(fz_context* context, Arc<MupdfContext> parent)
     : parent_(std::move(parent)) {
-    context_.reset(PDFT_VERIFY(context));
+    context_.reset(verify(context));
 }
 
 fz_context* ClonedMupdfContext::native() const {
@@ -112,7 +112,7 @@ fz_context* ClonedMupdfContext::native() const {
 }
 
 Arc<MupdfContext> ClonedMupdfContext::clone(Arc<MupdfContext> from) {
-    auto* ctx = PDFT_VERIFY(fz_clone_context(from->native()), "failed to clone context");
+    fz_context* ctx = verify(fz_clone_context(from->native()), "failed to clone context");
     return std::make_shared<ClonedMupdfContext>(ctx, std::move(from));
 }
 

@@ -25,7 +25,7 @@ bool StackScopeTraceHandle::isValid() const {
 }
 
 StackScopeTracerOwner StackScopeTraceHandle::addChild(const char* label, std::source_location loc) {
-    PDFT_VERIFY(isValid());
+    verify{isValid()};
     auto c = base_->pool->getTracer(label, loc);
     c.base_->depth = base_->depth + 1;
     c.base_->parent = base_;
@@ -42,11 +42,11 @@ StackScopeTracerOwner::StackScopeTracerOwner(StackScopeTracerOwner&& rhs) noexce
     : base_(std::exchange(rhs.base_, nullptr)) {}
 
 StackScopeTracerOwner StackScopeTracerOwner::addChild(const char* label, std::source_location loc) {
-    return StackScopeTraceHandle{PDFT_VERIFY(base_)}.addChild(label, loc);
+    return StackScopeTraceHandle{verify(base_)}.addChild(label, loc);
 }
 
 const StackScopeTracerBase& StackScopeTracerOwner::getInfo() const {
-    return *PDFT_VERIFY(base_);
+    return *verify(base_);
 }
 
 void StackScopeTracerOwner::finalize() {
@@ -109,8 +109,8 @@ size_t StackScopeTracerPool::numAllocations() const {
 }
 
 void StackScopeTracerPool::release(StackScopeTracerBase* item) {
-    PDFT_VERIFY(item != nullptr);
-    PDFT_VERIFY(item->refcount > 0);
+    verify(item != nullptr);
+    verify(item->refcount > 0);
 
     --item->refcount;
 

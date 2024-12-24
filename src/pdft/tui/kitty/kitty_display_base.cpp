@@ -20,7 +20,7 @@ void KittyDisplayBase::loadCompressedImage(
     std::string_view compressed_data,
     io::OutBuffer& buffer) {
     log::debug(ctx, "loading a compressed image with id={} to the display", id);
-    PDFT_VERIFY(!isLoaded(id), "image with id={} is already loaded", id);
+    verify(!isLoaded(id), "image with id={} is already loaded", id);
 
     if (auto unloaded = loaded_.add(id, size)) {
         auto&& [unloaded_id, _] = *unloaded;

@@ -14,7 +14,7 @@ extern "C" {
 namespace pdft::media {
 
 PixmapMupdfImage::PixmapMupdfImage(PixmapMupdfImage&& rhs) noexcept
-    : pixmap_(PDFT_VERIFY(std::exchange(rhs.pixmap_, nullptr))) {}
+    : pixmap_(verify(std::exchange(rhs.pixmap_, nullptr))) {}
 
 PixmapMupdfImage::~PixmapMupdfImage() noexcept {
     if (pixmap_ == nullptr) {

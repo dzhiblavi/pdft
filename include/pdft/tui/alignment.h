@@ -13,7 +13,7 @@ enum class Alignment {
 template <typename T>
 requires std::integral<T> || std::floating_point<T>
 T getOffset(T outer, T inner, Alignment strategy) {
-    PDFT_VERIFY(outer >= inner, "outer cannot be smaller than inner one");
+    verify(outer >= inner, "outer cannot be smaller than inner one");
 
     switch (strategy) {
         using enum Alignment;

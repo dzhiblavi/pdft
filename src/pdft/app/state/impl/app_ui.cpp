@@ -104,10 +104,10 @@ void AppUI::addDocument(DocumentId id, uint32_t page_count) {
 void AppUI::removeDocument(DocumentId id) {
     auto& idx = model_.index;
     auto& states = model_.documents;
-    PDFT_VERIFY(idx);
+    verify{idx};
 
     auto it = std::ranges::find(states, id, &DocumentModel::document_id);
-    PDFT_VERIFY(it != states.end());
+    verify(it != states.end());
 
     size_t index = it - states.begin();
 
@@ -126,7 +126,7 @@ void AppUI::removeDocument(DocumentId id) {
 
 void AppUI::onDocumentChanged(DocumentId from, DocumentId to, uint32_t page_count) {
     auto it = std::ranges::find(model_.documents, from, &DocumentModel::document_id);
-    PDFT_VERIFY(it != model_.documents.end(), "failed to find the old document with id={}", from);
+    verify(it != model_.documents.end(), "failed to find the old document with id={}", from);
     setDocument(*it, to, page_count);
 }
 

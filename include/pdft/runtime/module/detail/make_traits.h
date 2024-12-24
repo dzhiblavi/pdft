@@ -38,8 +38,8 @@ requires IsModule<F>
 FactoryTraits* factoryTraits() {
     struct TraitsImpl : FactoryTraits {
         Result<Arc<Module>> create(Module* self) const override {
-            F* factory = PDFT_VERIFY(dynamic_cast<F*>(self), "inconsistent factory traits");
-            return PDFT_VERIFY(
+            F* factory = verify(dynamic_cast<F*>(self), "inconsistent factory traits");
+            return verify(
                 std::dynamic_pointer_cast<Module>(factory->create()),
                 "stuff created by this factory is not even a module");
         }

@@ -86,11 +86,11 @@ TEST_CASE("intrusive/MPMCStack/move-between-lists", "") {
     }
 
     for (int i = 0; i < 5; ++i) {
-        list2.push(*PDFT_VERIFY(list1.tryPop()));
+        list2.push(*verify(list1.tryPop()));
     }
 
     for (int i = 0; i < 5; ++i) {
-        list1.push(*PDFT_VERIFY(list2.tryPop()));
+        list1.push(*verify(list2.tryPop()));
     }
 }
 

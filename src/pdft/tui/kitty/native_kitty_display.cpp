@@ -8,11 +8,11 @@ namespace pdft::tui {
 
 void NativeKittyDisplay::displayImage(
     Context& ctx, ImageId id, const IRect& rect, const FRect& image_subarea, BufPair& buffers) {
-    PDFT_VERIFY(isLoaded(id));
+    verify(isLoaded(id));
 
     const auto& [x, y, w, h] = rect;
-    PDFT_VERIFY(x >= 0 && y >= 0, "rect offset must not be negative: x={},y={}", x, y);
-    PDFT_VERIFY(w >= 0 && h >= 0, "rect dimensions must not be negative: w={},h={}", w, h);
+    verify(x >= 0 && y >= 0, "rect offset must not be negative: x={},y={}", x, y);
+    verify(w >= 0 && h >= 0, "rect dimensions must not be negative: w={},h={}", w, h);
 
     if (w == 0 || h == 0) {
         return;
@@ -20,10 +20,10 @@ void NativeKittyDisplay::displayImage(
 
     const auto& [rix, riy, riw, rih] = image_subarea;
     log::debug(ctx, "@={} SA={}", rect, image_subarea);
-    PDFT_VERIFY(rix >= 0 && riy >= 0, "image offset must not be negative: x={},y={}", rix, riy);
-    PDFT_VERIFY(riw > 0 && rih > 0, "image dimensions must be positive: w={},h={}", riw, rih);
+    verify(rix >= 0 && riy >= 0, "image offset must not be negative: x={},y={}", rix, riy);
+    verify(riw > 0 && rih > 0, "image dimensions must be positive: w={},h={}", riw, rih);
 
-    const auto& image_size = *PDFT_VERIFY(loaded_.tryGet(id));
+    const auto& image_size = *verify(loaded_.tryGet(id));
 
     const FRect ipx = {
         .x = std::floor(image_size.width_px * riw * rix),   // NOLINT

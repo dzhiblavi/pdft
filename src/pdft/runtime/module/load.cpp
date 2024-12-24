@@ -22,7 +22,7 @@ bool LoadContext::isLoaded(const std::string& name) {
 }
 
 void LoadContext::addNewModule(const std::string& name, Arc<Module> module) {
-    PDFT_VERIFY(!isLoaded(name), "duplicate loaded module {}", name);
+    verify(!isLoaded(name), "duplicate loaded module {}", name);
     loaded_[name] = module;
     log::info("successfully loaded a module: name={}", name);
 }

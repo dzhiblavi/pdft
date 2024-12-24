@@ -17,7 +17,7 @@ inline constexpr float FswLatency = 0.1f;
 
 FswNotify::FswNotify() {
     [[maybe_unused]] static auto _ = [] {
-        PDFT_VERIFY(fsw_init_library() == FSW_OK);
+        verify(fsw_init_library() == FSW_OK);
         return 0;
     }();
 
@@ -48,14 +48,14 @@ FswNotify::FswNotify() {
             break;
     }
 
-    PDFT_VERIFY(fsw_set_latency(handle_, FswLatency) == FSW_OK);
-    PDFT_VERIFY(fsw_set_callback(handle_, processEvents, this) == FSW_OK);
+    verify(fsw_set_latency(handle_, FswLatency) == FSW_OK);
+    verify(fsw_set_callback(handle_, processEvents, this) == FSW_OK);
 
     fsw_event_type_filter filter;
     filter.flag = IsFile;
-    PDFT_VERIFY(fsw_add_event_type_filter(handle_, filter) == FSW_OK);
+    verify(fsw_add_event_type_filter(handle_, filter) == FSW_OK);
     filter.flag = Updated;
-    PDFT_VERIFY(fsw_add_event_type_filter(handle_, filter) == FSW_OK);
+    verify(fsw_add_event_type_filter(handle_, filter) == FSW_OK);
 
     // XXX Add a dummy path because FSW requires that at least one path
     // is added before polling is started
@@ -73,7 +73,7 @@ FswNotify::~FswNotify() noexcept {
         fsw_thread_.join();
     }
 
-    PDFT_VERIFY(fsw_destroy_session(handle_) == FSW_OK);
+    verify(fsw_destroy_session(handle_) == FSW_OK);
 }
 
 void FswNotify::stop() {
@@ -87,7 +87,7 @@ bool FswNotify::isStopped() const {
 
 void FswNotify::add(const std::filesystem::path& path) {
     fsw_stop_monitor(handle_);
-    PDFT_VERIFY(fsw_add_path(handle_, path.c_str()) == FSW_OK);
+    verify(fsw_add_path(handle_, path.c_str()) == FSW_OK);
 }
 
 void FswNotify::monitorRunLoop(FswNotify* self) {
