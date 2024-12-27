@@ -11,6 +11,7 @@ target_link_libraries(
   PUBLIC pdft-utils
          dl # cpptrace dependency
          saf
+         result
          reflectcpp
          asio::asio
          tclap::tclap

@@ -21,6 +21,7 @@ include(./cmake/thirdparty/MuPDF.cmake)
 include(./cmake/thirdparty/fswatch.cmake)
 include(./cmake/thirdparty/reflect-cpp.cmake)
 include(./cmake/thirdparty/ftxui.cmake)
+include(./cmake/thirdparty/result.cmake)
 
 # Enable warnings for core of the project
 include(./cmake/CompileOptions.cmake)
