@@ -17,7 +17,7 @@ class ConsoleReader {
     AsyncResult<std::string> read(size_t num_bytes) {
         std::string buffer;
         co_return co_await this->read(num_bytes, buffer) |
-            result::map([&] { return std::move(buffer); });
+            result::map([&](auto) { return std::move(buffer); });
     }
 };
 

@@ -1,11 +1,9 @@
 #include "pdft/app/controller/impl/app_controller.h"
 
-#include "pdft/core/assert.h"
-#include "pdft/core/log.h"
 #include "pdft/runtime/module/register.h"
 
-#include "pdft/core/result/coro/maybe.h"   // IWYU pragma: keep
-#include "pdft/core/result/coro/result.h"  // IWYU pragma: keep
+#include "pdft/core/assert.h"
+#include "pdft/core/log.h"
 
 namespace pdft::app {
 
@@ -85,7 +83,7 @@ Result<ControllerAction> AppController::applyPendingCommand() {
             return ControllerAction::Quit;
 
         case Reload:
-            return reloadCurrentDocument() | map([] { return ControllerAction::Redraw; });
+            return reloadCurrentDocument() | map([](auto) { return ControllerAction::Redraw; });
 
         case CloseDocument:
             if (auto id = ui_->getDocumentId()) {
@@ -260,7 +258,7 @@ Result<ControllerAction> AppController::handleSignal(int signal) {
             return Quit;
 
         default:
-            return result::err("unknown signal");
+            return result::makeError<std::string>("unknown signal");
     }
 }
 

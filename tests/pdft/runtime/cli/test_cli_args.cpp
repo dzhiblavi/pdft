@@ -4,8 +4,7 @@
 #include "pdft/runtime/cli/detail/parsed.h"
 #include "pdft/runtime/cli/detail/register.h"
 
-#include "pdft/core/result/make/err.h"
-#include "pdft/core/result/type/maybe.h"
+#include "pdft/core/result.h"
 
 #include <catch2/catch_test_macros.hpp>
 
@@ -34,7 +33,7 @@ void test(F check, Args... args) {
         parse(options, args...);
         check(parsed<T>(cli_args));
     } catch (...) {
-        check(Result<T>(result::err("error")));
+        check(Result<T>(result::makeError<std::string>("error")));
     }
 }
 

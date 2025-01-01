@@ -15,22 +15,22 @@ Result<C> parsed(CliArgsFor<C>& cli_args) {
         return cli_arg->apply(&consumer);
     };
 
-    auto do_apply =
-        [&]<typename Self, size_t I, size_t... Is>(
-            this const Self& self, std::index_sequence<I, Is...>) -> Result<Unit, std::string> {
+    auto do_apply = [&]<typename Self, size_t I, size_t... Is>(
+                        this const Self& self, std::index_sequence<I, Is...>) -> Result<Unit> {
         if (auto ok = apply.template operator()<I>(); !ok) {
-            return std::unexpected(std::move(ok.error()));
+            return result::makeError(std::move(ok.template error<std::string>()));
         }
 
         if constexpr (sizeof...(Is) != 0) {
             return self.template operator()(std::index_sequence<Is...>());
         } else {
-            return unit;
+            return result::unit;
         }
     };
 
-    return do_apply(std::make_index_sequence<std::tuple_size_v<std::decay_t<decltype(cli_args)>>>())
-        .transform([&](Unit) { return result; });
+    return do_apply(
+               std::make_index_sequence<std::tuple_size_v<std::decay_t<decltype(cli_args)>>>()) |
+           result::map([&](Unit) { return result; });
 }
 
 }  // namespace pdft::rt::detail

@@ -1,11 +1,12 @@
 #include "pdft/app/app.h"
 
+#include "pdft/runtime/module/register.h"
+
 #include "pdft/core/awaitable.h"
 #include "pdft/core/log.h"
-#include "pdft/core/result/make/err.h"
+#include "pdft/core/result.h"
 #include "pdft/core/trace/log_stack_trace.h"
 #include "pdft/core/trace/stack_scope_tracer.h"
-#include "pdft/runtime/module/register.h"
 
 #include "pdft/utils/visit.h"
 
@@ -55,7 +56,7 @@ Application::Application(
 
 Async<Status> Application::run(Context& ctx) {
     if (auto res = ctx.push("load") | loader_->load(); !res) {
-        co_return result::err(res.error());
+        co_return res;
     }
 
     // XXX Handle errors everywhere in this class
@@ -64,7 +65,7 @@ Async<Status> Application::run(Context& ctx) {
     subscribe();
     co_await runApplicationLoop();
     co_await shutdown();
-    co_return unit;
+    co_return result::unit;
 }
 
 Async<Status> Application::runApplicationLoop() {
@@ -101,7 +102,7 @@ Async<Status> Application::runApplicationLoop() {
                 break;
 
             case Quit:
-                co_return unit;
+                co_return result::unit;
 
             case Redraw:
                 co_await renderOne();
@@ -168,7 +169,7 @@ bool Application::isEventStale(SteadyTimePointType timestamp) {
 }
 
 ControllerAction Application::onEvent(const rt::Event<notify::Event>& fs_event) {
-    return controller_->onFilesystemEvent(fs_event.value).value_or(ControllerAction::None);
+    return controller_->onFilesystemEvent(fs_event.value).valueOr(ControllerAction::None);
 }
 
 ControllerAction Application::onEvent(const rt::Event<char>& key_event) {
@@ -177,11 +178,11 @@ ControllerAction Application::onEvent(const rt::Event<char>& key_event) {
         return ControllerAction::None;
     }
 
-    return controller_->onKeyEvent(key_event.value).value_or(ControllerAction::None);
+    return controller_->onKeyEvent(key_event.value).valueOr(ControllerAction::None);
 }
 
 ControllerAction Application::onEvent(const rt::Event<int>& sig_event) {
-    return controller_->onSignal(sig_event.value).value_or(ControllerAction::None);
+    return controller_->onSignal(sig_event.value).valueOr(ControllerAction::None);
 }
 
 Async<Status> Application::renderOne() {
@@ -194,7 +195,7 @@ Async<Status> Application::renderOne() {
     co_await renderer_->renderFrame(ctx);
     trace::logStackTrace(std::move(tracer));
 
-    co_return unit;
+    co_return result::unit;
 }
 
 }  // namespace pdft::app

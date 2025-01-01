@@ -5,8 +5,7 @@
 #include "pdft/runtime/module/detail/make_traits.h"
 #include "pdft/runtime/module/factory_storage.h"
 
-#include "pdft/core/result/combine/unwrap.h"
-#include "pdft/core/result/syntax/pipe.h"  // IWYU pragma: keep
+#include "pdft/core/result.h"
 
 namespace pdft::rt::detail {
 

@@ -34,13 +34,13 @@ Status AppPersister::save(std::ostream& os) const {
     }
 
     rfl::json::write(state, os);
-    return result::ok();
+    return result::unit;
 }
 
 Status AppPersister::restore(std::istream& is) const {
     auto maybe_state = rfl::json::read<State>(is);
     if (!maybe_state) {
-        return result::err("failed to read state");
+        return result::makeError<std::string>("failed to read state");
     }
 
     auto&& state = maybe_state.value();
@@ -58,7 +58,7 @@ Status AppPersister::restore(std::istream& is) const {
                 this,
                 "failed to load file by path while restoring state path={}: {}",
                 path,
-                maybe_document.error());
+                maybe_document.error<std::string>());
             continue;
         }
 
@@ -75,7 +75,7 @@ Status AppPersister::restore(std::istream& is) const {
         ui.documents.erase(ui.documents.begin() + static_cast<long>(i));
     }
 
-    return result::ok();
+    return result::unit;
 }
 
 }  // namespace pdft::app

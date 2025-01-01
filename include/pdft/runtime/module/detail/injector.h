@@ -3,8 +3,7 @@
 #include "pdft/runtime/module/detail/inject.h"
 #include "pdft/runtime/module/module.h"
 
-#include "pdft/core/result/combine/map_err.h"
-#include "pdft/core/result/syntax/pipe.h"  // IWYU pragma: keep
+#include "pdft/core/result.h"
 
 namespace pdft::rt::detail {
 
@@ -26,8 +25,8 @@ T unwrap(const InjectCtx& ctx, Result<T> value) {
                     err);
             });
 
-    if (!value.has_value()) {
-        throw std::move(value.error());
+    if (!value.hasValue()) {
+        throw std::move(value.template error<std::string>());
     }
 
     return std::move(*value);

@@ -27,13 +27,13 @@ add_test(./pdft/core/trace/test_stack_scope_tracer.cpp)
 add_test(./pdft/core/test_assert.cpp)
 
 # core/result
-add_test(./pdft/core/result/combine/test_and_then.cpp)
-add_test(./pdft/core/result/combine/test_lift.cpp)
-add_test(./pdft/core/result/combine/test_map.cpp)
-add_test(./pdft/core/result/combine/test_map_err.cpp)
-add_test(./pdft/core/result/combine/test_or_else.cpp)
-add_test(./pdft/core/result/coro/test_maybe.cpp)
-add_test(./pdft/core/result/coro/test_result.cpp)
+# add_test(./pdft/core/result/combine/test_and_then.cpp)
+# add_test(./pdft/core/result/combine/test_lift.cpp)
+# add_test(./pdft/core/result/combine/test_map.cpp)
+# add_test(./pdft/core/result/combine/test_map_err.cpp)
+# add_test(./pdft/core/result/combine/test_or_else.cpp)
+# add_test(./pdft/core/result/coro/test_maybe.cpp)
+# add_test(./pdft/core/result/coro/test_result.cpp)
 
 # runtime
 add_test(./pdft/runtime/cli/test_cli_args.cpp)

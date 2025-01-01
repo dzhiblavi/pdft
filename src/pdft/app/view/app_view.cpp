@@ -1,10 +1,8 @@
 #include "pdft/app/view/impl/app_view.h"
 
-#include "pdft/core/result/combine/unwrap.h"
-#include "pdft/core/result/coro/maybe.h"  // IWYU pragma: keep
-#include "pdft/core/result/make/from_ptr.h"
-#include "pdft/core/result/syntax/pipe.h"
 #include "pdft/runtime/module/register.h"
+
+#include "pdft/core/result.h"
 
 namespace pdft::app {
 
@@ -35,12 +33,15 @@ Async<void> AppView::render(Context& ctx, tui::Screen& screen) {
 }
 
 Maybe<tui::Element> AppView::getDocumentLayout(Context& ctx) {
-    auto state = co_await fromPtr(ui_->getDocument());
+    if (!ui_->getDocument()) {
+        return none;
+    }
+    auto state = ui_->getDocument();
     auto document = documents_->getDocument(state->document_id) | unwrap;
     auto path = document->getPath().filename();
     auto page_str = std::format("{}/{}", state->page_index + 1, state->page_count);
 
-    co_return tui::window(
+    return tui::window(
         tui::text(std::format("{} page {}", path.c_str(), page_str)),
         ctx.push("appview:document") | doc_view_->getLayout(ctx, *state));
 }

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "pdft/core/result/type/result.h"
+#include "pdft/core/result.h"
 
 #include <span>
 

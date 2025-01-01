@@ -1,8 +1,8 @@
 #include "pdft/app/view/impl/app_page_renderer.h"
 
-#include "pdft/core/result/combine/unwrap.h"
-#include "pdft/core/result/syntax/pipe.h"
 #include "pdft/runtime/module/register.h"
+
+#include "pdft/core/result.h"
 
 #include <asio/bind_executor.hpp>
 #include <asio/co_spawn.hpp>

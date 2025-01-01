@@ -1,7 +1,6 @@
 #include "pdft/io/posix_console_reader.h"
 
-#include "pdft/core/result/combine/unwrap.h"
-#include "pdft/core/result/syntax/pipe.h"  // IWYU pragma: keep
+#include "pdft/core/result.h"
 
 #include "tests/pdft/io/mock_fd_console.h"
 #include "tests/pdft/run_coroutine.h"

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "pdft/core/result/type/status.h"
+#include "pdft/core/result.h"
 
 namespace pdft::app {
 

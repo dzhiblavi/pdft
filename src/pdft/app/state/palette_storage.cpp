@@ -1,7 +1,5 @@
 #include "pdft/app/state/palette_storage.h"
 
-#include "pdft/core/result/make/none.h"
-#include "pdft/core/result/make/some.h"
 #include "pdft/runtime/module/register.h"
 
 namespace pdft::app {
@@ -19,11 +17,11 @@ Maybe<image::PaletteRef> PaletteStorage::get(const std::string& name) const {
     auto it = palettes_.find(name);
 
     if (it == palettes_.end()) {
-        return result::none;
+        return none;
     }
 
     const auto& palette = it->second;
-    return result::some(image::PaletteRef{palette.begin(), palette.end()});
+    return image::PaletteRef{palette.begin(), palette.end()};
 }
 
 }  // namespace pdft::app

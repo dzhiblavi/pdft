@@ -8,7 +8,6 @@
 #include "pdft/runtime/cli/register.h"
 
 #include "pdft/core/log/load.h"
-#include "pdft/core/result/coro/result.h"  // IWYU pragma: keep
 
 #include "pdft/utils/get_home_dir.h"
 
@@ -30,9 +29,9 @@ Status main(Config config) {
 
     try {
         context.run();
-        co_return unit;
+        co_return result::unit;
     } catch (...) {
-        co_return result::err("an unexpected exception in main loop");
+        co_return result::makeError<std::string>("an unexpected exception in main loop");
     }
 }
 
@@ -69,7 +68,8 @@ Result<int> start(
 
     auto cli_args = fromParsedCli<CliArgs>();
     if (!cli_args) {
-        co_return result::err("Failed to parse CLI arguments: {}", cli_args.error());
+        co_return result::makeError(
+            std::format("Failed to parse CLI arguments: {}", cli_args.error<std::string>()));
     }
 
     if (cli_args->list_modules) {
@@ -80,7 +80,8 @@ Result<int> start(
     auto config = rfl::json::load<Config, rfl::DefaultIfMissing>(
         cli_args->config_path->value_or(utils::expandHome("~/.config/pdft/config.json")));
     if (!config) {
-        co_return result::err("Error while parsing configuration: {}", config.error()->what());
+        co_return result::makeError(
+            std::format("Error while parsing configuration: {}", config.error()->what()));
     }
 
     co_await main(*config);

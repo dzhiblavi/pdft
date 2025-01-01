@@ -83,7 +83,7 @@ TEST_CASE("LoadContext/load/cls/no-args") {
     LoadContext ctx(io, {{"test", module}}, storage);
 
     auto mod = ctx.getModule<NoArgumentsModule>("test");
-    CHECK(mod.has_value());
+    CHECK(mod.hasValue());
 }
 
 TEST_CASE("LoadContext/load/cls/io-arg") {
@@ -95,7 +95,7 @@ TEST_CASE("LoadContext/load/cls/io-arg") {
     LoadContext ctx(io, {{"test", module}}, storage);
 
     auto mod = ctx.getModule<IoArgumentModule>("test");
-    CHECK(mod.has_value());
+    CHECK(mod.hasValue());
 }
 
 TEST_CASE("LoadContext/load/cls/config-arg") {
@@ -111,7 +111,7 @@ TEST_CASE("LoadContext/load/cls/config-arg") {
     LoadContext ctx(io, {{"test", module}}, storage);
 
     auto mod = ctx.getModule<ConfigArgumentModule>("test");
-    CHECK(mod.has_value());
+    CHECK(mod.hasValue());
 }
 
 TEST_CASE("LoadContext/load/cls/cli-arg") {
@@ -124,7 +124,7 @@ TEST_CASE("LoadContext/load/cls/cli-arg") {
     LoadContext ctx(io, {{"test", module}}, storage);
 
     auto mod = ctx.getModule<CliArgsArgumentModule>("test");
-    CHECK(mod.has_value());
+    CHECK(mod.hasValue());
 }
 
 TEST_CASE("LoadContext/load/cls/inject-arg") {
@@ -153,7 +153,7 @@ TEST_CASE("LoadContext/load/cls/inject-arg") {
         storage);
 
     auto mod = ctx.getModule<InjectArgumentModule>("test");
-    CHECK(mod.has_value());
+    CHECK(mod.hasValue());
 }
 
 TEST_CASE("LoadContext/load/cls/mixed-args") {
@@ -197,8 +197,8 @@ TEST_CASE("LoadContext/load/cls/mixed-args") {
         storage);
 
     auto mod = ctx.getModule<MixedArgumentsModule>("test");
-    log::info(mod.error());
-    CHECK(mod.has_value());
+    log::info(mod.error<std::string>());
+    CHECK(mod.hasValue());
 }
 
 }  // namespace pdft::rt

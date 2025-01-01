@@ -17,12 +17,12 @@ Result<bool> parseCliArgs(
     try {
         cmd.parse(static_cast<int>(argv.size()), argv.data());
     } catch (const TCLAP::ArgException& e) {
-        return result::err(std::format("Error for argument '{}': {}", e.argId(), e.error()));
+        return result::makeError(std::format("Error for argument '{}': {}", e.argId(), e.error()));
     } catch (const TCLAP::ExitException& e) {
-        return result::ok(false);
+        return false;
     }
 
-    return result::ok(true);
+    return true;
 }
 
 }  // namespace pdft::rt

@@ -2,7 +2,7 @@
 
 #include "pdft/notify/event.h"
 
-#include "pdft/core/result/type/result.h"
+#include "pdft/core/result.h"
 
 namespace pdft::app {
 

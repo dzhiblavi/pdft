@@ -1,8 +1,7 @@
 #pragma once
 
-#include "pdft/core/result/make/err.h"
-#include "pdft/core/result/type/result.h"
-#include "pdft/core/result/type/status.h"
+#include "pdft/core/result.h"
+#include <format>
 
 extern "C" {
 #include <mupdf/fitz/context.h>
@@ -20,7 +19,7 @@ Result<std::invoke_result_t<T>> tryFz(fz_context* ctx, T&& func) {
         result = std::forward<T>(func)();
     }
     fz_catch(ctx) {
-        result = result::err("mupdf (fz) call failed: {}", ctx->error.message);
+        result = result::makeError(std::format("mupdf (fz) call failed: {}", ctx->error.message));
     }
 
     return result;
@@ -34,10 +33,10 @@ Status tryFz(fz_context* ctx, T&& func) {
     fz_try(ctx) {
         // It is illegal to return from here
         std::forward<T>(func)();
-        result = unit;
+        result = Unit{};
     }
     fz_catch(ctx) {
-        result = result::err("mupdf (fz) call failed: {}", ctx->error.message);
+        result = result::makeError(std::format("mupdf (fz) call failed: {}", ctx->error.message));
     }
 
     return result;

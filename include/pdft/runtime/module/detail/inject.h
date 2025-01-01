@@ -50,7 +50,7 @@ Result<ArgType> injectArgument(const InjectCtx& ctx) {
         return *result;
     }
 
-    return result::err(result.error()->what());
+    return result::makeError(result.error()->what());
 }
 
 template <IsModule ModuleType, utils::InstanceOfTemplate<std::shared_ptr> ArgType>
@@ -61,8 +61,8 @@ Result<ArgType> injectArgument(const InjectCtx& ctx) {
     auto&& deps = ctx.config.deps;
 
     if (ctx.arg_index >= deps.size()) {
-        return result::err(
-            "dependency index {} is out of range [0..{})", ctx.arg_index, deps.size());
+        return result::makeError(
+            std::format("dependency index {} is out of range [0..{})", ctx.arg_index, deps.size()));
     }
 
     const auto& dep = deps[ctx.arg_index];

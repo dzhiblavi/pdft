@@ -3,7 +3,7 @@
 #include "pdft/runtime/module/config.h"
 #include "pdft/runtime/module/module.h"
 
-#include "pdft/core/result/type/result.h"
+#include "pdft/core/result.h"
 
 #include <rfl/Generic.hpp>
 

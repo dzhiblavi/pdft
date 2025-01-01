@@ -11,7 +11,7 @@ Result<ControlDataItem> parseControlDataItem(std::string_view item_view) {
     auto equal_sign_pos = item_view.find('=');
 
     if (equal_sign_pos == std::string::npos || equal_sign_pos == 0) {
-        return result::err("malformed response");
+        return result::makeError<std::string>("malformed response");
     }
 
     return std::make_pair(
@@ -34,10 +34,10 @@ Result<ControlData> parseControlData(std::string_view control_data) {
             kv_view = control_data.substr(pos, kv_end - pos);
         }
 
-        if (auto item = parseControlDataItem(kv_view); item.has_value()) {
+        if (auto item = parseControlDataItem(kv_view); item.hasValue()) {
             data.push_back(std::move(item.value()));
         } else {
-            return std::unexpected(item.error());
+            return result::makeError(item.template error<std::string>());
         }
 
         pos = kv_end + 1;
@@ -51,15 +51,15 @@ Result<ControlData> parseControlData(std::string_view control_data) {
 // \033_Ga=b,c=d;OK\033 and backslash
 Result<Response> parseResponse(std::string_view response) {
     if (response.size() <= 4) {
-        return result::err("malformed response");
+        return result::makeError<std::string>("malformed response");
     }
 
     if (response[0] != '\033') {
-        return result::err("malformed response");
+        return result::makeError<std::string>("malformed response");
     }
 
     if (response.back() != '\\') {
-        return result::err("malformed response");
+        return result::makeError<std::string>("malformed response");
     }
 
     // The first two bytes after escape code are interpreted as command code (_G)
@@ -69,20 +69,20 @@ Result<Response> parseResponse(std::string_view response) {
     auto end_of_control_data = response.find(';', 3);
 
     if (end_of_control_data == std::string::npos) {
-        return result::err("malformed response");
+        return result::makeError<std::string>("malformed response");
     }
 
     auto control_data_view = response.substr(3, end_of_control_data - 3);
     auto payload_view =
         response.substr(end_of_control_data + 1, response.size() - end_of_control_data - 3);
 
-    return parseControlData(control_data_view).transform([&](auto control_data) {
-        return Response{
-            .command = std::string(command_view),
-            .payload = std::string(payload_view),
-            .control_data = std::move(control_data),
-        };
-    });
+    return parseControlData(control_data_view) | result::map([&](auto control_data) {
+               return Response{
+                   .command = std::string(command_view),
+                   .payload = std::string(payload_view),
+                   .control_data = std::move(control_data),
+               };
+           });
 }
 
 }  // namespace pdft::tui

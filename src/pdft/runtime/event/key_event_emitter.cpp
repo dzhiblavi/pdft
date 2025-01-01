@@ -30,7 +30,7 @@ Async<void> KeyEventEmitter::listenForEvents() {
         if (key) {
             emit((*key)[0]);
         } else {
-            log::err(this, "error when reading input from console: {}", key.error());
+            log::err(this, "error when reading input from console: {}", key.error<std::string>());
         }
     }
 }

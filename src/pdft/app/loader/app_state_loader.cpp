@@ -50,11 +50,11 @@ AppStateLoader::AppStateLoader(
 Status AppStateLoader::save() {
     if (config_.mode == StateMode::Standalone) {
         log::info(this, "not saving the state in Standalone mode");
-        return result::ok();
+        return result::unit;
     }
     if (!config_.state_path.has_value()) {
         log::info(this, "not saving the state because no state path is configured");
-        return result::ok();
+        return result::unit;
     }
 
     std::ofstream ofs(*config_.state_path);
@@ -65,7 +65,7 @@ Status AppStateLoader::save() {
 Status AppStateLoader::load(const std::vector<std::string>& paths) {
     if (!config_.state_path.has_value()) {
         log::info(this, "not loading the state because state path is not configured");
-        return result::ok();
+        return result::unit;
     }
 
     auto mode_name = magic_enum::enum_name(config_.mode);
@@ -75,7 +75,8 @@ Status AppStateLoader::load(const std::vector<std::string>& paths) {
         std::ifstream ifs(*config_.state_path);
 
         if (auto result = persister_->restore(ifs); !result) {
-            log::warn(this, "failed to restore the state: {}; ignoring", result.error());
+            log::warn(
+                this, "failed to restore the state: {}; ignoring", result.error<std::string>());
         } else {
             log::info(this, "the state has been successfully restored");
         }
@@ -93,7 +94,11 @@ Status AppStateLoader::load(const std::vector<std::string>& paths) {
 
         auto maybe_document = doc_loader_->load(path);
         if (!maybe_document) {
-            log::warn(this, "failed to open document by path {}: {}", path, maybe_document.error());
+            log::warn(
+                this,
+                "failed to open document by path {}: {}",
+                path,
+                maybe_document.error<std::string>());
             continue;
         }
 
@@ -105,7 +110,7 @@ Status AppStateLoader::load(const std::vector<std::string>& paths) {
     }
 
     log::info(this, "the state has been successfully restored from {}", *config_.state_path);
-    return result::ok();
+    return result::unit;
 }
 
 }  // namespace pdft::app

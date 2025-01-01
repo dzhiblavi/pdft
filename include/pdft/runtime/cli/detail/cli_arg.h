@@ -3,8 +3,7 @@
 #include "pdft/runtime/cli/detail/lift.h"
 #include "pdft/runtime/cli/option.h"
 
-#include "pdft/core/result/type/result.h"
-#include "pdft/core/result/type/unit.h"
+#include "pdft/core/result.h"
 
 #include <tclap/CmdLine.h>
 
@@ -13,13 +12,13 @@ namespace pdft::rt::detail {
 template <typename T>
 struct IConsumer {
     virtual ~IConsumer() = default;
-    virtual Result<Unit, std::string> consume(T value) = 0;
+    virtual Result<Unit> consume(T value) = 0;
 };
 
 template <typename T>
 struct ICliArg : IOption {
     virtual ~ICliArg() = default;
-    virtual Result<Unit, std::string> apply(IConsumer<T>* consumer) = 0;
+    virtual Result<Unit> apply(IConsumer<T>* consumer) = 0;
 };
 
 // Specialization for arbitrarily complex types
@@ -36,18 +35,18 @@ struct CliArg : ICliArg<T>, IConsumer<typename ComplexType<T>::type> {
     }
 
     // IConsumer<U>
-    Result<Unit, std::string> consume(U value) override {
+    Result<Unit> consume(U value) override {
         auto lifted = Traits::lift(std::move(value));
 
         if (!lifted) {
-            return std::unexpected(lifted.error());
+            return result::makeError(lifted.template error<std::string>());
         }
 
         return consumer_->consume(*lifted);
     }
 
     // ICliArg<T>
-    Result<Unit, std::string> apply(IConsumer<T>* consumer) override {
+    Result<Unit> apply(IConsumer<T>* consumer) override {
         consumer_ = consumer;
         return impl_.apply(this);
     }
@@ -75,9 +74,9 @@ struct CliArg<Description, T> : ICliArg<T> {
     }
 
     // ICliArg<T>
-    Result<Unit, std::string> apply(IConsumer<T>* consumer) override {
+    Result<Unit> apply(IConsumer<T>* consumer) override {
         if (!arg_.isSet()) {
-            return unit;
+            return result::unit;
         }
 
         return consumer->consume(arg_.getValue());
@@ -102,9 +101,9 @@ struct CliArg<Description, bool> : ICliArg<bool> {
     }
 
     // ICliArg<bool>
-    Result<Unit, std::string> apply(IConsumer<bool>* consumer) override {
+    Result<Unit> apply(IConsumer<bool>* consumer) override {
         if (!arg_.isSet()) {
-            return unit;
+            return result::unit;
         }
 
         return consumer->consume(arg_.getValue());
@@ -131,7 +130,7 @@ struct CliArg<Description, std::vector<T>> : ICliArg<std::vector<T>> {
     }
 
     // ICliArg
-    Result<Unit, std::string> apply(IConsumer<std::vector<T>>* consumer) override {
+    Result<Unit> apply(IConsumer<std::vector<T>>* consumer) override {
         return consumer->consume(arg_.getValue());
     }
 

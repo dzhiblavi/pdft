@@ -16,7 +16,7 @@ Res<int> just(int x) {
 }
 
 Res<int> faulty(std::string err) {
-    return result::err(err);
+    return result::makeError(err);
 }
 
 Maybe<int> getInt() {

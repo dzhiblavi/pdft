@@ -5,7 +5,7 @@
 
 #include "pdft/core/awaitable.h"
 #include "pdft/core/context.h"
-#include "pdft/core/result/type/status.h"
+#include "pdft/core/result.h"
 
 #include <ftxui/screen/screen.hpp>
 

@@ -1,7 +1,6 @@
 #pragma once
 
-#include "pdft/core/result/type/result.h"
-#include "pdft/core/result/type/unit.h"
+#include "pdft/core/result.h"
 
 #include <asio/as_tuple.hpp>
 #include <asio/use_awaitable.hpp>

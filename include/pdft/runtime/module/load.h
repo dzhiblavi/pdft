@@ -4,12 +4,10 @@
 #include "pdft/runtime/module/factory_storage.h"
 #include "pdft/runtime/module/module.h"
 
-#include "pdft/core/result/coro/result.h"  // IWYU pragma: keep
-#include "pdft/core/result/make/err.h"
-#include "pdft/core/result/type/maybe.h"
-#include "pdft/core/result/type/status.h"
+#include "pdft/core/result.h"
 
 #include <asio/io_context.hpp>
+#include <rfl/type_name_t.hpp>
 
 namespace pdft::rt {
 
@@ -22,7 +20,7 @@ class LoadContext {
     Status loadAllModules();
 
     asio::io_context& getIoContext();
-    Maybe<const ModuleConfig*> getConfig(const std::string& name);
+    std::optional<const ModuleConfig*> getConfig(const std::string& name);
 
     template <typename T>
     Result<Arc<T>> getModule(const std::string& name);
@@ -64,10 +62,10 @@ Result<Arc<T>> LoadContext::castModule(Arc<Module> module) {
         co_return std::move(casted);
     }
 
-    co_return result::err(
+    co_return result::makeError(std::format(
         "type of module '{}' does not match the expected type '{}'",
         module->name(),
-        rfl::type_name_t<T>().name());
+        rfl::type_name_t<T>().name()));
 }
 
 }  // namespace pdft::rt

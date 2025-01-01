@@ -3,7 +3,7 @@
 #include "pdft/io/buffer.h"
 
 #include "pdft/core/awaitable.h"
-#include "pdft/core/result/type/status.h"
+#include "pdft/core/result.h"
 
 #include <asio/buffer.hpp>
 

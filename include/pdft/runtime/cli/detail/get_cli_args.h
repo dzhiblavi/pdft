@@ -42,9 +42,9 @@ auto makeConsumerForField(rfl::Field<Name, CliOption<T, D>*>& field) {
         Consumer(CliOption<T, D>* d) : dst(d) {}
 
         // IConsumer<T>
-        Result<Unit, std::string> consume(T value) override {
+        Result<Unit> consume(T value) override {
             *dst = std::move(value);
-            return unit;
+            return result::unit;
         }
 
         CliOption<T, D>* dst;

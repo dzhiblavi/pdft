@@ -3,7 +3,7 @@
 #include "pdft/runtime/module/detail/constructor.h"
 #include "pdft/runtime/module/detail/injector.h"
 
-#include "pdft/core/result/coro/result.h"  // IWYU pragma: keep
+#include "pdft/core/result.h"
 
 namespace pdft::rt::detail {
 
@@ -36,7 +36,7 @@ Result<Arc<T>> createModule(LoadContext& ctx, const ModuleConfig& config, const 
             [&, name](auto... args) { return std::make_shared<T>(std::move(args)...); },
             std::move(arguments));
     } catch (std::string error) {
-        co_return result::err(error);
+        co_return result::makeError(std::move(error));
     }
 }
 

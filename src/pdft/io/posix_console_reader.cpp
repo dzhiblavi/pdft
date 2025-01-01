@@ -1,7 +1,6 @@
 #include "pdft/io/posix_console_reader.h"
 
-#include "pdft/core/result/make/err.h"
-#include "pdft/core/result/make/ok.h"
+#include "pdft/core/result.h"
 #include "pdft/runtime/module/register.h"
 
 #include <asio/read.hpp>
@@ -19,10 +18,10 @@ Async<Status> PosixConsoleReader::read(size_t num_bytes, std::string& out) {
     auto [ec, _] = co_await asio::async_read(stdin_, asio::buffer(out), AsioCoroAsTuple);
 
     if (ec) {
-        co_return result::err(errorCodeToString(ec));
+        co_return result::makeError(errorCodeToString(ec));
     }
 
-    co_return result::ok();
+    co_return result::unit;
 }
 
 }  // namespace pdft::io

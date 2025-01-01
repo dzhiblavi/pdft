@@ -1,6 +1,6 @@
 #pragma once
 
-#include "pdft/core/result/type/unit.h"
+#include "pdft/core/result.h"
 
 namespace pdft::rt::detail {
 

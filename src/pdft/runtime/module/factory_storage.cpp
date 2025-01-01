@@ -1,17 +1,16 @@
 #include "pdft/runtime/module/factory_storage.h"
 
 #include "pdft/core/result.h"
-#include "pdft/core/result/coro/result.h"  // IWYU pragma: keep
 
 namespace pdft::rt {
 
 Status FactoryStorage::registerModule(const std::string& cls, ModuleTraits* traits) {
     if (modules_.contains(cls)) {
-        return result::err("duplicate module {}", cls);
+        return result::makeError(std::format("duplicate module {}", cls));
     }
 
     modules_.emplace(cls, traits);
-    return result::ok();
+    return result::unit;
 }
 
 Status FactoryStorage::registerFactoryModule(
@@ -19,16 +18,16 @@ Status FactoryStorage::registerFactoryModule(
     co_await registerModule(cls, mod);
 
     if (factories_.contains(cls)) {
-        co_return result::err("duplicate factory {}", cls);
+        co_return result::makeError(std::format("duplicate factory {}", cls));
     }
 
     factories_.emplace(cls, fac);
-    co_return result::ok();
+    co_return result::unit;
 }
 
 Result<ModuleTraits*> FactoryStorage::getModuleTraits(const std::string& cls) {
     if (!modules_.contains(cls)) {
-        return result::err(std::format("unknown module {}", cls));
+        return result::makeError(std::format("unknown module {}", cls));
     }
 
     return modules_[cls];
@@ -36,7 +35,7 @@ Result<ModuleTraits*> FactoryStorage::getModuleTraits(const std::string& cls) {
 
 Result<FactoryTraits*> FactoryStorage::getFactoryTraits(const std::string& cls) {
     if (!factories_.contains(cls)) {
-        return result::err(std::format("unknown factory {}", cls));
+        return result::makeError(std::format("unknown factory {}", cls));
     }
 
     return factories_[cls];

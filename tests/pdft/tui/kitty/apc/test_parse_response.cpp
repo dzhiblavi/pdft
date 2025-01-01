@@ -6,23 +6,23 @@ namespace pdft::tui {
 
 TEST_CASE("parseResponse/empty") {
     auto resp = parseResponse("");
-    CHECK(!resp.has_value());
+    CHECK(!resp.hasValue());
 }
 
 TEST_CASE("parseResponse/no-first-escape") {
     auto resp = parseResponse("_Ga=b;\033");
-    CHECK(!resp.has_value());
+    CHECK(!resp.hasValue());
 }
 
 TEST_CASE("parseResponse/no-last-escape") {
     auto resp = parseResponse("\033_Ga=b;\033b");
-    CHECK(!resp.has_value());
+    CHECK(!resp.hasValue());
 }
 
 TEST_CASE("parseResponse/no-control/no-payload") {
     auto resp = parseResponse("\033_G;\033\\");
 
-    CHECK(resp.has_value());
+    CHECK(resp.hasValue());
     auto&& apc = resp.value();
 
     CHECK(apc.command == "_G");
@@ -32,13 +32,13 @@ TEST_CASE("parseResponse/no-control/no-payload") {
 
 TEST_CASE("parseResponse/no-payload-delimiter") {
     auto resp = parseResponse("\033_Ga=b\033\\");
-    CHECK(!resp.has_value());
+    CHECK(!resp.hasValue());
 }
 
 TEST_CASE("parseResponse/control/no-payload") {
     auto resp = parseResponse("\033_Ga=b;\033\\");
 
-    CHECK(resp.has_value());
+    CHECK(resp.hasValue());
     auto&& apc = resp.value();
 
     CHECK(apc.command == "_G");
@@ -50,7 +50,7 @@ TEST_CASE("parseResponse/control/no-payload") {
 TEST_CASE("parseResponse/control/payload") {
     auto resp = parseResponse("\033_Ga=b;the payload is [OK]\033\\");
 
-    CHECK(resp.has_value());
+    CHECK(resp.hasValue());
     auto&& apc = resp.value();
 
     CHECK(apc.command == "_G");
@@ -62,7 +62,7 @@ TEST_CASE("parseResponse/control/payload") {
 TEST_CASE("parseResponse/multi-control/payload") {
     auto resp = parseResponse("\033_Ga=b,c=d,a_b_'=hello world;\033\\");
 
-    CHECK(resp.has_value());
+    CHECK(resp.hasValue());
     auto&& apc = resp.value();
 
     CHECK(apc.command == "_G");
@@ -75,12 +75,12 @@ TEST_CASE("parseResponse/multi-control/payload") {
 
 TEST_CASE("parseResponse/invalid-control-data-empty") {
     auto resp = parseResponse("\033_G,,,,;\033\\");
-    CHECK(!resp.has_value());
+    CHECK(!resp.hasValue());
 }
 
 TEST_CASE("parseResponse/invalid-control-data-not-a-kv") {
     auto resp = parseResponse("\033_GAB;\033\\");
-    CHECK(!resp.has_value());
+    CHECK(!resp.hasValue());
 }
 
 }  // namespace pdft::tui

@@ -1,7 +1,6 @@
 #include "pdft/runtime/module/load.h"
 
 #include "pdft/core/result.h"
-#include "pdft/core/result/coro/result.h"  // IWYU pragma: keep
 
 namespace pdft::rt {
 
@@ -35,10 +34,10 @@ Status LoadContext::loadAllModules() {
     co_return unit;
 }
 
-Maybe<const ModuleConfig*> LoadContext::getConfig(const std::string& name) {
+std::optional<const ModuleConfig*> LoadContext::getConfig(const std::string& name) {
     auto it = modules_.find(name);
     if (it == modules_.end()) {
-        return none;
+        return std::nullopt;
     }
     return &it->second;
 }
@@ -53,8 +52,8 @@ Result<Arc<Module>> LoadContext::loadModule(const std::string& name, const Modul
     } else if (config.alias.has_value()) {
         instance = co_await loadViaAlias(config, name);
     } else {
-        co_return err(
-            "neither factory nor cls construction methods are provided for module '{}'", name);
+        co_return result::makeError(std::format(
+            "neither factory nor cls construction methods are provided for module '{}'", name));
     }
 
     log::LoggerPtr logger;
@@ -65,7 +64,8 @@ Result<Arc<Module>> LoadContext::loadModule(const std::string& name, const Modul
     }
 
     if (!logger) {
-        co_return err("missing logger {} required by module '{}'", config.logger, name);
+        co_return result::makeError(
+            std::format("missing logger {} required by module '{}'", config.logger, name));
     }
 
     instance->setLogger(logger);
@@ -94,7 +94,7 @@ Result<Arc<Module>> LoadContext::loadViaFactory(
     // Check that factory is not created via factory (not supported)
     const auto& factory_config = getConfig(fac) | unwrap;
     if (!factory_config->cls) {
-        co_return err("factory factories and aliases are not supported");
+        co_return result::makeError<std::string>("factory factories and aliases are not supported");
     }
 
     // Get the factory class traits (unwrap because we have already created the module successfully)
@@ -115,7 +115,8 @@ Result<Arc<Module>> LoadContext::getModule(const std::string& name) {
         co_return it->second;
     }
 
-    const auto& config = co_await (getConfig(name) | lift("no config for module '{}'", name));
+    const auto& config =
+        co_await (getConfig(name) | lift(std::format("no config for module '{}'", name)));
     auto instance = co_await loadModule(name, *config);
     addNewModule(name, instance);
     co_return instance;

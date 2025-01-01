@@ -2,7 +2,7 @@
 
 #include "pdft/runtime/module/traits.h"
 
-#include "pdft/core/result/type/status.h"
+#include "pdft/core/result.h"
 
 #include <unordered_map>
 

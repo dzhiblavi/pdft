@@ -2,7 +2,7 @@
 
 #include "pdft/media/document.h"
 
-#include "pdft/core/result/type/maybe.h"
+#include "pdft/core/result.h"
 #include "pdft/runtime/module/module.h"
 
 #include <unordered_map>
