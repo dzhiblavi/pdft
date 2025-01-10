@@ -164,20 +164,20 @@ and stack traces can also be generated and will simplify troubleshooting greatly
 
 | Library | Why |
 | --- | --- |
-| [asio/1.32.0][asio] | Self-explanatory |
+| [asio][asio] | Self-explanatory |
 | [saf][saf] | Scheduler-aware futures |
-| [mupdf/1.24.10][mupdf] | A powerful library for working with PDFs and other document formats |
-| [ftxui/v5.0.0][ftxui] | A Terminal User Interface library |
-| [fswatch/1.17.1][fswatch] | A cross-platform filesystem event watching library |
-| [reflect-cpp/v0.16.0][reflect-cpp] | Serialization, Deserialization and Reflection library |
-| [spdlog/1.14.1][spdlog] | Logging library |
-| [zlib/1.3.1][zlib] | Used to compress images before sending images |
-| [base64/0.5.2][base64] | Required to send image data via Kitty graphics protocol |
-| [cpptrace/0.7.3][cpptrace] | Helps to generate stacktraces |
-| [magic_enum/0.9.6][magic_enum] | Static reflection for enums |
-| [tclap/1.2.5][tclap]| Command line argument parser |
-| [gtest/1.15.0][gtest] | Unit testing & mocking framework |
-| [catch2/3.6.0][catch2] | Unit testing framework |
+| [mupdf][mupdf] | A powerful library for working with PDFs and other document formats |
+| [ftxui][ftxui] | A Terminal User Interface library |
+| [fswatch][fswatch] | A cross-platform filesystem event watching library |
+| [reflect-cpp][reflect-cpp] | Serialization, Deserialization and Reflection library |
+| [spdlog][spdlog] | Logging library |
+| [zlib][zlib] | Used to compress images before sending images |
+| [base64][base64] | Required to send image data via Kitty graphics protocol |
+| [cpptrace][cpptrace] | Helps to generate stacktraces |
+| [magic_enum][magic_enum] | Static reflection for enums |
+| [tclap][tclap]| Command line argument parser |
+| [gtest][gtest] | Unit testing & mocking framework |
+| [catch2][catch2] | Unit testing framework |
 
 [kitty-graphics-protocol]: https://sw.kovidgoyal.net/kitty/graphics-protocol/
 [unicode-placeholders]: https://sw.kovidgoyal.net/kitty/graphics-protocol/#unicode-placeholders
