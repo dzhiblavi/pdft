@@ -1,6 +1,6 @@
 #include "pdft/tui/terminal.h"
 
-#include "pdft/core/assert.h"
+#include "platform/core/assert.h"
 
 #include <stdio.h>
 #include <sys/ioctl.h>
@@ -12,7 +12,7 @@ TerminalDimensions Terminal::getDimensions() const {
     winsize sz{};
 
     if (ioctl(STDIN_FILENO, TIOCGWINSZ, &sz) != 0) {
-        panic("ioctl failed, errno={} ({})", errno, strerror(errno));
+        platform::panic("ioctl failed, errno={} ({})", errno, strerror(errno));
     }
 
     // XXX For debugging purposes

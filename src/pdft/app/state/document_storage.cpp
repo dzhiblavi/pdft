@@ -1,9 +1,9 @@
 #include "pdft/app/state/document_storage.h"
-#include "pdft/runtime/module/register.h"
+#include "platform/module/register.h"
 
 namespace pdft::app {
 
-DocumentId DocumentStorage::addDocument(Arc<media::Document> document) {
+DocumentId DocumentStorage::addDocument(platform::Arc<media::Document> document) {
     static DocumentId next_id = 0;
 
     auto id = next_id++;
@@ -23,7 +23,7 @@ bool DocumentStorage::removeDocument(DocumentId id) {
     return true;
 }
 
-Maybe<Arc<const media::Document>> DocumentStorage::getDocument(DocumentId id) const {
+platform::Maybe<platform::Arc<const media::Document>> DocumentStorage::getDocument(DocumentId id) const {
     auto it = documents_.find(id);
     if (it == documents_.end()) {
         return std::nullopt;
@@ -32,7 +32,7 @@ Maybe<Arc<const media::Document>> DocumentStorage::getDocument(DocumentId id) co
     return it->second;
 }
 
-Maybe<DocumentId> DocumentStorage::getIdByPath(const std::filesystem::path& path) const {
+platform::Maybe<DocumentId> DocumentStorage::getIdByPath(const std::filesystem::path& path) const {
     auto it = ids_by_path_.find(path);
     if (it == ids_by_path_.end()) {
         return std::nullopt;
@@ -43,4 +43,4 @@ Maybe<DocumentId> DocumentStorage::getIdByPath(const std::filesystem::path& path
 
 }  // namespace pdft::app
 
-PDFT_REGISTER_MODULE(pdft::app::DocumentStorage);
+PLATFORM_REGISTER_MODULE(pdft::app::DocumentStorage);

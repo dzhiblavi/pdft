@@ -5,7 +5,7 @@
 #include "pdft/tui/elements.h"
 #include "pdft/tui/screen.h"
 
-#include "pdft/core/awaitable.h"
+#include "platform/core/async.h"
 #include "pdft/core/context.h"
 
 namespace pdft::app {
@@ -16,7 +16,7 @@ class DocumentView {
 
     virtual tui::Element getLayout(Context& ctx, const DocumentModel& doc) = 0;
 
-    virtual Async<void> render(
+    virtual platform::Async<void> render(
         Context& ctx,
         const DocumentModel& doc,
         const DisplayProperties& properties,

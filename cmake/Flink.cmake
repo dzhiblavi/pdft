@@ -4,12 +4,12 @@ include(CMakeParseArguments)
 
 function(target_do_force_link_libraries target visibility lib)
   if(MSVC)
-    target_link_libraries(${target} ${visibility} "/WHOLEARCHIVE:${lib}")
+    target_link_libraries(${target} ${visibility} "/WHOLEplatform::ArcHIVE:${lib}")
   elseif(APPLE)
     target_link_libraries(${target} ${visibility} "-Wl,-force_load" ${lib})
   else()
-    target_link_libraries(${target} ${visibility} "-Wl,--whole-archive" ${lib}
-                          "-Wl,--no-whole-archive")
+    target_link_libraries(${target} ${visibility} "-Wl,--whole-platform::Archive" ${lib}
+                          "-Wl,--no-whole-platform::Archive")
   endif()
 endfunction()
 

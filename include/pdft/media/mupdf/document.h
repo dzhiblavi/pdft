@@ -2,7 +2,7 @@
 
 #include "pdft/media/document.h"
 
-#include "pdft/core/result.h"
+#include "platform/core/result.h"
 
 struct fz_document;  // NOLINT
 
@@ -16,10 +16,10 @@ class MupdfDocument : public Document {
     ~MupdfDocument() noexcept override;
 
     size_t getPageCount() const override;
-    Arc<media::Page> getPage(int index) const override;
+    platform::Arc<media::Page> getPage(int index) const override;
     const std::filesystem::path& getPath() const override;
 
-    static Result<MupdfDocument> open(const std::filesystem::path& path);
+    static platform::Result<MupdfDocument> open(const std::filesystem::path& path);
 
  private:
     MupdfDocument(std::filesystem::path path, fz_document* document)

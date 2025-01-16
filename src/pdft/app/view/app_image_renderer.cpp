@@ -3,9 +3,9 @@
 #include "pdft/image/image.h"
 #include "pdft/image/operations.h"
 
-#include "pdft/core/log.h"
-#include "pdft/core/result.h"
-#include "pdft/runtime/module/register.h"
+#include "platform/core/result.h"
+#include "platform/log.h"
+#include "platform/module/register.h"
 
 #include <asio/any_io_executor.hpp>
 #include <asio/post.hpp>
@@ -13,7 +13,9 @@
 
 namespace pdft::app {
 
-AppImageRenderer::AppImageRenderer(Arc<const PaletteStorage> palettes)
+using namespace platform;
+
+AppImageRenderer::AppImageRenderer(platform::Arc<const PaletteStorage> palettes)
     : palettes_(std::move(palettes)) {}
 
 void AppImageRenderer::render(
@@ -32,11 +34,11 @@ void AppImageRenderer::render(
         auto _ = ctx.push("apply_palette");
 
         palettes_->get(*display.palette)
-            .and_then([&](image::PaletteRef palette) -> Maybe<Unit> {
+            .and_then([&](image::PaletteRef palette) -> platform::Maybe<platform::Unit> {
                 image::applyPalette(image.mutableSamples(), palette);
                 return result::unit;
             })
-            .or_else([&]() -> Maybe<Unit> {
+            .or_else([&]() -> platform::Maybe<platform::Unit> {
                 log::warn("failed to find a palette with name {}", *display.palette);
                 return none;
             });
@@ -45,4 +47,4 @@ void AppImageRenderer::render(
 
 }  // namespace pdft::app
 
-PDFT_REGISTER_MODULE(pdft::app::AppImageRenderer);
+PLATFORM_REGISTER_MODULE(pdft::app::AppImageRenderer);

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "pdft/core/result.h"
+#include "platform/core/result.h"
 
 namespace pdft::app {
 
@@ -8,8 +8,8 @@ class Loader {
  public:
     virtual ~Loader() = default;
 
-    virtual Status load() = 0;
-    virtual Status save() = 0;
+    virtual platform::Status load() = 0;
+    virtual platform::Status save() = 0;
 };
 
 }  // namespace pdft::app

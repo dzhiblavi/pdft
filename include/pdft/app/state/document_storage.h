@@ -2,8 +2,8 @@
 
 #include "pdft/media/document.h"
 
-#include "pdft/core/result.h"
-#include "pdft/runtime/module/module.h"
+#include "platform/core/result.h"
+#include "platform/module/module.h"
 
 #include <unordered_map>
 
@@ -11,18 +11,18 @@ namespace pdft::app {
 
 using DocumentId = uint32_t;
 
-class DocumentStorage : public rt::Module {
+class DocumentStorage : public platform::rt::Module {
  public:
-    DocumentId addDocument(Arc<media::Document> document);
+    DocumentId addDocument(platform::Arc<media::Document> document);
 
     [[nodiscard]] bool removeDocument(DocumentId id);
 
-    Maybe<Arc<const media::Document>> getDocument(DocumentId id) const;
+    platform::Maybe<platform::Arc<const media::Document>> getDocument(DocumentId id) const;
 
-    Maybe<DocumentId> getIdByPath(const std::filesystem::path& path) const;
+    platform::Maybe<DocumentId> getIdByPath(const std::filesystem::path& path) const;
 
  private:
-    std::unordered_map<DocumentId, Arc<media::Document>> documents_;
+    std::unordered_map<DocumentId, platform::Arc<media::Document>> documents_;
     std::unordered_map<std::string, DocumentId> ids_by_path_;
 };
 

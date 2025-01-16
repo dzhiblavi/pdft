@@ -7,7 +7,7 @@ namespace {
 using ControlDataItem = std::pair<std::string, std::string>;
 using ControlData = std::vector<ControlDataItem>;
 
-Result<ControlDataItem> parseControlDataItem(std::string_view item_view) {
+platform::Result<ControlDataItem> parseControlDataItem(std::string_view item_view) {
     auto equal_sign_pos = item_view.find('=');
 
     if (equal_sign_pos == std::string::npos || equal_sign_pos == 0) {
@@ -19,7 +19,7 @@ Result<ControlDataItem> parseControlDataItem(std::string_view item_view) {
         std::string(item_view.substr(equal_sign_pos + 1)));
 }
 
-Result<ControlData> parseControlData(std::string_view control_data) {
+platform::Result<ControlData> parseControlData(std::string_view control_data) {
     ControlData data;
     size_t pos = 0;
 
@@ -49,7 +49,7 @@ Result<ControlData> parseControlData(std::string_view control_data) {
 }  // namespace
 
 // \033_Ga=b,c=d;OK\033 and backslash
-Result<Response> parseResponse(std::string_view response) {
+platform::Result<Response> parseResponse(std::string_view response) {
     if (response.size() <= 4) {
         return result::makeError<std::string>("malformed response");
     }
@@ -65,7 +65,7 @@ Result<Response> parseResponse(std::string_view response) {
     // The first two bytes after escape code are interpreted as command code (_G)
     auto command_view = response.substr(1, 2);
 
-    // Search for ; starting from index 3
+    // Seplatform::Arch for ; starting from index 3
     auto end_of_control_data = response.find(';', 3);
 
     if (end_of_control_data == std::string::npos) {

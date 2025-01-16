@@ -15,5 +15,5 @@ add_library(pdft-utils STATIC)
 target_link_libraries(pdft-utils PUBLIC pdft-utils-buildinfo)
 target_link_libraries(pdft-utils PRIVATE aklomp::base64 ZLIB::ZLIB)
 
-target_sources(pdft-utils PRIVATE ./base64.cpp ./zlib.cpp ./get_home_dir.cpp
-                                  ./random.cpp ./base64.cpp)
+target_sources(pdft-utils PRIVATE ./base64.cpp ./zlib.cpp ./random.cpp
+                                  ./base64.cpp)

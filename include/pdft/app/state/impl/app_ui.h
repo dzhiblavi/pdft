@@ -4,7 +4,7 @@
 
 namespace pdft::app {
 
-class AppUI : public UI, public rt::Module {
+class AppUI : public UI, public platform::rt::Module {
  public:
     void onInput(char key) override;
     void resetInput() override;
@@ -26,7 +26,7 @@ class AppUI : public UI, public rt::Module {
 
     const UIModel& getModel() const override;
     UIModel& getModel() override;
-    Maybe<DocumentId> getDocumentId() const override;
+    platform::Maybe<DocumentId> getDocumentId() const override;
     DocumentModel* getDocument() override;
     const DocumentModel* getDocument() const override;
 

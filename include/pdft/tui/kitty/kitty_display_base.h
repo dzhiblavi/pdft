@@ -15,7 +15,7 @@ class KittyDisplayBase : public Display {
         size_t max_loaded_images = DefaultMaxLoadedImages;
     };
 
-    KittyDisplayBase(Config config, Arc<APCExecutor> executor);
+    KittyDisplayBase(Config config, platform::Arc<APCExecutor> executor);
 
     void loadCompressedImage(
         Context& ctx,
@@ -30,7 +30,7 @@ class KittyDisplayBase : public Display {
     bool isLoaded(ImageId id) const override;
 
  protected:
-    Arc<APCExecutor> executor_;
+    platform::Arc<APCExecutor> executor_;
     utils::LRUCache<ImageId, image::ImageSize> loaded_;
 };
 

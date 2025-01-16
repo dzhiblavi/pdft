@@ -4,8 +4,8 @@
 #include "pdft/app/view/page_renderer.h"
 #include "pdft/tui/display.h"
 
-#include "pdft/core/future.h"
-#include "pdft/runtime/module/module.h"
+#include "platform/core/future.h"
+#include "platform/module/module.h"
 
 #include "pdft/utils/lru_cache.h"
 #include "pdft/utils/random.h"
@@ -13,16 +13,17 @@
 #include <asio/io_context.hpp>
 #include <asio/strand.hpp>
 #include <asio/thread_pool.hpp>
+#include <asio/use_awaitable.hpp>
 
 namespace pdft::app {
 
 template <typename T>
 struct FutureValue {
-    explicit FutureValue(Future<T> future) : value_(std::move(future)) {}
+    explicit FutureValue(platform::Future<T> future) : value_(std::move(future)) {}
 
-    Async<const T*> get() const {
-        if (std::holds_alternative<Future<T>>(value_)) {
-            Future<T> future = std::get<Future<T>>(std::move(value_));
+    platform::Async<const T*> get() const {
+        if (std::holds_alternative<platform::Future<T>>(value_)) {
+            platform::Future<T> future = std::get<platform::Future<T>>(std::move(value_));
             value_ = co_await std::move(future).async_extract(asio::use_awaitable);
         }
         co_return &std::get<T>(value_);
@@ -31,10 +32,10 @@ struct FutureValue {
  private:
     friend class BackgroundPool;
 
-    mutable std::variant<Future<T>, T> value_;
+    mutable std::variant<platform::Future<T>, T> value_;
 };
 
-class AppPageRenderer : public PageRenderer, public rt::Module {
+class AppPageRenderer : public PageRenderer, public platform::rt::Module {
  public:
     struct Config {
         static constexpr uint32_t DefaultImageCacheSize = 128;
@@ -47,11 +48,11 @@ class AppPageRenderer : public PageRenderer, public rt::Module {
 
     AppPageRenderer(
         Config config,
-        Arc<const DocumentStorage> documents,
-        Arc<PageProcessor> processor,
-        Arc<tui::Display> display);
+        platform::Arc<const DocumentStorage> documents,
+        platform::Arc<PageProcessor> processor,
+        platform::Arc<tui::Display> display);
 
-    Async<Unit> render(
+    platform::Async<platform::Unit> render(
         Context& ctx,
         const Page& page,
         const PagePosition& pos,
@@ -66,15 +67,17 @@ class AppPageRenderer : public PageRenderer, public rt::Module {
 
     using RenderingImage = FutureValue<ProcessedImage>;
 
-    Async<void> renderImagesAround(
-        Arc<const media::Document> document, const DisplayProperties& display, const Page& page);
+    platform::Async<void> renderImagesAround(
+        platform::Arc<const media::Document> document,
+        const DisplayProperties& display,
+        const Page& page);
 
-    Async<void> loadImageToDisplay(Context& ctx, tui::ImageId id, tui::Screen& screen);
+    platform::Async<void> loadImageToDisplay(Context& ctx, tui::ImageId id, tui::Screen& screen);
 
     const Config config_;
-    Arc<const DocumentStorage> documents_;
-    Arc<PageProcessor> processor_;
-    Arc<tui::Display> display_;
+    platform::Arc<const DocumentStorage> documents_;
+    platform::Arc<PageProcessor> processor_;
+    platform::Arc<tui::Display> display_;
 
     utils::LRUCache<tui::ImageId, RenderingImage> rendered_;
     std::unordered_map<tui::ImageId, CellImageSize> sizes_;

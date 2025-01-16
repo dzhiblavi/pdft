@@ -1,6 +1,6 @@
 #include "pdft/app/version.h"
 
-#include "pdft/runtime/module/start.h"
+#include "pdft/runtime/start.h"
 
 #include <iostream>
 

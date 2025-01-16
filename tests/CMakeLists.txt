@@ -21,28 +21,6 @@ endfunction(add_test)
 
 # Add tests here
 
-# core
-add_test(./pdft/core/trace/test_scope_tracer.cpp)
-add_test(./pdft/core/trace/test_stack_scope_tracer.cpp)
-add_test(./pdft/core/test_assert.cpp)
-
-# core/result
-# add_test(./pdft/core/result/combine/test_and_then.cpp)
-# add_test(./pdft/core/result/combine/test_lift.cpp)
-# add_test(./pdft/core/result/combine/test_map.cpp)
-# add_test(./pdft/core/result/combine/test_map_err.cpp)
-# add_test(./pdft/core/result/combine/test_or_else.cpp)
-# add_test(./pdft/core/result/coro/test_maybe.cpp)
-# add_test(./pdft/core/result/coro/test_result.cpp)
-
-# runtime
-add_test(./pdft/runtime/cli/test_cli_args.cpp)
-add_test(./pdft/runtime/event/test_event_emitter.cpp)
-add_test(./pdft/runtime/module/test_factory_storage.cpp)
-add_test(./pdft/runtime/module/test_load_cls.cpp)
-add_test(./pdft/runtime/module/test_load_factory.cpp)
-add_test(./pdft/runtime/module/test_load_alias.cpp)
-
 # io
 add_test(./pdft/io/test_posix_console_writer.cpp)
 add_test(./pdft/io/test_posix_console_reader.cpp)
@@ -52,8 +30,6 @@ add_test(./pdft/image/test_color.cpp)
 
 # utils
 add_test(./pdft/utils/test_lru_cache.cpp)
-add_test(./pdft/utils/intrusive/test_mpmc_stack.cpp)
-add_test(./pdft/utils/intrusive/test_list.cpp)
 
 # tui
 add_test(./pdft/tui/test_alignment.cpp)

@@ -1,20 +1,22 @@
 #include "pdft/tui/kitty/unicode_kitty_display.h"
 
-#include "pdft/core/assert.h"
-#include "pdft/core/log.h"
-#include "pdft/runtime/module/register.h"
+#include "platform/core/assert.h"
+#include "platform/log.h"
+#include "platform/module/register.h"
 
 #include "./detail/rowcolumn_diacritics.h"
 
 namespace pdft::tui {
 
+using namespace platform;
+
 void UnicodeKittyDisplay::displayImage(
     Context& ctx, ImageId id, const IRect& rect, const FRect& image_subarea, BufPair& buffers) {
-    verify(isLoaded(id));
+    platform::verify(isLoaded(id));
 
     const auto& [x, y, w, h] = rect;
-    verify(x >= 0 && y >= 0, "rect offset must not be negative: x={},y={}", x, y);
-    verify(w >= 0 && h >= 0, "rect dimensions must not be negative: w={},h={}", w, h);
+    platform::verify(x >= 0 && y >= 0, "rect offset must not be negative: x={},y={}", x, y);
+    platform::verify(w >= 0 && h >= 0, "rect dimensions must not be negative: w={},h={}", w, h);
 
     if (w == 0 || h == 0) {
         return;
@@ -22,8 +24,9 @@ void UnicodeKittyDisplay::displayImage(
 
     const auto& [rix, riy, riw, rih] = image_subarea;
     log::debug(ctx, "@={} SA={}", rect, image_subarea);
-    verify(rix >= 0 && riy >= 0, "image offset must not be negative: x={},y={}", rix, riy);
-    verify(riw > 0 && rih > 0, "image dimensions must be positive: w={},h={}", riw, rih);
+    platform::verify(
+        rix >= 0 && riy >= 0, "image offset must not be negative: x={},y={}", rix, riy);
+    platform::verify(riw > 0 && rih > 0, "image dimensions must be positive: w={},h={}", riw, rih);
 
     const uint32_t image_cols = std::roundf(w / riw);  // NOLINT
     const uint32_t image_rows = std::roundf(h / rih);  // NOLINT
@@ -90,4 +93,4 @@ void UnicodeKittyDisplay::displayImage(
 
 }  // namespace pdft::tui
 
-PDFT_REGISTER_MODULE(pdft::tui::UnicodeKittyDisplay);
+PLATFORM_REGISTER_MODULE(pdft::tui::UnicodeKittyDisplay);

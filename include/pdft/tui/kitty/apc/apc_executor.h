@@ -5,7 +5,7 @@
 #include "pdft/io/buffer.h"
 
 #include "pdft/core/context.h"
-#include "pdft/core/result.h"
+#include "platform/core/result.h"
 
 #include <asio/awaitable.hpp>
 

@@ -4,7 +4,8 @@
 #include "pdft/tui/display.h"
 
 #include "pdft/core/log/fmt_adapter.h"
-#include "pdft/utils/hash_combine.h"
+
+#include "platform/utils/hash_combine.h"
 
 #include <optional>
 #include <string>
@@ -28,7 +29,7 @@ struct DisplayProperties {
 };
 
 inline tui::ImageId getImageId(uint32_t salt, const Page& page, const DisplayProperties& display) {
-    utils::hashCombine(
+    platform::utils::hashCombine(
         salt,
         page.document_id,
         page.page_index,

@@ -4,7 +4,7 @@
 
 #include "fz_assert.h"
 
-#include "pdft/core/assert.h"
+#include "platform/core/assert.h"
 
 extern "C" {
 #include <mupdf/fitz/archive.h>
@@ -24,8 +24,8 @@ MupdfPage::~MupdfPage() noexcept {
     fz_drop_page(thisThreadMupdfContext().native(), page_);
 }
 
-Arc<image::Image> MupdfPage::getImage(float scaling_factor) const {
-    verify(scaling_factor > 0.f, "scale factor should be positive");
+platform::Arc<image::Image> MupdfPage::getImage(float scaling_factor) const {
+    platform::verify(scaling_factor > 0.f, "scale factor should be positive");
 
     auto ctx = thisThreadMupdfContext().native();
     fz_matrix ctm = fz_scale(scaling_factor, scaling_factor);
@@ -34,15 +34,15 @@ Arc<image::Image> MupdfPage::getImage(float scaling_factor) const {
         return fz_new_pixmap_from_page(ctx, page_, ctm, fz_device_rgb(ctx), /* alpha= */ 0);
     });
 
-    verify(pix, "failed to get pixmap by page");
-    verify((*pix)->w > 0 && (*pix)->h > 0, "loaded an image with negative size");
-    return Arc<image::Image>(new PixmapMupdfImage(*pix));
+    platform::verify(pix, "failed to get pixmap by page");
+    platform::verify((*pix)->w > 0 && (*pix)->h > 0, "loaded an image with negative size");
+    return platform::Arc<image::Image>(new PixmapMupdfImage(*pix));
 }
 
 PageSize MupdfPage::getDefaultSize() const {
     auto ctx = thisThreadMupdfContext().native();
     auto maybe_rect = tryFz(ctx, [&] { return fz_bound_page(ctx, page_); });
-    verify(maybe_rect, "failed to get default size for page");
+    platform::verify(maybe_rect, "failed to get default size for page");
     fz_rect rect = *maybe_rect;
 
     return {

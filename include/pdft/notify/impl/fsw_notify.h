@@ -2,7 +2,7 @@
 
 #include "pdft/notify/notify.h"
 
-#include "pdft/runtime/module/module.h"
+#include "platform/module/module.h"
 
 #include <asio/experimental/concurrent_channel.hpp>
 #include <asio/use_awaitable.hpp>
@@ -15,7 +15,7 @@
 
 namespace pdft::notify {
 
-class FswNotify : public Notify, public rt::Module {
+class FswNotify : public Notify, public platform::rt::Module {
  public:
     FswNotify();
     ~FswNotify() noexcept override;

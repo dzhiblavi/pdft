@@ -155,7 +155,7 @@ and stack traces can also be generated and will simplify troubleshooting greatly
 
 ### Planned features
 
-| Feature | Status |
+| Feature | platform::Status |
 | --- | --- |
 | iTerm image protocol support | N/A |
 | Windows OS support and testing | N/A |

@@ -1,12 +1,14 @@
 #include "pdft/app/loader/impl/app_persister.h"
 #include "pdft/app/state/ui.h"
 
-#include "pdft/core/log.h"
-#include "pdft/runtime/module/register.h"
+#include "platform/log.h"
+#include "platform/module/register.h"
 
 #include <rfl/json.hpp>
 
 namespace pdft::app {
+
+using namespace platform;
 
 namespace {
 
@@ -18,12 +20,14 @@ struct State {
 }  // namespace
 
 AppPersister::AppPersister(
-    Arc<UI> ui, Arc<DocumentStorage> documents, Arc<const media::Loader> doc_loader)
+    platform::Arc<UI> ui,
+    platform::Arc<DocumentStorage> documents,
+    platform::Arc<const media::Loader> doc_loader)
     : ui_(std::move(ui))
     , documents_(std::move(documents))
     , doc_loader_(std::move(doc_loader)) {}
 
-Status AppPersister::save(std::ostream& os) const {
+platform::Status AppPersister::save(std::ostream& os) const {
     State state;
     state.ui = ui_->getModel();
 
@@ -37,7 +41,7 @@ Status AppPersister::save(std::ostream& os) const {
     return result::unit;
 }
 
-Status AppPersister::restore(std::istream& is) const {
+platform::Status AppPersister::restore(std::istream& is) const {
     auto maybe_state = rfl::json::read<State>(is);
     if (!maybe_state) {
         return result::makeError<std::string>("failed to read state");
@@ -80,4 +84,4 @@ Status AppPersister::restore(std::istream& is) const {
 
 }  // namespace pdft::app
 
-PDFT_REGISTER_MODULE(pdft::app::AppPersister);
+PLATFORM_REGISTER_MODULE(pdft::app::AppPersister);

@@ -1,19 +1,21 @@
 #include "pdft/app/app.h"
+#include "pdft/core/asio_as_tuple.h"
+#include "pdft/core/log/common_adapters.h"  // IWYU pragma: keep
 
-#include "pdft/runtime/module/register.h"
-
-#include "pdft/core/awaitable.h"
-#include "pdft/core/log.h"
-#include "pdft/core/result.h"
-#include "pdft/core/trace/log_stack_trace.h"
-#include "pdft/core/trace/stack_scope_tracer.h"
-
-#include "pdft/utils/visit.h"
+#include "platform/core/async.h"
+#include "platform/core/result.h"
+#include "platform/log.h"
+#include "platform/module/register.h"
+#include "platform/trace/log_stack_trace.h"
+#include "platform/trace/stack_scope_tracer.h"
+#include "platform/utils/visit.h"
 
 #include <asio/co_spawn.hpp>
 #include <asio/detached.hpp>
 
 namespace pdft::app {
+
+using namespace platform;
 
 namespace {
 
@@ -36,13 +38,13 @@ ControllerAction combineActions(ControllerAction a, ControllerAction b) {
 Application::Application(
     Config config,
     asio::io_context& io,
-    Arc<Loader> loader,
-    Arc<rt::EventEmitter<notify::Event>> fs_emitter,
-    Arc<rt::EventEmitter<char>> key_emitter,
-    Arc<rt::EventEmitter<int>> sig_emitter,
-    Arc<Controller> controller,
-    Arc<View> view,
-    Arc<tui::Renderer> renderer)
+    platform::Arc<Loader> loader,
+    platform::Arc<rt::EventEmitter<notify::Event>> fs_emitter,
+    platform::Arc<rt::EventEmitter<char>> key_emitter,
+    platform::Arc<rt::EventEmitter<int>> sig_emitter,
+    platform::Arc<Controller> controller,
+    platform::Arc<View> view,
+    platform::Arc<tui::Renderer> renderer)
     : config_(config)
     , io_(io)
     , loader_(std::move(loader))
@@ -54,7 +56,7 @@ Application::Application(
     , sig_emitter_(std::move(sig_emitter))
     , events_chan_(io.get_executor(), config_.event_max_buffer_size) {}
 
-Async<Status> Application::run(Context& ctx) {
+platform::Async<platform::Status> Application::run(Context& ctx) {
     if (auto res = ctx.push("load") | loader_->load(); !res) {
         co_return res;
     }
@@ -68,7 +70,7 @@ Async<Status> Application::run(Context& ctx) {
     co_return result::unit;
 }
 
-Async<Status> Application::runApplicationLoop() {
+platform::Async<platform::Status> Application::runApplicationLoop() {
     auto on_event = [&](const auto& event) {
         return utils::visit(event, [&](const auto& ev) { return onEvent(ev); });
     };
@@ -117,8 +119,8 @@ void Application::subscribe() {
     sig_slot_.plug(*sig_emitter_);
 }
 
-Async<Status> Application::shutdown() {
-    auto tracer = trace::makeTracer("shutdown");
+platform::Async<platform::Status> Application::shutdown() {
+    auto tracer = platform::trace::makeTracer("shutdown");
     Context ctx(tracer);
 
     stop();
@@ -133,7 +135,7 @@ void Application::stop() {
 }
 
 void Application::queueEvent(Event event) {
-    auto accept = [this](Event ev) -> Async<void> {
+    auto accept = [this](Event ev) -> platform::Async<void> {
         auto [errc] = co_await events_chan_.async_send({}, ev, AsioCoroAsTuple);
 
         if (errc) {
@@ -185,19 +187,19 @@ ControllerAction Application::onEvent(const rt::Event<int>& sig_event) {
     return controller_->onSignal(sig_event.value).valueOr(ControllerAction::None);
 }
 
-Async<Status> Application::renderOne() {
-    auto tracer = trace::makeTracer("render_one");
+platform::Async<platform::Status> Application::renderOne() {
+    auto tracer = platform::trace::makeTracer("render_one");
     Context ctx(tracer);
 
     auto dom = view_->getLayout(ctx);
     auto screen = renderer_->newFrame(ctx, std::move(dom));
     co_await view_->render(ctx, screen);
     co_await renderer_->renderFrame(ctx);
-    trace::logStackTrace(std::move(tracer));
+    platform::trace::logStackTrace(std::move(tracer));
 
     co_return result::unit;
 }
 
 }  // namespace pdft::app
 
-PDFT_REGISTER_MODULE(pdft::app::Application);
+PLATFORM_REGISTER_MODULE(pdft::app::Application);

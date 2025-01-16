@@ -1,6 +1,6 @@
 #include "pdft/tui/kitty/apc/tmux_apc_executor.h"
 
-#include "pdft/runtime/module/register.h"
+#include "platform/module/register.h"
 
 namespace pdft::tui {
 
@@ -14,4 +14,4 @@ void TmuxAPCExecutor::writeSuffix(io::OutBuffer& buffer) const {
 
 }  // namespace pdft::tui
 
-PDFT_REGISTER_MODULE(pdft::tui::TmuxAPCExecutor);
+PLATFORM_REGISTER_MODULE(pdft::tui::TmuxAPCExecutor);

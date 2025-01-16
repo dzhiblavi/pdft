@@ -18,7 +18,7 @@ wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | apt-key add -
 add-apt-repository -y "deb http://apt.llvm.org/jammy/ llvm-toolchain-jammy-19 main"
 
 # CMake
-wget -O - https://apt.kitware.com/keys/kitware-archive-latest.asc | apt-key add -
+wget -O - https://apt.kitware.com/keys/kitware-platform::Archive-latest.asc | apt-key add -
 apt-add-repository 'deb https://apt.kitware.com/ubuntu/ jammy main'
 
 apt-get update

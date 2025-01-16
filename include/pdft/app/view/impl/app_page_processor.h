@@ -6,23 +6,23 @@
 
 namespace pdft::app {
 
-class AppPageProcessor : public PageProcessor, public rt::Module {
+class AppPageProcessor : public PageProcessor, public platform::rt::Module {
  public:
     struct Config {
         uint32_t render_pool_size = 4;
     };
 
-    AppPageProcessor(Config config, Arc<const ImageRenderer> renderer);
+    AppPageProcessor(Config config, platform::Arc<const ImageRenderer> renderer);
 
     ~AppPageProcessor() noexcept;
 
     void process(
-        Arc<media::Page> page,
+        platform::Arc<media::Page> page,
         const DisplayProperties& display,
-        Promise<ProcessedImage> promise) override;
+        platform::Promise<ProcessedImage> promise) override;
 
  private:
-    Arc<const ImageRenderer> renderer_;
+    platform::Arc<const ImageRenderer> renderer_;
     asio::thread_pool pool_;
     asio::strand<asio::thread_pool::executor_type> media_strand_;
 };

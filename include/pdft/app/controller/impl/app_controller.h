@@ -7,13 +7,13 @@
 
 #include "pdft/media/loader.h"
 
-#include "pdft/runtime/module/module.h"
+#include "platform/module/module.h"
 
 #include <vector>
 
 namespace pdft::app {
 
-class AppController : public Controller, public rt::Module {
+class AppController : public Controller, public platform::rt::Module {
  public:
     enum class Command {
         Quit,
@@ -54,20 +54,20 @@ class AppController : public Controller, public rt::Module {
 
     AppController(
         Config config,
-        Arc<const media::Loader> doc_loader,
-        Arc<UI> ui,
-        Arc<DocumentStorage> documents);
+        platform::Arc<const media::Loader> doc_loader,
+        platform::Arc<UI> ui,
+        platform::Arc<DocumentStorage> documents);
 
-    Result<ControllerAction> onKeyEvent(char key) override;
-    Result<ControllerAction> onFilesystemEvent(const notify::Event& event) override;
-    Result<ControllerAction> onSignal(int signal) override;
+    platform::Result<ControllerAction> onKeyEvent(char key) override;
+    platform::Result<ControllerAction> onFilesystemEvent(const notify::Event& event) override;
+    platform::Result<ControllerAction> onSignal(int signal) override;
 
  private:
     void bindKey(Command command, std::string_view keys);
-    Result<ControllerAction> applyPendingCommand();
-    Status reloadCurrentDocument();
-    Status reloadDocument(DocumentId id, std::filesystem::path path);
-    Result<ControllerAction> handleSignal(int signal);
+    platform::Result<ControllerAction> applyPendingCommand();
+    platform::Status reloadCurrentDocument();
+    platform::Status reloadDocument(DocumentId id, std::filesystem::path path);
+    platform::Result<ControllerAction> handleSignal(int signal);
 
     KeyTree::CallbackType commandCallback(Command command);
     KeyTree::NumberCallbackType numCommandCallback(Command command);
@@ -80,9 +80,9 @@ class AppController : public Controller, public rt::Module {
     Config config_;
     KeyTree key_tree_;
     PendingCommand command_{};
-    Arc<const media::Loader> doc_loader_;
-    Arc<UI> ui_;
-    Arc<DocumentStorage> documents_;
+    platform::Arc<const media::Loader> doc_loader_;
+    platform::Arc<UI> ui_;
+    platform::Arc<DocumentStorage> documents_;
 };
 
 }  // namespace pdft::app

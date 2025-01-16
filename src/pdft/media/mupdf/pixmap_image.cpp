@@ -1,9 +1,9 @@
 #include "pdft/media/mupdf/pixmap_image.h"
 #include "pdft/media/mupdf/context.h"
 
-#include "pdft/core/assert.h"
+#include "platform/core/assert.h"
 
-#include "pdft/utils/stdlike/memory.h"
+#include "platform/utils/stdlike/memory.h"
 
 extern "C" {
 #include <mupdf/fitz/pixmap.h>
@@ -14,7 +14,7 @@ extern "C" {
 namespace pdft::media {
 
 PixmapMupdfImage::PixmapMupdfImage(PixmapMupdfImage&& rhs) noexcept
-    : pixmap_(verify(std::exchange(rhs.pixmap_, nullptr))) {}
+    : pixmap_(platform::verify(std::exchange(rhs.pixmap_, nullptr))) {}
 
 PixmapMupdfImage::~PixmapMupdfImage() noexcept {
     if (pixmap_ == nullptr) {
@@ -34,7 +34,7 @@ image::ImageSize PixmapMupdfImage::size() const {
 std::span<const image::IRGBColor> PixmapMupdfImage::samples() const {
     size_t pixels_count = pixmap_->w * pixmap_->h;
     return {
-        stdlike::start_lifetime_as_array<const image::IRGBColor>(pixmap_->samples, pixels_count),
+        platform::stdlike::start_lifetime_as_array<const image::IRGBColor>(pixmap_->samples, pixels_count),
         pixels_count,
     };
 }
@@ -42,7 +42,7 @@ std::span<const image::IRGBColor> PixmapMupdfImage::samples() const {
 std::span<image::IRGBColor> PixmapMupdfImage::mutableSamples() {
     size_t pixels_count = pixmap_->w * pixmap_->h;
     return {
-        stdlike::start_lifetime_as_array<image::IRGBColor>(pixmap_->samples, pixels_count),
+        platform::stdlike::start_lifetime_as_array<image::IRGBColor>(pixmap_->samples, pixels_count),
         pixels_count,
     };
 }

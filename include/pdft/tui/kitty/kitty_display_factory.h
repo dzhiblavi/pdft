@@ -5,14 +5,13 @@
 #include "pdft/tui/kitty/kitty_display_base.h"
 #include "pdft/tui/terminal.h"
 
-#include "pdft/core/factory.h"
-#include "pdft/runtime/module/module.h"
-
-#include "pdft/runtime/cli/cli.h"
+#include "platform/cli/cli.h"
+#include "platform/core/factory.h"
+#include "platform/module/module.h"
 
 namespace pdft::tui {
 
-class KittyDisplayFactory : public AbstractFactory<Display>, public rt::Module {
+class KittyDisplayFactory : public platform::AbstractFactory<Display>, public platform::rt::Module {
  public:
     struct Config {
         bool force_unicode = false;
@@ -20,21 +19,24 @@ class KittyDisplayFactory : public AbstractFactory<Display>, public rt::Module {
     };
 
     struct CliArgs {
-        rt::cli_opt<bool>                                         //
+        platform::rt::cli_opt<bool>                               //
             ::desc<"Force Unicode Kitty image display protocol">  //
             ::shrt<'U'> force_unicode = false;
     };
 
     KittyDisplayFactory(
-        Config config, CliArgs cli, Arc<APCExecutor> executor, Arc<const Terminal> terminal);
+        Config config,
+        CliArgs cli,
+        platform::Arc<APCExecutor> executor,
+        platform::Arc<const Terminal> terminal);
 
-    Arc<Display> create() const override;
+    platform::Arc<Display> create() const override;
 
  private:
     Config config_;
     CliArgs cli_;
-    Arc<APCExecutor> executor_;
-    Arc<const Terminal> terminal_;
+    platform::Arc<APCExecutor> executor_;
+    platform::Arc<const Terminal> terminal_;
 };
 
 }  // namespace pdft::tui

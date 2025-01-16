@@ -1,12 +1,12 @@
 #pragma once
 
-#include "pdft/core/result.h"
+#include "platform/core/result.h"
 
 #include <span>
 
 namespace pdft::rt {
 
-Result<int> start(
+platform::Result<int> start(
     const std::string& description, const std::string& version, std::span<const char*> argv);
 
 }  // namespace pdft::rt

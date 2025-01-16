@@ -1,4 +1,4 @@
-#include "pdft/core/assert.h"
+#include "platform/core/assert.h"
 
 #include <asio/co_spawn.hpp>
 #include <asio/detached.hpp>
@@ -16,7 +16,7 @@ void runCoroutine(F func) {
     try {
         context.run();
     } catch (...) {
-        panic("unhandled exception");
+        platform::panic("unhandled exception");
     }
 }
 

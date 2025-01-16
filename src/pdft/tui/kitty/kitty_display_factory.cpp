@@ -2,20 +2,24 @@
 #include "pdft/tui/kitty/native_kitty_display.h"
 #include "pdft/tui/kitty/unicode_kitty_display.h"
 
-#include "pdft/runtime/module/register.h"
-
-#include "pdft/runtime/cli/register.h"
+#include "platform/cli/register.h"
+#include "platform/module/register.h"
 
 namespace pdft::tui {
 
+using namespace platform;
+
 KittyDisplayFactory::KittyDisplayFactory(
-    Config config, CliArgs cli, Arc<APCExecutor> executor, Arc<const Terminal> terminal)
+    Config config,
+    CliArgs cli,
+    platform::Arc<APCExecutor> executor,
+    platform::Arc<const Terminal> terminal)
     : config_(config)
     , cli_(cli)
     , executor_(std::move(executor))
     , terminal_(std::move(terminal)) {}
 
-Arc<Display> KittyDisplayFactory::create() const {
+platform::Arc<Display> KittyDisplayFactory::create() const {
     bool force_unicode = cli_.force_unicode.get() || config_.force_unicode;
 
     if (force_unicode || ::getenv("SSH_TTY") || ::getenv("TMUX")) {
@@ -29,5 +33,5 @@ Arc<Display> KittyDisplayFactory::create() const {
 
 }  // namespace pdft::tui
 
-PDFT_REGISTER_FACTORY(pdft::tui::Display, pdft::tui::KittyDisplayFactory);
-PDFT_REGISTER_CLI_ARGS(pdft::tui::KittyDisplayFactory::CliArgs);
+PLATFORM_REGISTER_FACTORY(pdft::tui::Display, pdft::tui::KittyDisplayFactory);
+PLATFORM_REGISTER_CLI_ARGS(pdft::tui::KittyDisplayFactory::CliArgs);

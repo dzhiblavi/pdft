@@ -1,6 +1,6 @@
 #include "pdft/app/controller/impl/keytree.h"
 
-#include "pdft/core/assert.h"
+#include "platform/core/assert.h"
 
 #include <stack>
 
@@ -46,7 +46,7 @@ void KeyTree::bind(NumberType, std::string_view keys, NumberCallbackType callbac
 }
 
 void KeyTree::bindFrom(Node* root, std::string_view keys, NumberCallbackType callback) {
-    verify(!keys.empty(), "cannot bind empty key sequence");
+    platform::verify(!keys.empty(), "cannot bind empty key sequence");
 
     Node* curr = root;
 
@@ -61,7 +61,7 @@ void KeyTree::bindFrom(Node* root, std::string_view keys, NumberCallbackType cal
             curr = next;
         }
 
-        verify(!curr->callback, "old keybinding is a prefix of new one: {}", keys);
+        platform::verify(!curr->callback, "old keybinding is a prefix of new one: {}", keys);
     }
 
     curr->callback = std::move(callback);
@@ -115,7 +115,7 @@ KeyTree::Result KeyTree::feedDigit(char key) {
 
     switch (state_) {
         case None:
-            verify(curr_ == nullptr, "invalid state");
+            platform::verify(curr_ == nullptr, "invalid state");
             if (num_root_ != nullptr) {
                 curr_ = num_root_;
                 state_ = Counting;
@@ -126,11 +126,11 @@ KeyTree::Result KeyTree::feedDigit(char key) {
             }
 
         case Simple:
-            verify(curr_ != nullptr, "invalid state");
+            platform::verify(curr_ != nullptr, "invalid state");
             return feedChar(key);
 
         case Counting:
-            verify(curr_ == num_root_, "invalid state");
+            platform::verify(curr_ == num_root_, "invalid state");
             number_ = number_ * 10 + digit;  // NOLINT
             return Result::Accepted;
     }

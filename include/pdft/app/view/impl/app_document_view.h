@@ -4,46 +4,46 @@
 #include "pdft/app/view/page_renderer.h"
 
 #include "pdft/core/context.h"
-#include "pdft/runtime/module/module.h"
+#include "platform/module/module.h"
 
 namespace pdft::app {
 
-class AppDocumentView : public DocumentView, public rt::Module {
+class AppDocumentView : public DocumentView, public platform::rt::Module {
  public:
-    explicit AppDocumentView(Arc<PageRenderer> renderer) : renderer_(std::move(renderer)) {}
+    explicit AppDocumentView(platform::Arc<PageRenderer> renderer) : renderer_(std::move(renderer)) {}
 
     tui::Element getLayout(Context& ctx, const DocumentModel& doc) override;
 
-    Async<void> render(
+    platform::Async<void> render(
         Context& ctx,
         const DocumentModel& doc,
         const DisplayProperties& properties,
         tui::Screen& screen) const override;
 
  private:
-    Async<void> renderOnePage(
+    platform::Async<void> renderOnePage(
         Context& ctx,
         const DocumentModel& doc,
         const DisplayProperties& properties,
         tui::Screen& screen) const;
-    Async<void> renderTwoPages(
+    platform::Async<void> renderTwoPages(
         Context& ctx,
         const DocumentModel& doc,
         const DisplayProperties& properties,
         tui::Screen& screen) const;
-    Async<void> renderOnePageContinuous(
+    platform::Async<void> renderOnePageContinuous(
         Context& ctx,
         const DocumentModel& doc,
         const DisplayProperties& properties,
         tui::Screen& screen) const;
-    Async<void> renderTwoPagesContinuous(
+    platform::Async<void> renderTwoPagesContinuous(
         Context& ctx,
         const DocumentModel& doc,
         const DisplayProperties& properties,
         tui::Screen& screen) const;
 
     tui::IRect tl, tr, bl, br, rect;
-    Arc<PageRenderer> renderer_;
+    platform::Arc<PageRenderer> renderer_;
 };
 
 }  // namespace pdft::app

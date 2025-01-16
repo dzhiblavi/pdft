@@ -1,13 +1,13 @@
 #pragma once
 
-#include "pdft/core/log/config.h"
-#include "pdft/runtime/module/config.h"
+#include "platform/log/config.h"
+#include "platform/module/config.h"
 
 namespace pdft::rt {
 
 struct Config {
-    log::LogConfig logging;
-    ModulesConfig modules;
+    platform::log::LogConfig logging;
+    platform::rt::ModulesConfig modules;
 };
 
 }  // namespace pdft::rt

@@ -1,23 +1,24 @@
 #include "pdft/app/loader/impl/app_loader.h"
 #include "pdft/app/palettes.h"
 
-#include "pdft/runtime/module/register.h"
+#include "pdft/core/log/common_adapters.h"  // IWYU pragma: keep
 
-#include "pdft/core/result.h"
-
-#include "pdft/runtime/cli/register.h"
+#include "platform/cli/register.h"
+#include "platform/core/result.h"
+#include "platform/module/register.h"
 
 namespace pdft::app {
 
 using namespace result;
+using namespace platform;
 
 AppLoader::AppLoader(
     CliArgs cli,
-    Arc<UI> ui,
-    Arc<DocumentStorage> documents,
-    Arc<StateLoader> state_loader,
-    Arc<notify::Notify> fswatcher,
-    Arc<PaletteStorage> palettes)
+    platform::Arc<UI> ui,
+    platform::Arc<DocumentStorage> documents,
+    platform::Arc<StateLoader> state_loader,
+    platform::Arc<notify::Notify> fswatcher,
+    platform::Arc<PaletteStorage> palettes)
     : cli_(cli)
     , ui_(std::move(ui))
     , documents_(std::move(documents))
@@ -25,7 +26,7 @@ AppLoader::AppLoader(
     , fs_watcher_(std::move(fswatcher))
     , palettes_(std::move(palettes)) {}
 
-Status AppLoader::load() {
+platform::Status AppLoader::load() {
     palettes_->add("skim", getSkimPalette());
     co_await state_loader_->load(cli_.path);
 
@@ -40,11 +41,11 @@ Status AppLoader::load() {
     co_return unit;
 }
 
-Status AppLoader::save() {
+platform::Status AppLoader::save() {
     return state_loader_->save();
 }
 
 }  // namespace pdft::app
 
-PDFT_REGISTER_MODULE(pdft::app::AppLoader);
-PDFT_REGISTER_CLI_ARGS(pdft::app::AppLoader::CliArgs);
+PLATFORM_REGISTER_MODULE(pdft::app::AppLoader);
+PLATFORM_REGISTER_CLI_ARGS(pdft::app::AppLoader::CliArgs);

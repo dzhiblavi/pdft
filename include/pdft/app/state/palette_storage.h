@@ -2,21 +2,21 @@
 
 #include "pdft/image/palette.h"
 
-#include "pdft/core/result.h"
-#include "pdft/runtime/module/module.h"
+#include "platform/core/result.h"
+#include "platform/module/module.h"
 
 #include <unordered_map>
 
 namespace pdft::app {
 
-class PaletteStorage : public rt::Module {
+class PaletteStorage : public platform::rt::Module {
  public:
     PaletteStorage() = default;
 
     void add(const std::string& name, std::vector<image::IRGBColor> palette);
     void add(const std::string& name, image::PaletteRef palette);
 
-    Maybe<image::PaletteRef> get(const std::string& name) const;
+    platform::Maybe<image::PaletteRef> get(const std::string& name) const;
 
  private:
     std::unordered_map<std::string, std::vector<image::IRGBColor>> palettes_;

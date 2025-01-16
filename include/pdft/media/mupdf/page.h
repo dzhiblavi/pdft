@@ -14,7 +14,7 @@ class MupdfPage : public Page {
 
     ~MupdfPage() noexcept override;
 
-    Arc<image::Image> getImage(float scaling_factor) const override;
+    platform::Arc<image::Image> getImage(float scaling_factor) const override;
 
     PageSize getDefaultSize() const override;
     size_t getPageIndex() const override;

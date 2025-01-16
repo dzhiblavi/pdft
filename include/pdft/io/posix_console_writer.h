@@ -2,14 +2,14 @@
 
 #include "pdft/io/console_writer.h"
 
-#include "pdft/runtime/module/module.h"
+#include "platform/module/module.h"
 
 #include <asio/io_context.hpp>
 #include <asio/posix/stream_descriptor.hpp>
 
 namespace pdft::io {
 
-class PosixConsoleWriter : public ConsoleWriter, public rt::Module {
+class PosixConsoleWriter : public ConsoleWriter, public platform::rt::Module {
  public:
     struct Config {
         int fd = STDOUT_FILENO;
@@ -19,8 +19,8 @@ class PosixConsoleWriter : public ConsoleWriter, public rt::Module {
 
     using ConsoleWriter::write;
 
-    Async<Status> write(std::string_view bytes) override;
-    Async<Status> writeMany(std::vector<asio::const_buffer> bytes) override;
+    platform::Async<platform::Status> write(std::string_view bytes) override;
+    platform::Async<platform::Status> writeMany(std::vector<asio::const_buffer> bytes) override;
 
  private:
     asio::posix::stream_descriptor stdout_;

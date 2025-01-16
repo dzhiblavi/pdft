@@ -67,7 +67,7 @@ function(_git_find_closest_git_dir _start_dir _git_dir_var)
   set(cur_dir "${_start_dir}")
   set(git_dir "${_start_dir}/.git")
   while(NOT EXISTS "${git_dir}")
-    # .git dir not found, search parent directories
+    # .git dir not found, seplatform::Arch parent directories
     set(git_previous_parent "${cur_dir}")
     get_filename_component(cur_dir "${cur_dir}" DIRECTORY)
     if(cur_dir STREQUAL git_previous_parent)

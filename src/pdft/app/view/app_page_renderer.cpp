@@ -1,8 +1,8 @@
 #include "pdft/app/view/impl/app_page_renderer.h"
 
-#include "pdft/runtime/module/register.h"
+#include "platform/module/register.h"
 
-#include "pdft/core/result.h"
+#include "platform/core/result.h"
 
 #include <asio/bind_executor.hpp>
 #include <asio/co_spawn.hpp>
@@ -12,19 +12,20 @@ namespace pdft::app {
 
 using tui::ImageId;
 using namespace result;
+using namespace platform;
 
 AppPageRenderer::AppPageRenderer(
     Config config,
-    Arc<const DocumentStorage> documents,
-    Arc<PageProcessor> processor,
-    Arc<tui::Display> display)
+    platform::Arc<const DocumentStorage> documents,
+    platform::Arc<PageProcessor> processor,
+    platform::Arc<tui::Display> display)
     : config_(std::move(config))
     , documents_(std::move(documents))
     , processor_(std::move(processor))
     , display_(std::move(display))
     , rendered_(config.image_cache_size) {}
 
-Async<Unit> AppPageRenderer::render(
+platform::Async<platform::Unit> AppPageRenderer::render(
     Context& ctx,
     const Page& page,
     const PagePosition& pos,
@@ -60,8 +61,10 @@ Async<Unit> AppPageRenderer::render(
     co_return unit;
 }
 
-Async<void> AppPageRenderer::renderImagesAround(
-    Arc<const media::Document> document, const DisplayProperties& display, const Page& page) {
+platform::Async<void> AppPageRenderer::renderImagesAround(
+    platform::Arc<const media::Document> document,
+    const DisplayProperties& display,
+    const Page& page) {
     const auto& [doc_id, page_index] = page;
 
     int forward = int(config_.num_preload_forward);
@@ -93,7 +96,7 @@ Async<void> AppPageRenderer::renderImagesAround(
     }
 }
 
-Async<void> AppPageRenderer::loadImageToDisplay(
+platform::Async<void> AppPageRenderer::loadImageToDisplay(
     Context& ctx, tui::ImageId id, tui::Screen& screen) {
     auto* future = rendered_.tryGet(id);
     if (!future) {
@@ -118,4 +121,4 @@ Async<void> AppPageRenderer::loadImageToDisplay(
 
 }  // namespace pdft::app
 
-PDFT_REGISTER_MODULE(pdft::app::AppPageRenderer);
+PLATFORM_REGISTER_MODULE(pdft::app::AppPageRenderer);

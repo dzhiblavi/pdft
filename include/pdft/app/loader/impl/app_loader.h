@@ -7,37 +7,37 @@
 
 #include "pdft/notify/notify.h"
 
-#include "pdft/runtime/module/module.h"
+#include "platform/module/module.h"
 
-#include "pdft/runtime/cli/cli.h"
+#include "platform/cli/cli.h"
 
 namespace pdft::app {
 
-class AppLoader : public Loader, public rt::Module {
+class AppLoader : public Loader, public platform::rt::Module {
  public:
     struct CliArgs {
-        rt::cli_opt<std::vector<std::string>>  //
+        platform::rt::cli_opt<std::vector<std::string>>  //
             ::desc<"Paths to the documents to be opened"> path;
     };
 
     AppLoader(
         CliArgs cli,
-        Arc<UI> ui,
-        Arc<DocumentStorage> documents,
-        Arc<StateLoader> state_loader,
-        Arc<notify::Notify> fswatcher,
-        Arc<PaletteStorage> palettes);
+        platform::Arc<UI> ui,
+        platform::Arc<DocumentStorage> documents,
+        platform::Arc<StateLoader> state_loader,
+        platform::Arc<notify::Notify> fswatcher,
+        platform::Arc<PaletteStorage> palettes);
 
-    Status load() override;
-    Status save() override;
+    platform::Status load() override;
+    platform::Status save() override;
 
  private:
     CliArgs cli_;
-    Arc<UI> ui_;
-    Arc<DocumentStorage> documents_;
-    Arc<StateLoader> state_loader_;
-    Arc<notify::Notify> fs_watcher_;
-    Arc<PaletteStorage> palettes_;
+    platform::Arc<UI> ui_;
+    platform::Arc<DocumentStorage> documents_;
+    platform::Arc<StateLoader> state_loader_;
+    platform::Arc<notify::Notify> fs_watcher_;
+    platform::Arc<PaletteStorage> palettes_;
 };
 
 }  // namespace pdft::app

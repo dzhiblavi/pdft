@@ -5,21 +5,21 @@
 
 #include "pdft/media/loader.h"
 
-#include "pdft/runtime/module/module.h"
+#include "platform/module/module.h"
 
 namespace pdft::app {
 
-class AppPersister : public Persister, public rt::Module {
+class AppPersister : public Persister, public platform::rt::Module {
  public:
-    AppPersister(Arc<UI> ui, Arc<DocumentStorage> documents, Arc<const media::Loader> doc_loader);
+    AppPersister(platform::Arc<UI> ui, platform::Arc<DocumentStorage> documents, platform::Arc<const media::Loader> doc_loader);
 
-    Status save(std::ostream& os) const override;
-    Status restore(std::istream& is) const override;
+    platform::Status save(std::ostream& os) const override;
+    platform::Status restore(std::istream& is) const override;
 
  private:
-    Arc<UI> ui_;
-    Arc<DocumentStorage> documents_;
-    Arc<const media::Loader> doc_loader_;
+    platform::Arc<UI> ui_;
+    platform::Arc<DocumentStorage> documents_;
+    platform::Arc<const media::Loader> doc_loader_;
 };
 
 }  // namespace pdft::app

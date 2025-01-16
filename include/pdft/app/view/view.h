@@ -3,7 +3,7 @@
 #include "pdft/tui/elements.h"
 #include "pdft/tui/screen.h"
 
-#include "pdft/core/awaitable.h"
+#include "platform/core/async.h"
 #include "pdft/core/context.h"
 
 namespace pdft::app {
@@ -13,7 +13,7 @@ class View {
     virtual ~View() = default;
 
     virtual tui::Element getLayout(Context& ctx) = 0;
-    virtual Async<void> render(Context& ctx, tui::Screen& screen) = 0;
+    virtual platform::Async<void> render(Context& ctx, tui::Screen& screen) = 0;
 };
 
 }  // namespace pdft::app

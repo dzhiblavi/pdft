@@ -7,9 +7,9 @@
 
 #include "pdft/media/loader.h"
 
-#include "pdft/runtime/module/module.h"
+#include "platform/module/module.h"
 
-#include "pdft/runtime/cli/cli.h"
+#include "platform/cli/cli.h"
 
 namespace pdft::app {
 
@@ -20,7 +20,7 @@ enum class StateMode {
     AddAll,      // Use the state and append all paths to it (duplicates can be created)
 };
 
-class AppStateLoader : public StateLoader, public rt::Module {
+class AppStateLoader : public StateLoader, public platform::rt::Module {
  public:
     struct Config {
         StateMode mode = StateMode::AddOnly;
@@ -28,7 +28,7 @@ class AppStateLoader : public StateLoader, public rt::Module {
     };
 
     struct CliArgs {
-        rt::cli_opt<std::optional<StateMode>>                        //
+        platform::rt::cli_opt<std::optional<StateMode>>              //
             ::desc<"Override the configured state management mode">  //
             ::shrt<'S'> state_mode;
     };
@@ -36,20 +36,20 @@ class AppStateLoader : public StateLoader, public rt::Module {
     AppStateLoader(
         Config config,
         CliArgs cli,
-        Arc<UI> ui,
-        Arc<DocumentStorage> documents,
-        Arc<const Persister> persister,
-        Arc<const media::Loader> doc_loader);
+        platform::Arc<UI> ui,
+        platform::Arc<DocumentStorage> documents,
+        platform::Arc<const Persister> persister,
+        platform::Arc<const media::Loader> doc_loader);
 
-    Status save() override;
-    Status load(const std::vector<std::string>& paths) override;
+    platform::Status save() override;
+    platform::Status load(const std::vector<std::string>& paths) override;
 
  private:
     Config config_;
-    Arc<UI> ui_;
-    Arc<DocumentStorage> documents_;
-    Arc<const Persister> persister_;
-    Arc<const media::Loader> doc_loader_;
+    platform::Arc<UI> ui_;
+    platform::Arc<DocumentStorage> documents_;
+    platform::Arc<const Persister> persister_;
+    platform::Arc<const media::Loader> doc_loader_;
 };
 
 }  // namespace pdft::app

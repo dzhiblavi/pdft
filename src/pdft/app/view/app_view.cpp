@@ -1,14 +1,18 @@
 #include "pdft/app/view/impl/app_view.h"
 
-#include "pdft/runtime/module/register.h"
+#include "platform/module/register.h"
 
-#include "pdft/core/result.h"
+#include "platform/core/result.h"
 
 namespace pdft::app {
 
 using namespace result;
+using namespace platform;
 
-AppView::AppView(Arc<const UI> ui, Arc<const DocumentStorage> documents, Arc<DocumentView> view)
+AppView::AppView(
+    platform::Arc<const UI> ui,
+    platform::Arc<const DocumentStorage> documents,
+    platform::Arc<DocumentView> view)
     : ui_(std::move(ui))
     , documents_(std::move(documents))
     , doc_view_(std::move(view)) {}
@@ -26,13 +30,13 @@ tui::Element AppView::getLayout(Context& ctx) {
     });
 }
 
-Async<void> AppView::render(Context& ctx, tui::Screen& screen) {
+platform::Async<void> AppView::render(Context& ctx, tui::Screen& screen) {
     if (auto state = ui_->getDocument()) {
         co_await doc_view_->render(ctx, *state, ui_->getModel().display, screen);
     }
 }
 
-Maybe<tui::Element> AppView::getDocumentLayout(Context& ctx) {
+platform::Maybe<tui::Element> AppView::getDocumentLayout(Context& ctx) {
     if (!ui_->getDocument()) {
         return none;
     }
@@ -71,4 +75,4 @@ tui::Element AppView::getSidebar() {
 
 }  // namespace pdft::app
 
-PDFT_REGISTER_MODULE(pdft::app::AppView);
+PLATFORM_REGISTER_MODULE(pdft::app::AppView);

@@ -1,6 +1,6 @@
 #include "pdft/io/posix_console_reader.h"
 
-#include "pdft/core/result.h"
+#include "platform/core/result.h"
 
 #include "tests/pdft/io/mock_fd_console.h"
 #include "tests/pdft/run_coroutine.h"

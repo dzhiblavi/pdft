@@ -1,8 +1,8 @@
 #include "pdft/notify/impl/fsw_notify.h"
 
-#include "pdft/core/assert.h"
-#include "pdft/core/log.h"
-#include "pdft/runtime/module/register.h"
+#include "platform/core/assert.h"
+#include "platform/log.h"
+#include "platform/module/register.h"
 
 #include "pdft/utils/build_info.h"
 
@@ -17,7 +17,7 @@ inline constexpr float FswLatency = 0.1f;
 
 FswNotify::FswNotify() {
     [[maybe_unused]] static auto _ = [] {
-        verify(fsw_init_library() == FSW_OK);
+        platform::verify(fsw_init_library() == FSW_OK);
         return 0;
     }();
 
@@ -44,18 +44,18 @@ FswNotify::FswNotify() {
             break;
 
         case Unknown:
-            panic("this platform is not supported by filesystem watcher");
+            platform::panic("this platform is not supported by filesystem watcher");
             break;
     }
 
-    verify(fsw_set_latency(handle_, FswLatency) == FSW_OK);
-    verify(fsw_set_callback(handle_, processEvents, this) == FSW_OK);
+    platform::verify(fsw_set_latency(handle_, FswLatency) == FSW_OK);
+    platform::verify(fsw_set_callback(handle_, processEvents, this) == FSW_OK);
 
     fsw_event_type_filter filter;
     filter.flag = IsFile;
-    verify(fsw_add_event_type_filter(handle_, filter) == FSW_OK);
+    platform::verify(fsw_add_event_type_filter(handle_, filter) == FSW_OK);
     filter.flag = Updated;
-    verify(fsw_add_event_type_filter(handle_, filter) == FSW_OK);
+    platform::verify(fsw_add_event_type_filter(handle_, filter) == FSW_OK);
 
     // XXX Add a dummy path because FSW requires that at least one path
     // is added before polling is started
@@ -73,7 +73,7 @@ FswNotify::~FswNotify() noexcept {
         fsw_thread_.join();
     }
 
-    verify(fsw_destroy_session(handle_) == FSW_OK);
+    platform::verify(fsw_destroy_session(handle_) == FSW_OK);
 }
 
 void FswNotify::stop() {
@@ -87,22 +87,22 @@ bool FswNotify::isStopped() const {
 
 void FswNotify::add(const std::filesystem::path& path) {
     fsw_stop_monitor(handle_);
-    verify(fsw_add_path(handle_, path.c_str()) == FSW_OK);
+    platform::verify(fsw_add_path(handle_, path.c_str()) == FSW_OK);
 }
 
 void FswNotify::monitorRunLoop(FswNotify* self) {
-    log::debug("start fswatch monitorRunLoop");
+    platform::log::debug("start fswatch monitorRunLoop");
 
     while (!self->should_exit_.load(std::memory_order_acquire)) {
         fsw_start_monitor(self->handle_);
     }
 
-    log::debug("end fswatch monitorRunLoop");
+    platform::log::debug("end fswatch monitorRunLoop");
 }
 
 void FswNotify::processEvents(const fsw_cevent* const evts, unsigned count, void* context) {
     auto* self = static_cast<FswNotify*>(context);
-    log::trace("received {} filesystem events", count);
+    platform::log::trace("received {} filesystem events", count);
 
     for (const auto& event : std::span{evts, count}) {
         std::span<fsw_event_flag> flags(event.flags, event.flags_num);
@@ -111,10 +111,10 @@ void FswNotify::processEvents(const fsw_cevent* const evts, unsigned count, void
             continue;
         }
 
-        log::trace("received a filesystem event for path {}", event.path);
+        platform::log::trace("received a filesystem event for path {}", event.path);
 
         for (fsw_event_flag flag : flags) {
-            log::trace("filesystem event flag: {}", magic_enum::enum_name(flag));
+            platform::log::trace("filesystem event flag: {}", magic_enum::enum_name(flag));
         }
 
         self->emit({.path = event.path});
@@ -123,4 +123,4 @@ void FswNotify::processEvents(const fsw_cevent* const evts, unsigned count, void
 
 }  // namespace pdft::notify
 
-PDFT_REGISTER_MODULE(pdft::notify::FswNotify);
+PLATFORM_REGISTER_MODULE(pdft::notify::FswNotify);

@@ -2,18 +2,19 @@
 
 #include "pdft/tui/kitty/apc/apc_executor.h"
 
-#include "pdft/core/factory.h"
-#include "pdft/runtime/module/module.h"
+#include "platform/core/factory.h"
+#include "platform/module/module.h"
 
 namespace pdft::tui {
 
-class APCExecutorFactory : public AbstractFactory<APCExecutor>, public rt::Module {
+class APCExecutorFactory : public platform::AbstractFactory<APCExecutor>,
+                           public platform::rt::Module {
  public:
     using Config = APCExecutorConfig;
 
     explicit APCExecutorFactory(APCExecutorConfig config);
 
-    Arc<APCExecutor> create() const override;
+    platform::Arc<APCExecutor> create() const override;
 
  private:
     APCExecutorConfig config_;

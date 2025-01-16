@@ -3,8 +3,8 @@
 #include "pdft/app/view/display_properties.h"
 #include "pdft/media/page.h"
 
-#include "pdft/core/future.h"
-#include "pdft/core/rc.h"
+#include "platform/core/future.h"
+#include "platform/core/rc.h"
 
 namespace pdft::app {
 
@@ -18,9 +18,9 @@ class PageProcessor {
     virtual ~PageProcessor() = default;
 
     virtual void process(
-        Arc<media::Page> page,
+        platform::Arc<media::Page> page,
         const DisplayProperties& display,
-        Promise<ProcessedImage> promsise) = 0;
+        platform::Promise<ProcessedImage> promsise) = 0;
 };
 
 }  // namespace pdft::app

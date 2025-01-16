@@ -3,7 +3,7 @@
 namespace pdft {
 
 PushHandle::PushHandle(
-    trace::StackScopeTracerOwner tracer, trace::StackScopeTraceHandle previous, Context* context)
+    platform::trace::StackScopeTracerOwner tracer, platform::trace::StackScopeTraceHandle previous, Context* context)
     : tracer(std::move(tracer))
     , previous(previous)
     , context(context) {}
@@ -21,9 +21,9 @@ PushHandle::~PushHandle() {
     context->trace_handle_ = previous;
 }
 
-Context::Context(trace::StackScopeTraceHandle trace_handle) : trace_handle_(trace_handle) {}
+Context::Context(platform::trace::StackScopeTraceHandle trace_handle) : trace_handle_(trace_handle) {}
 
-void Context::setTracer(trace::StackScopeTraceHandle tracer) {
+void Context::setTracer(platform::trace::StackScopeTraceHandle tracer) {
     trace_handle_ = tracer;
 }
 

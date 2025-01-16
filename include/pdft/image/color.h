@@ -1,9 +1,9 @@
 #pragma once
 
-#include "pdft/core/assert.h"
 #include "pdft/core/log/fmt_adapter.h"
+#include "platform/core/assert.h"
 
-#include "pdft/utils/stdlike/numeric.h"
+#include "platform/utils/stdlike/numeric.h"
 
 namespace pdft::image {
 
@@ -52,7 +52,7 @@ inline FRGBColor floatColorFromInt(const IRGBColor& color) {
 }
 
 inline RGBColor<uint8_t> rgbFromHex(std::string_view hex) {
-    verify(hex.size() == 7);
+    platform::verify(hex.size() == 7);
     uint32_t value = std::stoul(hex.substr(1).data(), nullptr, 16);  // NOLINT
     constexpr uint32_t mask = 0x0000ff;
 
@@ -65,37 +65,47 @@ inline RGBColor<uint8_t> rgbFromHex(std::string_view hex) {
 
 template <typename T>
 RGBColor<T> operator+(const RGBColor<T>& a, const RGBColor<T>& b) {
-    auto add = [](T a, T b) { return std::min(MaxColorValue<T>, stdlike::add_sat(a, b)); };
+    auto add = [](T a, T b) {
+        return std::min(MaxColorValue<T>, platform::stdlike::add_sat(a, b));
+    };
     return {add(a.r, b.r), add(a.g, b.g), add(a.b, b.b)};
 }
 
 template <typename T>
 RGBColor<T> operator-(const RGBColor<T>& a, const RGBColor<T>& b) {
-    auto sub = [](T a, T b) { return std::max(T(0), stdlike::sub_sat(a, b)); };
+    auto sub = [](T a, T b) { return std::max(T(0), platform::stdlike::sub_sat(a, b)); };
     return {sub(a.r, b.r), sub(a.g, b.g), sub(a.b, b.b)};
 }
 
 template <typename T>
 RGBColor<T> operator/(const RGBColor<T>& a, const RGBColor<T>& b) {
-    auto div = [](T a, T b) { return std::min(MaxColorValue<T>, stdlike::div_sat(a, b)); };
+    auto div = [](T a, T b) {
+        return std::min(MaxColorValue<T>, platform::stdlike::div_sat(a, b));
+    };
     return {div(a.r, b.r), div(a.g, b.g), div(a.b, b.b)};
 }
 
 template <typename T>
 RGBColor<T> operator/(const RGBColor<T>& a, T b) {
-    auto div = [](T a, T b) { return std::min(MaxColorValue<T>, stdlike::div_sat(a, b)); };
+    auto div = [](T a, T b) {
+        return std::min(MaxColorValue<T>, platform::stdlike::div_sat(a, b));
+    };
     return {div(a.r, b), div(a.g, b), div(a.b, b)};
 }
 
 template <typename T>
 RGBColor<T> operator*(const RGBColor<T>& a, const RGBColor<T>& b) {
-    auto mul = [](T a, T b) { return std::min(MaxColorValue<T>, stdlike::mul_sat(a, b)); };
+    auto mul = [](T a, T b) {
+        return std::min(MaxColorValue<T>, platform::stdlike::mul_sat(a, b));
+    };
     return {mul(a.r, b.r), mul(a.g, b.g), mul(a.b, b.b)};
 }
 
 template <typename T>
 RGBColor<T> operator*(const RGBColor<T>& a, T b) {
-    auto mul = [](T a, T b) { return std::min(MaxColorValue<T>, stdlike::mul_sat(a, b)); };
+    auto mul = [](T a, T b) {
+        return std::min(MaxColorValue<T>, platform::stdlike::mul_sat(a, b));
+    };
     return {mul(a.r, b), mul(a.g, b), mul(a.b, b)};
 }
 

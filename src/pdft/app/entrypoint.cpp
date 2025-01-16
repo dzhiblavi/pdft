@@ -1,8 +1,8 @@
 #include "pdft/app/entrypoint.h"
 #include "pdft/app/version.h"
 
-#include "pdft/core/trace/log_stack_trace.h"
-#include "pdft/runtime/module/register.h"
+#include "platform/module/register.h"
+#include "platform/trace/log_stack_trace.h"
 
 #include "pdft/utils/build_info.h"
 
@@ -11,7 +11,9 @@
 
 namespace pdft::app {
 
-Entrypoint::Entrypoint(asio::io_context& io, Arc<app::Application> app)
+using namespace platform;
+
+Entrypoint::Entrypoint(asio::io_context& io, platform::Arc<app::Application> app)
     : io_(io)
     , app_(std::move(app)) {}
 
@@ -20,11 +22,11 @@ void Entrypoint::start() {
     asio::co_spawn(io_, run(), asio::detached);
 }
 
-Async<void> Entrypoint::run() {
-    auto tracer = trace::makeTracer("entrypoint");
+platform::Async<void> Entrypoint::run() {
+    auto tracer = platform::trace::makeTracer("entrypoint");
     Context ctx(tracer);
     co_await app_->run(ctx);
-    trace::logStackTrace(std::move(tracer));
+    platform::trace::logStackTrace(std::move(tracer));
 }
 
 void Entrypoint::printAppInfo() const {
@@ -44,4 +46,4 @@ void Entrypoint::printAppInfo() const {
 
 }  // namespace pdft::app
 
-PDFT_REGISTER_MODULE(pdft::app::Entrypoint);
+PLATFORM_REGISTER_MODULE(pdft::app::Entrypoint);

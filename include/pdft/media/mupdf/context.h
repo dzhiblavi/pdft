@@ -1,7 +1,7 @@
 #pragma once
 
-#include "pdft/runtime/module/module.h"
-#include "pdft/utils/pinned.h"
+#include "platform/module/module.h"
+#include "platform/utils/pinned.h"
 
 struct fz_context;  // NOLINT
 
@@ -21,8 +21,8 @@ class MupdfContext {
 
 class MupdfContextOwner
     : public MupdfContext,
-      public rt::Module,
-      public utils::Pinned,
+      public platform::rt::Module,
+      public platform::utils::Pinned,
       public std::enable_shared_from_this<MupdfContextOwner> {
  public:
     struct Config {
@@ -54,21 +54,21 @@ class MupdfContextOwner
 
 class ClonedMupdfContext : public MupdfContext {
  public:
-    ClonedMupdfContext(fz_context* context, Arc<MupdfContext> parent);
+    ClonedMupdfContext(fz_context* context, platform::Arc<MupdfContext> parent);
 
     fz_context* native() const override;
 
-    static Arc<MupdfContext> clone(Arc<MupdfContext> from);
+    static platform::Arc<MupdfContext> clone(platform::Arc<MupdfContext> from);
 
  private:
-    Arc<MupdfContext> parent_;
+    platform::Arc<MupdfContext> parent_;
 
     // This thing must be destroyed BEFORE parent_ because
     // the destruction may involve using shared resources.
     ContextHolder context_{nullptr, &MupdfContext::drop};
 };
 
-void setGlobalMupdfContext(Arc<MupdfContext> ctx);
+void setGlobalMupdfContext(platform::Arc<MupdfContext> ctx);
 
 MupdfContext& thisThreadMupdfContext();
 

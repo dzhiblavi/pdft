@@ -2,7 +2,7 @@
 
 #include "pdft/notify/event.h"
 
-#include "pdft/core/result.h"
+#include "platform/core/result.h"
 
 namespace pdft::app {
 
@@ -16,9 +16,9 @@ class Controller {
  public:
     virtual ~Controller() = default;
 
-    virtual Result<ControllerAction> onKeyEvent(char key) = 0;
-    virtual Result<ControllerAction> onFilesystemEvent(const notify::Event& event) = 0;
-    virtual Result<ControllerAction> onSignal(int signal) = 0;
+    virtual platform::Result<ControllerAction> onKeyEvent(char key) = 0;
+    virtual platform::Result<ControllerAction> onFilesystemEvent(const notify::Event& event) = 0;
+    virtual platform::Result<ControllerAction> onSignal(int signal) = 0;
 };
 
 }  // namespace pdft::app

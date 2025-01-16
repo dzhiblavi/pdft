@@ -1,6 +1,6 @@
 #include "pdft/app/view/impl/app_document_view.h"
 
-#include "pdft/runtime/module/register.h"
+#include "platform/module/register.h"
 
 namespace pdft::app {
 
@@ -45,7 +45,7 @@ tui::Element AppDocumentView::getLayout(Context& /*ctx*/, const DocumentModel& d
     }
 }
 
-Async<void> AppDocumentView::render(
+platform::Async<void> AppDocumentView::render(
     Context& ctx,
     const DocumentModel& doc,
     const DisplayProperties& properties,
@@ -69,7 +69,7 @@ Async<void> AppDocumentView::render(
     }
 }
 
-Async<void> AppDocumentView::renderOnePage(
+platform::Async<void> AppDocumentView::renderOnePage(
     Context& ctx,
     const DocumentModel& doc,
     const DisplayProperties& properties,
@@ -94,7 +94,7 @@ Async<void> AppDocumentView::renderOnePage(
         screen);
 }
 
-Async<void> AppDocumentView::renderTwoPages(
+platform::Async<void> AppDocumentView::renderTwoPages(
     Context& ctx,
     const DocumentModel& doc,
     const DisplayProperties& properties,
@@ -140,7 +140,7 @@ Async<void> AppDocumentView::renderTwoPages(
             screen);
 }
 
-Async<void> AppDocumentView::renderOnePageContinuous(
+platform::Async<void> AppDocumentView::renderOnePageContinuous(
     Context& ctx,
     const DocumentModel& doc,
     const DisplayProperties& properties,
@@ -204,7 +204,7 @@ Async<void> AppDocumentView::renderOnePageContinuous(
             screen);
 }
 
-Async<void> AppDocumentView::renderTwoPagesContinuous(
+platform::Async<void> AppDocumentView::renderTwoPagesContinuous(
     Context& ctx,
     const DocumentModel& doc,
     const DisplayProperties& properties,
@@ -332,4 +332,4 @@ Async<void> AppDocumentView::renderTwoPagesContinuous(
 
 }  // namespace pdft::app
 
-PDFT_REGISTER_MODULE(pdft::app::AppDocumentView);
+PLATFORM_REGISTER_MODULE(pdft::app::AppDocumentView);

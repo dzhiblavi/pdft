@@ -1,15 +1,13 @@
-#include "pdft/runtime/module/start.h"
+#include "pdft/runtime/start.h"
 #include "pdft/runtime/config.h"
-#include "pdft/runtime/module/load.h"
 
-#include "pdft/runtime/cli/cli.h"
-#include "pdft/runtime/cli/parse.h"
-#include "pdft/runtime/cli/parsed.h"
-#include "pdft/runtime/cli/register.h"
-
-#include "pdft/core/log/load.h"
-
-#include "pdft/utils/get_home_dir.h"
+#include "platform/cli/cli.h"
+#include "platform/cli/parse.h"
+#include "platform/cli/parsed.h"
+#include "platform/cli/register.h"
+#include "platform/log/load.h"
+#include "platform/module/load.h"
+#include "platform/utils/home_dir.h"
 
 #include <rfl/Processors.hpp>
 #include <rfl/json/load.hpp>
@@ -19,12 +17,15 @@
 
 namespace pdft::rt {
 
+using namespace platform;
+
 namespace {
 
 Status main(Config config) {
     log::loadConfig(config.logging);
     asio::io_context context(1);
-    LoadContext ctx(context, std::move(config.modules), FactoryStorage::globalInstance());
+    platform::rt::LoadContext ctx(
+        context, std::move(config.modules), platform::rt::FactoryStorage::globalInstance());
     co_await ctx.loadAllModules();
 
     try {
@@ -42,7 +43,8 @@ struct Modules {
 void listModules() {
     Modules res;
 
-    for (const auto& [module, traits] : FactoryStorage::globalInstance().getModules()) {
+    for (const auto& [module, traits] :
+         platform::rt::FactoryStorage::globalInstance().getModules()) {
         res.modules.emplace(module, traits->getConfig());
     }
 
@@ -50,10 +52,10 @@ void listModules() {
 }
 
 struct CliArgs {
-    cli_opt<std::optional<std::string>>  //
+    platform::rt::cli_opt<std::optional<std::string>>  //
         ::desc<"Path to the configuration file"> config_path;
 
-    cli_opt<bool>                                      //
+    platform::rt::cli_opt<bool>                        //
         ::desc<"Get default modules' configurations">  //
         ::shrt<'L'> list_modules;
 };
@@ -62,11 +64,11 @@ struct CliArgs {
 
 Result<int> start(
     const std::string& description, const std::string& version, std::span<const char*> argv) {
-    if (!co_await parseCliArgs(argv, description, version)) {
+    if (!co_await platform::rt::parseCliArgs(argv, description, version)) {
         co_return 0;
     }
 
-    auto cli_args = fromParsedCli<CliArgs>();
+    auto cli_args = platform::rt::fromParsedCli<CliArgs>();
     if (!cli_args) {
         co_return result::makeError(
             std::format("Failed to parse CLI arguments: {}", cli_args.error<std::string>()));
@@ -90,4 +92,4 @@ Result<int> start(
 
 }  // namespace pdft::rt
 
-PDFT_REGISTER_CLI_ARGS(pdft::rt::CliArgs);
+PLATFORM_REGISTER_CLI_ARGS(pdft::rt::CliArgs);

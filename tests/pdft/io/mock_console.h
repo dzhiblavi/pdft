@@ -1,7 +1,7 @@
 #include "pdft/io/console_reader.h"
 #include "pdft/io/console_writer.h"
 
-#include "pdft/core/rc.h"
+#include "platform/core/rc.h"
 
 #include <format>
 #include <iostream>
@@ -12,20 +12,20 @@ struct MockConsole : ConsoleWriter, ConsoleReader {
     using ConsoleReader::read;
     using ConsoleWriter::write;
 
-    Async<Status> write(std::string_view bytes) override {
+    platform::Async<platform::Status> write(std::string_view bytes) override {
         std::cerr << std::format("write '{}' to console", bytes) << std::endl;
         out_ += bytes;
         co_return result::unit;
     }
 
-    Async<Status> writeMany(std::vector<asio::const_buffer> buffers) override {
+    platform::Async<platform::Status> writeMany(std::vector<asio::const_buffer> buffers) override {
         for (const auto& buf : buffers) {
             out_ += std::string_view{(const char*)buf.data(), buf.size()};
         }
         co_return result::unit;
     }
 
-    Async<Status> read(size_t num_bytes, std::string& out) override {
+    platform::Async<platform::Status> read(size_t num_bytes, std::string& out) override {
         auto result = readFrom(in_, num_bytes);
         std::cerr << std::format("read '{}' from console (requested {} bytes)", result, num_bytes)
                   << std::endl;
@@ -58,7 +58,7 @@ struct MockConsole : ConsoleWriter, ConsoleReader {
     std::string out_;
 };
 
-inline Arc<MockConsole> makeMockConsole() {
+inline platform::Arc<MockConsole> makeMockConsole() {
     return std::make_shared<MockConsole>();
 }
 

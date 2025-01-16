@@ -1,6 +1,6 @@
 #include "pdft/tui/impl/ansi_terminal.h"
 
-#include "pdft/runtime/module/register.h"
+#include "platform/module/register.h"
 
 namespace pdft::tui {
 
@@ -48,4 +48,4 @@ void AnsiTerminal::showCursor(io::OutBuffer& buffer) const {
 
 }  // namespace pdft::tui
 
-PDFT_REGISTER_MODULE(pdft::tui::AnsiTerminal);
+PLATFORM_REGISTER_MODULE(pdft::tui::AnsiTerminal);

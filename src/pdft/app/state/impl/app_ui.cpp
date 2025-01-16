@@ -1,7 +1,7 @@
 #include "pdft/app/state/impl/app_ui.h"
 
-#include "pdft/core/assert.h"
-#include "pdft/runtime/module/register.h"
+#include "platform/core/assert.h"
+#include "platform/module/register.h"
 
 #include <magic_enum.hpp>
 
@@ -104,10 +104,10 @@ void AppUI::addDocument(DocumentId id, uint32_t page_count) {
 void AppUI::removeDocument(DocumentId id) {
     auto& idx = model_.index;
     auto& states = model_.documents;
-    verify{idx};
+    platform::verify{idx};
 
     auto it = std::ranges::find(states, id, &DocumentModel::document_id);
-    verify(it != states.end());
+    platform::verify(it != states.end());
 
     size_t index = it - states.begin();
 
@@ -126,7 +126,7 @@ void AppUI::removeDocument(DocumentId id) {
 
 void AppUI::onDocumentChanged(DocumentId from, DocumentId to, uint32_t page_count) {
     auto it = std::ranges::find(model_.documents, from, &DocumentModel::document_id);
-    verify(it != model_.documents.end(), "failed to find the old document with id={}", from);
+    platform::verify(it != model_.documents.end(), "failed to find the old document with id={}", from);
     setDocument(*it, to, page_count);
 }
 
@@ -192,7 +192,7 @@ void AppUI::setPalette(const std::optional<std::string>& name) {
     model_.display.palette = name;
 }
 
-Maybe<DocumentId> AppUI::getDocumentId() const {
+platform::Maybe<DocumentId> AppUI::getDocumentId() const {
     return model_.index.transform([this](auto i) { return model_.documents[i].document_id; });
 }
 
@@ -226,4 +226,4 @@ UIModel& AppUI::getModel() {
 
 }  // namespace pdft::app
 
-PDFT_REGISTER_MODULE(pdft::app::AppUI);
+PLATFORM_REGISTER_MODULE(pdft::app::AppUI);

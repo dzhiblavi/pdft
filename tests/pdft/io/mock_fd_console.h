@@ -1,7 +1,7 @@
 #include "pdft/io/console_reader.h"
 #include "pdft/io/console_writer.h"
 
-#include "pdft/core/rc.h"
+#include "platform/core/rc.h"
 
 #include <asio/co_spawn.hpp>
 #include <asio/detached.hpp>
@@ -60,19 +60,19 @@ struct MockConsole : ConsoleWriter, ConsoleReader {
     using ConsoleReader::read;
     using ConsoleWriter::write;
 
-    Async<Status> write(std::string_view bytes) override {
+    platform::Async<platform::Status> write(std::string_view bytes) override {
         out_fd_w.write(bytes);
         co_return result::unit;
     }
 
-    Async<Status> writeMany(std::vector<asio::const_buffer> buffers) override {
+    platform::Async<platform::Status> writeMany(std::vector<asio::const_buffer> buffers) override {
         for (const auto& s : buffers) {
             out_fd_w.write({(const char*)s.data(), s.size()});
         }
         co_return result::unit;
     }
 
-    Async<Status> read(size_t num_bytes, std::string& out) override {
+    platform::Async<platform::Status> read(size_t num_bytes, std::string& out) override {
         out = in_fd_r.read(num_bytes);
         co_return result::unit;
     }
@@ -96,7 +96,7 @@ struct MockConsole : ConsoleWriter, ConsoleReader {
     detail::FileDescriptor in_fd_r, in_fd_w, out_fd_r, out_fd_w;
 };
 
-inline Arc<MockConsole> makeMockConsole() {
+inline platform::Arc<MockConsole> makeMockConsole() {
     int in_fds[2];
     (void)pipe(in_fds);
 

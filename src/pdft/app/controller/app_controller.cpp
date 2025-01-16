@@ -1,16 +1,22 @@
 #include "pdft/app/controller/impl/app_controller.h"
+#include "pdft/core/log/common_adapters.h"  // IWYU pragma: keep
 
-#include "pdft/runtime/module/register.h"
+#include "platform/module/register.h"
 
-#include "pdft/core/assert.h"
-#include "pdft/core/log.h"
+#include "platform/core/assert.h"
+#include "platform/log.h"
 
 namespace pdft::app {
+
+using namespace platform;
 
 inline constexpr float ZoomUpdateCoeff = 1.05f;
 
 AppController::AppController(
-    Config config, Arc<const media::Loader> doc_loader, Arc<UI> ui, Arc<DocumentStorage> documents)
+    Config config,
+    platform::Arc<const media::Loader> doc_loader,
+    platform::Arc<UI> ui,
+    platform::Arc<DocumentStorage> documents)
     : config_(config)
     , doc_loader_(std::move(doc_loader))
     , ui_(std::move(ui))
@@ -72,7 +78,7 @@ KeyTree::NumberCallbackType AppController::numCommandCallback(Command command) {
     };
 }
 
-Result<ControllerAction> AppController::applyPendingCommand() {
+platform::Result<ControllerAction> AppController::applyPendingCommand() {
     using namespace result;
     auto [n, command] = command_;
 
@@ -88,7 +94,7 @@ Result<ControllerAction> AppController::applyPendingCommand() {
         case CloseDocument:
             if (auto id = ui_->getDocumentId()) {
                 ui_->removeDocument(*id);
-                verify(documents_->removeDocument(*id));
+                platform::verify(documents_->removeDocument(*id));
             }
             return ControllerAction::Redraw;
 
@@ -177,7 +183,7 @@ Result<ControllerAction> AppController::applyPendingCommand() {
     }
 }
 
-Result<ControllerAction> AppController::onKeyEvent(char key) {
+platform::Result<ControllerAction> AppController::onKeyEvent(char key) {
     log::debug("controller: key={}", key);
 
     switch (key_tree_.feed(key)) {
@@ -198,7 +204,7 @@ Result<ControllerAction> AppController::onKeyEvent(char key) {
     }
 }
 
-Result<ControllerAction> AppController::onFilesystemEvent(const notify::Event& event) {
+platform::Result<ControllerAction> AppController::onFilesystemEvent(const notify::Event& event) {
     using namespace result;
     log::debug("controller: fs event on path={}", event.path);
 
@@ -209,7 +215,7 @@ Result<ControllerAction> AppController::onFilesystemEvent(const notify::Event& e
     co_return ControllerAction::Redraw;
 }
 
-Status AppController::reloadCurrentDocument() {
+platform::Status AppController::reloadCurrentDocument() {
     using namespace result;
 
     if (auto id = ui_->getDocumentId()) {
@@ -220,10 +226,10 @@ Status AppController::reloadCurrentDocument() {
     co_return unit;
 }
 
-Status AppController::reloadDocument(DocumentId old_id, std::filesystem::path path) {
+platform::Status AppController::reloadDocument(DocumentId old_id, std::filesystem::path path) {
     using namespace result;
 
-    verify(documents_->removeDocument(old_id));
+    platform::verify(documents_->removeDocument(old_id));
     log::debug("controller: removed document with id={}", old_id);
 
     auto document =
@@ -241,11 +247,11 @@ Status AppController::reloadDocument(DocumentId old_id, std::filesystem::path pa
     co_return unit;
 }
 
-Result<ControllerAction> AppController::onSignal(int signal) {
+platform::Result<ControllerAction> AppController::onSignal(int signal) {
     return handleSignal(signal);
 }
 
-Result<ControllerAction> AppController::handleSignal(int signal) {
+platform::Result<ControllerAction> AppController::handleSignal(int signal) {
     switch (signal) {
         using enum ControllerAction;
 
@@ -264,4 +270,4 @@ Result<ControllerAction> AppController::handleSignal(int signal) {
 
 }  // namespace pdft::app
 
-PDFT_REGISTER_MODULE(pdft::app::AppController);
+PLATFORM_REGISTER_MODULE(pdft::app::AppController);

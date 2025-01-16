@@ -1,15 +1,15 @@
 #pragma once
 
-#include "pdft/runtime/event/event_emitter.h"
-#include "pdft/runtime/module/module.h"
+#include "platform/event/event_emitter.h"
+#include "platform/module/module.h"
 
-#include "pdft/core/awaitable.h"
+#include "platform/core/async.h"
 
 #include <asio/signal_set.hpp>
 
 namespace pdft::rt {
 
-class SignalEventEmitter : public EventEmitter<int>, public rt::Module {
+class SignalEventEmitter : public platform::rt::EventEmitter<int>, public platform::rt::Module {
  public:
     struct Config {
         std::vector<int> signals = {};
@@ -21,7 +21,7 @@ class SignalEventEmitter : public EventEmitter<int>, public rt::Module {
     void stop() override;
 
  private:
-    Async<void> listenForEvents();
+    platform::Async<void> listenForEvents();
 
     asio::io_context& io_;
     asio::signal_set signals_;

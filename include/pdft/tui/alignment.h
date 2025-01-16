@@ -1,6 +1,6 @@
 #pragma once
 
-#include "pdft/core/assert.h"
+#include "platform/core/assert.h"
 
 namespace pdft::tui {
 
@@ -13,7 +13,7 @@ enum class Alignment {
 template <typename T>
 requires std::integral<T> || std::floating_point<T>
 T getOffset(T outer, T inner, Alignment strategy) {
-    verify(outer >= inner, "outer cannot be smaller than inner one");
+    platform::verify(outer >= inner, "outer cannot be smaller than inner one");
 
     switch (strategy) {
         using enum Alignment;
@@ -26,7 +26,7 @@ T getOffset(T outer, T inner, Alignment strategy) {
             return (outer - inner) / static_cast<T>(2);
 
         default:
-            panic("getOffset unexpected FitStrategy");
+            platform::panic("getOffset unexpected FitStrategy");
     }
 }
 

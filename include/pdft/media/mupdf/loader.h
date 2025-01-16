@@ -2,13 +2,14 @@
 
 #include "pdft/media/loader.h"
 
-#include "pdft/runtime/module/module.h"
+#include "platform/module/module.h"
 
 namespace pdft::media {
 
-class MupdfLoader : public Loader, public rt::Module {
+class MupdfLoader : public Loader, public platform::rt::Module {
  public:
-    Result<Arc<media::Document>> load(const std::filesystem::path& path) const override;
+    platform::Result<platform::Arc<media::Document>> load(
+        const std::filesystem::path& path) const override;
 };
 
 }  // namespace pdft::media

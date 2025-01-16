@@ -1,21 +1,22 @@
 #include "pdft/app/loader/impl/app_state_loader.h"
-
 #include "pdft/app/state/ui.h"
-#include "pdft/core/log.h"
-#include "pdft/core/result.h"
-#include "pdft/runtime/module/register.h"
 
-#include "pdft/runtime/cli/register.h"
-#include "pdft/utils/get_home_dir.h"
+#include "platform/cli/register.h"
+#include "platform/core/result.h"
+#include "platform/log.h"
+#include "platform/module/register.h"
+#include "platform/utils/home_dir.h"
 
 #include <magic_enum.hpp>
 
 namespace pdft::app {
 
+using namespace platform;
+
 namespace {
 
 bool isOpened(const std::string& abs_path, const UIModel& ui, const DocumentStorage& documents) {
-    // XXX this does not actually require linear search
+    // XXX this does not actually require linear seplatform::Arch
 
     for (const auto& state : ui.documents) {
         auto doc = documents.getDocument(state.document_id) | result::unwrap;
@@ -33,10 +34,10 @@ bool isOpened(const std::string& abs_path, const UIModel& ui, const DocumentStor
 AppStateLoader::AppStateLoader(
     Config config,
     CliArgs cli,
-    Arc<UI> ui,
-    Arc<DocumentStorage> documents,
-    Arc<const Persister> persister,
-    Arc<const media::Loader> doc_loader)
+    platform::Arc<UI> ui,
+    platform::Arc<DocumentStorage> documents,
+    platform::Arc<const Persister> persister,
+    platform::Arc<const media::Loader> doc_loader)
     : config_(config)
     , ui_(std::move(ui))
     , documents_(std::move(documents))
@@ -47,7 +48,7 @@ AppStateLoader::AppStateLoader(
     log::info(this, "AppStateLoader state mode is {}", magic_enum::enum_name(config_.mode));
 }
 
-Status AppStateLoader::save() {
+platform::Status AppStateLoader::save() {
     if (config_.mode == StateMode::Standalone) {
         log::info(this, "not saving the state in Standalone mode");
         return result::unit;
@@ -62,7 +63,7 @@ Status AppStateLoader::save() {
     return persister_->save(ofs);
 }
 
-Status AppStateLoader::load(const std::vector<std::string>& paths) {
+platform::Status AppStateLoader::load(const std::vector<std::string>& paths) {
     if (!config_.state_path.has_value()) {
         log::info(this, "not loading the state because state path is not configured");
         return result::unit;
@@ -115,5 +116,5 @@ Status AppStateLoader::load(const std::vector<std::string>& paths) {
 
 }  // namespace pdft::app
 
-PDFT_REGISTER_MODULE(pdft::app::AppStateLoader);
-PDFT_REGISTER_CLI_ARGS(pdft::app::AppStateLoader::CliArgs);
+PLATFORM_REGISTER_MODULE(pdft::app::AppStateLoader);
+PLATFORM_REGISTER_CLI_ARGS(pdft::app::AppStateLoader::CliArgs);

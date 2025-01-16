@@ -1,8 +1,8 @@
 #include "pdft/media/mupdf/context.h"
-#include "pdft/core/assert.h"
+#include "platform/core/assert.h"
 
 #include "fz_assert.h"
-#include "pdft/runtime/module/register.h"
+#include "platform/module/register.h"
 
 extern "C" {
 #include <mupdf/fitz/archive.h>
@@ -24,13 +24,13 @@ void errorCallback(void* raw, const char* message) {
     logger->error(message);
 }
 
-void setupMupdfLogging(fz_context* ctx, log::LoggerPtr logger) {
+void setupMupdfLogging(fz_context* ctx, platform::log::LoggerPtr logger) {
     fz_set_warning_callback(ctx, warningCallback, logger.get());
     fz_set_error_callback(ctx, errorCallback, logger.get());
 }
 
 void registerDocumentHandlers(fz_context* ctx) {
-    verify(tryFz(ctx, [&] { fz_register_document_handlers(ctx); }), "");
+    platform::verify(tryFz(ctx, [&] { fz_register_document_handlers(ctx); }), "");
 }
 
 void fzLockUser(void* user, int lock) {
@@ -43,7 +43,7 @@ void fzUnlockUser(void* user, int lock) {
     span[lock].unlock();  // NOLINT
 }
 
-Arc<MupdfContext> global_context = {};  // NOLINT
+platform::Arc<MupdfContext> global_context = {};  // NOLINT
 
 }  // namespace
 
@@ -61,24 +61,24 @@ MupdfContextOwner::MupdfContextOwner(Config config) : config_(config) {
     };
 
     context_.reset(fz_new_context(NULL, &locks_ctx, static_cast<int>(config.size)));
-    verify(native(), "failed to create new fz_context");
+    platform::verify(native(), "failed to create new fz_context");
 }
 
 void MupdfContextOwner::start() {
     auto* ctx = native();
 
     if (config_.enable_icc) {
-        verify(tryFz(ctx, [&] { fz_enable_icc(ctx); }), "failed to enable icc");
+        platform::verify(tryFz(ctx, [&] { fz_enable_icc(ctx); }), "failed to enable icc");
     }
 
     if (config_.text_aa_level != Config::UseDefault) {
-        verify(
+        platform::verify(
             tryFz(ctx, [&] { fz_set_text_aa_level(ctx, config_.text_aa_level); }),
             "failed to set text aa level");
     }
 
     if (config_.graphics_aa_level != Config::UseDefault) {
-        verify(
+        platform::verify(
             tryFz(ctx, [&] { fz_set_graphics_aa_level(ctx, config_.graphics_aa_level); }),
             "failed to set graphics aa level");
     }
@@ -93,7 +93,7 @@ void MupdfContextOwner::start() {
         if (auto ptr = shared_from_this()) {
             setGlobalMupdfContext(ptr);
         } else {
-            panic("cannot set MupdfContextOwner as global unless it is shared");
+            platform::panic("cannot set MupdfContextOwner as global unless it is shared");
         }
     }
 }
@@ -102,32 +102,32 @@ fz_context* MupdfContextOwner::native() const {
     return context_.get();
 }
 
-ClonedMupdfContext::ClonedMupdfContext(fz_context* context, Arc<MupdfContext> parent)
+ClonedMupdfContext::ClonedMupdfContext(fz_context* context, platform::Arc<MupdfContext> parent)
     : parent_(std::move(parent)) {
-    context_.reset(verify(context));
+    context_.reset(platform::verify(context));
 }
 
 fz_context* ClonedMupdfContext::native() const {
     return context_.get();
 }
 
-Arc<MupdfContext> ClonedMupdfContext::clone(Arc<MupdfContext> from) {
-    fz_context* ctx = verify(fz_clone_context(from->native()), "failed to clone context");
+platform::Arc<MupdfContext> ClonedMupdfContext::clone(platform::Arc<MupdfContext> from) {
+    fz_context* ctx = platform::verify(fz_clone_context(from->native()), "failed to clone context");
     return std::make_shared<ClonedMupdfContext>(ctx, std::move(from));
 }
 
-void setGlobalMupdfContext(Arc<MupdfContext> ctx) {
+void setGlobalMupdfContext(platform::Arc<MupdfContext> ctx) {
     if (global_context != nullptr) {
-        panic("global MuPdf context is already registered (@{})", (void*)ctx.get());
+        platform::panic("global MuPdf context is already registered (@{})", (void*)ctx.get());
     }
 
     global_context = ctx;
 }
 
 MupdfContext& thisThreadMupdfContext() {
-    thread_local Arc<MupdfContext> local = [] {
+    thread_local platform::Arc<MupdfContext> local = [] {
         if (global_context == nullptr) {
-            panic("global MuPdf context is not registered");
+            platform::panic("global MuPdf context is not registered");
         }
 
         return ClonedMupdfContext::clone(global_context);
@@ -138,4 +138,4 @@ MupdfContext& thisThreadMupdfContext() {
 
 }  // namespace pdft::media
 
-PDFT_REGISTER_MODULE(pdft::media::MupdfContextOwner);
+PLATFORM_REGISTER_MODULE(pdft::media::MupdfContextOwner);

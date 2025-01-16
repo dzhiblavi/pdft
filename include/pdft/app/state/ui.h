@@ -55,7 +55,7 @@ class UI {
 
     virtual const UIModel& getModel() const = 0;
     virtual UIModel& getModel() = 0;
-    virtual Maybe<DocumentId> getDocumentId() const = 0;
+    virtual platform::Maybe<DocumentId> getDocumentId() const = 0;
     virtual DocumentModel* getDocument() = 0;
     virtual const DocumentModel* getDocument() const = 0;
 };

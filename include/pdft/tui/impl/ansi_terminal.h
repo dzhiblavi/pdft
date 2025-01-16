@@ -2,11 +2,11 @@
 
 #include "pdft/tui/terminal.h"
 
-#include "pdft/runtime/module/module.h"
+#include "platform/module/module.h"
 
 namespace pdft::tui {
 
-class AnsiTerminal : public Terminal, public rt::Module {
+class AnsiTerminal : public Terminal, public platform::rt::Module {
  public:
     void clear(io::OutBuffer& buffer) const override;
     void setCursorPosition(CursorPosition position, io::OutBuffer& buffer) const override;

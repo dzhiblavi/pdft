@@ -1,8 +1,8 @@
 #include "pdft/app/view/impl/app_page_processor.h"
-
-#include "pdft/core/trace/log_stack_trace.h"
-#include "pdft/runtime/module/register.h"
 #include "pdft/utils/zlib.h"
+
+#include "platform/module/register.h"
+#include "platform/trace/log_stack_trace.h"
 
 #include <asio/bind_executor.hpp>
 #include <asio/co_spawn.hpp>
@@ -10,7 +10,9 @@
 
 namespace pdft::app {
 
-AppPageProcessor::AppPageProcessor(Config config, Arc<const ImageRenderer> renderer)
+using namespace platform;
+
+AppPageProcessor::AppPageProcessor(Config config, platform::Arc<const ImageRenderer> renderer)
     : renderer_(std::move(renderer))
     , pool_(config.render_pool_size)
     , media_strand_(pool_.get_executor()) {}
@@ -21,12 +23,14 @@ AppPageProcessor::~AppPageProcessor() noexcept {
 }
 
 void AppPageProcessor::process(
-    Arc<media::Page> page, const DisplayProperties& display, Promise<ProcessedImage> promise) {
+    platform::Arc<media::Page> page,
+    const DisplayProperties& display,
+    platform::Promise<ProcessedImage> promise) {
     asio::co_spawn(
         media_strand_,
         // NOLINTNEXTLINE
         [this, page, display, p = std::move(promise)]() mutable -> asio::awaitable<void> {
-            auto tracer = trace::makeTracer("bg_task");
+            auto tracer = platform::trace::makeTracer("bg_task");
             Context ctx(tracer);
 
             auto image = ctx.push("get_image") | page->getImage(display.scaling_coeff);
@@ -44,7 +48,7 @@ void AppPageProcessor::process(
             auto compressed = ctx.push("compress") |
                               utils::zlibCompress(image::pixelsToSamples(image->samples()));
 
-            trace::logStackTrace(std::move(tracer), log::loggerOrGlobal("bg-trace"));
+            platform::trace::logStackTrace(std::move(tracer), log::loggerOrGlobal("bg-trace"));
 
             std::move(p).set_value(ProcessedImage{
                 .size = image->size(),
@@ -56,4 +60,4 @@ void AppPageProcessor::process(
 
 }  // namespace pdft::app
 
-PDFT_REGISTER_MODULE(pdft::app::AppPageProcessor);
+PLATFORM_REGISTER_MODULE(pdft::app::AppPageProcessor);

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "pdft/core/result.h"
+#include "platform/core/result.h"
 
 #include <ostream>
 
@@ -10,8 +10,8 @@ class Persister {
  public:
     virtual ~Persister() = default;
 
-    virtual Status save(std::ostream& os) const = 0;
-    virtual Status restore(std::istream& is) const = 0;
+    virtual platform::Status save(std::ostream& os) const = 0;
+    virtual platform::Status restore(std::istream& is) const = 0;
 };
 
 }  // namespace pdft::app

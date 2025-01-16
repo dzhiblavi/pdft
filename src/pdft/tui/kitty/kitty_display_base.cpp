@@ -1,11 +1,13 @@
 #include "pdft/tui/kitty/kitty_display_base.h"
 
-#include "pdft/core/assert.h"
-#include "pdft/core/log.h"
+#include "platform/core/assert.h"
+#include "platform/log.h"
 
 namespace pdft::tui {
 
-KittyDisplayBase::KittyDisplayBase(Config config, Arc<APCExecutor> executor)
+using namespace platform;
+
+KittyDisplayBase::KittyDisplayBase(Config config, platform::Arc<APCExecutor> executor)
     : executor_(std::move(executor))
     , loaded_(config.max_loaded_images) {}
 
@@ -20,7 +22,7 @@ void KittyDisplayBase::loadCompressedImage(
     std::string_view compressed_data,
     io::OutBuffer& buffer) {
     log::debug(ctx, "loading a compressed image with id={} to the display", id);
-    verify(!isLoaded(id), "image with id={} is already loaded", id);
+    platform::verify(!isLoaded(id), "image with id={} is already loaded", id);
 
     if (auto unloaded = loaded_.add(id, size)) {
         auto&& [unloaded_id, _] = *unloaded;
