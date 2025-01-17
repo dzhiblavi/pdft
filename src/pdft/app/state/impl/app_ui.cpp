@@ -126,7 +126,8 @@ void AppUI::removeDocument(DocumentId id) {
 
 void AppUI::onDocumentChanged(DocumentId from, DocumentId to, uint32_t page_count) {
     auto it = std::ranges::find(model_.documents, from, &DocumentModel::document_id);
-    platform::verify(it != model_.documents.end(), "failed to find the old document with id={}", from);
+    platform::verify(
+        it != model_.documents.end(), "failed to find the old document with id={}", from);
     setDocument(*it, to, page_count);
 }
 

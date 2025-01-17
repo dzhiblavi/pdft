@@ -23,7 +23,8 @@ bool DocumentStorage::removeDocument(DocumentId id) {
     return true;
 }
 
-platform::Maybe<platform::Arc<const media::Document>> DocumentStorage::getDocument(DocumentId id) const {
+platform::Maybe<platform::Arc<const media::Document>> DocumentStorage::getDocument(
+    DocumentId id) const {
     auto it = documents_.find(id);
     if (it == documents_.end()) {
         return std::nullopt;

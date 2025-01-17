@@ -11,7 +11,10 @@ namespace pdft::app {
 
 class AppPersister : public Persister, public platform::rt::Module {
  public:
-    AppPersister(platform::Arc<UI> ui, platform::Arc<DocumentStorage> documents, platform::Arc<const media::Loader> doc_loader);
+    AppPersister(
+        platform::Arc<UI> ui,
+        platform::Arc<DocumentStorage> documents,
+        platform::Arc<const media::Loader> doc_loader);
 
     platform::Status save(std::ostream& os) const override;
     platform::Status restore(std::istream& is) const override;

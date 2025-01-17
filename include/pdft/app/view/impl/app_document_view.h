@@ -10,7 +10,8 @@ namespace pdft::app {
 
 class AppDocumentView : public DocumentView, public platform::rt::Module {
  public:
-    explicit AppDocumentView(platform::Arc<PageRenderer> renderer) : renderer_(std::move(renderer)) {}
+    explicit AppDocumentView(platform::Arc<PageRenderer> renderer)
+        : renderer_(std::move(renderer)) {}
 
     tui::Element getLayout(Context& ctx, const DocumentModel& doc) override;
 

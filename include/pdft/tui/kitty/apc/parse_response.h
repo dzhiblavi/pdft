@@ -1,7 +1,7 @@
 #pragma once
 
-#include "platform/core/result.h"
 #include "pdft/tui/kitty/apc/command.h"
+#include "platform/core/result.h"
 
 namespace pdft::tui {
 

@@ -34,7 +34,8 @@ image::ImageSize PixmapMupdfImage::size() const {
 std::span<const image::IRGBColor> PixmapMupdfImage::samples() const {
     size_t pixels_count = pixmap_->w * pixmap_->h;
     return {
-        platform::stdlike::start_lifetime_as_array<const image::IRGBColor>(pixmap_->samples, pixels_count),
+        platform::stdlike::start_lifetime_as_array<const image::IRGBColor>(
+            pixmap_->samples, pixels_count),
         pixels_count,
     };
 }
@@ -42,7 +43,8 @@ std::span<const image::IRGBColor> PixmapMupdfImage::samples() const {
 std::span<image::IRGBColor> PixmapMupdfImage::mutableSamples() {
     size_t pixels_count = pixmap_->w * pixmap_->h;
     return {
-        platform::stdlike::start_lifetime_as_array<image::IRGBColor>(pixmap_->samples, pixels_count),
+        platform::stdlike::start_lifetime_as_array<image::IRGBColor>(
+            pixmap_->samples, pixels_count),
         pixels_count,
     };
 }

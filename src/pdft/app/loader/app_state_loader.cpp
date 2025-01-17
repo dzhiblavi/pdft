@@ -16,7 +16,7 @@ using namespace platform;
 namespace {
 
 bool isOpened(const std::string& abs_path, const UIModel& ui, const DocumentStorage& documents) {
-    // XXX this does not actually require linear seplatform::Arch
+    // XXX this does not actually require linear search
 
     for (const auto& state : ui.documents) {
         auto doc = documents.getDocument(state.document_id) | result::unwrap;

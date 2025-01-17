@@ -14,7 +14,8 @@ class ConsoleWriter {
     virtual ~ConsoleWriter() = default;
 
     virtual platform::Async<platform::Status> write(std::string_view buffer) = 0;
-    virtual platform::Async<platform::Status> writeMany(std::vector<asio::const_buffer> buffers) = 0;
+    virtual platform::Async<platform::Status> writeMany(
+        std::vector<asio::const_buffer> buffers) = 0;
 
     platform::Async<platform::Status> write(OutBuffer& buffer) {
         co_return co_await this->write(buffer.view());

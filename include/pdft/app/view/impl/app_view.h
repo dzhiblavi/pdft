@@ -10,7 +10,10 @@ namespace pdft::app {
 
 class AppView : public View, public platform::rt::Module {
  public:
-    AppView(platform::Arc<const UI> ui, platform::Arc<const DocumentStorage> documents, platform::Arc<DocumentView> view);
+    AppView(
+        platform::Arc<const UI> ui,
+        platform::Arc<const DocumentStorage> documents,
+        platform::Arc<DocumentView> view);
 
     tui::Element getLayout(Context& ctx) override;
     platform::Async<void> render(Context& ctx, tui::Screen& screen) override;

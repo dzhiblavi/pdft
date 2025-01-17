@@ -3,8 +3,8 @@
 #include "pdft/tui/elements.h"
 #include "pdft/tui/screen.h"
 
-#include "platform/core/async.h"
 #include "pdft/core/context.h"
+#include "platform/core/async.h"
 
 namespace pdft::app {
 
