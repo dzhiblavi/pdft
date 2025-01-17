@@ -26,7 +26,7 @@ AppPageRenderer::AppPageRenderer(
     , rendered_(config.image_cache_size) {}
 
 platform::Async<platform::Unit> AppPageRenderer::render(
-    Context& ctx,
+    platform::trace::Context& ctx,
     const Page& page,
     const PagePosition& pos,
     const DisplayProperties& orig_display,
@@ -54,7 +54,7 @@ platform::Async<platform::Unit> AppPageRenderer::render(
     float sub_cols = cols * pos.subarea.width;
     auto irect = tui::fitImage(sub_cols / sub_rows, pos.rect, pos.placement);
 
-    log::debug(ctx, "@={} I={}", pos.rect, irect);
+    log::debug(this, "@={} I={}", pos.rect, irect);
     auto _ = ctx.push("display_image");
     display_->displayImage(ctx, id, irect, pos.subarea, screen.bufpair());
 
@@ -97,7 +97,7 @@ platform::Async<void> AppPageRenderer::renderImagesAround(
 }
 
 platform::Async<void> AppPageRenderer::loadImageToDisplay(
-    Context& ctx, tui::ImageId id, tui::Screen& screen) {
+    platform::trace::Context& ctx, tui::ImageId id, tui::Screen& screen) {
     auto* future = rendered_.tryGet(id);
     if (!future) {
         panic("image with id {} is not rendered", id);

@@ -9,7 +9,7 @@ class APCExecutorBase : public APCExecutor {
     explicit APCExecutorBase(APCExecutorConfig config = {})
         : max_chunk_size_(config.max_chunk_size_bytes) {}
 
-    void execute(Context& ctx, const Command& cmd, io::OutBuffer& buffer) override;
+    void execute(platform::trace::Context& ctx, const Command& cmd, io::OutBuffer& buffer) override;
 
  protected:
     virtual void writePrefix(io::OutBuffer& buffer) const = 0;

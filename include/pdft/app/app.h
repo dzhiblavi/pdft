@@ -37,7 +37,7 @@ class Application : public platform::rt::Module {
         platform::Arc<View> view,
         platform::Arc<tui::Renderer> renderer);
 
-    platform::Async<platform::Status> run(Context& ctx);
+    platform::Async<platform::Status> run(platform::trace::Context& ctx);
 
  private:
     using Event = std::variant<

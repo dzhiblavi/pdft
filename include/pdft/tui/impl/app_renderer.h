@@ -18,10 +18,10 @@ class AppRenderer : public Renderer, public platform::rt::Module {
         platform::Arc<io::TermControl> term_control,
         platform::Arc<tui::Display> image_display);
 
-    platform::Async<platform::Status> initScreen(Context& ctx) override;
-    platform::Async<platform::Status> restoreScreen(Context& ctx) override;
-    Screen newFrame(Context& ctx, tui::Element dom) override;
-    platform::Async<platform::Status> renderFrame(Context& ctx) override;
+    platform::Async<platform::Status> initScreen(platform::trace::Context& ctx) override;
+    platform::Async<platform::Status> restoreScreen(platform::trace::Context& ctx) override;
+    Screen newFrame(platform::trace::Context& ctx, tui::Element dom) override;
+    platform::Async<platform::Status> renderFrame(platform::trace::Context& ctx) override;
 
  private:
     std::string tui_;

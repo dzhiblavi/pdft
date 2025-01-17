@@ -9,7 +9,11 @@ namespace pdft::tui {
 using namespace platform;
 
 void NativeKittyDisplay::displayImage(
-    Context& ctx, ImageId id, const IRect& rect, const FRect& image_subarea, BufPair& buffers) {
+    platform::trace::Context& ctx,
+    ImageId id,
+    const IRect& rect,
+    const FRect& image_subarea,
+    BufPair& buffers) {
     platform::verify(isLoaded(id));
 
     const auto& [x, y, w, h] = rect;
@@ -21,7 +25,7 @@ void NativeKittyDisplay::displayImage(
     }
 
     const auto& [rix, riy, riw, rih] = image_subarea;
-    log::debug(ctx, "@={} SA={}", rect, image_subarea);
+    log::debug(this, "@={} SA={}", rect, image_subarea);
     platform::verify(
         rix >= 0 && riy >= 0, "image offset must not be negative: x={},y={}", rix, riy);
     platform::verify(riw > 0 && rih > 0, "image dimensions must be positive: w={},h={}", riw, rih);
@@ -35,7 +39,7 @@ void NativeKittyDisplay::displayImage(
         .height = std::floor(image_size.height_px * rih),   // NOLINT
     };
 
-    log::debug(ctx, "wpx={},hpx={},SA={}", image_size.width_px, image_size.height_px, ipx);
+    log::debug(this, "wpx={},hpx={},SA={}", image_size.width_px, image_size.height_px, ipx);
 
     // x, y, w, h (pixels) control the subrectangle of the image
     // c, r (columns and rows) control the rectangle at which the image will be displayed

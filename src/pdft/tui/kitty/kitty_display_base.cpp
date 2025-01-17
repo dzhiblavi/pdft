@@ -16,12 +16,12 @@ bool KittyDisplayBase::isLoaded(ImageId id) const {
 }
 
 void KittyDisplayBase::loadCompressedImage(
-    Context& ctx,
+    platform::trace::Context& ctx,
     ImageId id,
     image::ImageSize size,
     std::string_view compressed_data,
     io::OutBuffer& buffer) {
-    log::debug(ctx, "loading a compressed image with id={} to the display", id);
+    log::debug("loading a compressed image with id={} to the display", id);
     platform::verify(!isLoaded(id), "image with id={} is already loaded", id);
 
     if (auto unloaded = loaded_.add(id, size)) {
@@ -51,8 +51,8 @@ void KittyDisplayBase::loadCompressedImage(
         buffer);
 }
 
-void KittyDisplayBase::clear(Context& ctx, io::OutBuffer& buffer) {
-    log::debug(ctx, "clearing all placements from the display");
+void KittyDisplayBase::clear(platform::trace::Context& ctx, io::OutBuffer& buffer) {
+    log::debug("clearing all placements from the display");
 
     std::pair<std::string_view, std::string> control_data[] = {
         {"q", "2"},
@@ -69,8 +69,8 @@ void KittyDisplayBase::clear(Context& ctx, io::OutBuffer& buffer) {
         buffer);
 }
 
-void KittyDisplayBase::unload(Context& ctx, ImageId id, io::OutBuffer& buffer) {
-    log::debug(ctx, "unloading an image with id={} from the display", id);
+void KittyDisplayBase::unload(platform::trace::Context& ctx, ImageId id, io::OutBuffer& buffer) {
+    log::debug("unloading an image with id={} from the display", id);
     loaded_.remove(id);
 
     std::pair<std::string_view, std::string> control_data[] = {
@@ -89,8 +89,8 @@ void KittyDisplayBase::unload(Context& ctx, ImageId id, io::OutBuffer& buffer) {
         buffer);
 }
 
-void KittyDisplayBase::unloadAll(Context& ctx, io::OutBuffer& buffer) {
-    log::debug(ctx, "unloading all {} images from the display", loaded_.size());
+void KittyDisplayBase::unloadAll(platform::trace::Context& ctx, io::OutBuffer& buffer) {
+    log::debug("unloading all {} images from the display", loaded_.size());
     loaded_.clear();
 
     std::pair<std::string_view, std::string> control_data[] = {

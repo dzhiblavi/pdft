@@ -17,7 +17,7 @@ AppView::AppView(
     , documents_(std::move(documents))
     , doc_view_(std::move(view)) {}
 
-tui::Element AppView::getLayout(Context& ctx) {
+tui::Element AppView::getLayout(platform::trace::Context& ctx) {
     auto doc = getDocumentLayout(ctx).value_or(tui::emptyElement());
 
     if (!ui_->getModel().sidebar) {
@@ -30,13 +30,13 @@ tui::Element AppView::getLayout(Context& ctx) {
     });
 }
 
-platform::Async<void> AppView::render(Context& ctx, tui::Screen& screen) {
+platform::Async<void> AppView::render(platform::trace::Context& ctx, tui::Screen& screen) {
     if (auto state = ui_->getDocument()) {
         co_await doc_view_->render(ctx, *state, ui_->getModel().display, screen);
     }
 }
 
-platform::Maybe<tui::Element> AppView::getDocumentLayout(Context& ctx) {
+platform::Maybe<tui::Element> AppView::getDocumentLayout(platform::trace::Context& ctx) {
     if (!ui_->getDocument()) {
         return none;
     }

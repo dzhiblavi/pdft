@@ -6,7 +6,7 @@
 namespace pdft::tui {
 
 TEST_CASE("RegularAPCExecutor/control/no-payload") {
-    Context ctx;
+    platform::trace::Context ctx;
     io::OutBuffer buffer;
     auto executor = RegularAPCExecutor();
 
@@ -28,7 +28,7 @@ TEST_CASE("RegularAPCExecutor/control/no-payload") {
 }
 
 TEST_CASE("RegularAPCExecutor/control/payload") {
-    Context ctx;
+    platform::trace::Context ctx;
     io::OutBuffer buffer;
     auto executor = RegularAPCExecutor();
 

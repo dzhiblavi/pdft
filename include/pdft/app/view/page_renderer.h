@@ -6,8 +6,8 @@
 #include "pdft/tui/rect.h"
 #include "pdft/tui/screen.h"
 
-#include "pdft/core/context.h"
 #include "platform/core/async.h"
+#include "platform/trace/context.h"
 
 namespace pdft::app {
 
@@ -22,7 +22,7 @@ class PageRenderer {
     virtual ~PageRenderer() = default;
 
     virtual platform::Async<platform::Unit> render(
-        Context& ctx,
+        platform::trace::Context& ctx,
         const Page& page,
         const PagePosition& pos,
         const DisplayProperties& props,

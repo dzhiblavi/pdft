@@ -15,8 +15,11 @@ class NativeKittyDisplay : public KittyDisplayBase, public platform::rt::Module 
         , terminal_(std::move(terminal)) {}
 
     void displayImage(
-        Context& ctx, ImageId id, const IRect& rect, const FRect& image_subarea, BufPair& buffers)
-        override;
+        platform::trace::Context& ctx,
+        ImageId id,
+        const IRect& rect,
+        const FRect& image_subarea,
+        BufPair& buffers) override;
 
  private:
     platform::Arc<const Terminal> terminal_;

@@ -3,8 +3,8 @@
 #include "pdft/app/view/document_view.h"
 #include "pdft/app/view/page_renderer.h"
 
-#include "pdft/core/context.h"
 #include "platform/module/module.h"
+#include "platform/trace/context.h"
 
 namespace pdft::app {
 
@@ -13,32 +13,32 @@ class AppDocumentView : public DocumentView, public platform::rt::Module {
     explicit AppDocumentView(platform::Arc<PageRenderer> renderer)
         : renderer_(std::move(renderer)) {}
 
-    tui::Element getLayout(Context& ctx, const DocumentModel& doc) override;
+    tui::Element getLayout(platform::trace::Context& ctx, const DocumentModel& doc) override;
 
     platform::Async<void> render(
-        Context& ctx,
+        platform::trace::Context& ctx,
         const DocumentModel& doc,
         const DisplayProperties& properties,
         tui::Screen& screen) const override;
 
  private:
     platform::Async<void> renderOnePage(
-        Context& ctx,
+        platform::trace::Context& ctx,
         const DocumentModel& doc,
         const DisplayProperties& properties,
         tui::Screen& screen) const;
     platform::Async<void> renderTwoPages(
-        Context& ctx,
+        platform::trace::Context& ctx,
         const DocumentModel& doc,
         const DisplayProperties& properties,
         tui::Screen& screen) const;
     platform::Async<void> renderOnePageContinuous(
-        Context& ctx,
+        platform::trace::Context& ctx,
         const DocumentModel& doc,
         const DisplayProperties& properties,
         tui::Screen& screen) const;
     platform::Async<void> renderTwoPagesContinuous(
-        Context& ctx,
+        platform::trace::Context& ctx,
         const DocumentModel& doc,
         const DisplayProperties& properties,
         tui::Screen& screen) const;

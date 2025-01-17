@@ -22,7 +22,7 @@ struct TestExecutor : APCExecutorBase {
 }  // namespace
 
 TEST_CASE("APCExecutorBase/no-control/no-payload") {
-    Context ctx;
+    platform::trace::Context ctx;
     io::OutBuffer buffer;
     auto executor = TestExecutor();
 
@@ -38,7 +38,7 @@ TEST_CASE("APCExecutorBase/no-control/no-payload") {
 }
 
 TEST_CASE("APCExecutorBase/control/no-payload") {
-    Context ctx;
+    platform::trace::Context ctx;
     io::OutBuffer buffer;
     auto executor = TestExecutor();
 
@@ -59,7 +59,7 @@ TEST_CASE("APCExecutorBase/control/no-payload") {
 }
 
 TEST_CASE("APCExecutorBase/no-control/one-chunk") {
-    Context ctx;
+    platform::trace::Context ctx;
     io::OutBuffer buffer;
     auto executor = TestExecutor();
 
@@ -76,7 +76,7 @@ TEST_CASE("APCExecutorBase/no-control/one-chunk") {
 }
 
 TEST_CASE("APCExecutorBase/control/one-chunk") {
-    Context ctx;
+    platform::trace::Context ctx;
     io::OutBuffer buffer;
     auto executor = TestExecutor();
 
@@ -98,7 +98,7 @@ TEST_CASE("APCExecutorBase/control/one-chunk") {
 }
 
 TEST_CASE("APCExecutorBase/control/multiple-chunks") {
-    Context ctx;
+    platform::trace::Context ctx;
     io::OutBuffer buffer;
     auto executor = TestExecutor();
 
@@ -120,7 +120,7 @@ TEST_CASE("APCExecutorBase/control/multiple-chunks") {
 }
 
 TEST_CASE("APCExecutorBase/control/one-chunk/b64") {
-    Context ctx;
+    platform::trace::Context ctx;
     io::OutBuffer buffer;
     auto executor = TestExecutor();
 
@@ -143,7 +143,7 @@ TEST_CASE("APCExecutorBase/control/one-chunk/b64") {
 }
 
 TEST_CASE("APCExecutorBase/control/multiple-chunks/b64") {
-    Context ctx;
+    platform::trace::Context ctx;
     io::OutBuffer buffer;
     auto executor = TestExecutor();
 

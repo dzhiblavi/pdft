@@ -4,8 +4,8 @@
 
 #include "pdft/io/buffer.h"
 
-#include "pdft/core/context.h"
 #include "platform/core/result.h"
+#include "platform/trace/context.h"
 
 #include <asio/awaitable.hpp>
 
@@ -21,7 +21,8 @@ class APCExecutor {
  public:
     virtual ~APCExecutor() = default;
 
-    virtual void execute(Context& ctx, const Command& cmd, io::OutBuffer& buffer) = 0;
+    virtual void execute(
+        platform::trace::Context& ctx, const Command& cmd, io::OutBuffer& buffer) = 0;
 };
 
 }  // namespace pdft::tui

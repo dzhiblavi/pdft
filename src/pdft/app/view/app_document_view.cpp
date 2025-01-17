@@ -4,7 +4,8 @@
 
 namespace pdft::app {
 
-tui::Element AppDocumentView::getLayout(Context& /*ctx*/, const DocumentModel& doc) {
+tui::Element AppDocumentView::getLayout(
+    platform::trace::Context& /*ctx*/, const DocumentModel& doc) {
     switch (doc.view_mode) {
         using enum ViewMode;
 
@@ -46,7 +47,7 @@ tui::Element AppDocumentView::getLayout(Context& /*ctx*/, const DocumentModel& d
 }
 
 platform::Async<void> AppDocumentView::render(
-    Context& ctx,
+    platform::trace::Context& ctx,
     const DocumentModel& doc,
     const DisplayProperties& properties,
     tui::Screen& screen) const {
@@ -70,7 +71,7 @@ platform::Async<void> AppDocumentView::render(
 }
 
 platform::Async<void> AppDocumentView::renderOnePage(
-    Context& ctx,
+    platform::trace::Context& ctx,
     const DocumentModel& doc,
     const DisplayProperties& properties,
     tui::Screen& screen) const {
@@ -95,7 +96,7 @@ platform::Async<void> AppDocumentView::renderOnePage(
 }
 
 platform::Async<void> AppDocumentView::renderTwoPages(
-    Context& ctx,
+    platform::trace::Context& ctx,
     const DocumentModel& doc,
     const DisplayProperties& properties,
     tui::Screen& screen) const {
@@ -141,7 +142,7 @@ platform::Async<void> AppDocumentView::renderTwoPages(
 }
 
 platform::Async<void> AppDocumentView::renderOnePageContinuous(
-    Context& ctx,
+    platform::trace::Context& ctx,
     const DocumentModel& doc,
     const DisplayProperties& properties,
     tui::Screen& screen) const {
@@ -205,7 +206,7 @@ platform::Async<void> AppDocumentView::renderOnePageContinuous(
 }
 
 platform::Async<void> AppDocumentView::renderTwoPagesContinuous(
-    Context& ctx,
+    platform::trace::Context& ctx,
     const DocumentModel& doc,
     const DisplayProperties& properties,
     tui::Screen& screen) const {

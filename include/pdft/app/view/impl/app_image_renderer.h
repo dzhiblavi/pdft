@@ -11,7 +11,10 @@ class AppImageRenderer : public ImageRenderer, public platform::rt::Module {
  public:
     explicit AppImageRenderer(platform::Arc<const PaletteStorage> palettes);
 
-    void render(Context& ctx, const DisplayProperties& display, image::Image& image) const override;
+    void render(
+        platform::trace::Context& ctx,
+        const DisplayProperties& display,
+        image::Image& image) const override;
 
  private:
     platform::Arc<const PaletteStorage> palettes_;

@@ -14,7 +14,7 @@ AppRenderer::AppRenderer(
     , term_control_(std::move(term_control))
     , console_(std::move(console)) {}
 
-platform::Async<platform::Status> AppRenderer::initScreen(Context& ctx) {
+platform::Async<platform::Status> AppRenderer::initScreen(platform::trace::Context& ctx) {
     io::clear(control_);
     term_control_->ioControl(io::ControlType::Input, {.canonical = false, .echo = false});
     terminal_->hideCursor(control_);
@@ -22,7 +22,7 @@ platform::Async<platform::Status> AppRenderer::initScreen(Context& ctx) {
     co_return co_await console_->write(control_);
 }
 
-platform::Async<platform::Status> AppRenderer::restoreScreen(Context& ctx) {
+platform::Async<platform::Status> AppRenderer::restoreScreen(platform::trace::Context& ctx) {
     io::clear(control_);
     terminal_->showCursor(control_);
     terminal_->clear(control_);
@@ -31,7 +31,7 @@ platform::Async<platform::Status> AppRenderer::restoreScreen(Context& ctx) {
 }
 
 // 1. Initialize a new frame
-Screen AppRenderer::newFrame(Context& ctx, tui::Element dom) {
+Screen AppRenderer::newFrame(platform::trace::Context& ctx, tui::Element dom) {
     // Clear display buffers
     io::clear(control_);
     io::clear(display_);
@@ -47,7 +47,7 @@ Screen AppRenderer::newFrame(Context& ctx, tui::Element dom) {
     return {terminal_->getDimensions(), control_, display_};
 }
 
-platform::Async<platform::Status> AppRenderer::renderFrame(Context& ctx) {
+platform::Async<platform::Status> AppRenderer::renderFrame(platform::trace::Context& ctx) {
     terminal_->clear(control_);
     co_return ctx.push("render:flush") |
         co_await console_->writeMany(control_, std::move(tui_), display_);

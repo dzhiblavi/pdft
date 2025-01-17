@@ -19,7 +19,7 @@ AppImageRenderer::AppImageRenderer(platform::Arc<const PaletteStorage> palettes)
     : palettes_(std::move(palettes)) {}
 
 void AppImageRenderer::render(
-    Context& ctx, const DisplayProperties& display, image::Image& image) const {
+    platform::trace::Context& ctx, const DisplayProperties& display, image::Image& image) const {
     if (display.invert_colors) {
         auto _ = ctx.push("invert_colors");
         image::invertColors(image.mutableSamples());

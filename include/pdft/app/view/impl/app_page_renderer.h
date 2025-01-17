@@ -53,7 +53,7 @@ class AppPageRenderer : public PageRenderer, public platform::rt::Module {
         platform::Arc<tui::Display> display);
 
     platform::Async<platform::Unit> render(
-        Context& ctx,
+        platform::trace::Context& ctx,
         const Page& page,
         const PagePosition& pos,
         const DisplayProperties& props,
@@ -72,7 +72,8 @@ class AppPageRenderer : public PageRenderer, public platform::rt::Module {
         const DisplayProperties& display,
         const Page& page);
 
-    platform::Async<void> loadImageToDisplay(Context& ctx, tui::ImageId id, tui::Screen& screen);
+    platform::Async<void> loadImageToDisplay(
+        platform::trace::Context& ctx, tui::ImageId id, tui::Screen& screen);
 
     const Config config_;
     platform::Arc<const DocumentStorage> documents_;

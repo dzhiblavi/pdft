@@ -11,7 +11,9 @@ class ImageRenderer {
     virtual ~ImageRenderer() = default;
 
     virtual void render(
-        Context& ctx, const DisplayProperties& display, image::Image& image) const = 0;
+        platform::trace::Context& ctx,
+        const DisplayProperties& display,
+        image::Image& image) const = 0;
 };
 
 }  // namespace pdft::app

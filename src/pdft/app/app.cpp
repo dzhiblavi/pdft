@@ -56,7 +56,7 @@ Application::Application(
     , sig_emitter_(std::move(sig_emitter))
     , events_chan_(io.get_executor(), config_.event_max_buffer_size) {}
 
-platform::Async<platform::Status> Application::run(Context& ctx) {
+platform::Async<platform::Status> Application::run(platform::trace::Context& ctx) {
     if (auto res = ctx.push("load") | loader_->load(); !res) {
         co_return res;
     }
@@ -121,7 +121,7 @@ void Application::subscribe() {
 
 platform::Async<platform::Status> Application::shutdown() {
     auto tracer = platform::trace::makeTracer("shutdown");
-    Context ctx(tracer);
+    platform::trace::Context ctx(tracer);
 
     stop();
     co_await renderer_->restoreScreen(ctx);
@@ -189,7 +189,7 @@ ControllerAction Application::onEvent(const rt::Event<int>& sig_event) {
 
 platform::Async<platform::Status> Application::renderOne() {
     auto tracer = platform::trace::makeTracer("render_one");
-    Context ctx(tracer);
+    platform::trace::Context ctx(tracer);
 
     auto dom = view_->getLayout(ctx);
     auto screen = renderer_->newFrame(ctx, std::move(dom));

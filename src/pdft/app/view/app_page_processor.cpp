@@ -31,7 +31,7 @@ void AppPageProcessor::process(
         // NOLINTNEXTLINE
         [this, page, display, p = std::move(promise)]() mutable -> asio::awaitable<void> {
             auto tracer = platform::trace::makeTracer("bg_task");
-            Context ctx(tracer);
+            platform::trace::Context ctx(tracer);
 
             auto image = ctx.push("get_image") | page->getImage(display.scaling_coeff);
 

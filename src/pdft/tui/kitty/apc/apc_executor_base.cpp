@@ -43,7 +43,8 @@ void writeControlData(const Command& apc, io::OutBuffer& buffer) {
     }
 }
 
-std::string_view preparePayload(Context& ctx, const Command& apc, std::string& encoded_payload) {
+std::string_view preparePayload(
+    platform::trace::Context& ctx, const Command& apc, std::string& encoded_payload) {
     std::string_view payload = apc.payload;
 
     if (apc.compress == Compress::Compress) {
@@ -63,7 +64,8 @@ std::string_view preparePayload(Context& ctx, const Command& apc, std::string& e
 
 }  // namespace
 
-void APCExecutorBase::execute(Context& ctx, const Command& apc, io::OutBuffer& buffer) {
+void APCExecutorBase::execute(
+    platform::trace::Context& ctx, const Command& apc, io::OutBuffer& buffer) {
     std::string encoded_payload;
     auto payload = preparePayload(ctx, apc, encoded_payload);
     auto first_chunk = nextChunk(payload, max_chunk_size_);

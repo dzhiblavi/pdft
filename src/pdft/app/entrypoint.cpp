@@ -24,7 +24,7 @@ void Entrypoint::start() {
 
 platform::Async<void> Entrypoint::run() {
     auto tracer = platform::trace::makeTracer("entrypoint");
-    Context ctx(tracer);
+    platform::trace::Context ctx(tracer);
     co_await app_->run(ctx);
     platform::trace::logStackTrace(std::move(tracer));
 }

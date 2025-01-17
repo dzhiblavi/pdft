@@ -5,6 +5,8 @@
 
 #include "pdft/utils/lru_cache.h"
 
+#include "platform/core/rc.h"
+
 namespace pdft::tui {
 
 class KittyDisplayBase : public Display {
@@ -18,15 +20,15 @@ class KittyDisplayBase : public Display {
     KittyDisplayBase(Config config, platform::Arc<APCExecutor> executor);
 
     void loadCompressedImage(
-        Context& ctx,
+        platform::trace::Context& ctx,
         ImageId id,
         image::ImageSize size,
         std::string_view compressed_data,
         io::OutBuffer& buffer) override;
 
-    void clear(Context& ctx, io::OutBuffer& buffer) override;
-    void unload(Context& ctx, ImageId id, io::OutBuffer& buffer) override;
-    void unloadAll(Context& ctx, io::OutBuffer& buffer) override;
+    void clear(platform::trace::Context& ctx, io::OutBuffer& buffer) override;
+    void unload(platform::trace::Context& ctx, ImageId id, io::OutBuffer& buffer) override;
+    void unloadAll(platform::trace::Context& ctx, io::OutBuffer& buffer) override;
     bool isLoaded(ImageId id) const override;
 
  protected:

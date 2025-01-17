@@ -5,8 +5,8 @@
 #include "pdft/tui/elements.h"
 #include "pdft/tui/screen.h"
 
-#include "pdft/core/context.h"
 #include "platform/core/async.h"
+#include "platform/trace/context.h"
 
 namespace pdft::app {
 
@@ -14,10 +14,10 @@ class DocumentView {
  public:
     virtual ~DocumentView() = default;
 
-    virtual tui::Element getLayout(Context& ctx, const DocumentModel& doc) = 0;
+    virtual tui::Element getLayout(platform::trace::Context& ctx, const DocumentModel& doc) = 0;
 
     virtual platform::Async<void> render(
-        Context& ctx,
+        platform::trace::Context& ctx,
         const DocumentModel& doc,
         const DisplayProperties& properties,
         tui::Screen& screen) const = 0;
