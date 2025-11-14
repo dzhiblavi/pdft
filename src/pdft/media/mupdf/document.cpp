@@ -50,7 +50,10 @@ const std::filesystem::path& MupdfDocument::getPath() const {
 platform::Result<MupdfDocument> MupdfDocument::open(const std::filesystem::path& path) {
     auto ctx = thisThreadMupdfContext().native();
     auto doc = tryFz(ctx, [&] { return fz_open_document(ctx, path.c_str()); });
-    platform::verify(doc, "failed to open document by path {}", path);
+
+    if (!doc) {
+        return result::makeError(std::format("failed to open document by path {}", path.c_str()));
+    }
     return MupdfDocument(path, *doc);
 }
 

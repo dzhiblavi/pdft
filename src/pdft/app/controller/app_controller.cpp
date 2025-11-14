@@ -229,17 +229,20 @@ platform::Status AppController::reloadCurrentDocument() {
 platform::Status AppController::reloadDocument(DocumentId old_id, std::filesystem::path path) {
     using namespace result;
 
+    auto document = co_await (doc_loader_->load(path) | mapErr([&](auto error) {
+                                  log::warn("failed to load document by path {}: {}", path, error);
+                                  return error;
+                              }));
+
+    auto page_count = document->getPageCount();
+    if (page_count == 0) {
+        log::warn("reopened document is empty, path: {}", path);
+        co_return unit;
+    }
+
     platform::verify(documents_->removeDocument(old_id));
     log::debug("controller: removed document with id={}", old_id);
 
-    auto document =
-        co_await (doc_loader_->load(path) | mapErr([&](auto error) {
-                      log::warn("failed to reload document by path {}: {}", path, error);
-                      ui_->removeDocument(old_id);
-                      return error;
-                  }));
-
-    auto page_count = document->getPageCount();
     auto new_id = documents_->addDocument(document);
     ui_->onDocumentChanged(old_id, new_id, page_count);
 
